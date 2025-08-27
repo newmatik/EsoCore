@@ -44,3 +44,11 @@ Deep links to `/docs/<slug>` work via `404.html` redirects in the root and `/doc
 ## Open source
 
 Website source: https://github.com/newmatik/edgesentinel-web
+
+## Protocols
+
+The hardware requirements and BOM include options for industrial fieldbus protocols:
+
+- Modbus RTU (RS‑485, isolated) and Modbus TCP (Ethernet)
+- PROFIBUS DP (DB‑9, switchable termination)
+- PROFINET Device (over Ethernet)

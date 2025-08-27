@@ -15,7 +15,14 @@ This document defines the hardware specifications, component requirements, and c
 ### Connectivity
 
 - **Ethernet (recommended)** with optional PoE (802.3af), or
-- **2.4 GHz Wi‑Fi** using an industrial module with a maintained TLS stack
+- **2.4 GHz Wi‑Fi** using a certified industrial module from a reputable vendor (e.g., u‑blox NINA series) with maintained TLS stack and regulatory approvals
+
+### Industrial Fieldbus Support
+
+- **Modbus RTU (RS‑485 half‑duplex)**: isolated transceiver, A/B/GND terminal block, on‑board termination (120 Ω) enable via DIP switch
+- **Modbus TCP**: supported over the existing Ethernet interface
+- **PROFIBUS DP**: isolated RS‑485 PHY compatible with PROFIBUS levels, DB‑9 male connector with shield, termination enable via DIP
+- **PROFINET Device (single‑port)**: supported over Ethernet with RJ45 MagJack and PHY; optional 2‑port switch can be provisioned via expansion header in future revisions
 
 ### Power System
 
@@ -56,10 +63,20 @@ This document defines the hardware specifications, component requirements, and c
 - **Digital inputs**: 2–4 additional optocoupled inputs
 - **Analog inputs**: 1–2 analog inputs (4–20 mA/0–10 V)
 - **Relay output**: 1 relay output for service indicators (optional)
+- **Addressing & Termination**: 8‑position DIP switch for node addressing/config and bus termination control (Modbus/PROFIBUS)
 
 ### Timing & Clock
 
 - **RTC**: 32.768 kHz RTC crystal + supercap; NTP over network
+
+---
+
+## User Interface (on-device)
+
+- **OLED Status Display**: 0.96" 128×64 monochrome OLED (I²C, 3.3 V) mounted on board for debugging, provisioning info, and basic menu UI
+- **Menu Buttons**: 3 × SMD tactile buttons placed below the display (Up/Down/Enter) for simple navigation; two additional buttons reserved for Reset/Boot already specified
+- **Electrical**: I²C pulled‑up to 3.3 V; debounce in firmware; ESD protection on button lines via existing arrays
+- **Mechanical**: Keepout and bezel height to ensure readability in enclosure; optional standoffs for display support
 
 ---
 
@@ -74,7 +91,8 @@ This document defines the hardware specifications, component requirements, and c
 ### Connectivity Options
 
 - **Ethernet (recommended)** with optional PoE (802.3af), or
-- **2.4 GHz Wi‑Fi** (industrial module with maintained TLS stack)
+- **2.4 GHz Wi‑Fi** via certified industrial module (u‑blox NINA‑W1/W10x or similar) with proven security maintenance
+- **Fieldbus**: RS‑485 isolated transceiver (Modbus RTU), PROFIBUS‑compatible RS‑485 PHY with DB‑9; Modbus TCP/PROFINET over Ethernet
 
 ### Detailed Sensor Specifications
 

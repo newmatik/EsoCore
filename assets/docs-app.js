@@ -15,6 +15,8 @@
     'development-timeline-budget.md',   // Development Timeline & Budget
     'business-model-and-partnerships.md', // Business Model & Partnerships
     'competitor-analysis.md',           // Competitor Analysis
+    'fieldbus.md',                      // Industrial Fieldbus Protocols
+    'bom.md',                           // Bill of Materials
     'license.md',                       // License
   ];
 
@@ -113,6 +115,7 @@
       const html = marked.parse(md);
       contentEl.innerHTML = html;
       wireInternalLinks();
+      await initWidgets();
       const pageTitle = await getTitle(path);
       document.title = pageTitle + ' – EdgeSentinel Docs';
       buildSectionMenu(slug);
@@ -155,6 +158,30 @@
           navigateTo(slug, anchor.replace('#',''));
         }
       });
+    });
+  }
+
+  async function initWidgets() {
+    // Load and render BOM table if present
+    const bomMount = contentEl.querySelector('#bom-table');
+    if (bomMount) {
+      if (!window.EdgeBOM) {
+        await loadScript('/assets/bom.js');
+      }
+      if (window.EdgeBOM && typeof window.EdgeBOM.renderBOM === 'function') {
+        window.EdgeBOM.renderBOM('bom-table','/docs/data/bom.csv');
+      }
+    }
+  }
+
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = src;
+      s.async = true;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error('Failed to load '+src));
+      document.head.appendChild(s);
     });
   }
 

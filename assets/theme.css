@@ -261,7 +261,7 @@ a:hover { color: var(--accent); }
   color: #cfd9e3;
 }
 .doc-content table { border-collapse: collapse; width: 100%; margin: 10px 0; }
-.doc-content th, .doc-content td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; }
+.doc-content th, .doc-content td { border: 1px solid var(--border); padding: 5px 6px; text-align: left; font-size: 14px; }
 .doc-content thead th { background: rgba(255,255,255,0.03); }
 
 @media (max-width: 960px) {
@@ -294,3 +294,14 @@ a:hover { color: var(--accent); }
 .gate-form input { width: 100%; padding: 10px 12px; border-radius: 10px; background: #0a121a; border: 1px solid var(--border); color: var(--text); }
 .gate-form input:focus { outline: none; border-color: rgba(0,220,130,.55); box-shadow: 0 0 0 3px rgba(0,220,130,.15); }
 .gate-msg { grid-column: span 2; color: var(--muted); min-height: 18px; }
+
+/* BOM widget */
+.bom-controls { display: flex; gap: 10px; margin-bottom: 8px; }
+.bom-controls input, .bom-controls select { padding: 8px 10px; border-radius: 8px; background: #0a121a; border: 1px solid var(--border); color: var(--text); font-size: 14px; }
+.bom-wrap { display: block; }
+.bom-table { width: 100%; }
+.bom-table th { cursor: pointer; }
+.bom-summary { border: 1px solid var(--border); border-radius: 12px; padding: 10px; background: rgba(255,255,255,0.02); margin-top: 12px; }
+.bom-summary .total { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; font-size: 16px; }
+.bom-summary .total .value { color: var(--accent); font-weight: 600; }
+.bom-summary .split .row { display: flex; justify-content: space-between; margin: 2px 0; color: var(--muted); font-size: 13px; }

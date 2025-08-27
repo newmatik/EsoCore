@@ -142,7 +142,7 @@ Detailed Specifications: See [Hardware Requirements](hardware-requirements.md) f
 
 ---
 
-## Firmware architecture (edge device)
+## Firmware architecture
 
 RTOS choices are flexible (e.g., FreeRTOS or Zephyr). The following task model maps well to STM32 but remains portable.
 
