@@ -33,7 +33,9 @@ EdgeSentinel differentiates itself in the industrial IoT market through cross-do
 - **Universal Compatibility**: Works with virtually all industrial machinery and manufacturing equipment
 - **Complete Data Visibility**: Comprehensive monitoring for mission-critical production environments
 
-### Target Applications
+---
+
+## Target Applications
 
 **Machining & Metal Working:**
 
