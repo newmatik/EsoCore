@@ -23,7 +23,6 @@
       <header class="header">
         <div class="container navbar">
           <a class="brand" href="${homeHref}">
-            <span class="brand-badge" aria-hidden="true"></span>
             <span>EdgeSentinel</span>
           </a>
           <nav class="nav" aria-label="Main Navigation">
@@ -96,9 +95,73 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => { inject(); gate(); });
+    document.addEventListener('DOMContentLoaded', () => { inject(); gate(); initTypewriter(); });
   } else {
     inject();
     gate();
+    initTypewriter();
   }
 })();
+
+// Typewriter rotation for hero subtext
+function initTypewriter(){
+  const el = document.getElementById('hero-typed');
+  if (!el) return;
+  const messages = [
+    'Open‑source. Apache 2.0 licensed.',
+    'Clean REST API access.',
+    'Industrial fieldbus: Modbus, PROFIBUS, PROFINET.',
+    'Edge intelligence with TinyML.',
+    'Robust hardware with RTC backup.',
+    'Reliable sync with idempotency.',
+    'Configurable sensing & I/O.',
+    'Built for EMC and safety.',
+    'Deploy anywhere: shopfloor to cloud.',
+    'Privacy‑first. Own your data.',
+    'Edge-first. Process where data is born.',
+    'Minimal. Low overhead, high signal.',
+    'Fully open-source. Transparent, auditable code.',
+    'Modern. Complete. Open.',
+    'One platform, multiple partners.'
+  ];
+  let pool = [];
+  let last = '';
+  let timer;
+  el.classList.add('typewriter');
+  function showNext(){
+    if (pool.length === 0) {
+      pool = shuffle(messages.filter(m => m !== last));
+    }
+    const text = pool.shift();
+    last = text;
+    typeText(text, 0);
+  }
+  function typeText(text, i){
+    el.textContent = text.slice(0, i) + '▌';
+    if (i < text.length){
+      setTimeout(() => typeText(text, i+1), 18);
+    } else {
+      // Blink cursor for remainder of 5s window
+      const endAt = Date.now() + 3000;
+      clearInterval(timer);
+      timer = setInterval(() => {
+        const cur = el.textContent.endsWith('▌');
+        el.textContent = text + (cur ? ' ' : '▌');
+        if (Date.now() > endAt){
+          clearInterval(timer);
+          showNext();
+        }
+      }, 420);
+    }
+  }
+  showNext();
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}

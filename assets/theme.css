@@ -107,6 +107,10 @@ a:hover { color: var(--accent); }
   color: var(--muted);
   font-size: clamp(16px, 1.6vw, 20px);
 }
+.typewriter {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  color: #cfeede;
+}
 
 .cta {
   display: flex;
