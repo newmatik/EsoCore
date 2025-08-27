@@ -288,7 +288,7 @@ EdgeSentinel is licensed under the **Apache License 2.0**. This means you can:
 - Fork the project and continue independently
 - Integrate into proprietary software/hardware
 
-See the [LICENSE](../LICENSE) file for complete terms and a detailed summary of what you can and cannot do.
+See the [License](license.md) page for complete terms and a detailed summary of what you can and cannot do.
 
 ---
 
