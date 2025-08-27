@@ -1,6 +1,18 @@
-# EdgeSentinel License
+# EdgeSentinel License and Contribution Terms
 
 EdgeSentinel uses the Apache 2.0 License, which gives you maximum freedom to use, modify, and distribute the platform while protecting both you and the original developers. You can build commercial products, fork the project, and develop proprietary customizations without sharing your modifications. The main requirements are proper attribution and not misusing project trademarks.
+
+---
+
+## Contribution Terms (Summary)
+
+- **Scope of Contributions**: "Contribution" means any code, documentation, designs, data, specifications, hardware schematics, PCB layouts, mechanical CAD, bill of materials (BOM), firmware, test artifacts, and other materials you provide to EdgeSentinel by any channel (source control, file transfer, email, tickets, or partner channels).
+- **Public contributors (CLA license grant)**: By submitting a Contribution, you agree to the EdgeSentinel Contributor License Agreement (CLA). You grant the project a worldwide, perpetual, irrevocable, royalty‑free license to use, reproduce, modify, publicly perform, publicly display, sublicense, and distribute your Contribution, including an appropriate patent license to exercise those rights.
+- **Partners and customers (assignment or exclusive license; default non‑proprietary rule)**: Partner/customer Contributions become part of the project and are not proprietary to the contributor. Partners must execute the PCA in `docs/partner-contribution-agreement.md`, under which (a) all right, title, and interest in Contributions are assigned to the project owner (Newmatik for EdgeSentinel) or, where assignment is not possible, (b) an exclusive, transferable, sublicensable, perpetual, irrevocable, royalty‑free license (including patent rights) is granted; and by default all submitted items are covered unless explicitly excluded in writing before submission.
+- **No royalties or fees**: Contributions are provided royalty‑free and free of any use restrictions other than those in the Apache 2.0 License and the applicable CLA/PCA.
+- **Patent non‑assert (partners)**: Partners agree not to assert patent claims against the Project or users based on use, modification, or distribution of Contributions, except for defensive counterclaims.
+- **Representations**: You represent that you have the necessary rights to make the Contribution and that it does not include third‑party material unless clearly identified with the applicable license, compatible with Apache 2.0.
+- **No compensation**: Contributions are voluntary and made without expectation of payment, unless a separate written agreement says otherwise.
 
 ---
 
