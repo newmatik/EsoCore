@@ -11,7 +11,7 @@ Any capable backend can fulfill these roles. The following concrete model assume
 ### Doctypes / Core Data Model (Frappe Reference)
 
 - **Device**: id, serial, model, keys, firmware, last_seen, site/customer, tags, status
-- **Door**: door_id, site/customer, type (industrial/residential), drive model
+- **Asset**: asset_id, site/customer, type (door/cnc/robot/etc.), make, model
 - **Telemetry Packet (ingest ledger)**: device_id, upload_id, checksum, status
 - **Timeseries (partitioned)**:
   - TelemetryPoint: ts, device_id, metric, value, unit, meta (JSON)
@@ -19,7 +19,7 @@ Any capable backend can fulfill these roles. The following concrete model assume
 - **System Events**:
   - SystemEvent: ts, device_id, event_type, severity, description, duration, resolved
   - EventLog: comprehensive audit trail with full context and metadata
-- **Door Events**: cycle_open, cycle_close, alerts (over‑torque, vibration)
+- **Asset Events**: cycle_open, cycle_close, alerts (over‑torque, vibration)
 - **Event Workflows**: automated response rules triggered by system events
 - **Notification Queue**: pending alerts with delivery status and retries
 - **Config Profile**: sampling rates, window sizes, thresholds per device type
@@ -136,7 +136,7 @@ System Event → Event Parser → Severity Classification → Workflow Trigger �
 | `power_outage` | Severity = critical | Immediate SMS + email, create maintenance ticket |
 | `safe_shutdown_initiated` | Any occurrence | Critical alert + incident creation, prepare site visit |
 | `supercap_low` | Voltage < 80% rated | Maintenance alert, check backup power system |
-| `safety_edge_triggered` | Frequency > threshold | Safety audit alert, check door alignment |
+| `safety_edge_triggered` | Frequency > threshold | Safety audit alert, check alignment |
 | `emergency_stop_activated` | Any activation | Immediate safety team notification + incident log |
 | `light_curtain_breach` | Unexpected breach | Security alert if outside operating hours |
 | `server_unreachable` | Retry count > 5 | Notify IT team, check server status |
@@ -169,7 +169,7 @@ System Event → Event Parser → Severity Classification → Workflow Trigger �
 
 - Live status (online/offline), last sync, SD health, firmware version
 - Trends: ambient/stator temperature, RH, torque/current, vibration RMS/bandpower, acoustics level/features
-- Door cycle counters & daily/weekly histograms
+- Asset cycle counters & daily/weekly histograms
 
 ### Alerting System
 

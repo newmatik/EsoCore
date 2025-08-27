@@ -6,18 +6,19 @@
 
   // Manifest of markdown files (relative to /docs)
   const docs = [
-    'README.md',                         // Introduction
-    'hardware-requirements.md',         // Hardware Requirements
-    'edge-intelligence.md',             // Edge Intelligence
-    'data-format-specification.md',     // Data Format Specification
-    'api-specification.md',             // API Specification
-    'testing-procedures.md',            // Testing & Validation
-    'development-timeline-budget.md',   // Development Timeline & Budget
+    'README.md',                          // Introduction
+    'hardware-requirements.md',           // Hardware Requirements
+    'edge-intelligence.md',               // Edge Intelligence
+    'data-format-specification.md',       // Data Format Specification
+    'api-specification.md',               // API Specification
+    'testing-procedures.md',              // Testing & Validation
+    'development-environment.md',         // Development Environment
+    'development-timeline-budget.md',     // Development Timeline & Budget
     'business-model-and-partnerships.md', // Business Model & Partnerships
-    'competitor-analysis.md',           // Competitor Analysis
-    'fieldbus.md',                      // Industrial Fieldbus Protocols
-    'bom.md',                           // Bill of Materials
-    'license.md',                       // License
+    'competitor-analysis.md',             // Competitor Analysis
+    'fieldbus.md',                        // Industrial Fieldbus Protocols
+    'bom.md',                             // Bill of Materials
+    'license.md',                         // License
   ];
 
   const slugs = docs.map(name => name.replace(/\.md$/,''));
@@ -35,6 +36,7 @@
     'development-timeline-budget': '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
     'business-model-and-partnerships': '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2H10a2 2 0 0 0-2 2v2"/></svg>',
     'competitor-analysis': '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="9" width="3" height="9"/><rect x="17" y="5" width="3" height="13"/></svg>',
+    'development-environment': '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 9l-3 3 3 3"/><path d="M13 15h5"/></svg>',
     'license': '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16l4-2 4 2 4-2 4 2V9z"/></svg>'
   };
 
@@ -70,7 +72,7 @@
       if (m) title = m[1].trim();
     } catch (_) {}
     // Strip product name prefix in menu
-    title = title.replace(/^\s*(EdgeSentinel|DoorMetrics)\s+/i, '').trim();
+    title = title.replace(/^\s*EdgeSentinel\s+/i, '').trim();
     titlesCache.set(path, title);
     return title;
   }
@@ -171,7 +173,7 @@
       }
       // Insert a structured System Cost section near the top (after the H1 if present)
       const systemNames = {
-        'bom-main': 'Main Edge Device PCB',
+        'bom-main': 'Main Edge Device',
         'bom-vibration': 'Vibration Sensor Module',
         'bom-acoustic': 'Acoustic Sensor Module',
         'bom-current': 'Current Sensor Module',
@@ -365,8 +367,20 @@
   function renderResults(items, q) {
     searchResults.hidden = items.length === 0;
     searchResults.innerHTML = items.map(i => (
-      `<a class="result" href="#/${i.slug}"><strong>${i.title}</strong><br><small>${highlight(i.snippet, q)}</small></a>`
+      `<a class="result" href="/docs/${i.slug}"><strong>${i.title}</strong><br><small>${highlight(i.snippet, q)}</small></a>`
     )).join('');
+    // Wire results to internal router
+    Array.from(searchResults.querySelectorAll('a.result')).forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        try {
+          const href = a.getAttribute('href') || '';
+          const slug = href.split('/').filter(Boolean).pop();
+          if (slug) navigateTo(slug);
+          searchResults.hidden = true;
+        } catch (_) {}
+      });
+    });
   }
 
   function navigateTo(slug, anchor) {

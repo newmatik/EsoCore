@@ -10,7 +10,7 @@ The EdgeSentinel system consists of a **main edge device** (installed in control
 
 ---
 
-## Main Edge Device PCB
+## Main Edge Device
 
 Control cabinet mounted unit with processing, connectivity, and I/O. Houses the STM32H743 MCU, fieldbus interfaces, PoE support, and safety systems.
 

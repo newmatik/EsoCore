@@ -40,7 +40,7 @@ Each sensor reading contains:
   "ts": "2025-01-15T14:30:22.123Z",    // Timestamp (UTC)
   "device_id": "DEVICE001",             // Unique device identifier  
   "site_id": "WAREHOUSE_A",             // Installation location
-  "door_id": "DOCK_DOOR_3",             // Specific door
+  "asset_id": "ASSET_3",                // Specific asset/machine
   "series": "temp_ambient",             // Data type (sensor data or system event)
   "val": 23.5,                          // Measurement value (null for events)
   "unit": "°C",                         // Unit of measurement
@@ -63,7 +63,7 @@ In addition to sensor data, the system captures operational events:
   "ts": "2025-01-15T14:35:10.456Z",
   "device_id": "DEVICE001", 
   "site_id": "WAREHOUSE_A",
-  "door_id": "DOCK_DOOR_3",
+  "asset_id": "ASSET_3",
   "series": "connectivity_lost",
   "val": null,
   "unit": null,
@@ -84,7 +84,7 @@ In addition to sensor data, the system captures operational events:
   "ts": "2025-01-15T09:22:33.123Z", 
   "device_id": "DEVICE001",
   "site_id": "WAREHOUSE_A", 
-  "door_id": "DOCK_DOOR_3",
+  "asset_id": "ASSET_3",
   "series": "power_outage",
   "val": null,
   "unit": null,
@@ -106,16 +106,16 @@ In addition to sensor data, the system captures operational events:
   "ts": "2025-01-15T11:45:22.789Z",
   "device_id": "DEVICE001",
   "site_id": "WAREHOUSE_A",
-  "door_id": "DOCK_DOOR_3", 
+  "asset_id": "ASSET_3", 
   "series": "safety_edge_triggered",
   "val": null,
   "unit": null,
   "meta": {
     "event_type": "safety",
     "severity": "warning",
-    "description": "Safety edge contact detected during door closing",
+    "description": "Safety edge contact detected during operation",
     "input_channel": "SAFETY_IN_1",
-    "door_position": "75_percent_closed",
+    "asset_position": "75_percent_complete",
     "response_time_ms": 8
   }
 }
@@ -128,7 +128,7 @@ In addition to sensor data, the system captures operational events:
   "ts": "2025-01-15T09:22:35.456Z",
   "device_id": "DEVICE001", 
   "site_id": "WAREHOUSE_A",
-  "door_id": "DOCK_DOOR_3",
+  "asset_id": "ASSET_3",
   "series": "safe_shutdown_initiated",
   "val": null,
   "unit": null,
@@ -168,7 +168,7 @@ In addition to sensor data, the system captures operational events:
 - `safety_edge_triggered` - Safety edge contact detected
 - `emergency_stop_activated` - Emergency stop button pressed
 - `light_curtain_breach` - Light curtain interrupted
-- `door_obstruction` - Door movement obstructed
+- `asset_obstruction` - Movement obstructed
 - `safety_circuit_fault` - Safety circuit malfunction
 
 ### System Events
@@ -203,7 +203,7 @@ In addition to sensor data, the system captures operational events:
 
 - **Ambient**: temp_ambient (°C), RH (%), 1 Hz default; averaged to 1 min for cloud
 - **Drive stator temperature**: temp_stator (°C), 1 Hz default; per‑cycle min/avg/max for load indication
-- **Door cycles**: increment on open→closed transition; event objects carry `cycle_id` and durations
+- **Asset cycles**: increment on open→closed or start→stop transitions; event objects carry `cycle_id` and durations
 - **Torque proxy**: motor current RMS at 100–500 Hz; compute per‑cycle stats (avg/max)
 - **Vibration**: rolling RMS at 100–500 Hz; periodic 2–5 s high‑rate window (1–3 kHz) for spectral bands (e.g., bearing, imbalance)
 - **Acoustics**: rolling RMS and event detection; periodic windows in audible/ultrasound bands for spectral features; flag high‑amplitude events (e.g., spring break)

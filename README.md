@@ -15,11 +15,7 @@ Open `http://localhost:3000/` (docs at `/docs`).
 
 ## Temporary access protection
 
-The site is temporarily protected with a simple client-side access code prompt. Use this code to unlock a session:
-
-- Access code: `55619`
-
-The unlock persists for the browser tab (sessionStorage) and is intended only to keep previews private while we iterate.
+The site can be temporarily protected with a simple client-side access code prompt for preview deployments. To enable or change this during development, edit `assets/site.js` (`ACCESS_CODE`). The unlock persists for the browser tab (`sessionStorage`) and is intended only to keep previews private while iterating. Remove or disable before production.
 
 ## Deployment (GitHub Pages)
 
@@ -43,7 +39,7 @@ Deep links to `/docs/<slug>` work via `404.html` redirects in the root and `/doc
 
 ## Open source
 
-Website source: https://github.com/newmatik/edgesentinel-web
+Website source: [github.com/newmatik/edgesentinel-web](https://github.com/newmatik/edgesentinel-web)
 
 ## Protocols
 

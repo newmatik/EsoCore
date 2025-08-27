@@ -18,7 +18,7 @@ This document defines the hardware specifications, component requirements, and c
   - IEEE 802.3af compliant Powered Device (PD) controller
   - Integrated isolation transformer with PoE capability
   - 12.95W maximum power draw within 802.3af limits
-  - Automatic detection and classification as Class 2 device
+  - Automatic detection and classification as Class 3 device
 - **2.4 GHz Wi‑Fi** using a certified industrial module from a reputable vendor (e.g., u‑blox NINA series) with maintained TLS stack and regulatory approvals
 
 ### Industrial Fieldbus Support
@@ -52,7 +52,7 @@ EdgeSentinel uses a **distributed sensor network** where each sensor module cont
 
 #### Integration Strategy
 
-- **Modular by design**: New sensor types (including partner‑specific or proprietary modules) can be introduced without any changes to the main edge device PCB or firmware architecture. The RS‑485 protocol layer abstracts capabilities, so the platform scales by adding sensor modules rather than redesigning hardware.
+- **Modular by design**: New sensor types (including partner‑specific or proprietary modules) can be introduced without any changes to the main edge device or firmware architecture. The RS‑485 protocol layer abstracts capabilities, so the platform scales by adding sensor modules rather than redesigning hardware.
 - **Hot‑plug and discovery**: Auto‑enumeration assigns addresses and registers sensor capabilities at runtime, enabling field upgrades and customer‑specific configurations.
 
 ### Sensor Bus Protocol Selection
@@ -92,7 +92,7 @@ EdgeSentinel uses a **distributed sensor network** where each sensor module cont
 - **RS-485 Transceiver**: SN65HVD72 half-duplex transceiver with fail-safe biasing
 - **Bus Power**: TPS54331 12V @ 2A switching supply with current limiting and short-circuit protection
 - **Termination**: 120Ω termination resistors at bus endpoints with 560Ω bias resistors
-- **Main Device Connectors**: 
+- **Main Device Connectors**:
   - Primary sensor bus port (4-pin terminal block) for backbone connection
   - Secondary sensor bus port for daisy-chain or redundant connections
   - Dedicated terminal blocks for Safety I/O (8-pin input, 6-pin output)
@@ -157,25 +157,26 @@ EdgeSentinel uses a **distributed sensor network** where each sensor module cont
 #### Sensor Module Architecture
 
 Each sensor module contains:
+
 - **Sensor MCU**: STM32G031 (ARM Cortex-M0+) for local processing and bus communication
 - **Local Processing**: Real-time filtering, calibration, and feature extraction  
 - **Bus Interface**: RS-485 transceiver with protocol stack
 - **Power Management**: Local regulation from +12V bus power
 - **Status Indication**: LED for operational status and diagnostics
 
-#### Environmental Monitoring Modules
+#### Environmental Monitoring Modules (Reference Implementation)
 
 - **Ambient Temp/RH**: SHT41 sensor with MCU providing calibrated readings and dew point calculation
 - **Stator Temperature**: High-precision NTC with 16-bit ADC and linearization in MCU
 - **Process Temperature**: PT100/PT1000 with precision instrumentation amplifier and cold junction compensation
 
-#### Mechanical Monitoring Modules
+#### Mechanical Monitoring Modules (Reference Implementation)
 
 - **Vibration**: ADXL355 with MCU performing FFT analysis, RMS calculation, and anomaly detection
 - **Acoustic**: Wide-band MEMS microphone with MCU doing frequency analysis and event detection  
 - **Position/Cycle**: Quadrature encoder interface with position tracking and cycle counting
 
-#### Electrical Monitoring Modules
+#### Electrical Monitoring Modules (Reference Implementation)
 
 - **Current**: Isolated Hall sensor with MCU calculating RMS, power factor, and harmonic content
 - **Voltage**: Isolated sensing with MCU performing waveform analysis and power quality monitoring
@@ -186,7 +187,7 @@ Each sensor module contains:
 - **Optocoupled inputs** with 24V compatibility and built-in diagnostics
 - **Safety relay outputs** for door control interlocking and fault indication
 
-### General I/O
+### General I/O (Reference Implementation)
 
 - **2–4 additional digital inputs** (optocoupled)
 - **1–2 analog inputs** (4–20 mA/0–10 V)
@@ -232,8 +233,8 @@ Each sensor module contains:
   - Reverse polarity protection, surge protection, EMI filtering
   - 3A maximum current draw at 12V
 - **Power over Ethernet (PoE)**: IEEE 802.3af compliant
-  - Automatic detection and classification as Class 2 device (3.84-6.49W)
-  - Maximum power consumption: 12.95W at 37-57V input
+  - Automatic detection and classification as Class 3 device (6.49–12.95W)
+  - Maximum power consumption: 12.95W at 37–57V input
   - Isolation transformer with PoE signature resistor (25.5kΩ)
   - Integrated switching controller with current limiting
 

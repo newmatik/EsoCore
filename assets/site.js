@@ -64,6 +64,8 @@
 
   function gate() {
     if (isUnlocked()) return;
+    const path = location.pathname.replace(/\/index.html$/, '');
+    if (path === '/imprint.html' || path === '/imprint') return;
     const overlay = el(`
       <div class="gate" role="dialog" aria-modal="true" aria-label="Access Required">
         <div class="gate-card">
