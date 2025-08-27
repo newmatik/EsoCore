@@ -110,6 +110,12 @@ For these demanding applications, EdgeSentinel provides the complete operational
 - **Industrial microSD**: Provides local resilience for 30+ days of offline operation
 - **TLS over REST**: Simple, firewall-friendly protocol with strong security
 
+### Modular RS‑485 Sensor Architecture
+
+- **Distributed sensor bus (RS‑485)**: Sensor modules with local MCUs connect over an industrial RS‑485 multi‑drop bus, enabling plug‑and‑play expansion.
+- **No edge redesign**: New sensor types can be added—customer‑specific, proprietary, or exclusive—without changing the edge device or platform architecture.
+- **Scalable and robust**: Digital, noise‑immune wiring up to 100 m with auto‑discovery and hot‑plug support. See detailed specs in [Hardware Requirements](hardware-requirements.md).
+
 ---
 
 ## Hardware Overview

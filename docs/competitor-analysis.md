@@ -185,6 +185,12 @@ The CNC monitoring market is mature with established players offering different 
 - **Value**: Partners provide market validation
 - **Strategy**: Faster market entry with proven use cases
 
+#### 6. **Modular RS‑485 Sensor Bus**
+
+- **Advantage**: Add new sensor types (including proprietary partner modules) without redesigning the edge device
+- **Value**: Faster time‑to‑market for customer‑specific requirements and exclusive sensors
+- **Differentiation**: Many competitors tie capabilities to fixed hardware kits or OEM controllers; our RS‑485 multi‑drop bus enables plug‑and‑play expansion
+
 ### Competitive Advantages by Market
 
 #### Industrial Doors Market

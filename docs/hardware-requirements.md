@@ -14,7 +14,11 @@ This document defines the hardware specifications, component requirements, and c
 
 ### Connectivity
 
-- **Ethernet (recommended)** with optional PoE (802.3af), or
+- **Ethernet (recommended)** with Power over Ethernet (PoE) support:
+  - IEEE 802.3af compliant Powered Device (PD) controller
+  - Integrated isolation transformer with PoE capability
+  - 12.95W maximum power draw within 802.3af limits
+  - Automatic detection and classification as Class 2 device
 - **2.4 GHz Wi‑Fi** using a certified industrial module from a reputable vendor (e.g., u‑blox NINA series) with maintained TLS stack and regulatory approvals
 
 ### Industrial Fieldbus Support
@@ -26,31 +30,81 @@ This document defines the hardware specifications, component requirements, and c
 
 ### Power System
 
-- **Input**: 12–24 V DC input compatible with door control cabinets, including reverse‑polarity and surge protection; PoE option if chosen
+- **Primary Input Options**:
+  - **12–24 V DC**: Terminal block input compatible with door control cabinets, including reverse‑polarity and surge protection
+  - **Power over Ethernet (PoE)**: IEEE 802.3af compliant (up to 12.95W) with automatic detection and switching
+- **Power Management**: Automatic source selection between DC input and PoE with priority given to DC input when both available
 - **Backup**: Supercapacitor bank for safe shutdown during power loss (≥30 seconds runtime)
 
 ---
 
 ## Sensing & I/O Requirements
 
-### Environmental Sensors
+### Digital Sensor Bus Architecture
 
-- **Ambient Temp/RH**: digital, factory‑calibrated I²C sensor
-- **Drive stator temperature**: contact or embedded NTC/PT100/PT1000 or digital sensor on stator/end‑winding
+EdgeSentinel uses a **distributed sensor network** where each sensor module contains its own MCU for local processing and standardized digital communication. This architecture provides:
 
-### Mechanical Sensors
+- **Scalability**: Connect multiple sensors of the same type (e.g., 3 temperature, 2 vibration sensors)
+- **Flexibility**: Add/remove sensors based on specific machine requirements  
+- **Noise Immunity**: Digital signals over industrial RS-485 bus
+- **Local Intelligence**: Each sensor performs conditioning, filtering, and preprocessing
+- **Simplified Wiring**: Single 4-wire bus supports all sensor modules
 
-- **Door cycles**:
-  - Count rising edges from limit switches/reed sensors, or
-  - Quadrature encoder on drive shaft for high‑fidelity cycle/position (optional)
-- **Vibration**: 3‑axis accelerometer mounted on motor/gearbox; support ≥1–3 kHz ODR for diagnostic windows
-- **Acoustics**: MEMS microphone(s) with bandwidth into ultrasound range (≥40–80 kHz optional) to capture operational quality and catastrophic events
+#### Integration Strategy
 
-### Motor Monitoring
+- **Modular by design**: New sensor types (including partner‑specific or proprietary modules) can be introduced without any changes to the main edge device PCB or firmware architecture. The RS‑485 protocol layer abstracts capabilities, so the platform scales by adding sensor modules rather than redesigning hardware.
+- **Hot‑plug and discovery**: Auto‑enumeration assigns addresses and registers sensor capabilities at runtime, enabling field upgrades and customer‑specific configurations.
 
-- **Torque**:
-  - Start with motor current proxy via isolated Hall current sensor on motor phase/DC bus; calibrate to torque
-  - Allow drop‑in direct torque/strain sensor later for higher accuracy
+### Sensor Bus Protocol Selection
+
+- **Physical Layer**: RS-485 differential signaling over shielded twisted pair (Belden 3105A or equivalent)
+- **Cable**: 4-conductor (Power+, Power-, Data+, Data-) with drain wire for shield grounding
+- **Distance**: Up to 100 meters from main edge device to sensors with automatic repeaters
+- **Speed**: 115.2 kbps for real-time data with deterministic latency (<10ms)
+- **Topology**: Multi-drop bus with daisy-chain or star configurations
+- **Addressing**: 8-bit addresses (supports 254 sensor modules per bus) configured via DIP switches
+- **Power Distribution**: +12V @ 2A total bus power with individual module draw limits
+- **Termination**: 120Ω resistors at bus endpoints with bias resistors for idle state
+- **Error Detection**: CRC16 checksums and automatic retry mechanism
+- **Discovery Protocol**: Automatic enumeration with sensor type identification and capability reporting
+
+### Sensor Module Types
+
+#### Environmental Monitoring Modules
+
+- **Ambient Temp/RH Module**: SHT41 sensor with STM32G031 MCU for cabinet monitoring
+- **Stator Temperature Module**: High-precision NTC with conditioning MCU for drive thermal monitoring
+- **Process Temperature Module**: PT100/PT1000 with precision ADC for industrial process monitoring
+
+#### Mechanical Monitoring Modules  
+
+- **Vibration Module**: ADXL355 3-axis accelerometer with DSP-capable MCU for FFT analysis and anomaly detection
+- **Acoustic Module**: Wide-band MEMS microphone with signal processing MCU for sound signature analysis
+- **Position/Cycle Module**: Quadrature encoder or limit switch interface with cycle counting and position tracking
+
+#### Electrical Monitoring Modules
+
+- **Current Monitoring Module**: Isolated Hall sensor with MCU for torque/load calculation and power analysis
+- **Voltage Monitoring Module**: Isolated voltage sensing with harmonic analysis capability
+
+### Digital Sensor Bus Interface
+
+- **RS-485 Transceiver**: SN65HVD72 half-duplex transceiver with fail-safe biasing
+- **Bus Power**: TPS54331 12V @ 2A switching supply with current limiting and short-circuit protection
+- **Termination**: 120Ω termination resistors at bus endpoints with 560Ω bias resistors
+- **Main Device Connectors**: 
+  - Primary sensor bus port (4-pin terminal block) for backbone connection
+  - Secondary sensor bus port for daisy-chain or redundant connections
+  - Dedicated terminal blocks for Safety I/O (8-pin input, 6-pin output)
+  - General I/O terminal block (12-pin) for analog/digital signals
+  - Fieldbus terminal block (6-pin) for Modbus RTU/PROFIBUS
+- **Sensor Module Connectors**: 4-pin screw terminal blocks (5.08mm pitch) with PG9 cable glands for field serviceability
+- **Distribution Strategy**: IP54/IP67 junction boxes with screw terminal strips for sensor bus fan-out
+- **Cable System**: Standard 4-conductor shielded RS-485 cable (Belden 3105A) cut to length with field-installed terminals
+- **Discovery Protocol**: Broadcast enumeration with collision detection and automatic address assignment
+- **Hot-Plug Support**: Sensors can be added/removed during operation with automatic re-discovery
+- **Isolation**: Bus interface isolated from main MCU for noise immunity and safety
+- **Status Monitoring**: Bus voltage and current monitoring with fault detection and reporting
 
 ### Safety I/O
 
@@ -60,8 +114,8 @@ This document defines the hardware specifications, component requirements, and c
 
 ### General I/O
 
-- **Digital inputs**: 2–4 additional optocoupled inputs
-- **Analog inputs**: 1–2 analog inputs (4–20 mA/0–10 V)
+- **Digital inputs**: 2–4 additional optocoupled inputs for discrete signals
+- **Analog inputs**: 1–2 analog inputs (4–20 mA/0–10 V) for legacy process signals
 - **Relay output**: 1 relay output for service indicators (optional)
 - **Addressing & Termination**: 8‑position DIP switch for node addressing/config and bus termination control (Modbus/PROFIBUS)
 
@@ -90,30 +144,41 @@ This document defines the hardware specifications, component requirements, and c
 
 ### Connectivity Options
 
-- **Ethernet (recommended)** with optional PoE (802.3af), or
+- **Ethernet (recommended)** with Power over Ethernet (PoE) support:
+  - 10/100 Mbps Ethernet PHY
+  - IEEE 802.3af compliant PoE Powered Device (PD) controller
+  - RJ45 MagJack connector with integrated isolation transformer
+  - Automatic power source detection and management
 - **2.4 GHz Wi‑Fi** via certified industrial module (u‑blox NINA‑W1/W10x or similar) with proven security maintenance
 - **Fieldbus**: RS‑485 isolated transceiver (Modbus RTU), PROFIBUS‑compatible RS‑485 PHY with DB‑9; Modbus TCP/PROFINET over Ethernet
 
 ### Detailed Sensor Specifications
 
-#### Environmental Monitoring
+#### Sensor Module Architecture
 
-- **Ambient Temp/RH**: digital sensor (e.g., SHT3x/4x). I²C, factory‑calibrated
-- **Drive stator temperature**: NTC/PT100/PT1000 or digital temperature sensor bonded to stator; ADC or I²C/SPI
+Each sensor module contains:
+- **Sensor MCU**: STM32G031 (ARM Cortex-M0+) for local processing and bus communication
+- **Local Processing**: Real-time filtering, calibration, and feature extraction  
+- **Bus Interface**: RS-485 transceiver with protocol stack
+- **Power Management**: Local regulation from +12V bus power
+- **Status Indication**: LED for operational status and diagnostics
 
-#### Mechanical Monitoring
+#### Environmental Monitoring Modules
 
-- **Door cycles**:
-  - Count rising edges from limit switches/reed sensors, or
-  - Read quadrature encoder on the drive shaft for high‑fidelity cycle + position (optional)
-- **Vibration**: 3‑axis accelerometer (e.g., ADXL345/ADXL355/ICM‑42688). Mount on motor/gearbox housing; support ≥1–3 kHz ODR for diagnostic windows
-- **Acoustics**: wide‑band MEMS microphone (optionally up to 80 kHz) for audible/ultrasound; capture high‑amplitude events (e.g., spring break)
+- **Ambient Temp/RH**: SHT41 sensor with MCU providing calibrated readings and dew point calculation
+- **Stator Temperature**: High-precision NTC with 16-bit ADC and linearization in MCU
+- **Process Temperature**: PT100/PT1000 with precision instrumentation amplifier and cold junction compensation
 
-#### Motor Monitoring
+#### Mechanical Monitoring Modules
 
-- **Torque (two options)**:
-  - Proxy via motor current: isolated Hall current sensor on motor phase/DC bus; calibrate against known torque vs. current curve
-  - Direct strain or inline torque sensor (higher BOM, better accuracy). Start with current proxy; allow future drop‑in of direct sensor
+- **Vibration**: ADXL355 with MCU performing FFT analysis, RMS calculation, and anomaly detection
+- **Acoustic**: Wide-band MEMS microphone with MCU doing frequency analysis and event detection  
+- **Position/Cycle**: Quadrature encoder interface with position tracking and cycle counting
+
+#### Electrical Monitoring Modules
+
+- **Current**: Isolated Hall sensor with MCU calculating RMS, power factor, and harmonic content
+- **Voltage**: Isolated sensing with MCU performing waveform analysis and power quality monitoring
 
 ### Safety I/O (EN ISO 13849 compliant)
 
@@ -163,9 +228,14 @@ This document defines the hardware specifications, component requirements, and c
 
 ### Power Input
 
-- **Voltage range**: 12–24V DC nominal
-- **Protection**: Reverse polarity protection, surge protection, EMI filtering
-- **PoE option**: 802.3af compatibility where Ethernet is used
+- **DC Input**: 12–24V DC nominal via terminal block
+  - Reverse polarity protection, surge protection, EMI filtering
+  - 3A maximum current draw at 12V
+- **Power over Ethernet (PoE)**: IEEE 802.3af compliant
+  - Automatic detection and classification as Class 2 device (3.84-6.49W)
+  - Maximum power consumption: 12.95W at 37-57V input
+  - Isolation transformer with PoE signature resistor (25.5kΩ)
+  - Integrated switching controller with current limiting
 
 ### Backup Power System
 

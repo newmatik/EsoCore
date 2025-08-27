@@ -162,15 +162,99 @@
   }
 
   async function initWidgets() {
-    // Load and render BOM table if present
-    const bomMount = contentEl.querySelector('#bom-table');
-    if (bomMount) {
+    // Load BOM script if any BOM tables are present
+    const bomMounts = contentEl.querySelectorAll('[id^="bom-"]');
+    if (bomMounts.length > 0) {
       if (!window.EdgeBOM) {
         await loadScript('/assets/bom.js');
+        console.log('BOM script loaded, EdgeBOM available:', !!window.EdgeBOM);
       }
-      if (window.EdgeBOM && typeof window.EdgeBOM.renderBOM === 'function') {
-        window.EdgeBOM.renderBOM('bom-table','/docs/data/bom.csv');
+      // Insert a structured System Cost section near the top (after the H1 if present)
+      const systemNames = {
+        'bom-main': 'Main Edge Device PCB',
+        'bom-vibration': 'Vibration Sensor Module',
+        'bom-acoustic': 'Acoustic Sensor Module',
+        'bom-current': 'Current Sensor Module',
+        'bom-temperature': 'Temperature Sensor Module',
+        'bom-cables': 'Cables & Interconnects'
+      };
+      const displayOrder = ['bom-main','bom-vibration','bom-acoustic','bom-current','bom-temperature','bom-cables'];
+      let systemSection = document.getElementById('system-cost');
+      if (!systemSection) {
+        systemSection = document.createElement('section');
+        systemSection.id = 'system-cost';
+        const h2 = document.createElement('h2');
+        h2.textContent = 'System Cost';
+        const table = document.createElement('table');
+        table.className = 'bom-table';
+        table.innerHTML = `
+          <thead><tr><th>Board / Module</th><th>Total $ (filtered)</th></tr></thead>
+          <tbody></tbody>
+          <tfoot><tr><th>Total</th><th class="grand-total">$0.00</th></tr></tfoot>
+        `;
+        systemSection.appendChild(h2);
+        systemSection.appendChild(table);
+        // Place before the first H2 (so it comes after the intro text),
+        // fallback to right after H1 if no H2 exists yet.
+        const firstH2 = contentEl.querySelector('h2');
+        if (firstH2) {
+          firstH2.parentNode.insertBefore(systemSection, firstH2);
+        } else {
+          const h1 = contentEl.querySelector('h1');
+          if (h1 && h1.nextSibling) {
+            h1.parentNode.insertBefore(systemSection, h1.nextSibling);
+          } else {
+            contentEl.prepend(systemSection);
+          }
+        }
       }
+      const tableBody = systemSection.querySelector('tbody');
+      const grandEl = systemSection.querySelector('.grand-total');
+      const totals = {};
+      function updateSummary(){
+        // Ensure one row per known mount in display order
+        tableBody.innerHTML = '';
+        let grand = 0;
+        for (const id of displayOrder) {
+          if (!(id in systemNames)) continue;
+          const val = totals[id] || 0;
+          grand += val;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${systemNames[id]}</td><td>$${val.toFixed(2)}</td>`;
+          tableBody.appendChild(tr);
+        }
+        grandEl.textContent = `$${grand.toFixed(2)}`;
+      }
+      const onTotals = (e) => {
+        const { mountId, total } = e.detail || {};
+        if (!mountId) return;
+        totals[mountId] = total;
+        updateSummary();
+      };
+      window.addEventListener('EdgeBOM:totals', onTotals);
+      // Render BOM tables programmatically (scripts inside injected markdown don't execute)
+      const idToCsv = {
+        'bom-main': '/docs/data/bom-main.csv',
+        'bom-vibration': '/docs/data/bom-vibration-sensor.csv',
+        'bom-acoustic': '/docs/data/bom-acoustic-sensor.csv',
+        'bom-current': '/docs/data/bom-current-sensor.csv',
+        'bom-temperature': '/docs/data/bom-temperature-sensor.csv',
+        'bom-cables': '/docs/data/bom-cables.csv'
+      };
+      bomMounts.forEach(mount => {
+        const id = mount.id;
+        const csv = mount.getAttribute('data-csv') || idToCsv[id];
+        if (!csv) return;
+        try {
+          window.EdgeBOM.renderBOM(id, csv);
+        } catch (err) {
+          console.error('Failed to render BOM', id, err);
+          mount.innerHTML = '<p style="color: red;">Failed to load BOM.</p>';
+        }
+      });
+      // Clean up listener when navigating away
+      const disconnect = () => window.removeEventListener('EdgeBOM:totals', onTotals);
+      window.addEventListener('popstate', disconnect, { once: true });
     }
   }
 

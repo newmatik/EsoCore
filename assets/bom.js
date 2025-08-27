@@ -5,7 +5,26 @@
     try {
       const res = await fetch(csvPath + '?_=' + Date.now());
       const csv = await res.text();
-      const rows = csv.trim().split(/\r?\n/).map(r => r.split(','));
+      const rows = csv.trim().split(/\r?\n/).map(r => {
+        // Simple CSV parsing that handles commas in quoted fields
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let i = 0; i < r.length; i++) {
+          const char = r[i];
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            result.push(current.trim());
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        result.push(current.trim());
+        return result;
+      });
       const [header, ...raw] = rows;
 
       const keys = [
@@ -120,8 +139,12 @@
           .join('');
         summary.innerHTML = `
           <div class="total"><div>Total (filtered)</div><div class="value">$${total.toFixed(2)}</div></div>
-          <div class="split">${list}</div>
+          <details class="split"><summary>Category breakdown</summary>${list}</details>
         `;
+        // Notify listeners so the page can aggregate totals
+        try {
+          window.dispatchEvent(new CustomEvent('EdgeBOM:totals', { detail: { mountId, csvPath, total, breakdown: groupTotals } }));
+        } catch (_) {}
       }
 
       thead.addEventListener('click', (e) => {

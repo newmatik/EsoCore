@@ -45,6 +45,8 @@
             <a href="/docs/">Docs</a>
             &nbsp;•&nbsp;
             <a href="https://github.com/newmatik/edgesentinel-web" target="_blank" rel="noopener">Open Source</a>
+            &nbsp;•&nbsp;
+            <a href="/imprint.html">Imprint</a>
           </div>
         </div>
       </footer>

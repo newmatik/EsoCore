@@ -267,6 +267,15 @@ a:hover { color: var(--accent); }
 .doc-content table { border-collapse: collapse; width: 100%; margin: 10px 0; }
 .doc-content th, .doc-content td { border: 1px solid var(--border); padding: 5px 6px; text-align: left; font-size: 14px; }
 .doc-content thead th { background: rgba(255,255,255,0.03); }
+.doc-content .contact-info { 
+  background: rgba(255,255,255,0.02); 
+  border: 1px solid var(--border); 
+  border-radius: 4px; 
+  padding: 12px 16px; 
+  margin: 8px 0 16px; 
+  font-size: 14px; 
+  line-height: 1.5; 
+}
 
 @media (max-width: 960px) {
   .hero-grid { grid-template-columns: 1fr; }

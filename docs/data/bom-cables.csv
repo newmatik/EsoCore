@@ -1,0 +1,5 @@
+Category,Item,MPN,Supplier,Qty,Unit,Notes
+Cable,4-conductor shielded RS-485 cable 22AWG 25m,BELDEN-3105A-25M,Belden,1,28.50,Optional longer run; adjust as needed
+Connector,4-pin screw terminal strip (sensor end),MKKDS1/4-3.5,Phoenix Contact,2,1.20,For 2 sensor drops (example)
+Protection,Cable gland PG9 IP68,PG9-GLAND,Wiska,4,1.50,Typical glands for 2 cables in/out
+Installation,Heat shrink tubing assortment,HST-ASSORT,3M,1,8.90,Basic strain relief and insulation
