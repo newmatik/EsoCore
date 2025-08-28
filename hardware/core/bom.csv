@@ -56,5 +56,5 @@ IO,Op-amp for analog conditioning dual,OPA2182IDR,Texas Instruments,1,2.10,Legac
 IO,Precision resistor 249ohm 0.1% for 4-20mA,ERA-3AEB2490V,Panasonic,1,0.08,Current loop termination
 IO,Precision resistor 10kohm 0.1% for voltage,ERA-3AEB1002V,Panasonic,1,0.08,Voltage divider for 0-10V
 Protection,TVS diode array for sensor inputs,SP0503BAHT,Littelfuse,3,0.12,Sensor connector protection
-PCB,4-layer PCB FR4 1.6mm 35µm 100x160mm,PCB-4L,Various,1,2.40,ENIG finish 4-layer
+PCB,4-layer PCB FR4 1.55mm 35µm 100x160mm,PCB-4L,Various,1,2.40,ENIG finish 4-layer
 Programming,Tag-Connect SWD footprint (TC2050 or TC2030),TC2050/TC2030,Tag-Connect,0,0.00,DNP; ensure footprint on PCB for SWD
