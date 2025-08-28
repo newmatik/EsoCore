@@ -37,3 +37,9 @@ The hardware requirements and BOM include options for industrial fieldbus protoc
 - Modbus RTU (RS‑485, isolated) and Modbus TCP (Ethernet)
 - PROFIBUS DP (DB‑9, switchable termination)
 - PROFINET Device (over Ethernet)
+
+## Legal
+
+Copyright © 2025 Newmatik. All rights reserved.
+
+Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.
