@@ -6,17 +6,17 @@ This page documents the end-to-end development tooling used across hardware, fir
 
 ## PCB Design and Schematics
 
-- **Primary toolchain**: Altium Designer (latest stable)
-- **Why**: Enterprise-grade schematic/layout, strong library and variant management, impedance control, output automation (fabrication/assembly). Common with EMS partners.
+- **Primary toolchain**: KiCad (latest stable)
+- **Why**: Free and open-source EDA suite with comprehensive schematic capture, PCB layout, 3D visualization, and manufacturing output generation. Strong community support, extensive component libraries, and cross-platform compatibility.
 - **Artifacts**:
-  - Source: .PrjPcb, .SchDoc, .PcbDoc
+  - Source: .kicad_pro, .kicad_sch, .kicad_pcb
   - Manufacturing: Gerbers, drill files, IPC-356 netlist, ODB++ (preferred), Pick-and-Place, BOM (CSV/XLSX)
-- **Collaboration**: Altium 365 or exported ODB++/Gerbers stored in GitHub Releases for traceability.
+- **Collaboration**: Exported ODB++/Gerbers stored in GitHub Releases for traceability, with schematic/PCB sources versioned in Git.
 
 ## Enclosures and Mechanical
 
-- **Primary toolchain**: Autodesk Fusion 360
-- **Why**: Fast iterative design, CAM readiness, parametric modeling, good STEP interoperability.
+- **Primary toolchain**: FreeCAD (latest stable)
+- **Why**: Free and open-source parametric 3D modeler with strong STEP interoperability, CAM capabilities, and extensive workbench ecosystem for mechanical design.
 - **Artifacts**:
   - Exchange: .step (AP214/AP242), .stl for 3D printing, drawings as .dxf/.pdf
   - 3D print profiles: PrusaSlicer/Cura project files when applicable
@@ -87,8 +87,8 @@ This page documents the end-to-end development tooling used across hardware, fir
 ## Minimum Setup Per Role
 
 - **Hardware engineer**:
-  - Altium Designer + PCB libraries
-  - Fusion 360 for mechanical fit checks
+  - KiCad + PCB libraries
+  - FreeCAD for mechanical fit checks
   - GitHub access and LFS for large binaries if required
 - **Firmware engineer**:
   - STM32CubeIDE (standard), arm-none-eabi-gcc, ST-LINK, CubeMX, STM32CubeProgrammer, STM32CubeMonitor
@@ -101,8 +101,8 @@ This page documents the end-to-end development tooling used across hardware, fir
 
 ## Rationale Summary
 
-- Altium Designer: industry-standard for complex mixed-signal boards and manufacturing outputs.
-- Fusion 360: rapid iteration and broad vendor compatibility via STEP.
+- KiCad: free and open-source EDA suite with comprehensive capabilities and strong community support.
+- FreeCAD: free and open-source parametric 3D modeler with broad vendor compatibility via STEP.
 - STM32 + GCC/CMake: stable, cost-effective, open toolchain with excellent peripherals and community.
 - Zephyr RTOS on MCU: deterministic real-time behavior, small footprint, maintained drivers/networking/filesystem, and established OTA strategies.
 - Frappe (Python/Node.js): fast delivery of admin and API features with strong RBAC.

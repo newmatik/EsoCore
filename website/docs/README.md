@@ -82,6 +82,11 @@ For these demanding applications, EdgeSentinel provides the complete operational
 - **Capture**:
   - Comprehensive air quality monitoring (temperature, humidity, CO₂, VOCs, particulate matter)
   - Equipment environmental monitoring for thermal management and air quality
+  - Light intensity monitoring (visible, UV, IR, color, spectral) for workplace safety and process control
+  - Oil quality monitoring (viscosity, contamination, water content) for predictive lubrication maintenance
+  - Pressure monitoring for hydraulic/pneumatic systems (leak detection, performance validation)
+  - Targeted temperature monitoring (bearings, gearboxes, extreme environments)
+  - Position sensing and cycle counting (automation, robotics, machine validation)
   - Operational cycles (machine starts/stops, production counts)
   - Multi-axis vibration (RMS and diagnostic windows) for bearing/mechanical health
   - Motor current and power consumption for load monitoring
@@ -116,7 +121,7 @@ For these demanding applications, EdgeSentinel provides the complete operational
 
 - **Distributed sensor bus (RS‑485)**: Sensor modules with local MCUs connect over an industrial RS‑485 multi‑drop bus, enabling plug‑and‑play expansion.
 - **No Core redesign**: New sensor types can be added—customer‑specific, proprietary, or exclusive—without changing the Core or platform architecture.
-- **Scalable and robust**: Digital, noise‑immune wiring up to 100 m with auto‑discovery and hot‑plug support. See detailed specs in [Hardware Requirements](hardware-requirements.md).
+- **Scalable and robust**: Digital, noise‑immune wiring up to 100 m with auto‑discovery and hot‑plug support. See detailed specs in [Hardware: Core](edgesentinel-core.md).
 
 ---
 
@@ -132,9 +137,11 @@ For these demanding applications, EdgeSentinel provides the complete operational
 
 ### Sensor Suite
 
-**Environmental**: Comprehensive air quality monitoring (temperature, humidity, CO₂, VOCs, particulate matter) for thermal management and environmental compliance.
+**Environmental**: Comprehensive air quality monitoring (temperature, humidity, CO₂, VOCs, particulate matter) + light intensity monitoring (visible, UV, IR, color, spectral) + oil quality monitoring (viscosity, contamination, water content) for thermal management and environmental compliance.
 
-**Mechanical**: 3-axis vibration (1-3kHz), acoustic monitoring (audible + ultrasonic), machine cycle counting, motor current sensing for torque/load monitoring.
+**Mechanical**: 3-axis vibration (1-3kHz), acoustic monitoring (audible + ultrasonic), multi-range pressure sensors (hydraulic/pneumatic), proximity/position sensors (automation, cycle counting), motor current sensing for torque/load monitoring.
+
+**Thermal**: Targeted temperature monitoring with NTC thermistors, RTD sensors, thermocouples, and IR sensors for bearings, gearboxes, and extreme environments.
 
 **Safety I/O**: EN ISO 13849 compliant inputs for safety edges, emergency stops, light curtains with <10ms response time.
 
@@ -146,7 +153,7 @@ For these demanding applications, EdgeSentinel provides the complete operational
 
 **Environmental**: IP54-IP65 enclosure, -20°C to +60°C operation, industrial EMC compliance.
 
-Detailed Specifications: See [Hardware Requirements](hardware-requirements.md) for complete component specifications, compliance standards, and reference designs.
+Detailed Specifications: See [Hardware: Core](edgesentinel-core.md) for complete component specifications, compliance standards, and reference designs.
 
 ---
 
@@ -265,7 +272,8 @@ This page provides the business case and system overview. Detailed technical spe
 
 ### Core Specifications
 
-- **[Hardware Requirements](hardware-requirements.md)** - Component specifications, safety standards, and compliance requirements
+- **[Hardware: Core](edgesentinel-core.md)** - Core device specifications and connectivity
+- **[Hardware: Sensors](edgesentinel-sensors.md)** - Complete sensor module catalog and applications
 - **[Data Format Specification](data-format-specification.md)** - JSON schemas, event types, file structures, and data integrity protocols
 - **[API Specification](api-specification.md)** - REST API documentation, authentication, cloud platform architecture
 - **[Edge Intelligence](edge-intelligence.md)** - TinyML models, AI algorithms, training pipelines, and performance benchmarks

@@ -1,18 +1,18 @@
-Category,Item,MPN,Supplier,Qty,Unit,Notes
-MCU,STM32G031 ARM Cortex-M0+ 32MHz TSSOP20,STM32G031K8T6,ST,1,1.80,Power analysis and bus communication
-Sensor,Isolated Hall current sensor ±30A,ACS723LLCTR-30AB,Allegro,1,4.20,Higher current range with better linearity
-Communication,RS-485 transceiver isolated,ADM2582E,Analog Devices,1,4.20,Isolated bus interface for safety
-Power,Isolated DC-DC 12V to 5V 1W,MEA1S1205SC,Murata,1,9.20,Primary isolation for safety
-Power,LDO 5V to 3.3V,MCP1700T-3302E,Microchip,1,0.12,MCU power supply
-Connector,4-pin screw terminal block 5.08mm,691137710004,Wurth,1,0.18,Bus connection (12V GND Data+ Data-)
-Connector,Cable gland PG9 for 4-conductor cable,PG9-GLAND,Wiska,1,1.50,Strain relief and environmental sealing
-Connector,Motor cable clamp-on 20A,CT-20A-CLAMP,Generic,1,15.50,Non-invasive installation on motor cable
-Protection,Surge suppressor for power lines,GDT-230-3R,Bourns,1,0.45,Protection from motor switching spikes
-Clock,8MHz crystal for MCU,ABM8G-8.000MHZ,ABRACON,1,0.12,MCU external clock source
-Addressing,4-position DIP switch,219-4MS,CTS,1,0.10,Module address configuration
-Status,Status LED green 0603,LTST-C190KGKT,Lite-On,1,0.01,Operational status indication
-Passives,Resistors and capacitors 0603 assorted,R0603 assortment,Generic,1,0.20,Filter bias and bypass components
-Mechanical,DIN rail mount bracket,DIN-35-BRACKET,Phoenix Contact,1,1.20,Standard industrial mounting
-PCB,2-layer PCB FR4 1.55mm 50x35mm,PCB-2L-MEDIUM,Various,1,0.90,Current sensor module with isolation
-Enclosure,Custom enclosure (DIN rail IP54 45x80x58mm),CUSTOM,Custom,1,8.90,Custom enclosure; equivalent spec to Phoenix 1201161
-Programming,Tag-Connect SWD footprint (TC2050 or TC2030),TC2050/TC2030,Tag-Connect,0,0.00,DNP; ensure footprint on PCB for SWD
+Category,Item,MPN,Supplier,Qty,Unit,Notes,Package
+MCU,STM32G031 ARM Cortex-M0+ 32MHz TSSOP20,STM32G031K8T6,ST,1,1.80,Power analysis and bus communication,SMD
+Sensor,Isolated Hall current sensor ±30A,ACS723LLCTR-30AB,Allegro,1,4.20,Higher current range with better linearity,SMD
+Communication,RS-485 transceiver isolated,ADM2582E,Analog Devices,1,4.20,Isolated bus interface for safety,SMD
+Power,Isolated DC-DC 12V to 5V 1W,MEA1S1205SC,Murata,1,9.20,Primary isolation for safety,SMD
+Power,LDO 5V to 3.3V,MCP1700T-3302E,Microchip,1,0.12,MCU power supply,SMD
+Connector,4-pin screw terminal block 5.08mm,691137710004,Wurth,1,0.18,Bus connection (12V GND Data+ Data-),THT
+Connector,Cable gland PG9 for 4-conductor cable,PG9-GLAND,Wiska,1,1.50,Strain relief and environmental sealing,THT
+Connector,Motor cable clamp-on 20A,CT-20A-CLAMP,Generic,1,15.50,Non-invasive installation on motor cable,Mechanical
+Protection,Surge suppressor for power lines,GDT-230-3R,Bourns,1,0.45,Protection from motor switching spikes,SMD
+Clock,8MHz crystal for MCU,ABM8G-8.000MHZ,ABRACON,1,0.12,MCU external clock source,SMD
+Addressing,4-position SMD rotary switch,FRS-4,CTS,1,0.12,Module address configuration (SMD alternative),SMD
+Status,Status LED green 0603,LTST-C190KGKT,Lite-On,1,0.01,Operational status indication,SMD
+Passives,Resistors and capacitors 0603 assorted,R0603 assortment,Generic,1,0.20,Filter bias and bypass components,SMD
+Mechanical,DIN rail mount bracket,DIN-35-BRACKET,Phoenix Contact,1,1.20,Standard industrial mounting,Mechanical
+PCB,2-layer PCB FR4 1.55mm 50x35mm,PCB-2L-MEDIUM,Various,1,0.90,Current sensor module with isolation,PCB
+Enclosure,Custom enclosure (DIN rail IP54 45x80x58mm),CUSTOM,Custom,1,8.90,Custom enclosure; equivalent spec to Phoenix 1201161,Mechanical
+Programming,Tag-Connect SWD footprint (TC2050 or TC2030),TC2050/TC2030,Tag-Connect,0,0.00,DNP; ensure footprint on PCB for SWD,SMD

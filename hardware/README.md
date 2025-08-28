@@ -8,6 +8,11 @@ Hardware sources (see READMEs in subfolders)
   - `acoustic sensor/`
   - `current sensor/`
   - `air quality sensor/`
+  - `light sensor/`
+  - `oil quality sensor/`
+  - `pressure sensor/`
+  - `temperature spot sensor/`
+  - `proximity position sensor/`
 - `cables/`
 
 Notes:

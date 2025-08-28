@@ -16,8 +16,10 @@
 
   function header() {
     const here = isDocs() ? 'docs' : 'home';
-    const homeHref = '../'.repeat((location.pathname.match(/\//g) || []).length - (isDocs() ? 2 : 1)) || './';
-    const docsHref = homeHref + 'docs/';
+    // Simplified path calculation to prevent infinite loops
+    const isInDocs = isDocs();
+    const homeHref = isInDocs ? '../' : './';
+    const docsHref = isInDocs ? './' : './docs/';
     const githubHref = 'https://github.com/newmatik/edgesentinel-web';
     return el(`
       <header class="header">
@@ -37,6 +39,9 @@
 
   function footer() {
     const year = new Date().getFullYear();
+    const isInDocs = isDocs();
+    const docsHref = isInDocs ? './' : './docs/';
+    const homeHref = isInDocs ? '../' : './';
     return el(`
       <footer class="footer">
         <div class="container">

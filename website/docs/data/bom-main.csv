@@ -1,57 +1,57 @@
-Category,Item,MPN,Supplier,Qty,Unit,Notes
-MCU,STM32H757 Dual-core Cortex-M7/M4 LQFP144,STM32H757ZIT6,ST,1,13.50,Main MCU (dual-core)
-Wireless,WiFi module 2.4GHz u-blox NINA-W106,NINA-W106-00B,u-blox,1,7.90,Certified industrial WiFi BLE module
-Storage,Industrial microSD 16GB MLC -40C to 85C,ISD-16GB-MLC,Apacer or Innodisk,1,6.80,Logging and buffering
-Connector,MicroSD push-push holder,2041021-4,TE Connectivity,1,0.35,MicroSD socket
-Power,Integrated buck converter 12-24V to 3.3V 3A,TPS54331DR,Texas Instruments,1,2.80,Integrated power solution with enable and power good
-Backup,Supercapacitor 2.7V 10F,NES2R7100R,Nesscap or Maxwell,3,4.50,Bank of three high-capacity supercaps for 30+ sec runtime
-Protection,24V TVS diode SMAJ24A,SMAJ24A,Littelfuse,2,0.09,Input surge protection
-Protection,USB ESD protection array 4-ch,ESD9M5V,Onsemi,1,0.06,USB data protection
-Protection,GPIO ESD protection array 2-ch,ESD5Z3.3,Diodes Inc,4,0.05,Sensor connector protection
-Protection,Resettable polyfuse 1.1A hold MF-MSMF110,MFFSMF110,BOURNS,1,0.10,Input overcurrent protection
-Signal Integrity,USB 2.0 common-mode choke 90ohm,DLW21SN900SQ2,TDK,1,0.08,Reduce USB EMI
-Connector,USB-C receptacle mid-mount,632723300021,Wurth,1,0.35,USB-C for service
-Connector,Power input terminal block 2-pin 5.08mm,691137710002,Wurth,1,0.12,12-24V power input
-IO,Optocoupler for 24V inputs VO615A-A,VO615A-A,Vishay,10,0.12,Safety and general inputs
-IO,Relay SPDT 5V coil,G5LE-1-5VDC,Omron,1,1.60,Service indicator or interlock
-Clock,32.768kHz RTC crystal,AB26T-32.768KHZ,ABRACON,1,0.15,RTC reference
-Clock,25MHz HSE crystal for MCU,ABM8G-25.000MHZ-18-D2Y-T,ABRACON,1,0.18,STM32 external clock source
-Ethernet,10/100 Ethernet PHY DP83825I,DP83825IRHBR,Texas Instruments,1,1.50,PHY for optional Ethernet
-Connector,Sensor bus primary port 4-pin terminal block,691137710004,Wurth,1,0.18,Main RS-485 sensor bus out
-Connector,Sensor bus secondary port 4-pin terminal block,691137710004,Wurth,1,0.18,Daisy-chain or secondary bus
-Connector,Safety I/O input terminal block 8-pin,691137710008,Wurth,1,0.32,Safety edges emergency stops light curtains
-Connector,Safety I/O output terminal block 6-pin,691137710006,Wurth,1,0.24,Safety relay outputs and monitoring
-Connector,General I/O terminal block 12-pin,691137710012,Wurth,1,0.48,Digital inputs analog inputs relay outputs
-Connector,Fieldbus terminal block 6-pin,691137710006,Wurth,1,0.24,Modbus RTU PROFIBUS connections
-Sensor Bus,RS-485 transceiver for sensor network,SN65HVD72,Texas Instruments,1,0.85,Sensor bus interface
-Sensor Bus,12V power supply for sensor bus 2A,TPS54331DR,Texas Instruments,1,2.40,Distributed power for sensor modules
-Sensor Bus,Bus termination resistor 120 ohm,ERJ-3EKF1200V,Panasonic,2,0.02,End-of-line termination
-Connector,SWD debug header 2x5 1.27mm,3220-10-0300-00,Samtec compatible,1,0.10,Programming and debug
-UI,Tact switch 4.5mm SMD,TS-1187A,Generic,2,0.03,Reset and boot buttons
-UI,Status LED green 0603,LTST-C190KGKT,Lite-On,2,0.01,System status
-UI,0.96in OLED 128x64 I2C 3.3V,SSD1306-0.96-I2C,Raystar or WiseChip,1,2.80,On-device debug/menu display
-UI,Menu buttons SMD tact 4.5mm,TS-1187A,Generic,3,0.03,Up Down Enter navigation
-Passives,Resistors and capacitors 0603 assorted,R0603 assortment,Generic,1,0.50,Estimated per-board passives
-Ethernet,MagJack RJ45 with magnetics optional,HR911105A,Hanrun,1,0.90,If Ethernet is used instead of WiFi
-RTC Backup,CR2032 lithium coin cell,CR-2032,Panasonic,1,0.25,RTC backup battery
-RTC Backup,CR2032 SMD holder,1060,Keystone,1,0.32,Coin cell holder for VBAT
-RTC Backup,Schottky diode for VBAT isolation,BAT54A,Diodes Inc,1,0.03,Prevents backfeed into coin cell
-Fieldbus,Isolated RS-485 transceiver for Modbus RTU,ADM2582E,Analog Devices,1,4.20,Isolation and integrated DC/DC
-Fieldbus,PROFIBUS-compliant RS-485 transceiver,SN65HVD1176DR,Texas Instruments,1,1.90,Meets PROFIBUS electrical levels
-Fieldbus,DB-9 male connector with shield for PROFIBUS,1734532,Phoenix Contact,1,1.20,Panel mount or board edge
-Fieldbus,3-pin 5.08mm terminal block for RS-485,691137710003,Wurth,1,0.16,A/B/GND screw terminal
-Fieldbus,120 ohm termination resistor 0805,R0805-120R,Generic,1,0.01,Bus termination selectable
-Fieldbus,8-position DIP switch,219-8MS,CTS,1,0.18,Addressing and termination enable
-PoE,PoE controller with integrated switching,LTC4267CDKD,Analog Devices,1,8.50,IEEE 802.3af compliant PD controller
-PoE,PoE isolation transformer,H1102NLT,Pulse Electronics,1,3.20,Ethernet isolation with PoE support
-PoE,Schottky rectifier for PoE,PMEG4010BEA,Nexperia,4,0.15,PoE bridge rectifier
-PoE,Inductor 47µH for PoE switching,SRN6045-470M,Bourns,1,0.35,PoE DC-DC converter
-PoE,PoE detection resistor 25.5kohm 1%,ERJ-3EKF2552V,Panasonic,1,0.02,PoE signature resistor
-Safety,Safety relay dual-channel SPDT,G7SA-2A2B DC24,Omron,2,12.50,EN ISO 13849 PLd safety-rated outputs
-Safety,Safety relay monitoring IC,TLE4922,Infineon,1,2.80,Relay coil and contact monitoring
-IO,Op-amp for analog conditioning dual,OPA2182IDR,Texas Instruments,1,2.10,Legacy 4-20mA and 0-10V input conditioning
-IO,Precision resistor 249ohm 0.1% for 4-20mA,ERA-3AEB2490V,Panasonic,1,0.08,Current loop termination
-IO,Precision resistor 10kohm 0.1% for voltage,ERA-3AEB1002V,Panasonic,1,0.08,Voltage divider for 0-10V
-Protection,TVS diode array for sensor inputs,SP0503BAHT,Littelfuse,3,0.12,Sensor connector protection
-PCB,4-layer PCB FR4 1.55mm 35µm 100x160mm,PCB-4L,Various,1,2.40,ENIG finish 4-layer
-Programming,Tag-Connect SWD footprint (TC2050 or TC2030),TC2050/TC2030,Tag-Connect,0,0.00,DNP; ensure footprint on PCB for SWD
+Category,Item,MPN,Supplier,Qty,Unit,Notes,Package
+MCU,STM32H757 Dual-core Cortex-M7/M4 LQFP144,STM32H757ZIT6,ST,1,13.50,Main MCU (dual-core),SMD
+Wireless,WiFi module 2.4GHz u-blox NINA-W106,NINA-W106-00B,u-blox,1,7.90,Certified industrial WiFi BLE module,SMD
+Storage,Industrial microSD 16GB MLC -40C to 85C,ISD-16GB-MLC,Apacer or Innodisk,1,6.80,Logging and buffering,SMD
+Connector,MicroSD push-push holder,2041021-4,TE Connectivity,1,0.35,MicroSD socket,THT
+Power,Integrated buck converter 12-24V to 3.3V 3A,TPS54331DR,Texas Instruments,1,2.80,Integrated power solution with enable and power good,SMD
+Backup,Supercapacitor 2.7V 10F,NES2R7100R,Nesscap or Maxwell,3,4.50,Bank of three high-capacity supercaps for 30+ sec runtime,THT
+Protection,24V TVS diode SMAJ24A,SMAJ24A,Littelfuse,2,0.09,Input surge protection,SMD
+Protection,USB ESD protection array 4-ch,ESD9M5V,Onsemi,1,0.06,USB data protection,SMD
+Protection,GPIO ESD protection array 2-ch,ESD5Z3.3,Diodes Inc,4,0.05,Sensor connector protection,SMD
+Protection,Resettable polyfuse 1.1A hold MF-MSMF110,MFFSMF110,BOURNS,1,0.10,Input overcurrent protection,SMD
+Signal Integrity,USB 2.0 common-mode choke 90ohm,DLW21SN900SQ2,TDK,1,0.08,Reduce USB EMI,SMD
+Connector,USB-C receptacle mid-mount,632723300021,Wurth,1,0.35,USB-C for service,THT
+Connector,Power input terminal block 2-pin 5.08mm,691137710002,Wurth,1,0.12,12-24V power input,THT
+IO,Optocoupler for 24V inputs VO615A-A,VO615A-A,Vishay,10,0.12,Safety and general inputs,SMD
+IO,Relay SPDT 5V coil,G5LE-1-5VDC,Omron,1,1.60,Service indicator or interlock,THT
+Clock,32.768kHz RTC crystal,AB26T-32.768KHZ,ABRACON,1,0.15,RTC reference,SMD
+Clock,25MHz HSE crystal for MCU,ABM8G-25.000MHZ-18-D2Y-T,ABRACON,1,0.18,STM32 external clock source,SMD
+Ethernet,10/100 Ethernet PHY DP83825I,DP83825IRHBR,Texas Instruments,1,1.50,PHY for optional Ethernet,SMD
+Connector,Sensor bus primary port 4-pin terminal block,691137710004,Wurth,1,0.18,Main RS-485 sensor bus out,THT
+Connector,Sensor bus secondary port 4-pin terminal block,691137710004,Wurth,1,0.18,Daisy-chain or secondary bus,THT
+Connector,Safety I/O input terminal block 8-pin,691137710008,Wurth,1,0.32,Safety edges emergency stops light curtains,THT
+Connector,Safety I/O output terminal block 6-pin,691137710006,Wurth,1,0.24,Safety relay outputs and monitoring,THT
+Connector,General I/O terminal block 12-pin,691137710012,Wurth,1,0.48,Digital inputs analog inputs relay outputs,THT
+Connector,Fieldbus terminal block 6-pin,691137710006,Wurth,1,0.24,Modbus RTU PROFIBUS connections,THT
+Sensor Bus,RS-485 transceiver for sensor network,SN65HVD72,Texas Instruments,1,0.85,Sensor bus interface,SMD
+Sensor Bus,12V power supply for sensor bus 2A,TPS54331DR,Texas Instruments,1,2.40,Distributed power for sensor modules,SMD
+Sensor Bus,Bus termination resistor 120 ohm,ERJ-3EKF1200V,Panasonic,2,0.02,End-of-line termination,SMD
+Connector,SWD debug header 2x5 1.27mm,3220-10-0300-00,Samtec compatible,1,0.10,Programming and debug,THT
+UI,Tact switch 4.5mm SMD,TS-1187A,Generic,2,0.03,Reset and boot buttons,SMD
+UI,Status LED green 0603,LTST-C190KGKT,Lite-On,2,0.01,System status,SMD
+UI,0.96in OLED 128x64 I2C 3.3V,SSD1306-0.96-I2C,Raystar or WiseChip,1,2.80,On-device debug/menu display,SMD
+UI,Menu buttons SMD tact 4.5mm,TS-1187A,Generic,3,0.03,Up Down Enter navigation,SMD
+Passives,Resistors and capacitors 0603 assorted,R0603 assortment,Generic,1,0.50,Estimated per-board passives,SMD
+Ethernet,MagJack RJ45 with magnetics optional,HR911105A,Hanrun,1,0.90,If Ethernet is used instead of WiFi,THT
+RTC Backup,CR2032 lithium coin cell,CR-2032,Panasonic,1,0.25,RTC backup battery,THT
+RTC Backup,CR2032 SMD holder,1060,Keystone,1,0.32,Coin cell holder for VBAT,SMD
+RTC Backup,Schottky diode for VBAT isolation,BAT54A,Diodes Inc,1,0.03,Prevents backfeed into coin cell,SMD
+Fieldbus,Isolated RS-485 transceiver for Modbus RTU,ADM2582E,Analog Devices,1,4.20,Isolation and integrated DC/DC,SMD
+Fieldbus,PROFIBUS-compliant RS-485 transceiver,SN65HVD1176DR,Texas Instruments,1,1.90,Meets PROFIBUS electrical levels,SMD
+Fieldbus,DB-9 male connector with shield for PROFIBUS,1734532,Phoenix Contact,1,1.20,Panel mount or board edge,THT
+Fieldbus,3-pin 5.08mm terminal block for RS-485,691137710003,Wurth,1,0.16,A/B/GND screw terminal,THT
+Fieldbus,120 ohm termination resistor 0805,R0805-120R,Generic,1,0.01,Bus termination selectable,SMD
+Fieldbus,8-position SMD rotary switch,FRS-8,CTS,1,0.22,Addressing and termination enable (SMD alternative),SMD
+PoE,PoE controller with integrated switching,LTC4267CDKD,Analog Devices,1,8.50,IEEE 802.3af compliant PD controller,SMD
+PoE,PoE isolation transformer,H1102NLT,Pulse Electronics,1,3.20,Ethernet isolation with PoE support,THT
+PoE,Schottky rectifier for PoE,PMEG4010BEA,Nexperia,4,0.15,PoE bridge rectifier,SMD
+PoE,Inductor 47µH for PoE switching,SRN6045-470M,Bourns,1,0.35,PoE DC-DC converter,SMD
+PoE,PoE detection resistor 25.5kohm 1%,ERJ-3EKF2552V,Panasonic,1,0.02,PoE signature resistor,SMD
+Safety,Safety relay dual-channel SPDT,G7SA-2A2B DC24,Omron,2,12.50,EN ISO 13849 PLd safety-rated outputs,THT
+Safety,Safety relay monitoring IC,TLE4922,Infineon,1,2.80,Relay coil and contact monitoring,SMD
+IO,Op-amp for analog conditioning dual,OPA2182IDR,Texas Instruments,1,2.10,Legacy 4-20mA and 0-10V input conditioning,SMD
+IO,Precision resistor 249ohm 0.1% for 4-20mA,ERA-3AEB2490V,Panasonic,1,0.08,Current loop termination,SMD
+IO,Precision resistor 10kohm 0.1% for voltage,ERA-3AEB1002V,Panasonic,1,0.08,Voltage divider for 0-10V,SMD
+Protection,TVS diode array for sensor inputs,SP0503BAHT,Littelfuse,3,0.12,Sensor connector protection,SMD
+PCB,4-layer PCB FR4 1.55mm 35µm 100x160mm,PCB-4L,Various,1,2.40,ENIG finish 4-layer,PCB
+Programming,Tag-Connect SWD footprint (TC2050 or TC2030),TC2050/TC2030,Tag-Connect,0,0.00,DNP; ensure footprint on PCB for SWD,SMD

@@ -1,20 +1,20 @@
-Category,Item,MPN,Supplier,Qty,Unit,Notes
-MCU,STM32G031 ARM Cortex-M0+ 32MHz TSSOP20,STM32G031K8T6,ST,1,1.80,Local air quality processing and bus communication
-Sensor,Air Quality Sensor BME680,BME680,Bosch Sensortec,1,8.50,Temperature, humidity, pressure, VOC, IAQ index
-Sensor,Particulate Matter Sensor PMS5003,PMS5003,Plantower,1,12.80,PM2.5, PM10, particle count and size distribution
-Sensor,CO2 Sensor SCD40,SCD40,Sensirion,1,15.60,NDIR CO2 sensor with automatic self-calibration
-Communication,RS-485 transceiver half-duplex,SN65HVD72,Texas Instruments,1,0.85,Bus interface for digital communication
-Power,Buck converter 12V to 5V 1A,TPS62173DSGT,Texas Instruments,1,1.65,Power for particulate sensor (needs 5V)
-Power,LDO 5V to 3.3V 500mA,MCP1700T-3302E,Microchip,1,0.12,Clean 3.3V for MCU and air quality sensors
-Connector,4-pin screw terminal block 5.08mm,691137710004,Wurth,1,0.18,Bus connection (12V GND Data+ Data-)
-Connector,Cable gland PG9 for 4-conductor cable,PG9-GLAND,Wiska,1,1.50,Strain relief and environmental sealing
-Protection,ESD protection diode array 4-ch,ESD9X3.3ST5G,OnSemi,1,0.08,Bus and power line protection
-Clock,8MHz crystal for MCU,ABM8G-8.000MHZ,ABRACON,1,0.12,MCU external clock source
-Addressing,4-position DIP switch,219-4MS,CTS,1,0.10,Module address configuration
-Status,Status LED green 0603,LTST-C190KGKT,Lite-On,1,0.01,Operational status indication
-Passives,Resistors and capacitors 0603 assorted,R0603 assortment,Generic,1,0.30,Bus termination, filter, and bias network
-Mechanical,Air intake filter mesh 1mm,SS-MESH-1MM,Generic,1,0.50,Protection for particulate sensor
-Mechanical,Silicone adhesive for sensors,RTV-108,Dow Corning,0.1,0.05,Sensor mounting and sealing
-PCB,4-layer PCB FR4 1.55mm 60x40mm,PCB-4L-MEDIUM,Various,1,1.20,Air quality sensor module with multiple sensors
-Enclosure,Custom enclosure (IP54 with air vents),CUSTOM,Custom,1,6.80,Custom enclosure; equivalent spec to AQ-ENC-01
-Programming,Tag-Connect SWD footprint (TC2050 or TC2030),TC2050/TC2030,Tag-Connect,0,0.00,DNP; ensure footprint on PCB for SWD
+Category,Item,MPN,Supplier,Qty,Unit,Notes,Package
+MCU,STM32G031 ARM Cortex-M0+ 32MHz TSSOP20,STM32G031K8T6,ST,1,1.80,Local air quality processing and bus communication,SMD
+Sensor,Air Quality Sensor BME680,BME680,Bosch Sensortec,1,8.50,Temperature, humidity, pressure, VOC, IAQ index,SMD
+Sensor,Particulate Matter Sensor PMS5003,PMS5003,Plantower,1,12.80,PM2.5, PM10, particle count and size distribution,SMD
+Sensor,CO2 Sensor SCD40,SCD40,Sensirion,1,15.60,NDIR CO2 sensor with automatic self-calibration,SMD
+Communication,RS-485 transceiver half-duplex,SN65HVD72,Texas Instruments,1,0.85,Bus interface for digital communication,SMD
+Power,Buck converter 12V to 5V 1A,TPS62173DSGT,Texas Instruments,1,1.65,Power for particulate sensor (needs 5V),SMD
+Power,LDO 5V to 3.3V 500mA,MCP1700T-3302E,Microchip,1,0.12,Clean 3.3V for MCU and air quality sensors,SMD
+Connector,4-pin screw terminal block 5.08mm,691137710004,Wurth,1,0.18,Bus connection (12V GND Data+ Data-),THT
+Connector,Cable gland PG9 for 4-conductor cable,PG9-GLAND,Wiska,1,1.50,Strain relief and environmental sealing,THT
+Protection,ESD protection diode array 4-ch,ESD9X3.3ST5G,OnSemi,1,0.08,Bus and power line protection,SMD
+Clock,8MHz crystal for MCU,ABM8G-8.000MHZ,ABRACON,1,0.12,MCU external clock source,SMD
+Addressing,4-position SMD rotary switch,FRS-4,CTS,1,0.12,Module address configuration (SMD alternative),SMD
+Status,Status LED green 0603,LTST-C190KGKT,Lite-On,1,0.01,Operational status indication,SMD
+Passives,Resistors and capacitors 0603 assorted,R0603 assortment,Generic,1,0.30,Bus termination, filter, and bias network,SMD
+Mechanical,Air intake filter mesh 1mm,SS-MESH-1MM,Generic,1,0.50,Protection for particulate sensor,Mechanical
+Mechanical,Silicone adhesive for sensors,RTV-108,Dow Corning,0.1,0.05,Sensor mounting and sealing,Mechanical
+PCB,4-layer PCB FR4 1.55mm 60x40mm,PCB-4L-MEDIUM,Various,1,1.20,Air quality sensor module with multiple sensors,PCB
+Enclosure,Custom enclosure (IP54 with air vents),CUSTOM,Custom,1,6.80,Custom enclosure; equivalent spec to AQ-ENC-01,Mechanical
+Programming,Tag-Connect SWD footprint (TC2050 or TC2030),TC2050/TC2030,Tag-Connect,0,0.00,DNP; ensure footprint on PCB for SWD,SMD

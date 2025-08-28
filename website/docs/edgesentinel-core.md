@@ -1,6 +1,6 @@
-# Hardware Requirements
+# Hardware: Core
 
-This document defines the hardware specifications, component requirements, and compliance standards for the EdgeSentinel edge monitoring device.
+This document defines the hardware specifications for the EdgeSentinel Core device - the central processing and connectivity hub of the EdgeSentinel monitoring platform.
 
 ---
 
@@ -10,7 +10,7 @@ This document defines the hardware specifications, component requirements, and c
 
 - **MCU/SoC**: ARM Cortex‑M4/M7 or equivalent with sufficient RAM/flash for TLS and a filesystem; hardware crypto preferred
 - **Storage**: industrial‑grade microSD (SLC/MLC with wear leveling), via SPI or SDIO
-- **Enclosure**: DIN‑rail or compact IP54–IP65 industrial housing; ambient sensor either airflow‑exposed or externally cabled
+- **Enclosure**: DIN‑rail or compact IP54–IP65 industrial housing
 
 ### Connectivity
 
@@ -38,19 +38,17 @@ This document defines the hardware specifications, component requirements, and c
 
 ---
 
-## Sensing & I/O Requirements
-
-### Digital Sensor Bus Architecture
+## Sensor Bus Architecture
 
 EdgeSentinel uses a **distributed sensor network** where each sensor module contains its own MCU for local processing and standardized digital communication. This architecture provides:
 
 - **Scalability**: Connect multiple sensors of the same type (e.g., 3 air quality, 2 vibration sensors)
-- **Flexibility**: Add/remove sensors based on specific machine requirements  
+- **Flexibility**: Add/remove sensors based on specific machine requirements
 - **Noise Immunity**: Digital signals over industrial RS-485 bus
 - **Local Intelligence**: Each sensor performs conditioning, filtering, and preprocessing
 - **Simplified Wiring**: Single 4-wire bus supports all sensor modules
 
-#### Integration Strategy
+### Integration Strategy
 
 - **Modular by design**: New sensor types (including partner‑specific or proprietary modules) can be introduced without any changes to the Core or firmware architecture. The RS‑485 protocol layer abstracts capabilities, so the platform scales by adding sensor modules rather than redesigning hardware.
 - **Hot‑plug and discovery**: Auto‑enumeration assigns addresses and registers sensor capabilities at runtime, enabling field upgrades and customer‑specific configurations.
@@ -67,24 +65,6 @@ EdgeSentinel uses a **distributed sensor network** where each sensor module cont
 - **Termination**: 120Ω resistors at bus endpoints with bias resistors for idle state
 - **Error Detection**: CRC16 checksums and automatic retry mechanism
 - **Discovery Protocol**: Automatic enumeration with sensor type identification and capability reporting
-
-### Sensor Module Types
-
-#### Environmental Monitoring Modules
-
-- **Air Quality Module**: Comprehensive sensor combining temperature, humidity, CO₂, VOCs, and particulate matter (PM2.5/PM10) with local processing MCU for air quality analysis and environmental monitoring
-- **Process Temperature Module**: PT100/PT1000 with precision ADC for industrial process monitoring
-
-#### Mechanical Monitoring Modules  
-
-- **Vibration Module**: ADXL355 3-axis accelerometer with STM32G071 MCU for enhanced FFT analysis and anomaly detection
-- **Acoustic Module**: Digital MEMS microphone (ICS-43434) + ultrasound transducer with signal processing MCU for comprehensive sound analysis
-- **Position/Cycle Module**: Quadrature encoder or limit switch interface with cycle counting and position tracking
-
-#### Electrical Monitoring Modules
-
-- **Current Monitoring Module**: ACS723 isolated Hall sensor (±30A) with MCU for enhanced torque/load calculation and power analysis
-- **Voltage Monitoring Module**: Isolated voltage sensing with harmonic analysis capability
 
 ### Digital Sensor Bus Interface
 
@@ -105,20 +85,22 @@ EdgeSentinel uses a **distributed sensor network** where each sensor module cont
 - **Isolation**: Bus interface isolated from main MCU for noise immunity and safety
 - **Status Monitoring**: Bus voltage and current monitoring with fault detection and reporting
 
-### Safety I/O
+---
+
+## Safety I/O
 
 - **Safety-rated digital inputs** (4–6): optocoupled, 24V for safety edges, light curtains, emergency stops
 - **Safety-rated relay outputs** for door control interlocking (optional)
 - **Compliance**: EN ISO 13849 (Safety of machinery) for functional safety
 
-### General I/O
+## General I/O
 
 - **Digital inputs**: 2–4 additional optocoupled inputs for discrete signals
 - **Analog inputs**: 1–2 analog inputs (4–20 mA/0–10 V) for legacy process signals
 - **Relay output**: 1 relay output for service indicators (optional)
 - **Addressing & Termination**: 8‑position DIP switch for node addressing/config and bus termination control (Modbus/PROFIBUS)
 
-### Timing & Clock
+## Timing & Clock
 
 - **RTC**: 32.768 kHz RTC crystal + supercap; NTP over network
 
@@ -139,7 +121,7 @@ EdgeSentinel uses a **distributed sensor network** where each sensor module cont
 
 - **MCU**: STM32 family with enough RAM/flash for TLS + filesystem (e.g., STM32F4/F7/H7 depending on crypto/perf needs)
 - **Storage**: microSD (industrial grade, SLC/MLC, wear leveling), SPI or SDIO
-- **Enclosure**: DIN‑rail or compact IP54–IP65 industrial housing; ambient sensor should be airflow‑exposed or externally cabled
+- **Enclosure**: DIN‑rail or compact IP54–IP65 industrial housing
 
 ### Connectivity Options
 
@@ -150,34 +132,6 @@ EdgeSentinel uses a **distributed sensor network** where each sensor module cont
   - Automatic power source detection and management
 - **2.4 GHz Wi‑Fi** via certified industrial module (u‑blox NINA‑W1/W10x or similar) with proven security maintenance
 - **Fieldbus**: RS‑485 isolated transceiver (Modbus RTU), PROFIBUS‑compatible RS‑485 PHY with DB‑9; Modbus TCP/PROFINET over Ethernet
-
-### Detailed Sensor Specifications
-
-#### Sensor Module Architecture
-
-Each sensor module contains:
-
-- **Sensor MCU**: STM32G031 (ARM Cortex-M0+) for local processing and bus communication
-- **Local Processing**: Real-time filtering, calibration, and feature extraction  
-- **Bus Interface**: RS-485 transceiver with protocol stack
-- **Power Management**: Local regulation from +12V bus power
-- **Status Indication**: LED for operational status and diagnostics
-
-#### Environmental Monitoring Modules (Reference Implementation)
-
-- **Air Quality**: BME680 or ENS160 sensor with MCU providing temperature, humidity, CO₂, VOC, IAQ index, and particulate matter readings with local air quality analysis
-- **Process Temperature**: PT100/PT1000 with precision instrumentation amplifier and cold junction compensation
-
-#### Mechanical Monitoring Modules (Reference Implementation)
-
-- **Vibration**: ADXL355 with MCU performing FFT analysis, RMS calculation, and anomaly detection
-- **Acoustic**: Wide-band MEMS microphone with MCU doing frequency analysis and event detection  
-- **Position/Cycle**: Quadrature encoder interface with position tracking and cycle counting
-
-#### Electrical Monitoring Modules (Reference Implementation)
-
-- **Current**: Isolated Hall sensor with MCU calculating RMS, power factor, and harmonic content
-- **Voltage**: Isolated sensing with MCU performing waveform analysis and power quality monitoring
 
 ### Safety I/O (EN ISO 13849 compliant)
 

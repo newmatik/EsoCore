@@ -1,0 +1,57 @@
+{
+  "public": ".",
+  "rewrites": [
+    {
+      "source": "/docs/development-environment",
+      "destination": "/docs/404.html"
+    },
+    {
+      "source": "/docs/edgesentinel-core",
+      "destination": "/docs/404.html"
+    },
+    {
+      "source": "/docs/edgesentinel-sensors",
+      "destination": "/docs/404.html"
+    },
+    {
+      "source": "/docs/edge-intelligence",
+      "destination": "/docs/404.html"
+    },
+    {
+      "source": "/docs/data-format-specification",
+      "destination": "/docs/404.html"
+    },
+    {
+      "source": "/docs/api-specification",
+      "destination": "/docs/404.html"
+    },
+    {
+      "source": "/docs/testing-procedures",
+      "destination": "/docs/404.html"
+    },
+    {
+      "source": "/docs/development-timeline-budget",
+      "destination": "/docs/404.html"
+    },
+    {
+      "source": "/docs/business-model-and-partnerships",
+      "destination": "/docs/404.html"
+    },
+    {
+      "source": "/docs/competitor-analysis",
+      "destination": "/docs/404.html"
+    },
+    {
+      "source": "/docs/fieldbus",
+      "destination": "/docs/404.html"
+    },
+    {
+      "source": "/docs/bom",
+      "destination": "/docs/404.html"
+    },
+    {
+      "source": "/docs/license",
+      "destination": "/docs/404.html"
+    }
+  ]
+}

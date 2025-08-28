@@ -51,6 +51,46 @@ Comprehensive air quality monitoring combining temperature, humidity, CO₂, VOC
 
 ---
 
+## Light Sensor Module
+
+Multi-spectrum light intensity monitoring including visible, UV, IR, color, and spectral analysis. Essential for workplace safety compliance, process control, and environmental monitoring.
+
+<div id="bom-light">Loading BOM...</div>
+
+---
+
+## Oil Quality Sensor Module
+
+Comprehensive oil condition monitoring with turbidity, viscosity, water content, and dielectric sensors. Provides predictive maintenance for gearboxes, hydraulics, and other oil-lubricated systems.
+
+<div id="bom-oil-quality">Loading BOM...</div>
+
+---
+
+## Pressure Sensor Module
+
+Multi-range pressure monitoring for hydraulic and pneumatic systems. Detects leaks, filter clogging, and system performance issues.
+
+<div id="bom-pressure">Loading BOM...</div>
+
+---
+
+## Temperature Spot Sensor Module
+
+Targeted temperature monitoring with multiple sensor types for bearings, gearboxes, and industrial processes. Handles extreme temperatures with thermocouples and RTDs.
+
+<div id="bom-temperature-spot">Loading BOM...</div>
+
+---
+
+## Proximity Position Sensor Module
+
+Position detection and cycle counting with inductive, capacitive, encoder, and laser sensors. Perfect for automation, robotics, and machine positioning.
+
+<div id="bom-proximity-position">Loading BOM...</div>
+
+---
+
 ## Cables & Interconnects
 
 Shielded cables, connectors, and installation hardware for connecting sensor modules to the Core.

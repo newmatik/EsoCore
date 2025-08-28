@@ -35,6 +35,7 @@
         { key: 'Qty', label: 'Qty' },
         { key: 'Unit', label: 'Unit $ (1k)' },
         { key: 'Notes', label: 'Notes' },
+        { key: 'Package', label: 'Package' },
       ];
 
       const toNum = (v) => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
@@ -45,7 +46,8 @@
         Supplier: r[3],
         Qty: toNum(r[4]),
         Unit: toNum(r[5]),
-        Notes: r[6] || ''
+        Notes: r[6] || '',
+        Package: r[7] || ''
       })).map(d => ({ ...d, Ext: d.Qty * d.Unit }));
 
       // Controls
@@ -53,7 +55,7 @@
       controls.className = 'bom-controls';
       const search = document.createElement('input');
       search.type = 'search';
-      search.placeholder = 'Filter… (Category, Item, MPN, Supplier, Notes)';
+      search.placeholder = 'Filter… (Category, Item, MPN, Supplier, Notes, Package)';
       const cat = document.createElement('select');
       const categories = Array.from(new Set(data.map(d => d.Category))).sort();
       cat.innerHTML = '<option value="">All categories</option>' + categories.map(c => `<option>${c}</option>`).join('');
@@ -106,7 +108,8 @@
           (d.Item||'').toLowerCase().includes(q) ||
           (d.MPN||'').toLowerCase().includes(q) ||
           (d.Supplier||'').toLowerCase().includes(q) ||
-          (d.Notes||'').toLowerCase().includes(q)
+          (d.Notes||'').toLowerCase().includes(q) ||
+          (d.Package||'').toLowerCase().includes(q)
         )));
       }
 

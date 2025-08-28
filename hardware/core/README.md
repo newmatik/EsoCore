@@ -31,6 +31,9 @@
 
 ## Layout Guidance
 
+- Avoid THT components if possible and use SMD components instead
+- Ensure we have Tag-Connect pads on board for MCU flashing
+- Ensure we have 3 fiducials on each SMD assembled side
 - Separate power/PoE, digital, and analog zones; star ground tie at ADC/MCU ref
 - Keep RS‑485, Ethernet, and USB return paths tight; add stitching vias near chokes
 - Place TVS/ESD close to connectors; keep supercap high-current paths short

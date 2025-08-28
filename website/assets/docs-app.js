@@ -7,7 +7,8 @@
   // Manifest of markdown files (relative to docs root)
   const docs = [
     'README.md',                          // Introduction
-    'hardware-requirements.md',           // Hardware Requirements
+    'edgesentinel-core.md',               // Hardware: Core
+    'edgesentinel-sensors.md',            // Hardware: Sensors
     'edge-intelligence.md',               // Edge Intelligence
     'data-format-specification.md',       // Data Format Specification
     'api-specification.md',               // API Specification
@@ -28,7 +29,8 @@
 
   const icons = {
     'README': '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V6.5a2 2 0 0 1 2-2h0l4 2 4-2h0a2 2 0 0 1 2 2v13"/><path d="M6 20V6"/></svg>',
-    'hardware-requirements': '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 .6 1.65 1.65 0 0 0-.33 1.82l-.06.06a2 2 0 1 1-2.83 0l-.06-.06A1.65 1.65 0 0 0 8.6 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-.6-1 1.65 1.65 0 0 0-1.82-.33l-.06-.06a2 2 0 1 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-.6 1.65 1.65 0 0 0 .33-1.82l.06-.06a2 2 0 1 1 2.83 0l.06.06A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.24.49.24 1.06 0 1.56.24.49.24 1.06 0 1.56Z"/></svg>',
+    'edgesentinel-core': '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 .6 1.65 1.65 0 0 0-.33 1.82l-.06.06a2 2 0 1 1-2.83 0l-.06-.06A1.65 1.65 0 0 0 8.6 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-.6-1 1.65 1.65 0 0 0-1.82-.33l-.06-.06a2 2 0 1 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-.6 1.65 1.65 0 0 0 .33-1.82l.06-.06a2 2 0 1 1 2.83 0l.06.06A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.24.49.24 1.06 0 1.56.24.49.24 1.06 0 1.56Z"/></svg>',
+    'edgesentinel-sensors': '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>',
     'edge-intelligence': '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
     'data-format-specification': '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 5v6c0 1.66-4.03 3-9 3s-9-1.34-9-3V5"/><path d="M3 11v6c0 1.66 4.03 3 9 3s9-1.34 9-3v-6"/></svg>',
     'api-specification': '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 4 4 8 8 12"/><polyline points="16 4 20 8 16 12"/><line x1="12" y1="16" x2="12" y2="20"/></svg>',
@@ -42,6 +44,9 @@
 
   function titleFromName(name) {
     if (/^README\.md$/i.test(name)) return 'Introduction';
+    // Handle our custom naming convention
+    if (name === 'edgesentinel-core.md') return 'Hardware: Core';
+    if (name === 'edgesentinel-sensors.md') return 'Hardware: Sensors';
     return name
       .replace(/\-/g, ' ')
       .replace(/\.md$/, '')
@@ -71,7 +76,7 @@
       const m = text.match(/^#\s+(.+)$/m);
       if (m) title = m[1].trim();
     } catch (_) {}
-    // Strip product name prefix in menu
+    // Strip product name prefix in menu but keep Hardware: prefix
     title = title.replace(/^\s*EdgeSentinel\s+/i, '').trim();
     titlesCache.set(path, title);
     return title;
@@ -178,9 +183,14 @@
         'bom-acoustic': 'Acoustic Sensor Module',
         'bom-current': 'Current Sensor Module',
         'bom-air-quality': 'Air Quality Sensor Module',
+        'bom-light': 'Light Sensor Module',
+        'bom-oil-quality': 'Oil Quality Sensor Module',
+        'bom-pressure': 'Pressure Sensor Module',
+        'bom-temperature-spot': 'Temperature Spot Sensor Module',
+        'bom-proximity-position': 'Proximity Position Sensor Module',
         'bom-cables': 'Cables & Interconnects'
       };
-      const displayOrder = ['bom-main','bom-vibration','bom-acoustic','bom-current','bom-air-quality','bom-cables'];
+      const displayOrder = ['bom-main','bom-vibration','bom-acoustic','bom-current','bom-air-quality','bom-light','bom-oil-quality','bom-pressure','bom-temperature-spot','bom-proximity-position','bom-cables'];
       let systemSection = document.getElementById('system-cost');
       if (!systemSection) {
         systemSection = document.createElement('section');
@@ -241,6 +251,11 @@
         'bom-acoustic': './data/bom-acoustic-sensor.csv',
         'bom-current': './data/bom-current-sensor.csv',
         'bom-air-quality': './data/bom-air-quality-sensor.csv',
+        'bom-light': './data/bom-light-sensor.csv',
+        'bom-oil-quality': './data/bom-oil-quality-sensor.csv',
+        'bom-pressure': './data/bom-pressure-sensor.csv',
+        'bom-temperature-spot': './data/bom-temperature-spot-sensor.csv',
+        'bom-proximity-position': './data/bom-proximity-position-sensor.csv',
         'bom-cables': './data/bom-cables.csv'
       };
       bomMounts.forEach(mount => {
