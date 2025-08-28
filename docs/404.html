@@ -3,18 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <title>Redirecting…</title>
-  <meta http-equiv="refresh" content="0; url=/docs/" />
+  <meta http-equiv="refresh" content="0; url=./" />
   <script>
     (function(){
-      var path = location.pathname || '';
-      var isDocs = path.startsWith('/docs/');
-      if (isDocs) {
-        var slug = path.replace(/^\/docs\//,'').replace(/\/?$/,'');
-        var q = '?p=' + encodeURIComponent(slug + (location.hash || ''));
-        location.replace('/docs/' + q);
-      } else {
-        location.replace('/');
-      }
+      var path = (location.pathname || '').replace(/\/?$/, '');
+      var slug = path.replace(/^\//,'');
+      if (!slug) { location.replace('./'); return; }
+      var q = '?p=' + encodeURIComponent(slug + (location.hash || ''));
+      location.replace('./' + q);
     })();
   </script>
 </head>

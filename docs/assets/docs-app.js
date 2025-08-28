@@ -4,7 +4,7 @@
   const searchInput = document.getElementById('search-input');
   const searchResults = document.getElementById('search-results');
 
-  // Manifest of markdown files (relative to /docs)
+  // Manifest of markdown files (relative to docs root)
   const docs = [
     'README.md',                          // Introduction
     'hardware-requirements.md',           // Hardware Requirements
@@ -87,10 +87,10 @@
     list.className = 'nav-list';
     for (const name of docs) {
       const slug = name.replace(/\.md$/, '');
-      const path = '/docs/' + name;
+      const path = './' + name;
       const title = await getTitle(path);
       const a = document.createElement('a');
-      a.href = '/docs/' + slug;
+      a.href = './' + slug;
       a.dataset.slug = slug;
       const iconKey = slug in icons ? slug : (slug === '' ? 'README' : 'README');
       const icon = icons[iconKey] || icons['README'];
@@ -110,7 +110,7 @@
 
   async function renderDoc(slug) {
     const file = slug && slugs.includes(slug) ? slug + '.md' : docs[0];
-    const path = '/docs/' + file;
+    const path = './' + file;
     setActive(file.replace(/\.md$/, ''));
     try {
       const md = await fetchMarkdown(path);
@@ -146,7 +146,7 @@
       a.addEventListener('click', e => {
         try {
           e.preventDefault();
-          const url = new URL(href, location.origin + '/docs/');
+          const url = new URL(href, location.origin + location.pathname.replace(/[^/]+$/,'') );
           const file = url.pathname.split('/').pop();
           const slug = file.replace(/\.md$/i, '');
           const anchor = url.hash || '';
@@ -168,7 +168,7 @@
     const bomMounts = contentEl.querySelectorAll('[id^="bom-"]');
     if (bomMounts.length > 0) {
       if (!window.EdgeBOM) {
-        await loadScript('/assets/bom.js');
+        await loadScript('./assets/bom.js');
         console.log('BOM script loaded, EdgeBOM available:', !!window.EdgeBOM);
       }
       // Insert a structured System Cost section near the top (after the H1 if present)
@@ -236,12 +236,12 @@
       window.addEventListener('EdgeBOM:totals', onTotals);
       // Render BOM tables programmatically (scripts inside injected markdown don't execute)
       const idToCsv = {
-        'bom-main': '/docs/data/bom-main.csv',
-        'bom-vibration': '/docs/data/bom-vibration-sensor.csv',
-        'bom-acoustic': '/docs/data/bom-acoustic-sensor.csv',
-        'bom-current': '/docs/data/bom-current-sensor.csv',
-        'bom-temperature': '/docs/data/bom-temperature-sensor.csv',
-        'bom-cables': '/docs/data/bom-cables.csv'
+        'bom-main': './data/bom-main.csv',
+        'bom-vibration': './data/bom-vibration-sensor.csv',
+        'bom-acoustic': './data/bom-acoustic-sensor.csv',
+        'bom-current': './data/bom-current-sensor.csv',
+        'bom-temperature': './data/bom-temperature-sensor.csv',
+        'bom-cables': './data/bom-cables.csv'
       };
       bomMounts.forEach(mount => {
         const id = mount.id;
@@ -290,12 +290,12 @@
         h.id = id;
       }
       const a = document.createElement('a');
-      a.href = '/docs/' + slug + '#' + id;
+      a.href = './' + slug + '#' + id;
       a.textContent = text;
       a.addEventListener('click', (e) => {
         e.preventDefault();
         // Keep the current slug; just update anchor and smooth scroll
-        history.pushState({}, '', '/docs/' + slug + '#' + id);
+        history.pushState({}, '', './' + slug + '#' + id);
         const target = document.getElementById(id);
         if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
@@ -307,23 +307,19 @@
   }
 
   function currentSlug() {
-    // Read from clean path /docs/<slug>; default to README if missing
+    // Read from clean path <docs-root>/<slug>; default to README if missing
     const path = location.pathname.replace(/\/index.html$/, '');
-    const docsPrefix = '/docs/';
-    if (path === '/docs' || path === '/docs/') return slugs[0];
-    if (path.startsWith(docsPrefix)) {
-      const rest = path.slice(docsPrefix.length);
-      const slug = rest.split('/').filter(Boolean)[0];
-      return slug || slugs[0];
-    }
-    return slugs[0];
+    const base = path.replace(/\/[^/]*$/, '/');
+    const rest = path.slice(base.length);
+    const slug = rest.split('/').filter(Boolean)[0];
+    return slug || slugs[0];
   }
 
   async function buildSearchIndex() {
     const items = [];
     for (const name of docs) {
       const slug = name.replace(/\.md$/, '');
-      const path = '/docs/' + name;
+      const path = './' + name;
       try {
         const text = await fetchMarkdown(path);
         const title = await getTitle(path);
@@ -367,7 +363,7 @@
   function renderResults(items, q) {
     searchResults.hidden = items.length === 0;
     searchResults.innerHTML = items.map(i => (
-      `<a class="result" href="/docs/${i.slug}"><strong>${i.title}</strong><br><small>${highlight(i.snippet, q)}</small></a>`
+      `<a class="result" href="./${i.slug}"><strong>${i.title}</strong><br><small>${highlight(i.snippet, q)}</small></a>`
     )).join('');
     // Wire results to internal router
     Array.from(searchResults.querySelectorAll('a.result')).forEach(a => {
@@ -385,7 +381,7 @@
 
   function navigateTo(slug, anchor) {
     const hash = anchor ? '#' + anchor : location.hash;
-    history.pushState({}, '', '/docs/' + slug + (hash || ''));
+    history.pushState({}, '', './' + slug + (hash || ''));
     renderDoc(slug);
   }
 
@@ -394,7 +390,7 @@
   });
 
   (async function init() {
-    // Support GitHub Pages fallback: 404.html redirects to /docs/?p=<slug>[#anchor]
+    // Support GitHub Pages fallback: 404.html redirects to ./?p=<slug>[#anchor]
     const params = new URLSearchParams(location.search);
     const p = params.get('p');
     if (p) {
@@ -402,7 +398,7 @@
       const file = parts[0].replace(/.*\//, '');
       const slug = file.replace(/\.md$/i, '');
       const anchor = parts[1] || '';
-      history.replaceState({}, '', '/docs/' + slug + (anchor ? '#' + anchor : ''));
+      history.replaceState({}, '', './' + slug + (anchor ? '#' + anchor : ''));
     }
     await renderSidebar();
     await enableSearch();
