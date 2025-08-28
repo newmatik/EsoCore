@@ -1,7 +1,7 @@
 Category,Item,MPN,Supplier,Qty,Unit,Notes
 MCU,STM32G031 ARM Cortex-M0+ 32MHz TSSOP20,STM32G031K8T6,ST,1,1.80,Local processing FFT and bus communication
-Sensor,Wide-band MEMS microphone,SPU0410LR5H,Knowles,1,1.20,Audible + ultrasonic up to 80kHz
-Amplifier,Low-noise microphone preamp,MAX9814ETD,Maxim Integrated,1,2.80,Automatic gain control for wide dynamic range
+Sensor,Digital MEMS microphone ICS-43434,ICS-43434,TDK InvenSense,1,3.20,Wide-band digital output 50Hz-20kHz ±3dB
+Sensor,Ultrasound transducer MA40S4R,MA40S4R,Murata,1,4.50,Ultrasonic frequency response 40±1kHz
 Communication,RS-485 transceiver half-duplex,SN65HVD72,Texas Instruments,1,0.85,Bus interface for digital communication
 Power,Buck converter 12V to 3.3V 500mA,TPS62172DSGT,Texas Instruments,1,1.45,Efficient power from bus
 Power,LDO 3.3V clean for analog,MCP1700T-3302E,Microchip,1,0.12,Clean power for sensitive analog

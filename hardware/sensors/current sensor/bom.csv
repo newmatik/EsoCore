@@ -1,6 +1,6 @@
 Category,Item,MPN,Supplier,Qty,Unit,Notes
 MCU,STM32G031 ARM Cortex-M0+ 32MHz TSSOP20,STM32G031K8T6,ST,1,1.80,Power analysis and bus communication
-Sensor,Isolated Hall current sensor ±20A,ACS724LLCTR-20AB,Allegro,1,3.80,Bidirectional DC/AC current sensing
+Sensor,Isolated Hall current sensor ±30A,ACS723LLCTR-30AB,Allegro,1,4.20,Higher current range with better linearity
 Communication,RS-485 transceiver isolated,ADM2582E,Analog Devices,1,4.20,Isolated bus interface for safety
 Power,Isolated DC-DC 12V to 5V 1W,MEA1S1205SC,Murata,1,9.20,Primary isolation for safety
 Power,LDO 5V to 3.3V,MCP1700T-3302E,Microchip,1,0.12,MCU power supply

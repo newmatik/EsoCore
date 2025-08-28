@@ -1,5 +1,5 @@
 Category,Item,MPN,Supplier,Qty,Unit,Notes
-MCU,STM32G031 ARM Cortex-M0+ 32MHz TSSOP20,STM32G031K8T6,ST,1,1.80,Local processing and bus communication
+MCU,STM32G071 ARM Cortex-M0+ 64MHz TSSOP20,STM32G071KBT6,ST,1,2.20,Enhanced DSP capabilities for FFT processing
 Sensor,3-axis accelerometer MEMS,ADXL355BCCZ,Analog Devices,1,4.50,≥1-3kHz ODR for bearing/mechanical health
 Communication,RS-485 transceiver half-duplex,SN65HVD72,Texas Instruments,1,0.85,Bus interface for digital communication
 Power,Buck converter 12V to 3.3V 500mA,TPS62172DSGT,Texas Instruments,1,1.45,Efficient power from bus

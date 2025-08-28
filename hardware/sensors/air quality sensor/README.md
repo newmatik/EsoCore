@@ -1,19 +1,20 @@
-# EdgeSentinel Temperature Sensor
+# EdgeSentinel Air Quality Sensor
 
 ## PCB Specification
 
-- Board: 2-layer FR4 1.55 mm +/-10%
-- Dimensions: Approx. 40 × 30 mm
+- Board: 4-layer FR4 1.55 mm +/-10%
+- Dimensions: Approx. 60 × 40 mm
 - Surface finish: ENIG
 - Copper: 35 µm (1 OZ)
 
 ## Hardware
 
 - MCU: STM32G031K8T6 (TSSOP20), 8 MHz crystal
-- Sensor: 10 kΩ NTC (1%) with precision bias network
-- ADC: ADS1115 16-bit for high-accuracy temperature measurement
+- Environmental Sensor: BME680 (temperature, humidity, pressure, VOC, IAQ index)
+- Particulate Matter Sensor: PMS5003 (PM2.5, PM10, particle count)
+- CO2 Sensor: SCD40 (NDIR CO2 with auto-calibration)
 - Bus: RS‑485 half‑duplex (SN65HVD72), bias/termination network
-- Power: 12 V bus → 3.3 V buck (TPS62172)
+- Power: 12 V bus → 5 V buck (TPS62173) + 3.3 V LDO (MCP1700)
 - Connectors: 4‑pin screw terminal (12V, GND, D+, D‑)
 - Protection: ESD array on bus and power lines
 - Addressing: 4‑position DIP switch
@@ -22,15 +23,17 @@
 
 ## Layout Guidance
 
-- Place precision resistors close to ADC; use Kelvin connections as appropriate
+- Place air intake ports for particulate sensor and environmental sensors
 - Separate analog and digital grounds; single-point tie
-- Filter and decouple the ADC reference and input nodes
-- Provide strain relief and high-temp insulation for sensor lead exit
+- Provide proper air flow for accurate readings
+- Include mesh filter protection for particulate sensor
+- Allow space for multiple sensor components
 
 ## CAD Toolchain
 
 - Tool: KiCad (8.x recommended)
 - Projects: live under the `kicad/` subfolder of this device
+- Main project: `air-quality-sensor.kicad_pro`
 - Notes: Open the `.kicad_pro` in KiCad; generate fabrication outputs via KiCad Plot and Drill tools.
 
 ## Copyright and License

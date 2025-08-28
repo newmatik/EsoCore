@@ -9,15 +9,14 @@
 
 ## Hardware
 
-- MCU: STM32G031K8T6 (TSSOP20), 8 MHz crystal
-- Sensor: ADXL355 (low-noise 3‑axis MEMS accelerometer)
+- MCU: STM32G071KBT6 (TSSOP20), 8 MHz crystal, enhanced DSP for FFT processing
+- Sensor: ADXL355 (low-noise 3‑axis MEMS accelerometer, ≥1-3kHz ODR)
 - Bus: RS‑485 half‑duplex (SN65HVD72), bias/termination network
-- Power: 12 V bus → 3.3 V buck (TPS62172) → LDO (MCP1700) for analog cleanliness
+- Power: 12 V bus → 3.3 V buck (TPS62172) + LDO (MCP1700) for clean analog
 - Connectors: 4‑pin screw terminal (12V, GND, D+, D‑), PG9 cable gland
 - Addressing: 4‑position DIP switch for module address
 - Indicators: Green status LED
 - Programming: Tag‑Connect SWD footprint
-- PCB Stack-up: Flood ground on both layers; guard traces around MEMS as needed
 
 ## Layout Guidance
 
@@ -30,6 +29,7 @@
 
 - Tool: KiCad (8.x recommended)
 - Projects: live under the `kicad/` subfolder of this device
+- Main project: `vibration-sensor.kicad_pro`
 - Notes: Open the `.kicad_pro` in KiCad; generate fabrication outputs via KiCad Plot and Drill tools.
 
 ## Copyright and License

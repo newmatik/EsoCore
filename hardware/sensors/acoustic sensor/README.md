@@ -10,10 +10,10 @@
 ## Hardware
 
 - MCU: STM32G031K8T6 (TSSOP20), 8 MHz crystal
-- Sensor: Wide-band MEMS microphone (SPU0410LR5H)
-- Analog front-end: MAX9814 microphone preamp with AGC
+- Sensor: Digital MEMS microphone ICS-43434 (wide-band 50Hz-20kHz ±3dB)
+- Sensor: Ultrasound transducer MA40S4R (40±1kHz frequency response)
 - Bus: RS‑485 half‑duplex (SN65HVD72), bias/termination network
-- Power: 12 V bus → 3.3 V buck (TPS62172) → LDO (MCP1700) for low-noise analog
+- Power: 12 V bus → 3.3 V buck (TPS62172) + LDO (MCP1700) for clean analog
 - Connectors: 4‑pin screw terminal (12V, GND, D+, D‑), PG9 cable gland
 - Addressing: 4‑position DIP for module address
 - Indicators: Green status LED
@@ -22,14 +22,16 @@
 ## Layout Guidance
 
 - Keep microphone port unobstructed; consider acoustic opening and gasket
-- Separate analog ground for preamp; single-point tie to digital ground
-- Place ESD near connector; route RS‑485 differential pair; keep AGC lines short
+- Separate analog and digital grounds; single-point tie
+- Place ESD near connector; route RS‑485 differential pair
 - Provide mechanical support for enclosure mounting; consider magnetic base interface
+- Allow space for both audible and ultrasonic frequency sensors
 
 ## CAD Toolchain
 
 - Tool: KiCad (8.x recommended)
 - Projects: live under the `kicad/` subfolder of this device
+- Main project: `acoustic-sensor.kicad_pro`
 - Notes: Open the `.kicad_pro` in KiCad; generate fabrication outputs via KiCad Plot and Drill tools.
 
 ## Copyright and License

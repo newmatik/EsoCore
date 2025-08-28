@@ -34,7 +34,7 @@ This document defines the hardware specifications, component requirements, and c
   - **12–24 V DC**: Terminal block input compatible with door control cabinets, including reverse‑polarity and surge protection
   - **Power over Ethernet (PoE)**: IEEE 802.3af compliant (up to 12.95W) with automatic detection and switching
 - **Power Management**: Automatic source selection between DC input and PoE with priority given to DC input when both available
-- **Backup**: Supercapacitor bank for safe shutdown during power loss (≥30 seconds runtime)
+- **Backup**: High-capacity supercapacitor bank (3x 10F) for safe shutdown during power loss (≥30 seconds runtime)
 
 ---
 
@@ -44,7 +44,7 @@ This document defines the hardware specifications, component requirements, and c
 
 EdgeSentinel uses a **distributed sensor network** where each sensor module contains its own MCU for local processing and standardized digital communication. This architecture provides:
 
-- **Scalability**: Connect multiple sensors of the same type (e.g., 3 temperature, 2 vibration sensors)
+- **Scalability**: Connect multiple sensors of the same type (e.g., 3 air quality, 2 vibration sensors)
 - **Flexibility**: Add/remove sensors based on specific machine requirements  
 - **Noise Immunity**: Digital signals over industrial RS-485 bus
 - **Local Intelligence**: Each sensor performs conditioning, filtering, and preprocessing
@@ -72,19 +72,18 @@ EdgeSentinel uses a **distributed sensor network** where each sensor module cont
 
 #### Environmental Monitoring Modules
 
-- **Ambient Temp/RH Module**: SHT41 sensor with STM32G031 MCU for cabinet monitoring
-- **Stator Temperature Module**: High-precision NTC with conditioning MCU for drive thermal monitoring
+- **Air Quality Module**: Comprehensive sensor combining temperature, humidity, CO₂, VOCs, and particulate matter (PM2.5/PM10) with local processing MCU for air quality analysis and environmental monitoring
 - **Process Temperature Module**: PT100/PT1000 with precision ADC for industrial process monitoring
 
 #### Mechanical Monitoring Modules  
 
-- **Vibration Module**: ADXL355 3-axis accelerometer with DSP-capable MCU for FFT analysis and anomaly detection
-- **Acoustic Module**: Wide-band MEMS microphone with signal processing MCU for sound signature analysis
+- **Vibration Module**: ADXL355 3-axis accelerometer with STM32G071 MCU for enhanced FFT analysis and anomaly detection
+- **Acoustic Module**: Digital MEMS microphone (ICS-43434) + ultrasound transducer with signal processing MCU for comprehensive sound analysis
 - **Position/Cycle Module**: Quadrature encoder or limit switch interface with cycle counting and position tracking
 
 #### Electrical Monitoring Modules
 
-- **Current Monitoring Module**: Isolated Hall sensor with MCU for torque/load calculation and power analysis
+- **Current Monitoring Module**: ACS723 isolated Hall sensor (±30A) with MCU for enhanced torque/load calculation and power analysis
 - **Voltage Monitoring Module**: Isolated voltage sensing with harmonic analysis capability
 
 ### Digital Sensor Bus Interface
@@ -166,8 +165,7 @@ Each sensor module contains:
 
 #### Environmental Monitoring Modules (Reference Implementation)
 
-- **Ambient Temp/RH**: SHT41 sensor with MCU providing calibrated readings and dew point calculation
-- **Stator Temperature**: High-precision NTC with 16-bit ADC and linearization in MCU
+- **Air Quality**: BME680 or ENS160 sensor with MCU providing temperature, humidity, CO₂, VOC, IAQ index, and particulate matter readings with local air quality analysis
 - **Process Temperature**: PT100/PT1000 with precision instrumentation amplifier and cold junction compensation
 
 #### Mechanical Monitoring Modules (Reference Implementation)
@@ -196,7 +194,7 @@ Each sensor module contains:
 ### Power & Backup System
 
 - **Primary**: 12–24V DC input with surge protection and EMI filtering
-- **Supercapacitor bank**: 10–30F (e.g., 6x 5F Maxwell supercaps) for 30+ second safe shutdown
+- **Supercapacitor bank**: 30F total capacity (e.g., 3x 10F Maxwell supercaps) for 30+ second safe shutdown
 - **Power monitoring**: voltage/current sensors with brownout/blackout detection
 
 ### Timing

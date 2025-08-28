@@ -7,7 +7,7 @@ Hardware sources (see READMEs in subfolders)
   - `vibration sensor/`
   - `acoustic sensor/`
   - `current sensor/`
-  - `temperature sensor/`
+  - `air quality sensor/`
 - `cables/`
 
 Notes:

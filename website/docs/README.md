@@ -80,8 +80,8 @@ For these demanding applications, EdgeSentinel provides the complete operational
 ## Project goals
 
 - **Capture**:
-  - Ambient temperature (°C) and relative humidity (%)
-  - Equipment/motor temperature monitoring for thermal management
+  - Comprehensive air quality monitoring (temperature, humidity, CO₂, VOCs, particulate matter)
+  - Equipment environmental monitoring for thermal management and air quality
   - Operational cycles (machine starts/stops, production counts)
   - Multi-axis vibration (RMS and diagnostic windows) for bearing/mechanical health
   - Motor current and power consumption for load monitoring
@@ -132,7 +132,7 @@ For these demanding applications, EdgeSentinel provides the complete operational
 
 ### Sensor Suite
 
-**Environmental**: Ambient temperature/humidity, drive stator temperature monitoring for thermal management.
+**Environmental**: Comprehensive air quality monitoring (temperature, humidity, CO₂, VOCs, particulate matter) for thermal management and environmental compliance.
 
 **Mechanical**: 3-axis vibration (1-3kHz), acoustic monitoring (audible + ultrasonic), machine cycle counting, motor current sensing for torque/load monitoring.
 

@@ -177,10 +177,10 @@
         'bom-vibration': 'Vibration Sensor Module',
         'bom-acoustic': 'Acoustic Sensor Module',
         'bom-current': 'Current Sensor Module',
-        'bom-temperature': 'Temperature Sensor Module',
+        'bom-air-quality': 'Air Quality Sensor Module',
         'bom-cables': 'Cables & Interconnects'
       };
-      const displayOrder = ['bom-main','bom-vibration','bom-acoustic','bom-current','bom-temperature','bom-cables'];
+      const displayOrder = ['bom-main','bom-vibration','bom-acoustic','bom-current','bom-air-quality','bom-cables'];
       let systemSection = document.getElementById('system-cost');
       if (!systemSection) {
         systemSection = document.createElement('section');
@@ -240,7 +240,7 @@
         'bom-vibration': './data/bom-vibration-sensor.csv',
         'bom-acoustic': './data/bom-acoustic-sensor.csv',
         'bom-current': './data/bom-current-sensor.csv',
-        'bom-temperature': './data/bom-temperature-sensor.csv',
+        'bom-air-quality': './data/bom-air-quality-sensor.csv',
         'bom-cables': './data/bom-cables.csv'
       };
       bomMounts.forEach(mount => {

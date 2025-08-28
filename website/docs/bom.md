@@ -43,11 +43,11 @@ Non-invasive clamp-on installation on motor power cables. Provides isolated curr
 
 ---
 
-## Temperature Sensor Module
+## Air Quality Sensor Module
 
-High-temperature NTC sensor for direct stator temperature monitoring. Precision conditioning for accurate thermal management.
+Comprehensive air quality monitoring combining temperature, humidity, CO₂, VOCs, and particulate matter sensors. Provides environmental monitoring for thermal management and air quality compliance.
 
-<div id="bom-temperature">Loading BOM...</div>
+<div id="bom-air-quality">Loading BOM...</div>
 
 ---
 

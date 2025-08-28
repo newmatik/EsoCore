@@ -18,7 +18,7 @@ local development and deployment instructions.
     - `vibration sensor/`
     - `acoustic sensor/`
     - `current sensor/`
-    - `temperature sensor/`
+    - `air quality sensor/`
   - `cables/`
   - CAD files live under each device's `kicad/` folder; open the `.kicad_pro` projects with KiCad (8.x recommended).
 - `firmware/` – Device and board-support firmware

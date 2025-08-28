@@ -3,10 +3,8 @@ MCU,STM32H757 Dual-core Cortex-M7/M4 LQFP144,STM32H757ZIT6,ST,1,13.50,Main MCU (
 Wireless,WiFi module 2.4GHz u-blox NINA-W106,NINA-W106-00B,u-blox,1,7.90,Certified industrial WiFi BLE module
 Storage,Industrial microSD 16GB MLC -40C to 85C,ISD-16GB-MLC,Apacer or Innodisk,1,6.80,Logging and buffering
 Connector,MicroSD push-push holder,2041021-4,TE Connectivity,1,0.35,MicroSD socket
-Power,DC-DC buck 24V to 5V 3A module,OKI-78SR-5/3.0-W36C,TDK-Lambda,1,4.70,Primary 5V rail from 12-24V
-Power,Buck converter 5V to 3.3V 2A,TPS62130RGTR,Texas Instruments,1,1.25,3.3V rail for digital
-Power,LDO 3.3V clean rail for analog,MCP1825S-3302E,Microchip,1,0.25,Optional clean analog
-Backup,Supercapacitor 2.7V 5F,NES2R7055R,Nesscap or Maxwell,6,2.80,Bank of six for safe shutdown
+Power,Integrated buck converter 12-24V to 3.3V 3A,TPS54331DR,Texas Instruments,1,2.80,Integrated power solution with enable and power good
+Backup,Supercapacitor 2.7V 10F,NES2R7100R,Nesscap or Maxwell,3,4.50,Bank of three high-capacity supercaps for 30+ sec runtime
 Protection,24V TVS diode SMAJ24A,SMAJ24A,Littelfuse,2,0.09,Input surge protection
 Protection,USB ESD protection array 4-ch,ESD9M5V,Onsemi,1,0.06,USB data protection
 Protection,GPIO ESD protection array 2-ch,ESD5Z3.3,Diodes Inc,4,0.05,Sensor connector protection
@@ -18,7 +16,6 @@ IO,Optocoupler for 24V inputs VO615A-A,VO615A-A,Vishay,10,0.12,Safety and genera
 IO,Relay SPDT 5V coil,G5LE-1-5VDC,Omron,1,1.60,Service indicator or interlock
 Clock,32.768kHz RTC crystal,AB26T-32.768KHZ,ABRACON,1,0.15,RTC reference
 Clock,25MHz HSE crystal for MCU,ABM8G-25.000MHZ-18-D2Y-T,ABRACON,1,0.18,STM32 external clock source
-Sensors,Ambient Temp/RH sensor SHT41,SHT41-AD1B-R2,Sensirion,1,3.20,On-board cabinet ambient sensor
 Ethernet,10/100 Ethernet PHY DP83825I,DP83825IRHBR,Texas Instruments,1,1.50,PHY for optional Ethernet
 Connector,Sensor bus primary port 4-pin terminal block,691137710004,Wurth,1,0.18,Main RS-485 sensor bus out
 Connector,Sensor bus secondary port 4-pin terminal block,691137710004,Wurth,1,0.18,Daisy-chain or secondary bus
