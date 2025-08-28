@@ -1,0 +1,17 @@
+# Configuration for GitHub Issue Templates
+# See https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository
+
+# Disable the blank issue template (users must use our templates)
+blank_issues_enabled: false
+
+# Contact links for additional support
+contact_links:
+  - name: 📖 Documentation
+    url: https://newmatik.github.io/edgesentinel/
+    about: Check our documentation for answers to common questions
+  - name: 💬 Community Discussions
+    url: https://github.com/newmatik/edgesentinel/discussions
+    about: Join community discussions and Q&A
+  - name: 🏢 Newmatik Website
+    url: https://www.newmatik.com
+    about: Learn more about Newmatik, creators of EdgeSentinel

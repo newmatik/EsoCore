@@ -1,0 +1,76 @@
+name: ❓ General Question
+description: Ask a question or start a discussion
+title: "[QUESTION] <brief description>"
+labels: ["question", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## ❓ General Question
+
+        Have a question about EdgeSentinel? Need clarification on something? This is the place to ask!
+
+        **Note:** For bug reports, please use the Bug Report template. For feature requests, use the Feature Request template.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: What would you like to know or discuss?
+      placeholder: "Please be as specific as possible. The more context you provide, the better we can help you."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Question category
+      description: What is this question about?
+      options:
+        - Hardware - Core Device
+        - Hardware - Sensors
+        - Hardware - Integration/Setup
+        - Firmware - Development
+        - Firmware - Deployment
+        - Software - Host Tools
+        - Documentation
+        - Development Environment
+        - Business/Partnership
+        - General Discussion
+        - Other (please specify)
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context/Background
+      description: Provide any relevant context or background information
+      placeholder: "What are you trying to accomplish? What's your use case? What have you tried already?"
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Your environment (if relevant)
+      description: If your question is environment-specific, please provide details
+      placeholder: |
+        - OS: [e.g., Windows 10, macOS 12, Ubuntu 20.04]
+        - Hardware: [e.g., Raspberry Pi 4, custom PCB]
+        - Firmware version: [e.g., v1.2.3]
+        - Software version: [e.g., v2.1.0]
+        - Experience level: [beginner, intermediate, advanced]
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues and discussions for similar questions
+          required: true
+        - label: I have checked the documentation first
+          required: true
+        - label: This is not a bug report (use bug report template instead)
+          required: true
+        - label: This is not a feature request (use feature request template instead)
+          required: true

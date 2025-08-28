@@ -1,5 +1,7 @@
 # EdgeSentinel – Monorepo (Docs, Hardware, Firmware, Software)
 
+[![Sponsor](https://img.shields.io/badge/Sponsor-Newmatik-blue?style=for-the-badge&logo=github-sponsors)](https://www.newmatik.com)
+
 This repository contains the public documentation website and the source for hardware, firmware, and supporting software for EdgeSentinel.
 
 ## Website
