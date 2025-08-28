@@ -293,44 +293,6 @@ All EdgeSentinel sensor modules share a common architecture:
 
 ---
 
-## Sensor Compatibility Matrix
-
-| Sensor Type | RS-485 Bus | PoE Compatible | Hazardous Areas | High Temperature |
-|-------------|------------|----------------|-----------------|-----------------|
-| Air Quality | ✅ | ✅ | ⚠️ (consult spec) | ✅ |
-| Vibration | ✅ | ✅ | ✅ | ✅ |
-| Acoustic | ✅ | ✅ | ✅ | ✅ |
-| Current | ✅ | ⚠️ (isolated) | ⚠️ (consult spec) | ✅ |
-| Light | ✅ | ✅ | ✅ | ✅ |
-| Oil Quality | ✅ | ⚠️ (isolated) | ⚠️ (consult spec) | ✅ |
-| Pressure | ✅ | ✅ | ⚠️ (consult spec) | ✅ |
-| Temperature | ✅ | ✅ | ⚠️ (consult spec) | ✅ |
-| Proximity | ✅ | ✅ | ✅ | ✅ |
-
-**Legend:**
-
-- ✅ Compatible
-- ⚠️ Special considerations required
-- Contact manufacturer for hazardous area certifications
-
----
-
-## Technical Specifications Summary
-
-| Sensor Module | Dimensions | Power | Communication | Enclosure | Weight |
-|---------------|------------|-------|----------------|-----------|--------|
-| Air Quality | 60×40mm | 12V, 0.5A | RS-485 | IP54 | 150g |
-| Vibration | 40×30mm | 12V, 0.3A | RS-485 | IP67 | 120g |
-| Acoustic | 40×30mm | 12V, 0.4A | RS-485 | IP54 | 130g |
-| Current | 50×35mm | 12V, 0.6A | RS-485 | IP67 | 200g |
-| Light | 45×35mm | 12V, 0.4A | RS-485 | IP65 | 140g |
-| Oil Quality | 60×45mm | 12V, 0.8A | RS-485 | IP67 | 250g |
-| Pressure | 50×40mm | 12V, 0.5A | RS-485 | IP67 | 180g |
-| Temperature | 50×35mm | 12V, 0.4A | RS-485 | IP67 | 160g |
-| Proximity | 55×40mm | 12V, 0.5A | RS-485 | IP67 | 170g |
-
----
-
 ## Installation & Configuration
 
 ### Mounting Options

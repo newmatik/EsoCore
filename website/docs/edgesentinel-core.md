@@ -4,7 +4,7 @@ This document defines the hardware specifications for the EdgeSentinel Core devi
 
 ---
 
-## PCB Assembly
+## Core Hardware Requirements
 
 ### Core Processing
 
