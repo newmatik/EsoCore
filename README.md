@@ -11,36 +11,38 @@ npx serve -l 3000
 # or any static server (python3 -m http.server 3000)
 ```
 
-Open `http://localhost:3000/` and click Docs, or go directly to `http://localhost:3000/docs/`.
+Open `http://localhost:3000/website/` (landing) and `http://localhost:3000/website/docs/` (docs).
 
 ## Temporary access protection
 
-The site can be temporarily protected with a simple client-side access code prompt for preview deployments. To enable or change this during development, edit `docs/assets/site.js` (`ACCESS_CODE`). The unlock persists for the browser tab (`sessionStorage`) and is intended only to keep previews private while iterating. Remove or disable before production.
+The site can be temporarily protected with a simple client-side access code prompt for preview deployments. To enable or change this during development, edit `website/assets/site.js` (`ACCESS_CODE`). The unlock persists for the browser tab (`sessionStorage`) and is intended only to keep previews private while iterating. Remove or disable before production.
 
 ## Deployment (GitHub Pages)
 
-Deployed from the `docs/` folder on the `main` branch with a custom domain.
+Deployed from `website/` on the `main` branch with a custom domain.
 
 1. Push to `main`.
 2. In GitHub → Settings → Pages → Build and deployment:
    - Source: Deploy from branch
    - Branch: `main`
-   - Folder: `/docs`
-3. Set custom domain to `www.edgesentinel.de` (CNAME is in `docs/CNAME`). Ensure DNS points to GitHub Pages.
+   - Folder: `/website`
+3. Set custom domain to `www.edgesentinel.de` (CNAME is in `website/CNAME`). Ensure DNS points to GitHub Pages.
 
-Deep links under the docs app work via `docs/404.html` fallback routing.
+Deep links under the docs app work via `website/docs/404.html` fallback routing.
 
 ## Structure
 
-- `index.html` – Landing page (optional; site is published from `docs/`)
-- `docs/` – Public documentation site (published folder)
-  - `index.html` – Docs shell
-  - `assets/` – Shared styles and scripts used by the docs app
+- `website/` – Public website (published folder)
+  - `index.html` – Landing page
+  - `404.html`, `.nojekyll`, `CNAME` – GitHub Pages support files
+  - `assets/` – Shared styles and scripts used by the site and docs app
     - `theme.css` – Theme
     - `site.js` – Shared header/footer and temporary access gate
     - `docs-app.js` – Docs viewer: sidebar, clean routing, search, section submenus
-  - `data/` – Public data used by the docs (BOM CSV copies for rendering)
-  - `404.html`, `.nojekyll`, `CNAME` – GitHub Pages support files
+  - `docs/` – Documentation content and shell
+    - `index.html` – Docs shell
+    - `data/` – Public data used by the docs (BOM CSV copies for rendering)
+    - `404.html` – Docs deep-link fallback
 - `hardware/` – Hardware sources
   - `bom/` – Canonical Bill of Materials CSVs (author/edit here)
   - `altium/` – PCB projects (add here)
@@ -52,8 +54,8 @@ Deep links under the docs app work via `docs/404.html` fallback routing.
 
 Notes on BOMs:
 - The canonical BOM CSVs live in `hardware/bom/`.
-- The docs app reads CSVs from `docs/data/` for public rendering.
-- After editing CSVs in `hardware/bom/`, copy them to `docs/data/` to update the site. We can add a small sync script in `tools/` if desired.
+- The docs app reads CSVs from `website/docs/data/` for public rendering.
+- After editing CSVs in `hardware/bom/`, copy them to `website/docs/data/` to update the site. We can add a small sync script in `tools/` if desired.
 
 ## Open source
 
