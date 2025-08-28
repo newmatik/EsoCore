@@ -1,41 +1,59 @@
-# EdgeSentinel Website & Docs
+# EdgeSentinel – Monorepo (Docs, Hardware, Firmware, Software)
 
-This repository contains the static website and documentation viewer for EdgeSentinel.
+This repository contains the public documentation website and the source for hardware, firmware, and supporting software for EdgeSentinel.
 
 ## Local development
 
-From the project root, start a static server:
+From the project root, start any static server:
 
 ```sh
 npx serve -l 3000
 # or any static server (python3 -m http.server 3000)
 ```
 
-Open `http://localhost:3000/` (docs at `/docs`).
+Open `http://localhost:3000/` and click Docs, or go directly to `http://localhost:3000/docs/`.
 
 ## Temporary access protection
 
-The site can be temporarily protected with a simple client-side access code prompt for preview deployments. To enable or change this during development, edit `assets/site.js` (`ACCESS_CODE`). The unlock persists for the browser tab (`sessionStorage`) and is intended only to keep previews private while iterating. Remove or disable before production.
+The site can be temporarily protected with a simple client-side access code prompt for preview deployments. To enable or change this during development, edit `docs/assets/site.js` (`ACCESS_CODE`). The unlock persists for the browser tab (`sessionStorage`) and is intended only to keep previews private while iterating. Remove or disable before production.
 
 ## Deployment (GitHub Pages)
 
-Deployed from the `main` branch with a custom domain.
+Deployed from the `docs/` folder on the `main` branch with a custom domain.
 
 1. Push to `main`.
-2. Settings → Pages → Deploy from branch (`main`, root).
-3. Set custom domain to `www.edgesentinel.de` (CNAME provided). Ensure DNS points to GitHub Pages.
+2. In GitHub → Settings → Pages → Build and deployment:
+   - Source: Deploy from branch
+   - Branch: `main`
+   - Folder: `/docs`
+3. Set custom domain to `www.edgesentinel.de` (CNAME is in `docs/CNAME`). Ensure DNS points to GitHub Pages.
 
-Deep links to `/docs/<slug>` work via `404.html` redirects in the root and `/docs`.
+Deep links under the docs app work via `docs/404.html` fallback routing.
 
 ## Structure
 
-- `index.html` – Landing page
-- `docs/` – Markdown docs and docs shell (`index.html`)
-- `assets/` – Shared styles and scripts
-  - `theme.css` – Dark theme (Nuxt-like green accent)
-  - `site.js` – Shared header/footer and temporary access gate
-  - `docs-app.js` – Docs viewer: sidebar, clean routing, search, section submenus
-- `CNAME`, `.nojekyll`, `404.html`, `docs/404.html` – GitHub Pages support
+- `index.html` – Landing page (optional; site is published from `docs/`)
+- `docs/` – Public documentation site (published folder)
+  - `index.html` – Docs shell
+  - `assets/` – Shared styles and scripts used by the docs app
+    - `theme.css` – Theme
+    - `site.js` – Shared header/footer and temporary access gate
+    - `docs-app.js` – Docs viewer: sidebar, clean routing, search, section submenus
+  - `data/` – Public data used by the docs (BOM CSV copies for rendering)
+  - `404.html`, `.nojekyll`, `CNAME` – GitHub Pages support files
+- `hardware/` – Hardware sources
+  - `bom/` – Canonical Bill of Materials CSVs (author/edit here)
+  - `altium/` – PCB projects (add here)
+  - `mechanical/` – STEP/drawings (add here)
+- `firmware/` – Device and board-support firmware
+  - `stm32/`, `common/`, etc.
+- `software/` – Host-side tools/services
+- `tools/` – Utility scripts (e.g., sync, build, release)
+
+Notes on BOMs:
+- The canonical BOM CSVs live in `hardware/bom/`.
+- The docs app reads CSVs from `docs/data/` for public rendering.
+- After editing CSVs in `hardware/bom/`, copy them to `docs/data/` to update the site. We can add a small sync script in `tools/` if desired.
 
 ## Open source
 
