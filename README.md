@@ -2,33 +2,10 @@
 
 This repository contains the public documentation website and the source for hardware, firmware, and supporting software for EdgeSentinel.
 
-## Local development
+## Website
 
-From the project root, start any static server:
-
-```sh
-npx serve -l 3000
-# or any static server (python3 -m http.server 3000)
-```
-
-Open `http://localhost:3000/website/` (landing) and `http://localhost:3000/website/docs/` (docs).
-
-## Temporary access protection
-
-The site can be temporarily protected with a simple client-side access code prompt for preview deployments. To enable or change this during development, edit `website/assets/site.js` (`ACCESS_CODE`). The unlock persists for the browser tab (`sessionStorage`) and is intended only to keep previews private while iterating. Remove or disable before production.
-
-## Deployment (GitHub Pages)
-
-Deployed from `website/` on the `main` branch with a custom domain.
-
-1. Push to `main`.
-2. In GitHub → Settings → Pages → Build and deployment:
-   - Source: Deploy from branch
-   - Branch: `main`
-   - Folder: `/website`
-3. Set custom domain to `www.edgesentinel.de` (CNAME is in `website/CNAME`). Ensure DNS points to GitHub Pages.
-
-Deep links under the docs app work via `website/docs/404.html` fallback routing.
+The public website and docs live in `website/`. See `website/README.md` for
+local development and deployment instructions.
 
 ## Structure
 
