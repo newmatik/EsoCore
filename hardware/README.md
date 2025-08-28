@@ -13,7 +13,7 @@ Hardware sources (see READMEs in subfolders)
 Notes:
 
 - BOMs live in the respective device folders.
-- CAD/binaries belong under `altium/` and `mechanical/`.
+- CAD/binaries belong under `kicad/` and `mechanical/`.
 
 ## Copyright and License
 

@@ -20,6 +20,7 @@ local development and deployment instructions.
     - `current sensor/`
     - `temperature sensor/`
   - `cables/`
+  - CAD files live under each device's `kicad/` folder; open the `.kicad_pro` projects with KiCad (8.x recommended).
 - `firmware/` – Device and board-support firmware
   - `stm32/`, `common/`, etc.
 - `software/` – Host-side tools/services

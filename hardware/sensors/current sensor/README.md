@@ -26,6 +26,12 @@
 - Place ESD and GDT near connectors; filter supply rails for ADC measurements
 - Provide DIN rail mounting holes in accordance with enclosure spec
 
+## CAD Toolchain
+
+- Tool: KiCad (8.x recommended)
+- Projects: live under the `kicad/` subfolder of this device
+- Notes: Open the `.kicad_pro` in KiCad; generate fabrication outputs via KiCad Plot and Drill tools.
+
 ## Copyright and License
 
 Copyright © 2025 Newmatik. All rights reserved.

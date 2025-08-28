@@ -36,6 +36,12 @@
 - Place TVS/ESD close to connectors; keep supercap high-current paths short
 - Respect creepage/clearance around isolated fieldbus and PoE sections
 
+## CAD Toolchain
+
+- Tool: KiCad (8.x recommended)
+- Project: `hardware/core/kicad/core.kicad_pro`
+- Notes: Open the `.kicad_pro` in KiCad; edit schematics/layout in `.kicad_sch`/`.kicad_pcb`. Generate fabrication outputs via KiCad Plot and Drill tools.
+
 ## Copyright and License
 
 Copyright © 2025 Newmatik. All rights reserved.

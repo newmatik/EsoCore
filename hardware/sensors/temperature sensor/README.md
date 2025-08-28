@@ -27,6 +27,12 @@
 - Filter and decouple the ADC reference and input nodes
 - Provide strain relief and high-temp insulation for sensor lead exit
 
+## CAD Toolchain
+
+- Tool: KiCad (8.x recommended)
+- Projects: live under the `kicad/` subfolder of this device
+- Notes: Open the `.kicad_pro` in KiCad; generate fabrication outputs via KiCad Plot and Drill tools.
+
 ## Copyright and License
 
 Copyright © 2025 Newmatik. All rights reserved.
