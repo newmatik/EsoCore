@@ -92,8 +92,15 @@ body:
     id: logs
     attributes:
       label: Logs/Error messages
-      description: Please include any relevant logs, error messages, or console output
-      placeholder: "Paste any error messages or logs here"
+      description: Please include any relevant logs, error messages, or console output. IMPORTANT - Redact any sensitive data before pasting!
+      placeholder: |
+        Paste any error messages or logs here.
+
+        ⚠️ IMPORTANT: Before pasting, please:
+        - Remove or mask API keys, tokens, passwords
+        - Replace personal information with [REDACTED]
+        - Remove sensitive URLs, IP addresses, or credentials
+        - Example: api_key=sk-1234567890 → api_key=[REDACTED]
       render: shell
 
   - type: textarea

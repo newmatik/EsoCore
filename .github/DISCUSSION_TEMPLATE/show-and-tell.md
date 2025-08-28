@@ -1,6 +1,7 @@
 ---
 title: "[Show & Tell] <Your Project/Use Case>"
 labels: ["showcase"]
+category: "Show and tell"
 ---
 
 ## Project Overview

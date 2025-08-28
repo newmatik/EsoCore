@@ -1,6 +1,7 @@
 ---
 title: "[Discussion] <Topic Here>"
 labels: ["discussion"]
+category: "General"
 ---
 
 ## Topic
