@@ -23,10 +23,10 @@ is stored in `sessionStorage` and applies to the current browser tab only.
 ## Deployment (GitHub Pages)
 
 - Settings → Pages → Build and deployment:
-  - Source: Deploy from branch
-  - Branch: `main`
-  - Folder: `/website`
-- Custom domain: `www.edgesentinel.de` (`website/CNAME` is present)
+  - Source: GitHub Actions
+- Workflow: `.github/workflows/pages.yml` uploads `website/` and deploys on pushes to `main`.
+- Optional: trigger manually via “Run workflow”.
+- Custom domain: `www.edgesentinel.de` (`website/CNAME` is included in the artifact)
 - Docs deep links are handled by `website/docs/404.html`
 
 ## Structure
