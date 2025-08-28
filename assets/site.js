@@ -10,8 +10,8 @@
   }
 
   function isDocs() {
-    // When hosted from /docs/ folder, everything is the docs app
-    return true;
+    const p = location.pathname.replace(/\/index.html$/, '');
+    return p === '/docs' || p.startsWith('/docs/');
   }
 
   function header() {
@@ -65,7 +65,7 @@
   function gate() {
     if (isUnlocked()) return;
     const path = location.pathname.replace(/\/index.html$/, '');
-    if (path.endsWith('/imprint.html') || path.endsWith('/imprint')) return;
+    if (path === '/imprint.html' || path === '/imprint') return;
     const overlay = el(`
       <div class="gate" role="dialog" aria-modal="true" aria-label="Access Required">
         <div class="gate-card">
