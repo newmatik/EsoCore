@@ -88,7 +88,7 @@ CNC machine monitoring emphasizes performance optimization, condition monitoring
 #### MachineMetrics
 
 - **Target**: Discrete manufacturers, job shops, machine OEMs  
-- **Hardware**: Plug-and-play edge devices, CNC controller connectors (Fanuc, Haas, Siemens)  
+- **Hardware**: Plug-and-play Core devices, CNC controller connectors (Fanuc, Haas, Siemens)  
 - **Edge Intelligence**: Edge processing for real-time alerts, cloud for deeper analytics  
 - **Analytics**: Production monitoring, OEE, predictive maintenance, tool wear tracking  
 - **Safety**: Monitoring-only (no direct control), reliability focus  
@@ -187,7 +187,7 @@ The CNC monitoring market is mature with established players offering different 
 
 #### 6. **Modular RS‑485 Sensor Bus**
 
-- **Advantage**: Add new sensor types (including proprietary partner modules) without redesigning the edge device
+- **Advantage**: Add new sensor types (including proprietary partner modules) without redesigning the Core
 - **Value**: Faster time‑to‑market for customer‑specific requirements and exclusive sensors
 - **Differentiation**: Many competitors tie capabilities to fixed hardware kits or OEM controllers; our RS‑485 multi‑drop bus enables plug‑and‑play expansion
 

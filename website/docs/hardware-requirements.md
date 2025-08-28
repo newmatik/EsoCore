@@ -52,14 +52,14 @@ EdgeSentinel uses a **distributed sensor network** where each sensor module cont
 
 #### Integration Strategy
 
-- **Modular by design**: New sensor types (including partner‑specific or proprietary modules) can be introduced without any changes to the main edge device or firmware architecture. The RS‑485 protocol layer abstracts capabilities, so the platform scales by adding sensor modules rather than redesigning hardware.
+- **Modular by design**: New sensor types (including partner‑specific or proprietary modules) can be introduced without any changes to the Core or firmware architecture. The RS‑485 protocol layer abstracts capabilities, so the platform scales by adding sensor modules rather than redesigning hardware.
 - **Hot‑plug and discovery**: Auto‑enumeration assigns addresses and registers sensor capabilities at runtime, enabling field upgrades and customer‑specific configurations.
 
 ### Sensor Bus Protocol Selection
 
 - **Physical Layer**: RS-485 differential signaling over shielded twisted pair (Belden 3105A or equivalent)
 - **Cable**: 4-conductor (Power+, Power-, Data+, Data-) with drain wire for shield grounding
-- **Distance**: Up to 100 meters from main edge device to sensors with automatic repeaters
+- **Distance**: Up to 100 meters from Core to sensors with automatic repeaters
 - **Speed**: 115.2 kbps for real-time data with deterministic latency (<10ms)
 - **Topology**: Multi-drop bus with daisy-chain or star configurations
 - **Addressing**: 8-bit addresses (supports 254 sensor modules per bus) configured via DIP switches

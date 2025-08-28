@@ -4,13 +4,13 @@ This is an early, approximate BOM at 1k quantity based on requirements. Prices a
 
 > ⚠️ **Warning:** These figures reflect material (BOM) cost only. Assembly costs are not included.
 
-The EdgeSentinel system consists of a **main edge device** (installed in control cabinet) and separate **sensor modules** (mounted directly on machinery). This modular approach allows optimal placement while keeping sensitive electronics protected.
+The EdgeSentinel system consists of the **Core** (installed in the control cabinet) and separate **Sensor Modules** (mounted directly on machinery). This modular approach allows optimal placement while keeping sensitive electronics protected.
 
-**Industrial Connector Strategy**: All sensor modules use **4-pin screw terminal blocks** with PG9 cable glands for maximum field serviceability and cost effectiveness. Standard 4-conductor shielded cable can be cut to length and terminated in the field. The main edge device features dedicated **terminal block arrays** for different I/O types, enabling clean professional installation with clear functional separation.
+**Industrial Connector Strategy**: All sensor modules use **4-pin screw terminal blocks** with PG9 cable glands for maximum field serviceability and cost effectiveness. Standard 4-conductor shielded cable can be cut to length and terminated in the field. The Core features dedicated **terminal block arrays** for different I/O types, enabling clean professional installation with clear functional separation.
 
 ---
 
-## Main Edge Device
+## Core
 
 Control cabinet mounted unit with processing, connectivity, and I/O. Houses the STM32H743 MCU, fieldbus interfaces, PoE support, and safety systems.
 
@@ -52,7 +52,7 @@ High-temperature NTC sensor for direct stator temperature monitoring. Precision 
 
 ## Cables & Interconnects
 
-Shielded cables, connectors, and installation hardware for connecting sensor modules to main edge device.
+Shielded cables, connectors, and installation hardware for connecting sensor modules to the Core.
 
 <div id="bom-cables">Loading BOM...</div>
 

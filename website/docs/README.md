@@ -100,7 +100,7 @@ For these demanding applications, EdgeSentinel provides the complete operational
 
 | Component | Technology | Purpose |
 |-----------|------------|---------|
-| **Edge Device** | STM32 F4/F7/H7 | Real-time sensor data collection and local processing |
+| **Core** | STM32 F4/F7/H7 | Real-time sensor data collection and local processing |
 | **Cloud Platform** | Frappe Framework | Data management, analytics, and user interfaces |
 | **Connectivity** | Ethernet/PoE or Wi-Fi | Reliable data transmission with offline resilience |
 | **Storage** | Industrial microSD + Cloud DB | Local buffering and long-term data persistence |
@@ -115,7 +115,7 @@ For these demanding applications, EdgeSentinel provides the complete operational
 ### Modular RS‑485 Sensor Architecture
 
 - **Distributed sensor bus (RS‑485)**: Sensor modules with local MCUs connect over an industrial RS‑485 multi‑drop bus, enabling plug‑and‑play expansion.
-- **No edge redesign**: New sensor types can be added—customer‑specific, proprietary, or exclusive—without changing the edge device or platform architecture.
+- **No Core redesign**: New sensor types can be added—customer‑specific, proprietary, or exclusive—without changing the Core or platform architecture.
 - **Scalable and robust**: Digital, noise‑immune wiring up to 100 m with auto‑discovery and hot‑plug support. See detailed specs in [Hardware Requirements](hardware-requirements.md).
 
 ---

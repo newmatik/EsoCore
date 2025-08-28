@@ -10,16 +10,8 @@ local development and deployment instructions.
 ## Structure
 
 - `website/` – Public website (published folder)
-  - `index.html` – Landing page
-  - `404.html`, `.nojekyll`, `CNAME` – GitHub Pages support files
   - `assets/` – Shared styles and scripts used by the site and docs app
-    - `theme.css` – Theme
-    - `site.js` – Shared header/footer and temporary access gate
-    - `docs-app.js` – Docs viewer: sidebar, clean routing, search, section submenus
   - `docs/` – Documentation content and shell
-    - `index.html` – Docs shell
-    - `data/` – Public data used by the docs (BOM CSV copies for rendering)
-    - `404.html` – Docs deep-link fallback
 - `hardware/` – Hardware sources
   - `bom/` – Canonical Bill of Materials CSVs (author/edit here)
   - `altium/` – PCB projects (add here)
@@ -36,7 +28,7 @@ Notes on BOMs:
 
 ## Open source
 
-Website source: [github.com/newmatik/edgesentinel-web](https://github.com/newmatik/edgesentinel-web)
+Website source: [github.com/newmatik/edgesentinel](https://github.com/newmatik/edgesentinel)
 
 ## Protocols
 

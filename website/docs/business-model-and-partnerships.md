@@ -94,7 +94,7 @@ While the core platform remains open source, partners retain full ownership of t
 
 - **Custom ML Models**: Partners can develop proprietary machine learning algorithms optimized for their specific equipment types and failure modes.
 - **Industry-Specific Algorithms**: Specialized processing algorithms for unique sensor configurations or industry requirements remain proprietary to each partner.
- - **Custom Sensor Modules**: Partners can introduce exclusive or proprietary sensors as RS‑485 modules that integrate seamlessly with the platform without modifying the edge device or architecture.
+ - **Custom Sensor Modules**: Partners can introduce exclusive or proprietary sensors as RS‑485 modules that integrate seamlessly with the platform without modifying the Core or architecture.
 - **Configuration Management**: Custom device configurations, thresholds, and operational parameters specific to partner applications.
 - **Data Analytics**: Proprietary analytics and reporting capabilities tailored to specific industry needs and customer requirements.
 

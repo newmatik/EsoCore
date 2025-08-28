@@ -173,7 +173,7 @@
       }
       // Insert a structured System Cost section near the top (after the H1 if present)
       const systemNames = {
-        'bom-main': 'Main Edge Device',
+        'bom-main': 'Core',
         'bom-vibration': 'Vibration Sensor Module',
         'bom-acoustic': 'Acoustic Sensor Module',
         'bom-current': 'Current Sensor Module',
