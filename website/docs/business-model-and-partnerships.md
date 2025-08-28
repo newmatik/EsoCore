@@ -8,6 +8,9 @@ EdgeSentinel is developed and maintained by Newmatik through a collaborative par
 
 ### Lead Developer: Newmatik
 
+**Who is Newmatik?**
+[Newmatik](https://newmatik.com) is a European electronics and software company with deep experience in PCB assembly and industrial product development. With EU manufacturing and a software‑driven approach to automation, Newmatik combines hardware engineering with modern cloud and embedded development to deliver reliable, production‑ready solutions at scale.
+
 **Newmatik** serves as the primary technology developer and maintainer of the EdgeSentinel platform, providing comprehensive development services across all technical domains:
 
 **Hardware Development:**
@@ -38,6 +41,19 @@ EdgeSentinel is developed and maintained by Newmatik through a collaborative par
 - Safety compliance validation and testing
 - End-to-end system integration testing
 - Regulatory certification and compliance documentation
+
+---
+
+## Business Model (Open Core)
+
+EdgeSentinel follows an open‑core model under the Apache 2.0 License: the core is free and open source, while advanced capabilities and services are offered commercially.
+
+- **Open‑source core**: Free adoption to drive developer and industry traction
+- **Commercial add‑ons**: Advanced modules, integrations, monitoring dashboards
+- **Enterprise support & SLAs**: Priority fixes, security backports, training, and architectural guidance
+- **Premium features & licenses**: Optional proprietary capabilities for regulated or advanced use cases
+- **Cloud hosting / SaaS**: Optional managed cloud layer and turnkey deployments
+- **Managed services & consulting**: Custom development, integrations, certifications, and rollout support
 
 ---
 
@@ -86,6 +102,19 @@ EdgeSentinel's development is funded through strategic partnerships with two lea
 
 ---
 
+## Why collaborate if it’s open source?
+
+Yes—anyone can copy, manufacture, and sell the open‑source software and hardware. Collaboration with Newmatik is still the fastest, lowest‑risk, and most cost‑effective path:
+
+- **Speed to market**: Direct access to maintainers, roadmap, and proven reference designs
+- **Lower total cost**: Avoid hidden engineering, certification, and maintenance overheads
+- **Quality and reliability**: Hardware bring‑up, EMC/EMI practices, and field validation
+- **Security and compliance**: Regular updates, audits, and documentation aligned with standards
+- **Support and SLAs**: Enterprise‑grade support, training, and incident response
+- **Upstream benefits**: Features and fixes flow back, reducing long‑term fork costs
+
+---
+
 ## Proprietary Customization Model
 
 ### Market-Specific Intelligence
@@ -103,6 +132,8 @@ While the core platform remains open source, partners retain full ownership of t
 - **Partnership with Newmatik**: Partners can collaborate with Newmatik for custom development, leveraging our expertise while maintaining ownership of proprietary components.
 - **Independent Development**: Partners have complete freedom to develop custom features in-house using the open-source platform as a foundation.
 - **Hybrid Approach**: Combination of Newmatik collaboration for core features and independent development for highly specialized requirements.
+
+Partners with proprietary fault detection or domain-specific know‑how can work with us to implement closed‑source components for their customers and markets. Alternatively, we can co‑develop custom sensors and modules that may be shared openly with the community or kept proprietary when required. We encourage open source and ask partners to consider contributing improvements back to strengthen the shared platform and build a de‑facto industry standard.
 
 ---
 
