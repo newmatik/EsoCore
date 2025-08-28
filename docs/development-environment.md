@@ -44,19 +44,19 @@ This page documents the end-to-end development tooling used across hardware, fir
 
 ## Edge Device Software (Gateway)
 
-- **OS target**: Linux (Yocto/Debian-based) on ARM or x86 depending on SKU
-- **Languages**: C/C++ for low-level services, Python for orchestration, Node.js for support tooling where appropriate
-- **Why**: Linux provides mature networking, filesystems, TLS, and container options. Cross-compilation and CI are straightforward.
+- **OS target**: Zephyr RTOS on STM32 (Cortex-M4/M7)
+- **Languages**: C/C++ for firmware and services; Python/Node.js optional for host-side tooling
+- **Why**: Zephyr provides deterministic real-time scheduling, mature drivers, networking (when needed), secure OTA patterns, and an MCU-focused footprint with long-term support. Tooling is standardized around CMake and west for reproducible builds and CI.
 - **Tooling**:
-  - Build system: CMake/Ninja for C/C++; Poetry or pip-tools for Python; npm for Node.js tooling
-  - Cross-compile: clang/gcc with appropriate sysroot; Docker containers for reproducible builds
-  - Packaging: .deb or container images for deployment
-- **Debugging**: gdb, strace, perf, systemd journals; remote SSH
+  - Build system: Zephyr (CMake + west); Ninja as default generator
+  - Cross-compile: Zephyr SDK or arm-none-eabi-gcc toolchain; optional Docker for reproducibility
+  - Artifacts: firmware images (.elf/.bin/.hex/.dfu) with versioned metadata
+- **Debugging**: gdb via OpenOCD/J-Link, RTT/SWO logging, semihosting; on-target tracing where applicable
 
 ### Edge Device Hardware & OS prerequisites
 
-- Linux SBC or SOM with Ethernet (PoE optional), microSD, RS-485, RTC, and secure boot/OTA pathway.
-- Tooling on dev host: CMake toolchains, Python runtime, Docker for packaging, OpenSSL for TLS testing.
+- STM32-based main board (Cortex-M4/M7) with Ethernet (PoE optional), microSD, RS-485, RTC, and secure boot/OTA pathway.
+- Tooling on dev host: Zephyr SDK, west, CMake/Ninja, OpenOCD or J-Link tools; Python runtime for scripting.
 
 ## Cloud / Frappe Framework
 
@@ -94,8 +94,8 @@ This page documents the end-to-end development tooling used across hardware, fir
   - STM32CubeIDE (standard), arm-none-eabi-gcc, ST-LINK, CubeMX, STM32CubeProgrammer, STM32CubeMonitor
   - Serial console tools; OpenOCD (optional). VS Code toolchain optional.
 - **Edge/platform engineer**:
-  - Linux dev machine or containerized cross-compile toolchains
-  - CMake/Ninja, Docker, Python 3.11, Node.js 18, OpenSSL
+  - Dev host (Linux/macOS/Windows) with Zephyr SDK and cross-compile toolchains
+  - west, CMake/Ninja, OpenOCD or J-Link, Python 3.11; optional Docker
 - **Cloud engineer**:
   - Python 3.11, Node.js 18, Frappe bench, Redis, MariaDB/Postgres; VS Code/Cursor
 
@@ -104,7 +104,7 @@ This page documents the end-to-end development tooling used across hardware, fir
 - Altium Designer: industry-standard for complex mixed-signal boards and manufacturing outputs.
 - Fusion 360: rapid iteration and broad vendor compatibility via STEP.
 - STM32 + GCC/CMake: stable, cost-effective, open toolchain with excellent peripherals and community.
-- Linux Edge: robust networking, OTA, and filesystems; easy CI/CD.
+- Zephyr RTOS on MCU: deterministic real-time behavior, small footprint, maintained drivers/networking/filesystem, and established OTA strategies.
 - Frappe (Python/Node.js): fast delivery of admin and API features with strong RBAC.
 - GitHub: unified collaboration, reviews, issues, CI, and releases.
 

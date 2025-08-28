@@ -152,7 +152,7 @@ Detailed Specifications: See [Hardware Requirements](hardware-requirements.md) f
 
 ## Firmware architecture
 
-RTOS choices are flexible (e.g., FreeRTOS or Zephyr). The following task model maps well to STM32 but remains portable.
+We standardize on Zephyr RTOS for the edge device firmware. The following task model maps well to STM32 and remains portable across supported Zephyr boards.
 
 ### 4.1 RTOS & services
 
