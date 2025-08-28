@@ -1,0 +1,6 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "edgesentinel-symbols")(type "KiCad")(uri "${KIPRJMOD}/../../../library/symbols/edgesentinel.kicad_sym")(options "")(descr "EdgeSentinel Shared Symbol Library"))
+)
+
+
