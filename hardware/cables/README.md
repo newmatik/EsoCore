@@ -1,6 +1,4 @@
-# Tools
-
-Utility scripts (e.g., sync, build, release)
+# EdgeSentry Cables
 
 ## Copyright and License
 

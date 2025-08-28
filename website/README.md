@@ -11,8 +11,8 @@ npx serve -l 3000
 # or: python3 -m http.server 3000
 ```
 
-- Landing: http://localhost:3000/website/
-- Docs: http://localhost:3000/website/docs/
+- Landing: <http://localhost:3000/website/>
+- Docs: <http://localhost:3000/website/docs/>
 
 ## Temporary access protection
 
@@ -45,5 +45,3 @@ is stored in `sessionStorage` and applies to the current browser tab only.
 
 Note: The canonical BOM CSVs live in `hardware/bom/` at the repository root.
 Copy them to `website/docs/data/` to publish updates on the site.
-
-

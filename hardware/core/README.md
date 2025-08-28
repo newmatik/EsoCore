@@ -1,7 +1,14 @@
-# Core PCB Specification
+# EdgeSentry Core
 
-- Board: 4-layer FR4, 1.6 mm, ENIG, 100 × 160 mm
-- Copper: 35 µm outer/inner
+## PCB Specification
+
+- Board: 4-layer FR4 1.55 mm +/-10%
+- Dimensions: Approx. 100 × 160 mm
+- Surface finish: ENIG
+- Copper: 35 µm (1 OZ) outer/inner
+
+## Hardware
+
 - MCU: STM32H757ZIT6 (LQFP144), external HSE 25 MHz, 32.768 kHz RTC
 - Storage: microSD socket (push–push), industrial microSD card
 - Power: 12–24 V DC input → 5 V buck (3 A) → 3.3 V buck/LDO rails
@@ -22,8 +29,14 @@
 - UI: 0.96" 128×64 OLED (I²C), Reset/Boot/Menu buttons, status LEDs
 - PoE: IEEE 802.3af PD controller with isolation transformer; signature resistor 25.5 kΩ
 
-Layout guidance:
+## Layout Guidance
+
 - Separate power/PoE, digital, and analog zones; star ground tie at ADC/MCU ref
 - Keep RS‑485, Ethernet, and USB return paths tight; add stitching vias near chokes
 - Place TVS/ESD close to connectors; keep supercap high-current paths short
 - Respect creepage/clearance around isolated fieldbus and PoE sections
+
+## Copyright and License
+
+Copyright © 2025 Newmatik. All rights reserved.
+Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.

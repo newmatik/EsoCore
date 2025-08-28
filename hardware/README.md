@@ -1,24 +1,21 @@
-# Hardware Structure
+# EdgeSentry Hardware
+
+Hardware sources (see READMEs in subfolders)
 
 - `core/`
-  - `bom.csv` – Canonical BOM for the Core
-  - `pcb/pcb-specification.md` – PCB requirements and layout guidance
 - `sensors/`
-  - `vibration/`
-    - `bom.csv`
-    - `pcb/pcb-specification.md`
-  - `acoustic/`
-    - `bom.csv`
-    - `pcb/pcb-specification.md`
-  - `current/`
-    - `bom.csv`
-    - `pcb/pcb-specification.md`
-  - `temperature/`
-    - `bom.csv`
-    - `pcb/pcb-specification.md`
-- `altium/` – PCB project files
-- `mechanical/` – STEP, drawings, enclosure references
+  - `vibration sensor/`
+  - `acoustic sensor/`
+  - `current sensor/`
+  - `temperature sensor/`
+- `cables/`
 
 Notes:
-- Canonical BOMs live here; copy updates to `website/docs/data/` for publishing.
-- Use Git LFS for binary design files (`altium/`, `mechanical/`).
+
+- BOMs live in the respective device folders.
+- CAD/binaries belong under `altium/` and `mechanical/`.
+
+## Copyright and License
+
+Copyright © 2025 Newmatik. All rights reserved.
+Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.

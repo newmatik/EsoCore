@@ -1,4 +1,5 @@
 # Bill of Materials (Preliminary)
+<!-- markdownlint-disable MD033 -->
 
 This is an early, approximate BOM at 1k quantity based on requirements. Prices are indicative only and subject to change.
 

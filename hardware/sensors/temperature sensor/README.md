@@ -1,6 +1,14 @@
-# Temperature Sensor PCB Specification
+# EdgeSentry Temperature Sensor
 
-- Board: 2-layer FR4, 1.6 mm, approx. 30 × 20 mm
+## PCB Specification
+
+- Board: 2-layer FR4 1.55 mm +/-10%
+- Dimensions: Approx. 40 × 30 mm
+- Surface finish: ENIG
+- Copper: 35 µm (1 OZ)
+
+## Hardware
+
 - MCU: STM32G031K8T6 (TSSOP20), 8 MHz crystal
 - Sensor: 10 kΩ NTC (1%) with precision bias network
 - ADC: ADS1115 16-bit for high-accuracy temperature measurement
@@ -12,8 +20,14 @@
 - Indicators: Green status LED
 - Programming: Tag‑Connect SWD footprint
 
-Layout guidance:
+## Layout Guidance
+
 - Place precision resistors close to ADC; use Kelvin connections as appropriate
 - Separate analog and digital grounds; single-point tie
 - Filter and decouple the ADC reference and input nodes
 - Provide strain relief and high-temp insulation for sensor lead exit
+
+## Copyright and License
+
+Copyright © 2025 Newmatik. All rights reserved.
+Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.

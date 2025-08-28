@@ -12,19 +12,26 @@ local development and deployment instructions.
 - `website/` – Public website (published folder)
   - `assets/` – Shared styles and scripts used by the site and docs app
   - `docs/` – Documentation content and shell
-- `hardware/` – Hardware sources
-  - `bom/` – Canonical Bill of Materials CSVs (author/edit here)
-  - `altium/` – PCB projects (add here)
-  - `mechanical/` – STEP/drawings (add here)
+- `hardware/` – Hardware sources (see READMEs in subfolders)
+  - `core/`
+  - `sensors/`
+    - `vibration sensor/`
+    - `acoustic sensor/`
+    - `current sensor/`
+    - `temperature sensor/`
+  - `cables/`
 - `firmware/` – Device and board-support firmware
   - `stm32/`, `common/`, etc.
 - `software/` – Host-side tools/services
 - `tools/` – Utility scripts (e.g., sync, build, release)
 
 Notes on BOMs:
-- The canonical BOM CSVs live in `hardware/bom/`.
+
+- Canonical BOM CSVs live in each device folder under `hardware/` (e.g., `hardware/core/`, `hardware/sensors/*/`, `hardware/cables/`).
 - The docs app reads CSVs from `website/docs/data/` for public rendering.
-- After editing CSVs in `hardware/bom/`, copy them to `website/docs/data/` to update the site. We can add a small sync script in `tools/` if desired.
+- After editing BOMs in `hardware/…/`, copy them to `website/docs/data/` to update the site.
+
+Each folder under `hardware/` contains a `README.md` with more details.
 
 ## Open source
 
