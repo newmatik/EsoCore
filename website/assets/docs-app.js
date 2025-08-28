@@ -168,7 +168,7 @@
     const bomMounts = contentEl.querySelectorAll('[id^="bom-"]');
     if (bomMounts.length > 0) {
       if (!window.EdgeBOM) {
-        await loadScript('./assets/bom.js');
+        await loadScript('../assets/bom.js');
         console.log('BOM script loaded, EdgeBOM available:', !!window.EdgeBOM);
       }
       // Insert a structured System Cost section near the top (after the H1 if present)
