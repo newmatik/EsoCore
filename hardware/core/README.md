@@ -1,4 +1,4 @@
-# EdgeSentry Core
+# EdgeSentinel Core
 
 ## PCB Specification
 

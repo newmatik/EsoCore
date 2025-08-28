@@ -1,4 +1,4 @@
-# EdgeSentry Temperature Sensor
+# EdgeSentinel Temperature Sensor
 
 ## PCB Specification
 

@@ -1,4 +1,4 @@
-# EdgeSentry Current Sensor
+# EdgeSentinel Current Sensor
 
 ## PCB Specification
 

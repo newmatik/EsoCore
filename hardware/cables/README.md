@@ -1,4 +1,4 @@
-# EdgeSentry Cables
+# EdgeSentinel Cables
 
 ## Copyright and License
 

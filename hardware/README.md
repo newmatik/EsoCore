@@ -1,4 +1,4 @@
-# EdgeSentry Hardware
+# EdgeSentinel Hardware
 
 Hardware sources (see READMEs in subfolders)
 

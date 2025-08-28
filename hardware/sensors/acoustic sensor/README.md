@@ -1,4 +1,4 @@
-# EdgeSentry Acoustic Sensor
+# EdgeSentinel Acoustic Sensor
 
 ## PCB Specification
 

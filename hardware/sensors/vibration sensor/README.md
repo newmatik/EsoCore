@@ -1,4 +1,4 @@
-# EdgeSentry Vibration Sensor
+# EdgeSentinel Vibration Sensor
 
 ## PCB Specification
 
