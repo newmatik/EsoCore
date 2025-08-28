@@ -29,11 +29,16 @@
 - UI: 0.96" 128×64 OLED (I²C), Reset/Boot/Menu buttons, status LEDs
 - PoE: IEEE 802.3af PD controller with isolation transformer; signature resistor 25.5 kΩ
 
+## General Layout Requirements
+
+- Prefer SMD components; avoid THT where feasible
+- Provide Tag-Connect pads for MCU programming
+- Include three fiducials on each SMD-assembled side
+- Avoid single-sourcing; specify at least two MPNs where practical (exceptions: MCU or unique sensors)
+- Evaluate cost-effective alternatives on LCSC, including reputable Chinese brands, not only established manufacturers
+
 ## Layout Guidance
 
-- Avoid THT components if possible and use SMD components instead
-- Ensure we have Tag-Connect pads on board for MCU flashing
-- Ensure we have 3 fiducials on each SMD assembled side
 - Separate power/PoE, digital, and analog zones; star ground tie at ADC/MCU ref
 - Keep RS‑485, Ethernet, and USB return paths tight; add stitching vias near chokes
 - Place TVS/ESD close to connectors; keep supercap high-current paths short

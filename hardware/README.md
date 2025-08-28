@@ -1,6 +1,16 @@
 # EdgeSentinel Hardware
 
-Hardware sources (see READMEs in subfolders)
+## General Layout Requirements
+
+- Prefer SMD components; avoid THT where feasible
+- Provide Tag-Connect pads for MCU programming
+- Include three fiducials on each SMD-assembled side
+- Avoid single-sourcing; specify at least two MPNs where practical (exceptions: MCU or unique sensors)
+- Evaluate cost-effective alternatives on LCSC, including reputable Chinese brands, not only established manufacturers
+
+## Hardware sources
+
+See READMEs in subfolders.
 
 - `core/`
 - `sensors/`

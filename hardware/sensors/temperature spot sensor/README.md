@@ -32,11 +32,16 @@
 - Hydraulic system component temperatures
 - Non-contact temperature measurement for moving parts
 
+## General Layout Requirements
+
+- Prefer SMD components; avoid THT where feasible
+- Provide Tag-Connect pads for MCU programming
+- Include three fiducials on each SMD-assembled side
+- Avoid single-sourcing; specify at least two MPNs where practical (exceptions: MCU or unique sensors)
+- Evaluate cost-effective alternatives on LCSC, including reputable Chinese brands, not only established manufacturers
+
 ## Layout Guidance
 
-- Avoid THT components if possible and use SMD components instead
-- Ensure we have Tag-Connect pads on board for MCU flashing
-- Ensure we have 3 fiducials on each SMD assembled side
 - Place precision resistors close to ADC; use Kelvin connections
 - Separate analog and digital grounds; single-point tie
 - Keep thermocouple wires short and twisted

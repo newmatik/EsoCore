@@ -21,11 +21,16 @@
 - Indicators: Green status LED
 - Programming: Tag‑Connect SWD footprint
 
+## General Layout Requirements
+
+- Prefer SMD components; avoid THT where feasible
+- Provide Tag-Connect pads for MCU programming
+- Include three fiducials on each SMD-assembled side
+- Avoid single-sourcing; specify at least two MPNs where practical (exceptions: MCU or unique sensors)
+- Evaluate cost-effective alternatives on LCSC, including reputable Chinese brands, not only established manufacturers
+
 ## Layout Guidance
 
-- Avoid THT components if possible and use SMD components instead
-- Ensure we have Tag-Connect pads on board for MCU flashing
-- Ensure we have 3 fiducials on each SMD assembled side
 - Place air intake ports for particulate sensor and environmental sensors
 - Separate analog and digital grounds; single-point tie
 - Provide proper air flow for accurate readings
