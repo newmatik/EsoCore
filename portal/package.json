@@ -1,0 +1,50 @@
+{
+  "name": "newmatik-EsoCore-portal",
+  "type": "module",
+  "private": true,
+  "description": "EsoCore Portal",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@nuxt/ui": "^2.17.0",
+    "@pinia/nuxt": "^0.5.4",
+    "nuxt": "3.18.1",
+    "vue": "^3.4.38",
+    "vue-router": "^4.4.3",
+    "@nuxtjs/tailwindcss": "^6.12.1",
+    "@nuxtjs/color-mode": "^3.4.2",
+    "pinia": "^2.2.2",
+    "axios": "^1.7.9",
+    "chart.js": "^4.4.7",
+    "vue-chartjs": "^5.3.1",
+    "socket.io-client": "^4.8.1",
+    "jwt-decode": "^4.0.0",
+    "@vueuse/core": "^10.11.1"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "^1.5.2",
+    "@nuxt/eslint-config": "^0.5.7",
+    "@types/node": "^22.9.0",
+    "typescript": "^5.6.3",
+    "vue-tsc": "^2.0.29",
+    "prettier": "^3.3.3",
+    "eslint": "^8.57.1",
+    "@typescript-eslint/parser": "^6.21.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "eslint-plugin-vue": "^9.29.0"
+  }
+}

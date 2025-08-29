@@ -1,0 +1,85 @@
+name: Deploy GitHub Pages
+on:
+  push:
+    branches: [ main, fix/github-pages-workflow ]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+          
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('website/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+            
+      - name: Install dependencies
+        run: |
+          cd website
+          # Clear any existing build artifacts and node_modules
+          rm -rf .nuxt .output node_modules
+          # Set environment variables for native bindings
+          export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+          export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1
+          export NODE_ENV=production
+          # Create .npmrc with aggressive hoisting for native bindings
+          echo "shamefully-hoist=true" > .npmrc
+          echo "auto-install-peers=true" >> .npmrc
+          echo "prefer-frozen-lockfile=false" >> .npmrc
+          # Install with multiple fallback strategies
+          pnpm install --no-frozen-lockfile --ignore-scripts || \
+          (rm -rf node_modules && pnpm install --no-frozen-lockfile) || \
+          (rm -rf node_modules pnpm-lock.yaml && pnpm install)
+          # Manually install the correct oxc-parser binding for Linux x64
+          pnpm add -D @oxc-parser/binding-linux-x64-gnu || echo "Failed to install oxc-parser binding, continuing..."
+          
+      - name: Build Nuxt.js application
+        run: |
+          cd website
+          # Try to rebuild native bindings if they're missing
+          if ! pnpm run generate; then
+            echo "Build failed, attempting to rebuild native bindings..."
+            pnpm rebuild
+            pnpm run generate
+          fi
+          
+      - name: Verify CNAME file
+        run: |
+          cd website
+          ls -la .output/public/CNAME || echo "CNAME file not found in output"
+          
+      - name: Upload static site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/.output/public
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,20 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}EsoCore Server | Admin{% endblock %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <link rel="icon" type="image/png" href="{% static 'branding/icon.png' %}">
+  <link rel="icon" type="image/svg+xml" href="{% static 'branding/icon.svg' %}">
+  <link rel="shortcut icon" href="{% static 'branding/icon.png' %}">
+  <link rel="stylesheet" href="{% static 'branding/theme.css' %}">
+{% endblock %}
+
+{% block branding %}
+    {% include "unfold/helpers/site_branding.html" %}
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+

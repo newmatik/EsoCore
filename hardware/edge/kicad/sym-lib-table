@@ -1,0 +1,14 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "stm32-symbols")(type "KiCad")(uri "${KIPRJMOD}/../../library/symbols/STM32H743IIT6.kicad_sym")(options "")(descr "STM32H743 MCU Symbol Library"))
+  (lib (name "ethernet-symbols")(type "KiCad")(uri "${KIPRJMOD}/../../library/symbols/DP83825IRMQR.kicad_sym")(options "")(descr "Ethernet PHY Symbol Library"))
+  (lib (name "poe-symbols")(type "KiCad")(uri "${KIPRJMOD}/../../library/symbols/LTC4267CGN-3_PBF.kicad_sym")(options "")(descr "PoE Controller Symbol Library"))
+  (lib (name "rs485-symbols")(type "KiCad")(uri "${KIPRJMOD}/../../library/symbols/SN65HVD72D.kicad_sym")(options "")(descr "RS-485 Transceiver Symbol Library"))
+  (lib (name "wurth-connectors")(type "KiCad")(uri "${KIPRJMOD}/../../library/symbols")(options "")(descr "Wurth Terminal Block Connectors"))
+  (lib (name "power-components")(type "KiCad")(uri "${KIPRJMOD}/../../library/symbols")(options "")(descr "Power Management Components"))
+  (lib (name "connectors")(type "KiCad")(uri "${KIPRJMOD}/../../library/symbols")(options "")(descr "Various Connectors"))
+  (lib (name "crystals")(type "KiCad")(uri "${KIPRJMOD}/../../library/symbols")(options "")(descr "Crystal Oscillators"))
+  (lib (name "protection")(type "KiCad")(uri "${KIPRJMOD}/../../library/symbols")(options "")(descr "Protection Components"))
+)
+
+

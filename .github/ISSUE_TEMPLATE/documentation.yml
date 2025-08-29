@@ -1,0 +1,87 @@
+name: 📚 Documentation Improvement
+description: Suggest improvements to documentation or report missing docs
+title: "[DOCS] <brief description>"
+labels: ["documentation", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 📚 Documentation Improvement
+
+        Help us improve our documentation! Whether it's missing information, unclear explanations, or suggestions for new content.
+
+  - type: dropdown
+    id: doc_type
+    attributes:
+      label: Documentation type
+      description: What type of documentation needs improvement?
+      options:
+        - README files
+        - Hardware documentation
+        - API documentation
+        - Setup/installation guides
+        - Development guides
+        - User manuals
+        - Troubleshooting guides
+        - Other (please specify)
+    validations:
+      required: true
+
+  - type: input
+    id: doc_location
+    attributes:
+      label: Specific file or section
+      description: Which file or section needs improvement?
+      placeholder: "e.g., README.md, hardware/core/README.md, website/docs/api-specification.md"
+
+  - type: textarea
+    id: current_state
+    attributes:
+      label: Current state
+      description: What's currently documented (or missing)?
+      placeholder: "The current documentation says... or there's no documentation for..."
+
+  - type: textarea
+    id: improvement_suggestion
+    attributes:
+      label: Suggested improvement
+      description: How should this be improved?
+      placeholder: "I suggest adding... or clarifying..."
+
+  - type: dropdown
+    id: improvement_type
+    attributes:
+      label: Type of improvement
+      description: What kind of improvement is this?
+      options:
+        - Add missing documentation
+        - Clarify existing documentation
+        - Fix incorrect information
+        - Update outdated information
+        - Improve formatting/structure
+        - Add examples/code samples
+        - Other (please specify)
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: Any additional information that would help us understand the improvement needed
+      placeholder: "Screenshots, specific use cases, links to related issues, etc."
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing documentation for this information
+          required: true
+        - label: This is not a bug report (use bug report template instead)
+          required: true
+        - label: This is not a feature request (use feature request template instead)
+          required: true
+        - label: I am willing to help with this documentation improvement
+          required: false

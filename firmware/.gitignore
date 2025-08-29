@@ -1,0 +1,114 @@
+# Build outputs and binaries
+build/
+cmake-build-*/
+out/
+bin/
+*.elf
+*.bin
+*.hex
+*.map
+*.lst
+*.o
+*.d
+*.su
+*.i
+*.s
+
+# Zephyr specific
+west/
+zephyrproject/
+modules/
+.zephyr/
+.zephyrrc
+west.yml
+zephyr-env.sh
+zephyr-env.cmd
+
+# STM32CubeMX generated files
+*.ioc.bak
+*.ld.bak
+*.cproject.bak
+*.project.bak
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary and cache files
+*.tmp
+*.temp
+.cache/
+__pycache__/
+*.pyc
+*.pyo
+
+# OS specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Documentation builds
+docs/_build/
+*.pdf
+*.html
+
+# Testing and coverage
+coverage/
+*.gcda
+*.gcno
+*.gcov
+test_results/
+*.junit
+
+# Logs and debug
+*.log
+debug.log
+logs/
+
+# Backup files
+*.bak
+*.backup
+*.orig
+
+# Archives and packages
+*.tar.gz
+*.zip
+*.7z
+*.rar
+
+# Development tools
+.clang-format
+.clang-tidy
+compile_commands.json
+
+# Simulation and testing
+simulator/
+tests/unit/
+tests/integration/
+
+# Firmware images and updates
+firmware_images/
+ota_packages/
+update_manifests/
+
+# Keys and certificates
+keys/
+certificates/
+*.pem
+*.key
+*.crt
+
+# Configuration files (environment specific)
+config.local.h
+secrets.h
+
+# Flash and memory dumps
+*.dmp
+memory_dump.bin
+
+# USB and serial logs
+usb_log.txt
+serial_log.txt
