@@ -2,6 +2,8 @@
 
 EsoCore provides a comprehensive cloud infrastructure solution consisting of two main components: a scalable Django REST API backend and a modern Nuxt.js frontend portal. This infrastructure is designed to be flexible, allowing deployment as a managed SaaS service by Newmatik or self-hosted by partners.
 
+---
+
 ## Architecture Overview
 
 The EsoCore cloud infrastructure follows a microservices-like architecture with clear separation of concerns:
@@ -10,6 +12,8 @@ The EsoCore cloud infrastructure follows a microservices-like architecture with 
 - **Frontend Portal (Nuxt.js)**: Provides the user interface for monitoring and management
 - **Database**: Stores device data, telemetry, user information, and system configuration
 - **Real-time Communication**: WebSocket support for live updates and alerts
+
+---
 
 ## Backend: Django REST API Server
 
@@ -79,6 +83,8 @@ The Django backend is designed for horizontal and vertical scaling:
 - `/api/events/` - Event and alert management
 - `/api/telemetry/` - Historical data access
 
+---
+
 ## Frontend: Nuxt.js Portal
 
 ### Frontend Core Features
@@ -128,6 +134,8 @@ The Nuxt.js portal is built for performance and scale:
 - Server-side rendering for dynamic content
 - Easy integration with existing infrastructure
 - Customizable branding and theming
+
+--
 
 ## Integration and Communication
 
@@ -185,6 +193,8 @@ subscribe('devices', (data) => {
 - Industry-standard security practices
 - Regular security audits and penetration testing
 
+---
+
 ## Monitoring and Observability
 
 ### Backend Monitoring
@@ -207,6 +217,8 @@ subscribe('devices', (data) => {
 - Network performance
 - Container health checks
 - Automated alerting and incident response
+
+---
 
 ## Deployment Scenarios
 
@@ -232,6 +244,8 @@ subscribe('devices', (data) => {
 - Database replication
 - Advanced security and compliance
 - Dedicated support team
+
+---
 
 ## Customization and Extensibility
 
@@ -259,6 +273,8 @@ ADMIN_TITLE="YourCompany EdgeMonitor Server"
 - Branded login pages and dashboards
 - Custom widgets and components
 - Partner-specific feature modules
+
+---
 
 ## Support and Maintenance
 

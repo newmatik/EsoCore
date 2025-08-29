@@ -22,7 +22,7 @@ EsoCore is developed and maintained by Newmatik through a collaborative partners
 
 ### Competitive Position
 
-EsoCore differentiates itself in the industrial IoT market through cross-domain capability (supporting both industrial doors and CNC machines in one platform), edge-first TinyML architecture for ultra-low latency anomaly detection, and comprehensive safety integration. While competitors like MachineMetrics, ASSA ABLOY Insight, and Fanuc FIELD focus on single verticals with proprietary platforms, EsoCore's open-source foundation and unified approach provides unique value for facilities managing diverse industrial assets.
+EsoCore differentiates itself in the industrial IoT market through cross-domain capability (supporting both industrial doors and CNC machines in one platform), edge-first TinyML architecture for ultra-low latency anomaly detection, and comprehensive safety integration. While competitors often focus on single verticals with proprietary platforms, EsoCore's open-source foundation and unified approach provides unique value for facilities managing diverse industrial assets.
 
 ### Key Benefits
 
@@ -131,31 +131,23 @@ For these demanding applications, EsoCore provides the complete operational visi
 
 ### Edge Platform
 
-**Microcontroller**: ARM Cortex-M4/M7 (STM32 recommended) with hardware crypto, sufficient for TLS and edge AI processing.
+- **Microcontroller**: ARM Cortex-M4/M7 dual core with hardware crypto, sufficient for TLS and edge AI processing.
+- **Connectivity**: Industrial Ethernet with PoE option (preferred) or robust Wi-Fi module for reliable data transmission.
+- **Storage**: Industrial-grade microSD with wear leveling for 30+ days of local data buffering.
+- **Primary Power**: 12-24V DC with surge protection, optional PoE compatibility.
+- **Backup System**: Supercapacitor bank (30F) providing ≥30 seconds for safe shutdown during power outages.
+- **Environmental**: IP54-IP65 enclosure, -20°C to +60°C operation, industrial EMC compliance.
 
-**Connectivity**: Industrial Ethernet with PoE option (preferred) or robust Wi-Fi module for reliable data transmission.
-
-**Storage**: Industrial-grade microSD with wear leveling for 30+ days of local data buffering.
+Detailed Specifications: See [Hardware: Edge](esocore-edge.md) for complete component specifications, compliance standards, and reference designs.
 
 ### Sensor Suite
 
-**Environmental**: Comprehensive air quality monitoring (temperature, humidity, CO₂, VOCs, particulate matter) + light intensity monitoring (visible, UV, IR, color, spectral) + oil quality monitoring (viscosity, contamination, water content) for thermal management and environmental compliance.
+- **Environmental**: Comprehensive air quality monitoring (temperature, humidity, CO₂, VOCs, particulate matter) + light intensity monitoring (visible, UV, IR, color, spectral) + oil quality monitoring (viscosity, contamination, water content) for thermal management and environmental compliance.
+- **Mechanical**: 3-axis vibration (1-3kHz), acoustic monitoring (audible + ultrasonic), multi-range pressure sensors (hydraulic/pneumatic), proximity/position sensors (automation, cycle counting), motor current sensing for torque/load monitoring.
+- **Thermal**: Targeted temperature monitoring with NTC thermistors, RTD sensors, thermocouples, and IR sensors for bearings, gearboxes, and extreme environments.
+- **Safety I/O**: EN ISO 13849 compliant inputs for safety edges, emergency stops, light curtains with <10ms response time.
 
-**Mechanical**: 3-axis vibration (1-3kHz), acoustic monitoring (audible + ultrasonic), multi-range pressure sensors (hydraulic/pneumatic), proximity/position sensors (automation, cycle counting), motor current sensing for torque/load monitoring.
-
-**Thermal**: Targeted temperature monitoring with NTC thermistors, RTD sensors, thermocouples, and IR sensors for bearings, gearboxes, and extreme environments.
-
-**Safety I/O**: EN ISO 13849 compliant inputs for safety edges, emergency stops, light curtains with <10ms response time.
-
-### Power & Reliability
-
-**Primary Power**: 12-24V DC with surge protection, optional PoE compatibility.
-
-**Backup System**: Supercapacitor bank (10-30F) providing ≥30 seconds for safe shutdown during power outages.
-
-**Environmental**: IP54-IP65 enclosure, -20°C to +60°C operation, industrial EMC compliance.
-
-Detailed Specifications: See [Hardware: Edge](esocore-edge.md) for complete component specifications, compliance standards, and reference designs.
+Detailed Specifications: See [Hardware: Sensors](esocore-sensors.md) for complete component specifications, compliance standards, and reference designs.
 
 ---
 
@@ -163,7 +155,7 @@ Detailed Specifications: See [Hardware: Edge](esocore-edge.md) for complete comp
 
 We standardize on Zephyr RTOS for the edge device firmware. The following task model maps well to STM32 and remains portable across supported Zephyr boards.
 
-### 4.1 RTOS & services
+### RTOS & Services
 
 - **Sensor Task**: sampling scheduler (configurable rates; e.g., temp/RH 1 Hz, stator temp 1 Hz, vibration bursts at 1–3 kHz for 1–5 s windows, acoustics windows in audible/ultrasound bands, current 100–500 Hz).
 - **Safety I/O Task**: monitor safety edges, emergency stops, light curtains; handle safety interlocks with <10ms response time.
@@ -178,7 +170,7 @@ We standardize on Zephyr RTOS for the edge device firmware. The following task m
 - **OTA Task**: download, verify (Ed25519 or ECDSA), A/B swap, rollback.
 - **Watchdog & Health**: feed WDT, record resets, SD health, sensor self‑tests, supercap health monitoring.
 
-### 4.2 Data Storage & Event Logging
+### Data Storage & Event Logging
 
 - **Local Storage**: JSON format with zstandard compression for human-readable, audit-friendly data storage on industrial SD cards. Power-safe writes ensure zero data loss during outages.
 - **Event Logging**: Comprehensive system event capture including connectivity, power, safety, and security events with automated workflow triggers.
@@ -186,7 +178,7 @@ We standardize on Zephyr RTOS for the edge device firmware. The following task m
 
 Detailed Specifications: See [Data Format Specification](data-format-specification.md) for complete JSON schemas, event types, file structure details.
 
-### 4.3 Edge Intelligence & AI
+### Edge Intelligence & AI
 
 - **AI-Powered Analytics**: On-device TinyML models for vibration and acoustic anomaly detection using lightweight neural networks (<16KB) optimized for STM32 processors.
 - **Real-Time Processing**: <1 second anomaly detection with 90% reduction in data transmission through intelligent filtering and priority queuing.
@@ -195,13 +187,13 @@ Detailed Specifications: See [Data Format Specification](data-format-specificati
 
 Detailed Specifications: See [Edge Intelligence](edge-intelligence.md) for complete TinyML model specifications, training pipelines, and performance benchmarks.
 
-### 4.4 Cloud Synchronization
+### Cloud Synchronization
 
 - **Reliable Upload**: Compressed JSON batches with idempotency keys, exponential backoff, and priority queuing ensure zero data loss during network outages.
 - **Security**: TLS encryption with device-specific API keys, HMAC authentication, and OTA key rotation for enterprise-grade security.
 - **Offline Resilience**: 30+ day local buffering with automatic resume from last sync point when connectivity returns.
 
-Detailed Specifications: See [API Specification](api-specification.md) for complete REST API documentation, authentication methods, and sync protocols.
+Detailed Specifications: See [Cloud Infrastructure](cloud-infrastructure.md) and [API Specification](api-specification.md) for complete REST API documentation, authentication methods, and sync protocols.
 
 ---
 
@@ -308,7 +300,3 @@ EsoCore is licensed under the **Apache License 2.0**. This means you can:
 - Integrate into proprietary software/hardware
 
 See the [License](license.md) page for complete terms and a detailed summary of what you can and cannot do.
-
----
-
-*For questions about this specification or implementation details, please refer to the appropriate technical documentation linked above.*

@@ -63,10 +63,11 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => { inject(); initTypewriter(); });
+    document.addEventListener('DOMContentLoaded', () => { inject(); initTypewriter(); initHeroArtAnimation(); });
   } else {
     inject();
     initTypewriter();
+    initHeroArtAnimation();
   }
 })();
 
@@ -131,4 +132,18 @@ function shuffle(arr){
     const t = a[i]; a[i] = a[j]; a[j] = t;
   }
   return a;
+}
+
+// Slide-in + fade-in animation for hero PCB image on homepage
+function initHeroArtAnimation(){
+  // Only on homepage
+  const onDocs = (function(){
+    const p = location.pathname.replace(/\/index.html$/, '');
+    return /\/docs\/?$/.test(p) || /\/docs\//.test(p);
+  })();
+  if (onDocs) return;
+  const img = document.querySelector('.hero-art img');
+  if (!img) return;
+  // Ensure initial styles have applied before toggling
+  requestAnimationFrame(() => requestAnimationFrame(() => img.classList.add('enter')));
 }

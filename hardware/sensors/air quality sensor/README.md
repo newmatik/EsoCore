@@ -6,6 +6,7 @@
 - Dimensions: Approx. 60 × 40 mm
 - Surface finish: ENIG
 - Copper: 35 µm (1 OZ)
+- Black soldermash / white silkscreen
 
 ## Hardware
 
@@ -23,6 +24,8 @@
 
 ## General Layout Requirements
 
+- Black solder mask with white silk screen
+- Silk screen for important components with information value only (such as connectors)
 - Prefer SMD components; avoid THT where feasible
 - Provide Tag-Connect pads for MCU programming
 - Include three fiducials on each SMD-assembled side
