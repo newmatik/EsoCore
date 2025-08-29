@@ -1,0 +1,24 @@
+Category,Item,MPN,Supplier,Qty,Unit,Notes,Package
+MCU,STM32G031 ARM Cortex-M0+ 32MHz TSSOP20,STM32G031K8T6,ST,1,1.80,Local position processing and bus communication,SMD
+Sensor,Inductive proximity sensor LJ12A3-4-Z/BX,INDUCTIVE-12MM,Generic,2,4.50,12mm sensing distance for metal detection,SMD
+Sensor,Capacitive proximity sensor LJ18A3-8-Z/BX,CAPACITIVE-18MM,Generic,1,5.20,18mm sensing distance for non-metal detection,SMD
+Sensor,Optical encoder quadrature 1000PPR,ENCODER-1000PPR,Generic,1,12.80,High-resolution position and speed measurement,SMD
+Sensor,Magnetic proximity sensor reed switch,REED-SWITCH-10MM,Generic,2,2.10,Magnetic field detection for position sensing,SMD
+Sensor,Laser distance sensor VL53L0X,VL53L0X,ST,1,6.90,Laser ranging up to 2m for precision positioning,SMD
+Communication,RS-485 transceiver half-duplex,SN65HVD72,Texas Instruments,1,0.85,Bus interface for digital communication,SMD
+Power,Buck converter 12V to 3.3V 500mA,TPS62172DSGT,Texas Instruments,1,1.45,Efficient power from bus,SMD
+Power,LDO 3.3V clean for analog,MCP1700T-3302E,Microchip,1,0.12,Clean power for sensors,SMD
+Connector,4-pin screw terminal block 5.08mm,691137710004,Wurth,1,0.18,Bus connection (12V GND Data+ Data-),THT
+Connector,Cable gland PG9 for 4-conductor cable,PG9-GLAND,Wiska,1,1.50,Strain relief and environmental sealing,THT
+Connector,M12 connector for proximity sensors,M12-4PIN-FEMALE,Generic,3,2.40,Industrial connectors for proximity sensors,THT
+Connector,Encoder connector 8-pin,ENCODER-CONN-8PIN,Generic,1,3.80,Differential encoder signal connector,THT
+Protection,ESD protection diode array 4-ch,ESD9X3.3ST5G,OnSemi,1,0.08,Bus and power line protection,SMD
+Clock,8MHz crystal for MCU,ABM8G-8.000MHZ,ABRACON,1,0.12,MCU external clock source,SMD
+Addressing,4-position SMD rotary switch,FRS-4,CTS,1,0.12,Module address configuration (SMD alternative),SMD
+Status,Status LED green 0603,LTST-C190KGKT,Lite-On,1,0.01,Operational status indication,SMD
+Passives,Resistors and capacitors 0603 assorted,R0603 assortment,Generic,1,0.30,Bus termination filter and bias network,SMD
+Mechanical,Proximity sensor mounting bracket,MOUNT-BRACKET-M12,Generic,3,1.50,Adjustable mounting for different sensor types,Mechanical
+Mechanical,Encoder mounting hub 8mm shaft,ENCODER-HUB-8MM,Generic,1,4.20,Flexible coupling for encoder installation,Mechanical
+PCB,2-layer PCB FR4 1.55mm 55x40mm,PCB-2L-MEDIUM,Various,1,0.95,Proximity sensor module with multiple sensor interfaces,PCB
+Enclosure,Custom enclosure (IP67 industrial),CUSTOM,Custom,1,10.50,Custom enclosure; equivalent spec to PROX-ENC-01,Mechanical
+Programming,Tag-Connect SWD footprint (TC2050 or TC2030),TC2050/TC2030,Tag-Connect,0,0.00,DNP; ensure footprint on PCB for SWD,SMD

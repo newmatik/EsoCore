@@ -1,0 +1,15 @@
+(kicad_symbol_lib (version 20211014) (generator "eeschema")
+  (symbol "EsoCore_Placeholder" (pin_names (offset 0)) (in_bom yes) (on_board yes)
+    (property "Reference" "REF**" (id 0) (at 0 0 0)
+      (effects (font (size 1.27 1.27))))
+    (property "Value" "EsoCore_Placeholder" (id 1) (at 0 -2.54 0)
+      (effects (font (size 1.27 1.27))))
+    (property "Footprint" "" (id 2) (at 0 -5.08 0)
+      (effects (font (size 1.27 1.27))))
+    (property "Datasheet" "" (id 3) (at 0 -7.62 0)
+      (effects (font (size 1.27 1.27))))
+    (rectangle (start -2 2) (end 2 -2) (stroke (width 0.15)) (fill none))
+  )
+)
+
+

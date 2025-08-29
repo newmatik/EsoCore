@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Redirecting…</title>
+  <meta http-equiv="refresh" content="0; url=/docs/" />
+  <script>
+    (function(){
+      var path = (location.pathname || '').replace(/\/?$/, '');
+      // Extract only the last segment after /docs/ to avoid infinite loops
+      var parts = path.split('/').filter(Boolean);
+      var slug = '';
+      
+      // Find the part after 'docs' in the path
+      var docsIndex = parts.indexOf('docs');
+      if (docsIndex >= 0 && docsIndex < parts.length - 1) {
+        slug = parts[docsIndex + 1];
+      } else if (parts.length > 0) {
+        slug = parts[parts.length - 1];
+      }
+      
+      if (!slug) { location.replace('/docs/'); return; }
+      var q = '?p=' + encodeURIComponent(slug + (location.hash || ''));
+      location.replace('/docs/' + q);
+    })();
+  </script>
+</head>
+<body>Redirecting…</body>
+</html>

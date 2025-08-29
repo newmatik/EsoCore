@@ -1,0 +1,46 @@
+title: "[Q&A] <Your Question Here>"
+labels: ["question"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: Ask your question here. Be specific and provide context to help others understand your situation.
+      placeholder: "What would you like to know about EsoCore?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context/Background
+      description: Provide any relevant context or background information
+      placeholder: |
+        What are you trying to accomplish?
+        What's your use case?
+        What have you tried already?
+        Any specific challenges you're facing?
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Your environment (if relevant)
+      description: If your question is environment-specific, please provide details
+      placeholder: |
+        - Hardware: [e.g., Edge device, specific sensors]
+        - Firmware version: [e.g., v1.2.3]
+        - Software version: [e.g., v2.1.0]
+        - Experience level: [beginner, intermediate, advanced]
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing discussions for similar questions
+          required: true
+        - label: I have checked the documentation first
+          required: true
+        - label: This is not a bug report (use GitHub Issues instead)
+          required: true

@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Redirecting…</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    (function(){
+      var base = (document.currentScript && document.currentScript.src) || location.href;
+      var root = base.replace(/\/[^/]*$/, '/');
+      var p = location.pathname || '';
+      if (p.indexOf('/docs/') !== -1) {
+        var slug = p.replace(/^.*\/docs\//,'').replace(/\/?$/,'');
+        var q = '?p=' + encodeURIComponent(slug + (location.hash || ''));
+        location.replace(root + 'docs/' + q);
+      } else {
+        location.replace(root);
+      }
+    })();
+  </script>
+</head>
+<body>Redirecting…</body>
+</html>

@@ -1,0 +1,56 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+__MACOSX/
+
+# Thumbnails
+._*
+
+# Node / tooling
+node_modules/
+.npm/
+.pnpm-debug.log*
+yarn.lock
+pnpm-lock.yaml
+package-lock.json
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+/dist
+/.cache
+/.parcel-cache
+/.vite
+.vite/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Misc
+.env*
+coverage/
+
+# KiCad
+# Project-local preferences, backups, and cache directories
+*.kicad_prl
+*-backups/
+fp-info-cache
+
+# KiCad backup files (v6+)
+*.kicad_sch-bak
+*.kicad_pcb-bak
+
+# Legacy KiCad backups/cache (v5 and earlier)
+*.sch-bak
+*.brd-bak
+*-cache.lib

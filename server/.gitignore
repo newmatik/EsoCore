@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+*.log
+
+# Django
+*.sqlite3
+/db.sqlite3
+/media/
+/static/
+staticfiles/
+
+# Environment
+.env
+.env.*
+.venv/
+venv/
+
+# Poetry
+.poetry/
+poetry.lock
+
+# IDE/OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Coverage/Testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Node (if present in subfolders)
+node_modules/
+
+# Migrations cache
+**/migrations/__pycache__/

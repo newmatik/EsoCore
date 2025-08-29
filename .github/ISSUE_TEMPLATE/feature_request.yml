@@ -1,0 +1,92 @@
+name: ✨ Feature Request
+description: Suggest a new feature or enhancement
+title: "[FEATURE] <brief description>"
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## ✨ Feature Request
+
+        Thanks for suggesting a new feature! Your input helps shape the future of EsoCore.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem/Use case
+      description: What problem are you trying to solve? What's the current limitation?
+      placeholder: "I'm always frustrated when... or I would like to be able to..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe your proposed solution or feature
+      placeholder: "I think it would be great if..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component this affects
+      description: Which part of EsoCore would this feature affect?
+      options:
+        - Hardware - Edge Device
+        - Hardware - Sensors (new sensor type)
+        - Hardware - Cables/Connectors
+        - Firmware - STM32
+        - Firmware - Common Libraries
+        - Software - Host Tools
+        - Documentation - Website
+        - Documentation - Hardware Docs
+        - Build Tools/Utilities
+        - Multiple Components
+        - Other (please specify)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Nice to have
+        - Would be helpful
+        - Important for my use case
+        - Critical for my project
+        - Can't work without this
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative solutions
+      description: Have you considered any alternative solutions or workarounds?
+      placeholder: "I also considered... but it wouldn't work because..."
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional context
+      description: Add any other context, screenshots, or examples about the feature request.
+      placeholder: "Any additional information, mockups, or examples"
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues for similar requests
+          required: true
+        - label: This is not a bug report (use bug report template instead)
+          required: true
+        - label: I am willing to help implement this feature
+          required: false
+        - label: I understand this may take time to implement
+          required: false

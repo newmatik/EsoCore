@@ -1,0 +1,9 @@
+This project uses Poetry for dependency management.
+
+To install dependencies:
+  poetry install
+
+To export a requirements.txt for environments that require pip:
+  poetry export -f requirements.txt --output requirements.txt --without-hashes
+
+Note: The exported file will include exact versions from poetry.lock.

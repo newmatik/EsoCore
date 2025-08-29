@@ -1,0 +1,23 @@
+{% extends "admin/base.html" %}
+
+{% load i18n %}
+
+{% block title %}EsoCore Server | Admin{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ app_label }}{% endblock %}
+
+{% block branding %}
+    {% include "unfold/helpers/site_branding.html" %}
+{% endblock %}
+
+{% block content %}
+    <div class="flex flex-row -mx-4">
+        <div class="grow px-4">
+            {% include "unfold/helpers/app_list_default.html" %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+
+

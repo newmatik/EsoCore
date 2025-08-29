@@ -1,0 +1,6 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "sentinel-symbols")(type "KiCad")(uri "${KIPRJMOD}/../../../library/symbols/EsoCore.kicad_sym")(options "")(descr "EsoCore Shared Symbol Library"))
+)
+
+

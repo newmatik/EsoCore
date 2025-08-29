@@ -1,0 +1,37 @@
+[project]
+name = "newmatik-EsoCore-server"
+version = "0.1.0"
+description = "EsoCore Django REST API"
+authors = [
+    {name = "Newmatik"}
+]
+license = {text = "Apache-2.0"}
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "django (==5.2.5)",
+    "djangorestframework (==3.16.1)",
+    "django-cors-headers (==4.7.0)",
+    "djangorestframework-api-key (==3.1.0)",
+    "drf-spectacular (==0.28.0)",
+    "django-filter (==25.1)",
+    "python-dotenv (==1.0.0)",
+    "requests (==2.31.0)",
+    "psycopg2-binary (==2.9.10)",
+    "django-unfold (>=0.65.0,<0.66.0)",
+    "django-crispy-forms (>=2.4,<3.0)"
+]
+
+[tool.poetry]
+package-mode = false
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+black = "24.4.2"
+isort = "5.13.2"
+flake8 = "7.0.0"
+
