@@ -80,7 +80,7 @@
       if (m) title = m[1].trim();
     } catch (_) {}
     // Strip product name prefix in menu but keep Hardware: prefix
-    title = title.replace(/^\s*(Sentinel)\s+/i, '').trim();
+    title = title.replace(/^\s*(EsoCore)\s+/i, '').trim();
     titlesCache.set(path, title);
     return title;
   }
@@ -127,7 +127,7 @@
       wireInternalLinks();
       await initWidgets();
       const pageTitle = await getTitle(path);
-      document.title = pageTitle + ' – Sentinel Docs';
+      document.title = pageTitle + ' – EsoCore Docs';
       buildSectionMenu(slug);
       // Scroll to hash anchor if present (/docs/slug#section)
       const anchor = location.hash ? location.hash.substring(1) : '';

@@ -21,7 +21,7 @@ Arguments:
     --verbose           Enable verbose output
     --help              Show this help message
 
-Author: EdgeSentinel Development Team
+Author: EsoCore Development Team
 """
 
 import argparse

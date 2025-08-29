@@ -180,7 +180,7 @@ REST_FRAMEWORK = {
 
 # DRF Spectacular configuration
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Sentinel API",
+    "TITLE": "EsoCore API",
     "DESCRIPTION": "IoT Device Monitoring and Management API",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,

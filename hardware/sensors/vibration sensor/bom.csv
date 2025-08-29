@@ -1,13 +1,13 @@
 Category,Item,MPN,Supplier,Qty,Unit,Notes,Package
 MCU,STM32G071 ARM Cortex-M0+ 64MHz TSSOP20,STM32G071KBT6,ST,1,2.20,Enhanced DSP capabilities for FFT processing,SMD
 Sensor,3-axis accelerometer MEMS,ADXL355BCCZ,Analog Devices,1,4.50,≥1-3kHz ODR for bearing/mechanical health,SMD
-Communication,RS-485 transceiver half-duplex,SN65HVD72,Texas Instruments,1,0.85,Bus interface for digital communication,SMD
+Communication,RS-485 transceiver half-duplex,SN65HVD72D,Texas Instruments,1,0.85,Bus interface for digital communication,SMD
 Power,Buck converter 12V to 3.3V 500mA,TPS62172DSGT,Texas Instruments,1,1.45,Efficient power from bus,SMD
-Power,LDO 3.3V clean for analog,MCP1700T-3302E,Microchip,1,0.12,Clean power for sensor,SMD
+Power,LDO 3.3V clean for analog,MCP1700T-3302E/TT,Microchip,1,0.12,Clean power for sensor,SMD
 Connector,4-pin screw terminal block 5.08mm,691137710004,Wurth,1,0.18,Bus connection (12V GND Data+ Data-),THT
 Connector,Cable gland PG9 for 4-conductor cable,PG9-GLAND,Wiska,1,1.50,Strain relief and environmental sealing,THT
-Protection,ESD protection diode array 4-ch,ESD9X3.3ST5G,OnSemi,1,0.08,Bus and power line protection,SMD
-Clock,8MHz crystal for MCU,ABM8G-8.000MHZ,ABRACON,1,0.12,MCU external clock source,SMD
+Protection,ESD protection diode array 4-ch,SP0503BAHTG,Littelfuse,1,0.08,Bus and power line protection,SMD
+Clock,8MHz crystal for MCU,ABMM2-8.000MHZ-E2-T,ABRACON,1,0.12,MCU external clock source,SMD
 Addressing,4-position SMD DIP switch,DSHP04TS-S,XKB,1,0.12,Module address configuration (SMD DIP),SMD
 Status,Status LED green 0603,LTST-C190KGKT,Lite-On,1,0.01,Operational status indication,SMD
 Passives,Resistors and capacitors 0603 assorted,R0603 assortment,Generic,1,0.25,Bus termination pullups bypass caps,SMD

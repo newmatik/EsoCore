@@ -5,14 +5,14 @@ Sensor,Oil temperature sensor DS18B20,DS18B20,Maxim Integrated,1,2.50,Oil temper
 Sensor,Viscosity sensor piezoelectric,PV-100-VISCOSITY,Generic,1,25.80,Piezoelectric viscosity measurement for oil degradation,SMD
 Sensor,Water content sensor capacitive,CAP-100-WATER,Generic,1,18.90,Capacitive water content detection in oil,SMD
 Sensor,Dielectric constant sensor,DIELECTRIC-100,Generic,1,22.50,Dielectric constant measurement for oil condition,SMD
-Communication,RS-485 transceiver isolated,ADM2582E,Analog Devices,1,4.20,Isolated bus interface for industrial safety,SMD
-Power,Isolated DC-DC 12V to 5V 1W,MEA1S1205SC,Murata,1,9.20,Primary isolation for safety with oil sensors,SMD
-Power,LDO 5V to 3.3V,MCP1700T-3302E,Microchip,1,0.12,MCU power supply,SMD
+Communication,RS-485 transceiver isolated,ADM2582EBRWZ,Analog Devices,1,4.20,Isolated bus interface for industrial safety,SMD
+Power,Isolated DC-DC 12V to 5V 1W,NXE1S1205MC,Murata,1,9.20,Primary isolation for safety with oil sensors,SMD
+Power,LDO 5V to 3.3V,MCP1700T-3302E/TT,Microchip,1,0.12,MCU power supply,SMD
 Connector,4-pin screw terminal block 5.08mm,691137710004,Wurth,1,0.18,Bus connection (12V GND Data+ Data-),THT
 Connector,Cable gland PG9 for 4-conductor cable,PG9-GLAND,Wiska,1,1.50,Strain relief and environmental sealing,THT
 Connector,Oil sampling port G1/8 BSP,OIL-SAMPLING-PORT,Generic,1,4.50,Threaded port for oil extraction and measurement,THT
 Protection,Surge suppressor for power lines,GDT-230-3R,Bourns,1,0.45,Protection from industrial electrical surges,SMD
-Clock,8MHz crystal for MCU,ABM8G-8.000MHZ,ABRACON,1,0.12,MCU external clock source,SMD
+Clock,8MHz crystal for MCU,ABMM2-8.000MHZ-E2-T,ABRACON,1,0.12,MCU external clock source,SMD
 Addressing,4-position SMD DIP switch,DSHP04TS-S,XKB,1,0.12,Module address configuration (SMD DIP),SMD
 Status,Status LED green 0603,LTST-C190KGKT,Lite-On,1,0.01,Operational status indication,SMD
 Passives,Resistors and capacitors 0603 assorted,R0603 assortment,Generic,1,0.30,Filter bias and bypass components,SMD
