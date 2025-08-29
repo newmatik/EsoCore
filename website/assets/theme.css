@@ -285,30 +285,7 @@ a:hover { color: var(--accent); }
   .sidebar { position: static; height: auto; }
 }
 
-/* Access gate */
-.gate {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.65);
-  backdrop-filter: blur(6px);
-  display: grid;
-  place-items: center;
-  z-index: 1000;
-}
-.gate-card {
-  width: min(440px, 92%);
-  background: var(--bg-elev);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: var(--shadow);
-  padding: 22px;
-}
-.gate-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.gate-card h2 { margin: 6px 0 12px; color: var(--accent); }
-.gate-form { display: grid; gap: 12px; grid-template-columns: 1fr auto; align-items: center; }
-.gate-form input { width: 100%; padding: 10px 12px; border-radius: 10px; background: #0a121a; border: 1px solid var(--border); color: var(--text); }
-.gate-form input:focus { outline: none; border-color: rgba(0,220,130,.55); box-shadow: 0 0 0 3px rgba(0,220,130,.15); }
-.gate-msg { grid-column: span 2; color: var(--muted); min-height: 18px; }
+
 
 /* BOM widget */
 .bom-controls { display: flex; gap: 10px; margin-bottom: 8px; }

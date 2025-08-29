@@ -1,8 +1,4 @@
 (function () {
-  const ACCESS_KEY = 'es_access';
-  const ACCESS_OK = 'yes';
-  const ACCESS_CODE = '55619';
-
   function el(html) {
     const template = document.createElement('template');
     template.innerHTML = html.trim();
@@ -66,49 +62,10 @@
     if (footerMount) footerMount.replaceWith(footer());
   }
 
-  function isUnlocked() { return sessionStorage.getItem(ACCESS_KEY) === ACCESS_OK; }
-
-  function gate() {
-    if (isUnlocked()) return;
-    const path = location.pathname.replace(/\/index.html$/, '');
-    if (path.endsWith('/imprint.html') || path.endsWith('/imprint')) return;
-    const overlay = el(`
-      <div class="gate" role="dialog" aria-modal="true" aria-label="Access Required">
-        <div class="gate-card">
-          <div class="gate-brand">
-            <span class="brand-badge" aria-hidden="true"></span>
-            <strong>EsoCore</strong>
-          </div>
-          <h2>Enter Access Code</h2>
-          <form class="gate-form">
-            <input type="password" inputmode="numeric" autocomplete="off" placeholder="Access code" aria-label="Access code" />
-            <button type="submit" class="btn">Unlock</button>
-            <div class="gate-msg" aria-live="polite"></div>
-          </form>
-        </div>
-      </div>
-    `);
-    const input = overlay.querySelector('input');
-    const msg = overlay.querySelector('.gate-msg');
-    overlay.querySelector('form').addEventListener('submit', (e) => {
-      e.preventDefault();
-      const val = (input.value || '').trim();
-      if (val === ACCESS_CODE) {
-        sessionStorage.setItem(ACCESS_KEY, ACCESS_OK);
-        overlay.remove();
-      } else {
-        msg.textContent = 'Incorrect code. Please try again.';
-      }
-    });
-    document.body.appendChild(overlay);
-    setTimeout(() => input && input.focus(), 0);
-  }
-
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => { inject(); gate(); initTypewriter(); });
+    document.addEventListener('DOMContentLoaded', () => { inject(); initTypewriter(); });
   } else {
     inject();
-    gate();
     initTypewriter();
   }
 })();

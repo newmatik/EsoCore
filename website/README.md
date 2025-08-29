@@ -14,11 +14,7 @@ npx serve -l 3000
 - Landing: <http://localhost:3000/website/>
 - Docs: <http://localhost:3000/website/docs/>
 
-## Temporary access protection
 
-For preview deployments only, a client-side access code prompt can be enabled.
-To change the code, edit `website/assets/site.js` (`ACCESS_CODE`). The unlock
-is stored in `sessionStorage` and applies to the current browser tab only.
 
 ## Deployment (GitHub Pages)
 
@@ -35,7 +31,7 @@ is stored in `sessionStorage` and applies to the current browser tab only.
 - `404.html`, `.nojekyll`, `CNAME` – Pages support
 - `assets/`
   - `theme.css` – Theme
-  - `site.js` – Shared header/footer and access gate
+  - `site.js` – Shared header/footer and site functionality
   - `docs-app.js` – Docs viewer (sidebar, routing, search)
 - `docs/`
   - `index.html` – Docs shell
