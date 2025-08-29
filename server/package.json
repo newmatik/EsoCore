@@ -1,0 +1,19 @@
+{
+  "name": "newmatik-esocore-server",
+  "version": "0.1.0",
+  "description": "EsoCore Django REST API",
+  "private": true,
+  "scripts": {
+    "lint": "poetry run python scripts/lint.py",
+    "format": "poetry run python scripts/format.py",
+    "lint:check": "poetry run ruff check . && poetry run black --check . && poetry run isort --check-only .",
+    "format:fix": "poetry run ruff check . --fix && poetry run black . && poetry run isort .",
+    "ruff": "poetry run ruff check .",
+    "ruff:fix": "poetry run ruff check . --fix",
+    "black": "poetry run black .",
+    "black:check": "poetry run black --check .",
+    "isort": "poetry run isort .",
+    "isort:check": "poetry run isort --check-only ."
+  },
+  "packageManager": "pnpm@10.15.0"
+}

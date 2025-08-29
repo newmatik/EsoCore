@@ -12,5 +12,3 @@ def _default_admin_title() -> str:
 
 
 ADMIN_TITLE = os.getenv("ADMIN_TITLE", _default_admin_title())
-
-

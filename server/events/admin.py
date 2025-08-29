@@ -13,7 +13,9 @@ class SystemEventAdmin(ModelAdmin):
     search_fields = ("event_type", "device__serial_number")
     formfield_overrides = {
         models.JSONField: {
-            'widget': forms.Textarea(attrs={'rows': 10, 'style': 'font-family: monospace'})
+            "widget": forms.Textarea(
+                attrs={"rows": 10, "style": "font-family: monospace"}
+            )
         }
     }
 
@@ -31,14 +33,24 @@ class AlertRuleAdmin(ModelAdmin):
     search_fields = ("name", "event_type")
     formfield_overrides = {
         models.JSONField: {
-            'widget': forms.Textarea(attrs={'rows': 12, 'style': 'font-family: monospace'})
+            "widget": forms.Textarea(
+                attrs={"rows": 12, "style": "font-family: monospace"}
+            )
         }
     }
 
 
 @admin.register(NotificationQueue)
 class NotificationQueueAdmin(ModelAdmin):
-    list_display = ("alert_rule", "event", "channel", "status", "retry_count", "created_at")
+    list_display = (
+        "alert_rule",
+        "event",
+        "channel",
+        "status",
+        "retry_count",
+        "created_at",
+    )
     list_filter = ("status", "channel")
+
 
 # Register your models here.

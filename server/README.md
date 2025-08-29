@@ -1,4 +1,4 @@
-# EsoCore Server (Django REST API)
+# EsoCore Server
 
 Django REST Framework backend for the EsoCore IoT monitoring system.
 
@@ -24,7 +24,8 @@ Django REST Framework backend for the EsoCore IoT monitoring system.
 ### Prerequisites
 
 - Python 3.11+
-- Poetry (recommended)
+- Poetry (recommended for Python dependencies)
+- pnpm (for code quality scripts)
 
 ### Installation (Poetry)
 
@@ -52,13 +53,18 @@ Django REST Framework backend for the EsoCore IoT monitoring system.
    poetry run python manage.py migrate
    ```
 
-5. **Create superuser:**
+5. **Set up code quality tools (optional):**
+
+   The project includes `package.json` with pnpm scripts for code quality tools.
+   These are pre-configured and ready to use with the Poetry environment.
+
+6. **Create superuser:**
 
    ```bash
    poetry run python manage.py createsuperuser
    ```
 
-6. **Run development server:**
+7. **Run development server:**
 
    ```bash
    poetry run python manage.py runserver
@@ -165,11 +171,51 @@ DATABASES = {
 python manage.py test
 ```
 
-### Code Formatting
+### Code Quality Tools
+
+This project uses modern Python code quality tools:
+
+- **Ruff**: Fast Python linter (replaces flake8)
+- **Black**: Code formatter
+- **isort**: Import organizer
+
+#### Running Code Quality Checks
 
 ```bash
-black .
-isort .
+# Quick linting (recommended)
+pnpm run lint
+
+# Auto-format code
+pnpm run format
+
+# Individual tools
+pnpm run ruff          # Lint with Ruff
+pnpm run black         # Format with Black
+pnpm run isort         # Organize imports
+```
+
+#### Check Only (No Auto-Fix)
+
+```bash
+# Check without fixing
+pnpm run lint:check
+
+# Individual checks
+pnpm run ruff:check    # Check Ruff rules
+pnpm run black:check   # Check Black formatting
+pnpm run isort:check   # Check import organization
+```
+
+#### Auto-Fix Issues
+
+```bash
+# Fix all auto-fixable issues
+pnpm run format:fix
+
+# Individual fixes
+pnpm run ruff:fix      # Fix Ruff issues
+pnpm run black         # Format with Black
+pnpm run isort         # Organize imports
 ```
 
 ### API Documentation
@@ -222,4 +268,5 @@ server/
 
 ## License
 
-Licensed under the Apache License, Version 2.0.
+Copyright © 2025 Newmatik. All rights reserved.
+Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.

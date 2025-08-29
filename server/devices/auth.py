@@ -7,6 +7,7 @@ class APIKeyAuthentication(authentication.BaseAuthentication):
     """
     Custom authentication class for API key authentication
     """
+
     def authenticate(self, request):
         # Get API key from header
         api_key = self.get_api_key(request)
@@ -17,12 +18,12 @@ class APIKeyAuthentication(authentication.BaseAuthentication):
         try:
             key_obj = APIKey.objects.get_from_key(api_key)
             if not key_obj.is_active:
-                raise exceptions.AuthenticationFailed('API key is inactive')
+                raise exceptions.AuthenticationFailed("API key is inactive")
 
             # Return user and key (DRF expects tuple of (user, auth))
             return (key_obj, api_key)
         except APIKey.DoesNotExist:
-            raise exceptions.AuthenticationFailed('Invalid API key')
+            raise exceptions.AuthenticationFailed("Invalid API key")
 
     def get_api_key(self, request):
         """Extract API key from request headers"""
@@ -34,8 +35,8 @@ class APIKeyAuthentication(authentication.BaseAuthentication):
             return api_key
 
         # Try Authorization header with Api-Key prefix
-        auth = request.META.get('HTTP_AUTHORIZATION', '')
-        if auth.startswith('Api-Key '):
+        auth = request.META.get("HTTP_AUTHORIZATION", "")
+        if auth.startswith("Api-Key "):
             return auth[8:]  # Remove 'Api-Key ' prefix
 
         return None

@@ -36,6 +36,9 @@ poetry.lock
 htmlcov/
 .pytest_cache/
 
+# Ruff cache
+.ruff_cache/
+
 # Node (if present in subfolders)
 node_modules/
 

@@ -3,11 +3,9 @@ export default defineNuxtPlugin(() => {
   const colorMode = useColorMode()
   watchEffect(() => {
     const isDark = colorMode.value === 'dark'
-    if (process.client) {
+    if (import.meta.client) {
       document.documentElement.classList.toggle('dark', isDark)
       document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
     }
   })
 })
-
-

@@ -7,7 +7,7 @@ module.exports = {
     './pages/**/*.{vue,js,ts}',
     './layouts/**/*.{vue,js,ts}',
     './plugins/**/*.{js,ts}',
-    './nuxt.config.{js,ts}'
+    './nuxt.config.{js,ts}',
   ],
   theme: {
     extend: {
@@ -22,10 +22,10 @@ module.exports = {
           600: '#059669',
           700: '#047857',
           800: '#065f46',
-          900: '#064e3b'
-        }
-      }
-    }
+          900: '#064e3b',
+        },
+      },
+    },
   },
-  plugins: []
+  plugins: [],
 }

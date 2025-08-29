@@ -26,8 +26,11 @@ class DashboardAdmin(ModelAdmin):
     list_filter = ("is_default", "is_public")
     formfield_overrides = {
         models.JSONField: {
-            'widget': forms.Textarea(attrs={'rows': 10, 'style': 'font-family: monospace'})
+            "widget": forms.Textarea(
+                attrs={"rows": 10, "style": "font-family: monospace"}
+            )
         }
     }
+
 
 # Register your models here.

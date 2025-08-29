@@ -13,9 +13,7 @@
 const colorMode = useColorMode()
 const isDark = computed(() => colorMode.value === 'dark')
 const nextLabel = computed(() => (isDark.value ? 'light' : 'dark'))
-function toggle(){
+function toggle() {
   colorMode.preference = isDark.value ? 'light' : 'dark'
 }
 </script>
-
-

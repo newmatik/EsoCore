@@ -9,7 +9,7 @@ class AssetViewSet(viewsets.ModelViewSet):
     serializer_class = AssetSerializer
 
     def get_queryset(self):
-        queryset = Asset.objects.select_related('site')
+        queryset = Asset.objects.select_related("site")
         if self.request.user.is_authenticated:
             # Filter assets by user's site access
             user_sites = self.request.user.sites.all()
@@ -22,7 +22,7 @@ class AssetCycleViewSet(viewsets.ModelViewSet):
     serializer_class = AssetCycleSerializer
 
     def get_queryset(self):
-        queryset = AssetCycle.objects.select_related('asset')
+        queryset = AssetCycle.objects.select_related("asset")
         if self.request.user.is_authenticated:
             # Filter by user's accessible assets
             user_sites = self.request.user.sites.all()

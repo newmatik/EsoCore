@@ -4,12 +4,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   // Modules
-  modules: [
-    '@nuxt/ui',
-    '@pinia/nuxt',
-    '@nuxtjs/tailwindcss',
-    '@nuxtjs/color-mode'
-  ],
+  modules: ['@nuxt/ui', '@pinia/nuxt', '@nuxtjs/tailwindcss', '@nuxtjs/color-mode'],
 
   // CSS
   css: ['@@/assets/css/main.css'],
@@ -24,8 +19,8 @@ export default defineNuxtConfig({
       appVersion: process.env.NUXT_PUBLIC_APP_VERSION || '1.0.0',
       brand: process.env.NUXT_PUBLIC_BRAND || 'Newmatik',
       product: process.env.NUXT_PUBLIC_PRODUCT || 'EsoCore',
-      displayBrand: (process.env.NUXT_PUBLIC_DISPLAY_BRAND || 'true') === 'true'
-    }
+      displayBrand: (process.env.NUXT_PUBLIC_DISPLAY_BRAND || 'true') === 'true',
+    },
   },
 
   // Color mode
@@ -37,7 +32,7 @@ export default defineNuxtConfig({
     componentName: 'ColorScheme',
     classPrefix: '',
     classSuffix: '',
-    storageKey: 'nuxt-color-mode'
+    storageKey: 'nuxt-color-mode',
   },
 
   // UI Configuration
@@ -47,26 +42,26 @@ export default defineNuxtConfig({
 
   // Build configuration
   nitro: {
-    preset: 'node-server'
+    preset: 'node-server',
   },
 
   // TypeScript
   typescript: {
     strict: true,
-    typeCheck: true
+    typeCheck: true,
   },
 
   // Vue configuration
   vue: {
     compilerOptions: {
-      isCustomElement: (tag) => tag.startsWith('ui-')
-    }
+      isCustomElement: tag => tag.startsWith('ui-'),
+    },
   },
 
   // Development server
   devServer: {
     port: 3000,
-    host: '0.0.0.0'
+    host: '0.0.0.0',
   },
 
   // SSR
@@ -77,7 +72,7 @@ export default defineNuxtConfig({
     '/dashboard': { ssr: false },
     '/devices/**': { ssr: false },
     '/assets/**': { ssr: false },
-    '/alerts/**': { ssr: false }
+    '/alerts/**': { ssr: false },
   },
 
   // Head configuration
@@ -87,13 +82,13 @@ export default defineNuxtConfig({
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'EsoCore IoT Device Monitoring and Management Portal' }
+        { name: 'description', content: 'EsoCore IoT Device Monitoring and Management Portal' },
       ],
       link: [
         { rel: 'icon', type: 'image/png', href: '/icon.png' },
         { rel: 'icon', type: 'image/svg+xml', href: '/icon.svg' },
-        { rel: 'apple-touch-icon', href: '/icon.png' }
-      ]
-    }
-  }
+        { rel: 'apple-touch-icon', href: '/icon.png' },
+      ],
+    },
+  },
 })

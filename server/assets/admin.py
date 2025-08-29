@@ -13,7 +13,9 @@ class AssetAdmin(ModelAdmin):
     search_fields = ("asset_id", "make", "model")
     formfield_overrides = {
         models.JSONField: {
-            'widget': forms.Textarea(attrs={'rows': 10, 'style': 'font-family: monospace'})
+            "widget": forms.Textarea(
+                attrs={"rows": 10, "style": "font-family: monospace"}
+            )
         }
     }
 
@@ -22,5 +24,6 @@ class AssetAdmin(ModelAdmin):
 class AssetCycleAdmin(ModelAdmin):
     list_display = ("asset", "cycle_type", "start_time", "end_time", "duration")
     list_filter = ("cycle_type", "start_time")
+
 
 # Register your models here.

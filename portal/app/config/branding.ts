@@ -7,7 +7,5 @@ export interface BrandingConfig {
 export const defaultBranding: BrandingConfig = {
   brand: 'Newmatik',
   product: 'EsoCore',
-  displayBrand: true
+  displayBrand: true,
 }
-
-

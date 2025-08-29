@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-#v8_1om$*2w#@)9lzgpo%01w6z)pd7=qn0o*od8yp@uhi7*vh3'
+SECRET_KEY = "django-insecure-#v8_1om$*2w#@)9lzgpo%01w6z)pd7=qn0o*od8yp@uhi7*vh3"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -33,69 +33,67 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'unfold',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-
+    "unfold",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
     # Third-party apps
-    'rest_framework',
-    'rest_framework_api_key',
-    'corsheaders',
-    'drf_spectacular',
-    'django_filters',
-    'crispy_forms',
-
+    "rest_framework",
+    "rest_framework_api_key",
+    "corsheaders",
+    "drf_spectacular",
+    "django_filters",
+    "crispy_forms",
     # Local apps
-    'users',
-    'devices',
-    'assets',
-    'telemetry',
-    'events',
-    'iot',
+    "users",
+    "devices",
+    "assets",
+    "telemetry",
+    "events",
+    "iot",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'sentinel_api.urls'
+ROOT_URLCONF = "sentinel_api.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'sentinel_api.wsgi.application'
+WSGI_APPLICATION = "sentinel_api.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -105,16 +103,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -122,9 +120,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -134,62 +132,59 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_URL = "static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Unfold basic configuration (can be extended later)
 UNFOLD = {
-    'SITE_HEADER': ADMIN_TITLE,  # left brand
-    'SITE_TITLE': 'Admin',       # right page title
+    "SITE_HEADER": ADMIN_TITLE,  # left brand
+    "SITE_TITLE": "Admin",  # right page title
 }
 
 # Crispy Forms (use Unfold template pack)
-CRISPY_TEMPLATE_PACK = 'unfold_crispy'
-CRISPY_ALLOWED_TEMPLATE_PACKS = ['unfold_crispy']
+CRISPY_TEMPLATE_PACK = "unfold_crispy"
+CRISPY_ALLOWED_TEMPLATE_PACKS = ["unfold_crispy"]
 
 # Django REST Framework configuration
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'devices.auth.APIKeyAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "devices.auth.APIKeyAuthentication",
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 100,
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle'
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 100,
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
     ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/hour',
-        'user': '1000/hour'
-    },
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
+    "DEFAULT_THROTTLE_RATES": {"anon": "100/hour", "user": "1000/hour"},
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
     ],
-    'DEFAULT_PARSER_CLASSES': [
-        'rest_framework.parsers.JSONParser',
-        'rest_framework.parsers.MultiPartParser',
-        'rest_framework.parsers.FormParser',
+    "DEFAULT_PARSER_CLASSES": [
+        "rest_framework.parsers.JSONParser",
+        "rest_framework.parsers.MultiPartParser",
+        "rest_framework.parsers.FormParser",
     ],
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 # DRF Spectacular configuration
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Sentinel API',
-    'DESCRIPTION': 'IoT Device Monitoring and Management API',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-    'COMPONENT_SPLIT_REQUEST': True,
+    "TITLE": "Sentinel API",
+    "DESCRIPTION": "IoT Device Monitoring and Management API",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
 }
 
 # CORS configuration

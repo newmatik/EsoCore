@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from rest_framework import viewsets
 
 from .models import Dashboard, UserDeviceRole, UserProfile
@@ -23,12 +22,10 @@ class UserDeviceRoleViewSet(viewsets.ModelViewSet):
     serializer_class = UserDeviceRoleSerializer
 
     def get_queryset(self):
-        queryset = UserDeviceRole.objects.select_related('user', 'device', 'site')
+        queryset = UserDeviceRole.objects.select_related("user", "device", "site")
         if self.request.user.is_authenticated:
             # Users can see roles they granted or roles for themselves
-            return queryset.filter(
-                granted_by=self.request.user
-            ) | queryset.filter(
+            return queryset.filter(granted_by=self.request.user) | queryset.filter(
                 user=self.request.user
             )
         return queryset.none()

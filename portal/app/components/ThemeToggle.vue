@@ -4,19 +4,16 @@
     :aria-label="`Switch to ${nextLabel} mode`"
     @click="toggle"
   >
-    <span v-if="isDark" class="i-heroicons-moon-20-solid w-5 h-5" aria-hidden="true"></span>
-    <span v-else class="i-heroicons-sun-20-solid w-5 h-5" aria-hidden="true"></span>
+    <span v-if="isDark" class="i-heroicons-moon-20-solid w-5 h-5" aria-hidden="true" />
+    <span v-else class="i-heroicons-sun-20-solid w-5 h-5" aria-hidden="true" />
   </button>
-  
 </template>
 
 <script setup lang="ts">
 const colorMode = useColorMode()
 const isDark = computed(() => colorMode.value === 'dark')
 const nextLabel = computed(() => (isDark.value ? 'light' : 'dark'))
-function toggle(){
+function toggle() {
   colorMode.preference = isDark.value ? 'light' : 'dark'
 }
 </script>
-
-

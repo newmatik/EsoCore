@@ -19,7 +19,9 @@ class DeviceAdmin(ModelAdmin):
     search_fields = ("serial_number", "model")
     formfield_overrides = {
         models.JSONField: {
-            'widget': forms.Textarea(attrs={'rows': 10, 'style': 'font-family: monospace'})
+            "widget": forms.Textarea(
+                attrs={"rows": 10, "style": "font-family: monospace"}
+            )
         }
     }
 
@@ -29,7 +31,9 @@ class DeviceConfigurationAdmin(ModelAdmin):
     list_display = ("device", "created_at", "updated_at")
     formfield_overrides = {
         models.JSONField: {
-            'widget': forms.Textarea(attrs={'rows': 12, 'style': 'font-family: monospace'})
+            "widget": forms.Textarea(
+                attrs={"rows": 12, "style": "font-family: monospace"}
+            )
         }
     }
 
@@ -38,5 +42,6 @@ class DeviceConfigurationAdmin(ModelAdmin):
 class FirmwareBundleAdmin(ModelAdmin):
     list_display = ("version", "channel", "created_at")
     list_filter = ("channel",)
+
 
 # Register your models here.

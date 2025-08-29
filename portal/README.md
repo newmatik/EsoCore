@@ -1,4 +1,4 @@
-# EsoCore Portal (Nuxt.js Frontend)
+# EsoCore Portal
 
 Modern Vue.js frontend application for the EsoCore IoT monitoring system, built with Nuxt.js.
 
@@ -174,7 +174,7 @@ const { connect, subscribe } = useWebSocket()
 connect()
 
 // Subscribe to device updates
-subscribe('devices', (data) => {
+subscribe('devices', data => {
   // Handle real-time updates
 })
 ```
@@ -279,4 +279,5 @@ This creates a `dist/` folder with static files ready for deployment.
 
 ## License
 
-Licensed under the Apache License, Version 2.0.
+Copyright © 2025 Newmatik. All rights reserved.
+Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.
