@@ -55,7 +55,12 @@ jobs:
       - name: Build Nuxt.js application
         run: |
           cd website
-          pnpm run generate
+          # Try to rebuild native bindings if they're missing
+          if ! pnpm run generate; then
+            echo "Build failed, attempting to rebuild native bindings..."
+            pnpm rebuild
+            pnpm run generate
+          fi
           
       - name: Verify CNAME file
         run: |
