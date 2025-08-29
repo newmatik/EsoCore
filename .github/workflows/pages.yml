@@ -37,13 +37,20 @@ jobs:
       - name: Install dependencies
         run: |
           cd website
-          # Clear any existing build artifacts
-          rm -rf .nuxt .output
+          # Clear any existing build artifacts and node_modules
+          rm -rf .nuxt .output node_modules
           # Set environment variables for native bindings
           export PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
           export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1
-          # Install with retry logic for native bindings
-          pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
+          export NODE_ENV=production
+          # Create .npmrc with aggressive hoisting for native bindings
+          echo "shamefully-hoist=true" > .npmrc
+          echo "auto-install-peers=true" >> .npmrc
+          echo "prefer-frozen-lockfile=false" >> .npmrc
+          # Install with multiple fallback strategies
+          pnpm install --no-frozen-lockfile --ignore-scripts || \
+          (rm -rf node_modules && pnpm install --no-frozen-lockfile) || \
+          (rm -rf node_modules pnpm-lock.yaml && pnpm install)
           
       - name: Build Nuxt.js application
         run: |

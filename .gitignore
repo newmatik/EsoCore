@@ -13,7 +13,7 @@ node_modules/
 .npm/
 .pnpm-debug.log*
 yarn.lock
-pnpm-lock.yaml
+# pnpm-lock.yaml - commented out to allow lockfile commits for CI
 package-lock.json
 
 # Logs
