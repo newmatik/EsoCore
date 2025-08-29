@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -51,6 +51,8 @@ jobs:
           pnpm install --no-frozen-lockfile --ignore-scripts || \
           (rm -rf node_modules && pnpm install --no-frozen-lockfile) || \
           (rm -rf node_modules pnpm-lock.yaml && pnpm install)
+          # Manually install the correct oxc-parser binding for Linux x64
+          pnpm add -D @oxc-parser/binding-linux-x64-gnu || echo "Failed to install oxc-parser binding, continuing..."
           
       - name: Build Nuxt.js application
         run: |
