@@ -1,4 +1,10 @@
 (fp_lib_table
   (version 7)
-  (lib (name "footprints")(type "KiCad")(uri "${KIPRJMOD}/../../library/footprints")(options "")(descr "Newmatik Shared Footprint Libary"))
+  (lib (name "footprints")(type "KiCad")(uri "${KIPRJMOD}/../../library/footprints")(options "")(descr "EsoCore Shared Footprint Library"))
+  (lib (name "stm32-footprints")(type "KiCad")(uri "${KIPRJMOD}/../../library/footprints")(options "")(descr "STM32 MCU Footprints"))
+  (lib (name "ethernet-footprints")(type "KiCad")(uri "${KIPRJMOD}/../../library/footprints")(options "")(descr "Ethernet Component Footprints"))
+  (lib (name "rs485-footprints")(type "KiCad")(uri "${KIPRJMOD}/../../library/footprints")(options "")(descr "RS-485 Transceiver Footprints"))
+  (lib (name "wurth-footprints")(type "KiCad")(uri "${KIPRJMOD}/../../library/footprints")(options "")(descr "Wurth Terminal Block Footprints"))
+  (lib (name "crystal-footprints")(type "KiCad")(uri "${KIPRJMOD}/../../library/footprints")(options "")(descr "Crystal Oscillator Footprints"))
+  (lib (name "protection-footprints")(type "KiCad")(uri "${KIPRJMOD}/../../library/footprints")(options "")(descr "Protection Component Footprints"))
 )

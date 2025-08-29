@@ -13,7 +13,7 @@ Connector,Cable gland PG9 for 4-conductor cable,PG9-GLAND,Wiska,1,1.50,Strain re
 Connector,Oil sampling port G1/8 BSP,OIL-SAMPLING-PORT,Generic,1,4.50,Threaded port for oil extraction and measurement,THT
 Protection,Surge suppressor for power lines,GDT-230-3R,Bourns,1,0.45,Protection from industrial electrical surges,SMD
 Clock,8MHz crystal for MCU,ABM8G-8.000MHZ,ABRACON,1,0.12,MCU external clock source,SMD
-Addressing,4-position SMD rotary switch,FRS-4,CTS,1,0.12,Module address configuration (SMD alternative),SMD
+Addressing,4-position SMD DIP switch,DSHP04TS-S,XKB,1,0.12,Module address configuration (SMD DIP),SMD
 Status,Status LED green 0603,LTST-C190KGKT,Lite-On,1,0.01,Operational status indication,SMD
 Passives,Resistors and capacitors 0603 assorted,R0603 assortment,Generic,1,0.30,Filter bias and bypass components,SMD
 Mechanical,Oil filter mesh 50 micron,OIL-FILTER-MESH,Generic,1,3.20,Protection for sensors from large particles,Mechanical

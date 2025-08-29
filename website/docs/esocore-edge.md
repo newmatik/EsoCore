@@ -204,5 +204,3 @@ EsoCore uses a **distributed sensor network** where each sensor module contains 
 - **Brownout detection**: Early warning system for voltage sags
 - **Blackout detection**: Immediate power loss detection
 - **Backup activation**: Automatic switchover to supercap backup
-
-

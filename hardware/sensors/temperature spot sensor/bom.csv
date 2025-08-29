@@ -13,7 +13,7 @@ Connector,Cable gland PG9 for 4-conductor cable,PG9-GLAND,Wiska,1,1.50,Strain re
 Connector,High-temp thermocouple connector,THERMO-COAX-CONN,Generic,2,1.80,Mineral insulated thermocouple connectors,THT
 Protection,ESD protection diode array 4-ch,ESD9X3.3ST5G,OnSemi,1,0.08,Bus and power line protection,SMD
 Clock,8MHz crystal for MCU,ABM8G-8.000MHZ,ABRACON,1,0.12,MCU external clock source,SMD
-Addressing,4-position SMD rotary switch,FRS-4,CTS,1,0.12,Module address configuration (SMD alternative),SMD
+Addressing,4-position SMD DIP switch,DSHP04TS-S,XKB,1,0.12,Module address configuration (SMD DIP),SMD
 Status,Status LED green 0603,LTST-C190KGKT,Lite-On,1,0.01,Operational status indication,SMD
 Passives,Precision resistor for NTC bias 0.1%,ERA-3AEB1002V,Panasonic,4,0.08,Temperature measurement accuracy,SMD
 Passives,Resistors and capacitors 0603 assorted,R0603 assortment,Generic,1,0.35,Bus termination filter and bias network,SMD

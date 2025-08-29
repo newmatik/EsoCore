@@ -14,7 +14,7 @@ Connector,M12 connector for proximity sensors,M12-4PIN-FEMALE,Generic,3,2.40,Ind
 Connector,Encoder connector 8-pin,ENCODER-CONN-8PIN,Generic,1,3.80,Differential encoder signal connector,THT
 Protection,ESD protection diode array 4-ch,ESD9X3.3ST5G,OnSemi,1,0.08,Bus and power line protection,SMD
 Clock,8MHz crystal for MCU,ABM8G-8.000MHZ,ABRACON,1,0.12,MCU external clock source,SMD
-Addressing,4-position SMD rotary switch,FRS-4,CTS,1,0.12,Module address configuration (SMD alternative),SMD
+Addressing,4-position SMD DIP switch,DSHP04TS-S,XKB,1,0.12,Module address configuration (SMD DIP),SMD
 Status,Status LED green 0603,LTST-C190KGKT,Lite-On,1,0.01,Operational status indication,SMD
 Passives,Resistors and capacitors 0603 assorted,R0603 assortment,Generic,1,0.30,Bus termination filter and bias network,SMD
 Mechanical,Proximity sensor mounting bracket,MOUNT-BRACKET-M12,Generic,3,1.50,Adjustable mounting for different sensor types,Mechanical
