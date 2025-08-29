@@ -8,6 +8,13 @@ export default defineNuxtConfig({
     prerender: {
       routes: [],
     },
+    publicAssets: [
+      {
+        baseURL: '/',
+        dir: 'public',
+        maxAge: 60 * 60 * 24 * 365, // 1 year
+      },
+    ],
   },
 
   // App configuration
