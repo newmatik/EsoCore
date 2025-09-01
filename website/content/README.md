@@ -107,7 +107,7 @@ For these demanding applications, EsoCore provides the complete operational visi
 
 | Component          | Technology                                    | Purpose                                               |
 | ------------------ | --------------------------------------------- | ----------------------------------------------------- |
-| **Edge**           | STM32 F4/F7/H7                                | Real-time sensor data collection and local processing |
+| **Edge**           | STM32H747 (dual-core M7/M4)                   | Real-time sensor data collection and local processing |
 | **Cloud Platform** | Django REST Framework Server + Nuxt.js Portal | Data management, analytics, and user interfaces       |
 | **Connectivity**   | Ethernet/PoE or Wi-Fi                         | Reliable data transmission with offline resilience    |
 | **Storage**        | Industrial microSD + Cloud DB                 | Local buffering and long-term data persistence        |
@@ -131,7 +131,7 @@ For these demanding applications, EsoCore provides the complete operational visi
 
 ### Edge Platform
 
-- **Microcontroller**: ARM Cortex-M4/M7 dual core with hardware crypto, sufficient for TLS and edge AI processing.
+- **Microcontroller**: STM32H747 dual core (Cortex-M7/M4) with hardware crypto, sufficient for TLS and edge AI processing.
 - **Connectivity**: Industrial Ethernet with PoE option (preferred) or robust Wi-Fi module for reliable data transmission.
 - **Storage**: Industrial-grade microSD with wear leveling for 30+ days of local data buffering.
 - **Primary Power**: 12-24V DC with surge protection, optional PoE compatibility.

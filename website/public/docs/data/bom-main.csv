@@ -1,5 +1,5 @@
 Category,Item,MPN,Supplier,Qty,Unit,Notes,Package
-MCU,STM32H743 Dual-core Cortex-M7/M4 LQFP176,STM32H743IIT6,ST,1,13.50,Main MCU (dual-core),SMD
+MCU,STM32H747 Dual-core Cortex-M7/M4 LQFP176,STM32H747IIT6,ST,1,13.50,Main MCU (dual-core),SMD
 Wireless,WiFi/BT module ESP32-WROOM-32,ESP32-WROOM-32,Espressif,1,4.50,WiFi 802.11b/g/n + Bluetooth 5.0,Module
 Storage,Industrial microSD 16GB MLC -40C to 85C,ISD-16GB-MLC,Apacer or Innodisk,1,6.80,Logging and buffering,SMD
 Connector,MicroSD push-push holder,DM3AT-SF-PEJM5,Hirose,1,0.35,MicroSD socket,SMD

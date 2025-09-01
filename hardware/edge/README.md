@@ -10,7 +10,7 @@
 
 ## Hardware
 
-- MCU: STM32H743IIT6 (LQFP144), external HSE 25 MHz, 32.768 kHz RTC
+- MCU: STM32H747IIT6 (LQFP176) dual-core M7/M4, external HSE 25 MHz, 32.768 kHz RTC
 - Storage: microSD socket (push–push), industrial microSD card
 - Power: 12–24 V DC input → 5 V buck (3 A) → 3.3 V buck/LDO rails
 - Backup: Six 2.7 V 5 F supercaps for ≥30 s safe shutdown

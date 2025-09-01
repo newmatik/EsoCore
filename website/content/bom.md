@@ -14,7 +14,7 @@ The EsoCore system consists of the **Edge** (installed in the control cabinet) a
 
 ## Edge
 
-Control cabinet mounted unit with processing, connectivity, and I/O. Houses the STM32H743 MCU, fieldbus interfaces, PoE support, and safety systems.
+Control cabinet mounted unit with processing, connectivity, and I/O. Houses the STM32H747 MCU, fieldbus interfaces, PoE support, and safety systems.
 
 <div id="bom-main">Loading BOM...</div>
 

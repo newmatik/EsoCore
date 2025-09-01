@@ -8,7 +8,7 @@ This document defines the hardware specifications for the EsoCore Edge device �
 
 ### Edge Processing
 
-- **MCU/SoC**: ARM Cortex‑M4/M7 or equivalent with sufficient RAM/flash for TLS and a filesystem; hardware crypto preferred
+- **MCU/SoC**: STM32H747IIT6 dual‑core Cortex‑M7/M4 with sufficient RAM/flash for TLS and a filesystem; hardware crypto preferred
 - **Storage**: industrial‑grade microSD (SLC/MLC with wear leveling), via SPI or SDIO
 - **Enclosure**: DIN‑rail or compact IP54–IP65 industrial housing
 
@@ -119,7 +119,7 @@ EsoCore uses a **distributed sensor network** where each sensor module contains 
 
 ### Edge Components
 
-- **MCU**: STM32 family with enough RAM/flash for TLS + filesystem (e.g., STM32F4/F7/H7 depending on crypto/perf needs)
+- **MCU**: STM32H747IIT6 (dual‑core M7/M4) with enough RAM/flash for TLS + filesystem
 - **Storage**: microSD (industrial grade, SLC/MLC, wear leveling), SPI or SDIO
 - **Enclosure**: DIN‑rail or compact IP54–IP65 industrial housing
 
