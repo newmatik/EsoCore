@@ -1,3 +1,6 @@
+# Local only project documentation
+.local/
+
 # macOS
 .DS_Store
 .AppleDouble

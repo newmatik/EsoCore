@@ -1,4 +1,48 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { readdirSync } from 'fs'
+import { defineNuxtConfig } from 'nuxt/config'
+import { join } from 'path'
+
+// Automatically generate docs routes from content directory
+function generateDocRoutes() {
+  try {
+    const contentDir = join(process.cwd(), 'content')
+    const files = readdirSync(contentDir)
+    const docRoutes = files
+      .filter(file => file.endsWith('.md') && file !== 'README.md')
+      .map(file => `/docs/${file.replace('.md', '')}`)
+    
+    return [
+      '/',
+      '/docs', // Main docs page (README)
+      '/imprint',
+      ...docRoutes
+    ]
+  } catch (error: any) {
+    console.warn('Could not auto-generate doc routes:', error.message)
+    // Fallback to manual routes if auto-generation fails
+    return [
+      '/',
+      '/docs',
+      '/docs/esocore-edge',
+      '/docs/esocore-sensors',
+      '/docs/edge-intelligence',
+      '/docs/data-format-specification',
+      '/docs/api-specification',
+      '/docs/cloud-infrastructure',
+      '/docs/testing-procedures',
+      '/docs/development-environment',
+      '/docs/development-timeline',
+      '/docs/business-model-and-partnerships',
+      '/docs/competitor-analysis',
+      '/docs/fieldbus',
+      '/docs/bom',
+      '/docs/license',
+      '/imprint'
+    ]
+  }
+}
+
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
@@ -6,26 +50,7 @@ export default defineNuxtConfig({
   // Static site generation for GitHub Pages
   nitro: {
     prerender: {
-      routes: [
-        '/',
-        '/docs',
-        '/docs/esocore-edge',
-        '/docs/esocore-sensors',
-        '/docs/edge-intelligence',
-        '/docs/data-format-specification',
-        '/docs/api-specification',
-        '/docs/cloud-infrastructure',
-        '/docs/testing-procedures',
-        '/docs/development-environment',
-        '/docs/development-timeline',
-        '/docs/business-model-and-partnerships',
-        '/docs/competitor-analysis',
-        '/docs/fieldbus',
-        '/docs/bom',
-        '/docs/license',
-        '/imprint'
-      ],
-      fallback: '404.html'
+      routes: generateDocRoutes(),
     },
     publicAssets: [
       {
