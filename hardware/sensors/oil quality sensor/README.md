@@ -18,9 +18,9 @@
 - Sensor: Dielectric constant sensor
 - Bus: RS‑485 isolated transceiver (ADM2582E)
 - Power: Isolated 12V→5V DC/DC (MEA1S1205SC) → 3.3 V LDO (MCP1700)
-- Connectors: 4‑pin screw terminal (12V, GND, D+, D‑), oil sampling port G1/8 BSP
+- Connectors: Two pluggable RS‑485 ports (IN and OUT): plug `2EDGK-5.0-04P` ↔ PCB mate `2EDGR-5.0-04P`; silk labels A/B/24V/GND; signal loop‑through; oil sampling port G1/8 BSP
 - Protection: GDT surge suppressor, ESD arrays, oil filter mesh
-- Addressing: 4‑position DIP switch
+- Addressing: 8‑position SMD DIP; 1–7 = Modbus address bits, 8 = 120 Ω termination enable; silkscreen: "1‑7=ADDR, 8=TERM, ON/OFF"
 - Indicators: Green status LED
 - Programming: Tag‑Connect SWD footprint
 

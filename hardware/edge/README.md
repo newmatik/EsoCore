@@ -21,10 +21,12 @@
   - RS‑485 sensor bus (SN65HVD72), termination selectable
   - Fieldbus: Isolated Modbus RTU, PROFIBUS-compatible RS‑485 (DB‑9)
 - I/O connectors:
-  - 2× 4-pin sensor bus (primary/secondary)
-  - Safety I/O: 8-pin input, 6-pin output
-  - General I/O: 12-pin (DI, AI, relay)
-  - Fieldbus: 6-pin terminal, DB‑9 for PROFIBUS
+  - Pluggable terminal blocks (Degson): plugs `2EDGK-5.0-xxP` mating with PCB connectors `2EDGR-5.0-xxP`; all PCB mates are 90° angled at PCB edge for enclosure access
+  - 2× 4-pin sensor bus: plug `2EDGK-5.0-04P` ↔ PCB mate `2EDGR-5.0-04P`
+  - Safety I/O: 8-pin input `2EDGK-5.0-08P` ↔ `2EDGR-5.0-08P`, 6-pin output `2EDGK-5.0-06P` ↔ `2EDGR-5.0-06P`
+  - General I/O: 2× 6-pin `2EDGK-5.0-06P` ↔ `2EDGR-5.0-06P` (DI, AI, relay)
+  - Fieldbus: 6-pin `2EDGK-5.0-06P` ↔ `2EDGR-5.0-06P`; PROFIBUS: DB‑9
+  - Power input: 2-pin `2EDGK-5.0-02P` ↔ `2EDGR-5.0-02P`
   - SWD 2×5 1.27 mm header (or Tag‑Connect footprint)
 - Safety: Dual-channel safety relays with monitoring IC (PLd target)
 - UI: 0.96" 128×64 OLED (I²C), Reset/Boot/Menu buttons, status LEDs

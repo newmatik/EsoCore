@@ -14,9 +14,9 @@
 - Sensor: ACS723 ±30 A Hall current sensor (higher range, better linearity)
 - Isolation: RS‑485 transceiver ADM2582E (integrated iso + DC/DC)
 - Power: Isolated 12V→5V DC/DC (MEA1S1205SC) → 3.3 V LDO (MCP1700)
-- Connectors: 4‑pin screw terminal (12V, GND, D+, D‑), clamp-on current interface
+- Connectors: Two pluggable RS‑485 ports (IN and OUT): plug `2EDGK-5.0-04P` ↔ PCB mate `2EDGR-5.0-04P`; silk labels A/B/24V/GND; signal loop‑through; clamp-on current interface
 - Protection: GDT surge suppressor on power; ESD arrays at bus/power
-- Addressing: 4‑position DIP switch
+- Addressing: 8‑position SMD DIP; 1–7 = Modbus address bits, 8 = 120 Ω termination enable; silkscreen: "1‑7=ADDR, 8=TERM, ON/OFF"
 - Indicators: Green status LED
 - Programming: Tag‑Connect SWD footprint
 

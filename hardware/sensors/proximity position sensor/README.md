@@ -18,9 +18,9 @@
 - Sensor: VL53L0X laser distance sensor for precision positioning
 - Bus: RS‑485 half‑duplex (SN65HVD72), bias/termination network
 - Power: 12 V bus → 3.3 V buck (TPS62172) + LDO (MCP1700) for clean analog
-- Connectors: 4‑pin screw terminal (12V, GND, D+, D‑), M12 proximity connectors, encoder connector
+- Connectors: Two pluggable RS‑485 ports (IN and OUT): plug `2EDGK-5.0-04P` ↔ PCB mate `2EDGR-5.0-04P`; silk labels A/B/24V/GND; signal loop‑through; M12 proximity connectors, encoder connector
 - Protection: ESD arrays on bus/power lines
-- Addressing: 4‑position DIP switch
+- Addressing: 8‑position SMD DIP; 1–7 = Modbus address bits, 8 = 120 Ω termination enable; silkscreen: "1‑7=ADDR, 8=TERM, ON/OFF"
 - Indicators: Green status LED
 - Programming: Tag‑Connect SWD footprint
 
