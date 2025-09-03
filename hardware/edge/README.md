@@ -53,9 +53,9 @@
 
 ## CAD Toolchain
 
-- Tool: KiCad (8.x recommended)
-- Project: `hardware/edge/kicad/core.kicad_pro`
-- Notes: Open the `.kicad_pro` in KiCad; edit schematics/layout in `.kicad_sch`/`.kicad_pcb`. Generate fabrication outputs via KiCad Plot and Drill tools.
+- Tool: Altium Designer
+- Project: `hardware/edge/altium/core.PcbDoc`
+- Notes: Open the `.PcbDoc` in Altium Designer; edit schematics/layout in `.SchDoc`/`.PcbDoc`. Generate fabrication outputs via Altium Designer.
 
 ## Copyright and License
 

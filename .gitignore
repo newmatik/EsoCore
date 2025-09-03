@@ -42,18 +42,3 @@ yarn-error.log*
 # Misc
 .env*
 coverage/
-
-# KiCad
-# Project-local preferences, backups, and cache directories
-*.kicad_prl
-*-backups/
-fp-info-cache
-
-# KiCad backup files (v6+)
-*.kicad_sch-bak
-*.kicad_pcb-bak
-
-# Legacy KiCad backups/cache (v5 and earlier)
-*.sch-bak
-*.brd-bak
-*-cache.lib

@@ -141,7 +141,7 @@ class StepLinter:
         # Standard header format (without ISO line - that's handled separately)
         standard_header = f"""HEADER;
 FILE_DESCRIPTION(('3D model data'),'2;1');
-FILE_NAME('{filename}','2024-01-01T00:00:00',(''),(''),'KiCad Library','Unspecified','');
+FILE_NAME('{filename}','2024-01-01T00:00:00',(''),(''),'EsoCore Library','Unspecified','');
 FILE_SCHEMA(('AUTOMOTIVE_DESIGN'));
 ENDSEC;"""
 

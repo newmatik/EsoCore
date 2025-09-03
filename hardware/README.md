@@ -28,7 +28,7 @@ See READMEs in subfolders.
 Notes:
 
 - BOMs live in the respective device folders.
-- CAD/binaries belong under `kicad/` and `mechanical/`.
+- CAD/binaries belong under `altium/` and `mechanical/`.
 
 ## Copyright and License
 

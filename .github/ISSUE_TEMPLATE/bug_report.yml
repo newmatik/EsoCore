@@ -84,7 +84,7 @@ body:
         - Hardware: [e.g., Raspberry Pi 4, custom PCB]
         - Firmware version: [e.g., v1.2.3]
         - Software version: [e.g., v2.1.0]
-        - KiCad version (if applicable): [e.g., 8.0]
+        - Altium Designer version (if applicable): [e.g., 25.0]
     validations:
       required: false
 

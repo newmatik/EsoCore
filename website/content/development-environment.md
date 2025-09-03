@@ -6,10 +6,22 @@ This page documents the end-to-end development tooling used across hardware, fir
 
 ## PCB Design and Schematics
 
-- **Primary toolchain**: KiCad (latest stable)
-- **Why**: Free and open-source EDA suite with comprehensive schematic capture, PCB layout, 3D visualization, and manufacturing output generation. Strong community support, extensive component libraries, and cross-platform compatibility.
+- **Primary toolchain**: Altium Designer
+- **Why**: Professional EDA suite with comprehensive schematic capture, PCB layout, 3D visualization, and manufacturing output generation. Industry-standard tool with extensive component libraries and advanced features.
+
+  ### High-Speed Design Capabilities
+
+  Altium Designer excels in high-speed routing and signal integrity with industry-leading features:
+  - **Advanced Length Matching**: Intelligent algorithms ensure precise signal timing in high-speed interfaces, critical for reliable communication
+  - **Comprehensive Signal Integrity**: Advanced verification tools for high-speed designs including:
+    - Differential pair routing with automatic phase matching
+    - Impedance control and verification
+    - Crosstalk analysis and mitigation
+    - Eye diagram simulation and analysis
+  - **Real-time Verification**: Continuous verification during routing ensures signal integrity throughout the design process
+
 - **Artifacts**:
-  - Source: .kicad_pro, .kicad_sch, .kicad_pcb
+  - Source: .PcbDoc, .SchDoc
   - Manufacturing: Gerbers, drill files, IPC-356 netlist, ODB++ (preferred), Pick-and-Place, BOM (CSV/XLSX)
 - **Collaboration**: Exported ODB++/Gerbers stored in GitHub Releases for traceability, with schematic/PCB sources versioned in Git.
 
@@ -88,7 +100,7 @@ This page documents the end-to-end development tooling used across hardware, fir
 ## Minimum Setup Per Role
 
 - **Hardware engineer**:
-  - KiCad + PCB libraries
+  - Altium Designer + PCB libraries
   - FreeCAD for mechanical fit checks
   - GitHub access and LFS for large binaries if required
 - **Firmware engineer**:
@@ -103,7 +115,7 @@ This page documents the end-to-end development tooling used across hardware, fir
 
 ## Rationale Summary
 
-- KiCad: free and open-source EDA suite with comprehensive capabilities and strong community support.
+- Altium Designer: professional EDA suite with comprehensive capabilities and industry-standard features.
 - FreeCAD: free and open-source parametric 3D modeler with broad vendor compatibility via STEP.
 - STM32 + GCC/CMake: stable, cost-effective, open toolchain with excellent peripherals and community.
 - Zephyr RTOS on MCU: deterministic real-time behavior, small footprint, maintained drivers/networking/filesystem, and established OTA strategies.

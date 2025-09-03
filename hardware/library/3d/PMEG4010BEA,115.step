@@ -1,7 +1,7 @@
 ISO-10303-21;
 HEADER;
 FILE_DESCRIPTION(('3D model data'),'2;1') ;
-FILE_NAME('PMEG4010BEA,115.step','2024-01-01T00:00:00',(''),(''),'KiCad Library','Unspecified','') ;
+FILE_NAME('PMEG4010BEA,115.step','2024-01-01T00:00:00',(''),(''),'EsoCore Library','Unspecified','') ;
 FILE_SCHEMA(('AUTOMOTIVE_DESIGN')) ;
 ENDSEC;
 DATA;

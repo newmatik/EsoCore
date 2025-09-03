@@ -57,10 +57,10 @@
 
 ## CAD Toolchain
 
-- Tool: KiCad (8.x recommended)
-- Projects: live under the `kicad/` subfolder of this device
-- Main project: `oil-quality-sensor.kicad_pro`
-- Notes: Open the `.kicad_pro` in KiCad; generate fabrication outputs via KiCad Plot and Drill tools.
+- Tool: Altium Designer
+- Projects: live under the `altium/` subfolder of this device
+- Main project: `oil-quality-sensor.PcbDoc`
+- Notes: Open the `.PcbDoc` in Altium Designer; generate fabrication outputs via Altium Designer.
 
 ## Copyright and License
 

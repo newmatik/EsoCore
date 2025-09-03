@@ -1,7 +1,7 @@
 ISO-10303-21;
 HEADER;
 FILE_DESCRIPTION(('3D model data'),'2;1') ;
-FILE_NAME('ABM8G-25.000MHZ-18-D2Y-T.step','2024-01-01T00:00:00',(''),(''),'KiCad Library','Unspecified','') ;
+FILE_NAME('ABM8G-25.000MHZ-18-D2Y-T.step','2024-01-01T00:00:00',(''),(''),'EsoCore Library','Unspecified','') ;
 FILE_SCHEMA(('AUTOMOTIVE_DESIGN')) ;
 ENDSEC;
 

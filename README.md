@@ -33,7 +33,7 @@ local development and deployment instructions.
     - `temperature spot sensor/`
     - `proximity position sensor/`
   - `cables/`
-  - CAD files live under each device's `kicad/` folder; open the `.kicad_pro` projects with KiCad (8.x recommended).
+  - CAD files live under each device's `altium/` folder; open the `.PcbDoc` projects with Altium Designer.
 - `firmware/` – Device and board-support firmware
   - `stm32/`, `common/`, etc.
 - `tools/` – Utility scripts (e.g., sync, build, release)
