@@ -1,7 +1,17 @@
-# ${f//-/ } Module
+# Current Sensor Module
 
 ## Overview
-Detailed specifications for the ${f//-/ } module.
+Isolated Hall‑effect current sensing with motor load analysis, harmonic content monitoring, and power quality metrics.
+
+## Features
+- ±30 A range (others optional)
+- RMS current, THD, harmonics
+- Load factor and torque estimation
+
+## Applications
+- Motor load and efficiency
+- Pump/fan performance
+- Electrical fault diagnostics
 
 ## Edge Integration
-RS‑485 bus, auto‑discovery, configurable via the Edge UI.
+Streams RMS and power metrics over RS‑485; thresholds and alarms configurable in the Edge UI.

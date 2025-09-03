@@ -1,7 +1,16 @@
-# ${f//-/ } Module
+# Oil Quality Sensor Module
 
 ## Overview
-Detailed specifications for the ${f//-/ } module.
+Monitors lubricant condition via turbidity, viscosity, water content, temperature, and dielectric constant for predictive maintenance.
+
+## Features
+- Turbidity and particle contamination
+- Viscosity and temperature compensation
+- Water content detection
+
+## Applications
+- Gearbox and hydraulic oil monitoring
+- Contamination and degradation trending
 
 ## Edge Integration
-RS‑485 bus, auto‑discovery, configurable via the Edge UI.
+Provides oil health parameters and trends over RS‑485; configurable alert thresholds.
