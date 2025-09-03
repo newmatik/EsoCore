@@ -1,10 +1,12 @@
 # Hardware: Sensors
 
-This document details all available EsoCore sensor modules, their capabilities, and applications for industrial preventive maintenance and monitoring.
+This page provides an overview of the EsoCore sensor ecosystem and how sensor modules connect to the EsoCore Edge. Each sensor has a dedicated detail page.
 
 ---
 
-## Air Quality Sensor Module
+## Available Sensor Modules
+
+### [Air Quality Sensor Module](sensors/air-quality-sensor)
 
 ### Features
 
@@ -25,7 +27,7 @@ This document details all available EsoCore sensor modules, their capabilities, 
 
 ---
 
-## Vibration Sensor Module
+### [Vibration Sensor Module](sensors/vibration-sensor)
 
 ### Features
 
@@ -47,7 +49,7 @@ This document details all available EsoCore sensor modules, their capabilities, 
 
 ---
 
-## Acoustic Sensor Module
+### [Acoustic Sensor Module](sensors/acoustic-sensor)
 
 ### Features
 
@@ -69,7 +71,7 @@ This document details all available EsoCore sensor modules, their capabilities, 
 
 ---
 
-## Current Sensor Module
+### [Current Sensor Module](sensors/current-sensor)
 
 ### Features
 
@@ -91,7 +93,7 @@ This document details all available EsoCore sensor modules, their capabilities, 
 
 ---
 
-## Light Sensor Module
+### [Light Sensor Module](sensors/light-sensor)
 
 ### Features
 
@@ -114,7 +116,7 @@ This document details all available EsoCore sensor modules, their capabilities, 
 
 ---
 
-## Oil Quality Sensor Module
+### [Oil Quality Sensor Module](sensors/oil-quality-sensor)
 
 ### Features
 
@@ -136,7 +138,7 @@ This document details all available EsoCore sensor modules, their capabilities, 
 
 ---
 
-## Pressure Sensor Module
+### [Pressure Sensor Module](sensors/pressure-sensor)
 
 ### Features
 
@@ -158,7 +160,7 @@ This document details all available EsoCore sensor modules, their capabilities, 
 
 ---
 
-## Temperature Spot Sensor Module
+### [Temperature Spot Sensor Module](sensors/temperature-spot-sensor)
 
 ### Features
 
@@ -180,7 +182,7 @@ This document details all available EsoCore sensor modules, their capabilities, 
 
 ---
 
-## Proximity Position Sensor Module
+### [Proximity Position Sensor Module](sensors/proximity-position-sensor)
 
 ### Features
 

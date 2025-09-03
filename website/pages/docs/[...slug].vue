@@ -26,14 +26,39 @@
         </div>
         <nav aria-label="Documentation">
           <ul class="nav-list">
-            <li v-for="doc in docs" :key="doc.slug">
-              <NuxtLink
-                :to="doc.slug ? `/docs/${doc.slug}` : '/docs'"
-                :class="{ active: currentSlug === doc.slug }"
-              >
-                <span class="icon" aria-hidden="true" v-html="doc.icon" />
-                <span class="label">{{ doc.title }}</span>
-              </NuxtLink>
+            <li v-for="doc in docs" :key="doc.slug || `group-${doc.title}`">
+              <template v-if="!doc.children">
+                <NuxtLink
+                  :to="doc.slug ? `/docs/${doc.slug}` : '/docs'"
+                  :class="{ active: currentSlug === doc.slug }"
+                >
+                  <span class="icon" aria-hidden="true" v-html="doc.icon" />
+                  <span class="label">{{ doc.title }}</span>
+                </NuxtLink>
+              </template>
+              <template v-else>
+                <div class="nav-group">
+                  <NuxtLink
+                    :to="doc.title === 'Hardware: Sensors' ? '/docs/esocore-sensors' : '/docs'"
+                    class="nav-group-header"
+                    :class="{ active: doc.title === 'Hardware: Sensors' && sensorsExpanded }"
+                  >
+                    <span class="icon" aria-hidden="true" v-html="doc.icon" />
+                    <span class="label">{{ doc.title }}</span>
+                  </NuxtLink>
+                  <ul class="nav-sublist" v-show="doc.title !== 'Hardware: Sensors' || sensorsExpanded">
+                    <li v-for="child in doc.children" :key="child.slug">
+                      <NuxtLink
+                        :to="child.slug ? `/docs/${child.slug}` : '/docs'"
+                        :class="{ active: currentSlug === child.slug }"
+                      >
+                        <span class="icon" aria-hidden="true" v-html="child.icon" />
+                        <span class="label">{{ child.title }}</span>
+                      </NuxtLink>
+                    </li>
+                  </ul>
+                </div>
+              </template>
             </li>
           </ul>
         </nav>
@@ -71,6 +96,14 @@ const slug = computed(() => {
 // Track current slug for active navigation
 const currentSlug = computed(() => slug.value)
 
+// Expand sensors group only when on its overview or any child page
+const sensorsExpanded = computed(() => {
+  return (
+    currentSlug.value === 'esocore-sensors' ||
+    currentSlug.value?.startsWith('sensors/')
+  )
+})
+
 // Documentation structure (same as in docs/index.vue)
 const docs = ref([
   {
@@ -84,9 +117,20 @@ const docs = ref([
     icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 .6 1.65 1.65 0 0 0-.33 1.82l-.06.06a2 2 0 1 1-2.83 0l-.06-.06A1.65 1.65 0 0 0 8.6 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-.6-1 1.65 1.65 0 0 0-1.82-.33l-.06-.06a2 2 0 1 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-.6 1.65 1.65 0 0 0 .33-1.82l.06-.06a2 2 0 1 1 2.83 0l.06.06A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.24.49.24 1.06 0 1.56.24.49.24 1.06 0 1.56Z"/></svg>',
   },
   {
-    slug: 'esocore-sensors',
     title: 'Hardware: Sensors',
     icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>',
+    children: [
+      { slug: 'esocore-sensors', title: 'Overview', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>' },
+      { slug: 'sensors/air-quality-sensor', title: 'Air Quality Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
+      { slug: 'sensors/vibration-sensor', title: 'Vibration Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
+      { slug: 'sensors/acoustic-sensor', title: 'Acoustic Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
+      { slug: 'sensors/current-sensor', title: 'Current Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
+      { slug: 'sensors/light-sensor', title: 'Light Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
+      { slug: 'sensors/oil-quality-sensor', title: 'Oil Quality Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
+      { slug: 'sensors/pressure-sensor', title: 'Pressure Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
+      { slug: 'sensors/temperature-spot-sensor', title: 'Temperature Spot Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
+      { slug: 'sensors/proximity-position-sensor', title: 'Proximity Position Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' }
+    ]
   },
   {
     slug: 'edge-intelligence',
@@ -117,11 +161,6 @@ const docs = ref([
     slug: 'development-environment',
     title: 'Development Environment',
     icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 9l-3 3 3 3"/><path d="M13 15h5"/></svg>',
-  },
-  {
-    slug: 'development-timeline',
-    title: 'Development Timeline',
-    icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
   },
   {
     slug: 'business-model-and-partnerships',

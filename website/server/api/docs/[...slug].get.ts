@@ -1,14 +1,13 @@
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 
-export default defineEventHandler(async event => {
-  const slug = getRouterParam(event, 'slug') || 'README'
+export default defineEventHandler(async (event) => {
+  const param = getRouterParam(event, 'slug')
+  const slug = Array.isArray(param) ? param.join('/') : (param || 'README')
 
   try {
-    // Read the markdown file from the content directory
     const contentPath = join(process.cwd(), 'content', `${slug}.md`)
     const content = await readFile(contentPath, 'utf-8')
-
     return content
   } catch {
     throw createError({
@@ -17,3 +16,5 @@ export default defineEventHandler(async event => {
     })
   }
 })
+
+

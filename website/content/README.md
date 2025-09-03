@@ -277,7 +277,6 @@ This page provides the business case and system overview. Detailed technical spe
 
 - **[Business Model & Partnerships](/docs/business-model-and-partnerships)** - Development model, funding structure, open source philosophy, and partnership framework
 - **[Competitor Analysis](/docs/competitor-analysis)** - Market landscape, competitive positioning, and strategic differentiation in industrial doors and CNC machine monitoring
-- **[Development Timeline](/docs/development-timeline)** - Project phases, team composition, resource requirements, and critical path dependencies
 - **[Testing Procedures](/docs/testing-procedures)** - Comprehensive testing protocols, validation procedures, and acceptance criteria
 
 ### Quick Reference

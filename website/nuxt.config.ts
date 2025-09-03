@@ -3,21 +3,34 @@ import { readdirSync } from 'fs'
 import { defineNuxtConfig } from 'nuxt/config'
 import { join } from 'path'
 
-// Automatically generate docs routes from content directory
+// Automatically generate docs routes from content directory (recursive)
 function generateDocRoutes() {
   try {
     const contentDir = join(process.cwd(), 'content')
-    const files = readdirSync(contentDir)
-    const docRoutes = files
-      .filter(file => file.endsWith('.md') && file !== 'README.md')
-      .map(file => `/docs/${file.replace('.md', '')}`)
+
+    function walk(dir: string, prefix = ''): string[] {
+      const entries = readdirSync(dir, { withFileTypes: true })
+      const routes: string[] = []
+      for (const entry of entries) {
+        if (entry.isDirectory()) {
+          routes.push(...walk(join(dir, entry.name), `${prefix}${entry.name}/`))
+        } else if (entry.isFile() && entry.name.endsWith('.md') && entry.name !== 'README.md') {
+          routes.push(`/docs/${prefix}${entry.name.replace('.md', '')}`)
+        }
+      }
+      return routes
+    }
+
+    const docRoutes = walk(contentDir)
     
-    return [
+    const routes = [
       '/',
       '/docs', // Main docs page (README)
       '/imprint',
       ...docRoutes
     ]
+    // Remove development-timeline if present
+    return routes.filter(r => r !== '/docs/development-timeline')
   } catch (error: any) {
     console.warn('Could not auto-generate doc routes:', error.message)
     // Fallback to manual routes if auto-generation fails
@@ -32,7 +45,7 @@ function generateDocRoutes() {
       '/docs/cloud-infrastructure',
       '/docs/testing-procedures',
       '/docs/development-environment',
-      '/docs/development-timeline',
+      // '/docs/development-timeline', // removed
       '/docs/business-model-and-partnerships',
       '/docs/competitor-analysis',
       '/docs/fieldbus',
