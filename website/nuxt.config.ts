@@ -15,14 +15,15 @@ function generateDocRoutes() {
         if (entry.isDirectory()) {
           routes.push(...walk(join(dir, entry.name), `${prefix}${entry.name}/`))
         } else if (entry.isFile() && entry.name.endsWith('.md') && entry.name !== 'README.md') {
-          routes.push(`/docs/${prefix}${entry.name.replace('.md', '')}`)
+          const route = `/docs/${prefix}${entry.name.replace('.md', '')}`
+          routes.push(route)
         }
       }
       return routes
     }
 
     const docRoutes = walk(contentDir)
-    
+
     const routes = [
       '/',
       '/docs', // Main docs page (README)
@@ -72,6 +73,8 @@ export default defineNuxtConfig({
         maxAge: 60 * 60 * 24 * 365, // 1 year
       },
     ],
+    // Ensure clean URLs without trailing slashes
+    static: true,
   },
 
   // App configuration
@@ -117,10 +120,11 @@ export default defineNuxtConfig({
   // Modules
   modules: [],
 
-  // Router configuration
+  // Router configuration for consistent trailing slash handling
   router: {
     options: {
       strict: false,
+      trailingSlash: false, // Ensure no trailing slashes in routes
     },
   },
 })

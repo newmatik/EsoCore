@@ -1,0 +1,3 @@
+# Trailing slash redirects for GitHub Pages
+/docs/* /docs/:splat 301
+/* /:splat 301
