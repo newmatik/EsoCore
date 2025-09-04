@@ -62,7 +62,7 @@
           </div>
           <div class="panel feature">
             <div class="kicker">Customizable</div>
-            <h3>STEP, Altium Designer, FreeCAD</h3>
+            <h3>STEP, Altium Designer, Fusion 360</h3>
             <p>Modify hardware or PCBs and customize to your needs.</p>
           </div>
         </div>

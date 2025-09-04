@@ -27,8 +27,8 @@ This page documents the end-to-end development tooling used across hardware, fir
 
 ## Enclosures and Mechanical
 
-- **Primary toolchain**: FreeCAD (latest stable)
-- **Why**: Free and open-source parametric 3D modeler with strong STEP interoperability, CAM capabilities, and extensive workbench ecosystem for mechanical design.
+- **Primary toolchain**: Autodesk Fusion 360
+- **Why**: Professional parametric 3D modeler with strong STEP interoperability, integrated CAM capabilities, generative design, and cloud collaboration for mechanical design.
 - **Artifacts**:
   - Exchange: .step (AP214/AP242), .stl for 3D printing, drawings as .dxf/.pdf
   - 3D print profiles: PrusaSlicer/Cura project files when applicable
@@ -101,7 +101,7 @@ This page documents the end-to-end development tooling used across hardware, fir
 
 - **Hardware engineer**:
   - Altium Designer + PCB libraries
-  - FreeCAD for mechanical fit checks
+  - Fusion 360 for mechanical fit checks
   - GitHub access and LFS for large binaries if required
 - **Firmware engineer**:
   - STM32CubeIDE (standard), arm-none-eabi-gcc, ST-LINK, CubeMX, STM32CubeProgrammer, STM32CubeMonitor
@@ -116,7 +116,7 @@ This page documents the end-to-end development tooling used across hardware, fir
 ## Rationale Summary
 
 - Altium Designer: professional EDA suite with comprehensive capabilities and industry-standard features.
-- FreeCAD: free and open-source parametric 3D modeler with broad vendor compatibility via STEP.
+- Autodesk Fusion 360: professional parametric 3D modeler with integrated CAM, generative design, and broad vendor compatibility via STEP.
 - STM32 + GCC/CMake: stable, cost-effective, open toolchain with excellent peripherals and community.
 - Zephyr RTOS on MCU: deterministic real-time behavior, small footprint, maintained drivers/networking/filesystem, and established OTA strategies.
 - Django REST Framework Server + Nuxt.js Portal: scalable backend with REST APIs, RBAC, and modern responsive frontend with real-time capabilities.
