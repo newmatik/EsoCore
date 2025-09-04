@@ -26,14 +26,39 @@
         </div>
         <nav aria-label="Documentation">
           <ul class="nav-list">
-            <li v-for="doc in docs" :key="doc.slug">
-              <NuxtLink
-                :to="doc.slug ? `/docs/${doc.slug}` : '/docs'"
-                :class="{ active: currentSlug === doc.slug }"
-              >
-                <span class="icon" aria-hidden="true" v-html="doc.icon" />
-                <span class="label">{{ doc.title }}</span>
-              </NuxtLink>
+            <li v-for="doc in docsConfig" :key="doc.slug || doc.key || `group-${doc.title}`">
+              <template v-if="!doc.children">
+                <NuxtLink
+                  :to="doc.slug ? `/docs/${doc.slug}` : '/docs'"
+                  :class="{ active: currentSlug === doc.slug }"
+                >
+                  <span class="icon" aria-hidden="true" v-html="doc.icon" />
+                  <span class="label">{{ doc.title }}</span>
+                </NuxtLink>
+              </template>
+              <template v-else>
+                <div class="nav-group">
+                  <NuxtLink
+                    :to="getGroupHeaderLink(doc)"
+                    class="nav-group-header"
+                    :class="{ active: isGroupExpanded(doc, currentSlug) }"
+                  >
+                    <span class="icon" aria-hidden="true" v-html="doc.icon" />
+                    <span class="label">{{ doc.title }}</span>
+                  </NuxtLink>
+                  <ul class="nav-sublist" v-show="isGroupExpanded(doc, currentSlug)">
+                    <li v-for="child in doc.children" :key="child.slug">
+                      <NuxtLink
+                        :to="child.slug ? `/docs/${child.slug}` : '/docs'"
+                        :class="{ active: currentSlug === child.slug }"
+                      >
+                        <span class="icon" aria-hidden="true" v-html="child.icon" />
+                        <span class="label">{{ child.title }}</span>
+                      </NuxtLink>
+                    </li>
+                  </ul>
+                </div>
+              </template>
             </li>
           </ul>
         </nav>
@@ -55,6 +80,7 @@
 
 <script setup>
 import { marked } from 'marked'
+import { docsConfig, getGroupHeaderLink, isGroupExpanded } from '~/utils/docs-config'
 
 // Set page meta
 useHead({
@@ -92,92 +118,17 @@ const renderedReadmeContent = computed(() => {
   return marked.parse(readmeContent.value)
 })
 
-// Documentation structure
-const docs = ref([
-  {
-    slug: '',
-    title: 'Introduction',
-    icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V6.5a2 2 0 0 1 2-2h0l4 2 4-2h0a2 2 0 0 1 2 2v13"/><path d="M6 20V6"/></svg>',
-  },
-  {
-    slug: 'esocore-edge',
-    title: 'Hardware: Edge',
-    icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 .6 1.65 1.65 0 0 0-.33 1.82l-.06.06a2 2 0 1 1-2.83 0l-.06-.06A1.65 1.65 0 0 0 8.6 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-.6-1 1.65 1.65 0 0 0-1.82-.33l-.06-.06a2 2 0 1 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-.6 1.65 1.65 0 0 0 .33-1.82l.06-.06a2 2 0 1 1 2.83 0l.06.06A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.24.49.24 1.06 0 1.56.24.49.24 1.06 0 1.56Z"/></svg>',
-  },
-  {
-    slug: 'esocore-sensors',
-    title: 'Hardware: Sensors',
-    icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>',
-  },
-  {
-    slug: 'edge-intelligence',
-    title: 'Edge Intelligence',
-    icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>',
-  },
-  {
-    slug: 'data-format-specification',
-    title: 'Data Format Specification',
-    icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 5v6c0 1.66-4.03 3-9 3s-9-1.34-9-3V5"/><path d="M3 11v6c0 1.66 4.03 3 9 3s9-1.34 9-3v-6"/></svg>',
-  },
-  {
-    slug: 'api-specification',
-    title: 'API Specification',
-    icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 4 4 8 8 12"/><polyline points="16 4 20 8 16 12"/><line x1="12" y1="16" x2="12" y2="20"/></svg>',
-  },
-  {
-    slug: 'cloud-infrastructure',
-    title: 'Cloud Infrastructure',
-    icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><path d="M12 2v6m0 0l-3-3m3 3 3-3"/></svg>',
-  },
-  {
-    slug: 'testing-procedures',
-    title: 'Testing & Validation',
-    icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
-  },
-  {
-    slug: 'development-environment',
-    title: 'Development Environment',
-    icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 9l-3 3 3 3"/><path d="M13 15h5"/></svg>',
-  },
-  {
-    slug: 'business-model-and-partnerships',
-    title: 'Business Model & Partnerships',
-    icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2H10a2 2 0 0 0-2 2v2"/></svg>',
-  },
-  {
-    slug: 'competitor-analysis',
-    title: 'Competitor Analysis',
-    icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="9" width="3" height="9"/><rect x="17" y="5" width="3" height="13"/></svg>',
-  },
-  {
-    slug: 'fieldbus',
-    title: 'Industrial Fieldbus Protocols',
-    icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 9l-3 3 3 3"/><path d="M13 15h5"/></svg>',
-  },
-  {
-    slug: 'bom',
-    title: 'Bill of Materials',
-    icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16l4-2 4 2 4-2 4 2V9z"/></svg>',
-    children: [
-      { slug: 'bom/edge', title: 'Edge', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>' },
-      { slug: 'bom/vibration-sensor', title: 'Vibration Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
-      { slug: 'bom/acoustic-sensor', title: 'Acoustic Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
-      { slug: 'bom/current-sensor', title: 'Current Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
-      { slug: 'bom/air-quality-sensor', title: 'Air Quality Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
-      { slug: 'bom/light-sensor', title: 'Light Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
-      { slug: 'bom/oil-quality-sensor', title: 'Oil Quality Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
-      { slug: 'bom/pressure-sensor', title: 'Pressure Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
-      { slug: 'bom/temperature-spot-sensor', title: 'Temperature Spot Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
-      { slug: 'bom/proximity-position-sensor', title: 'Proximity Position Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
-      { slug: 'bom/cables', title: 'Cables & Interconnects', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>' }
-    ]
-  },
-  {
-    slug: 'license',
-    title: 'License',
-    icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16l4-2 4 2 4-2 4 2V9z"/></svg>',
-  },
-])
+// Helper function to flatten docs for search indexing
+function flattenDocs(docs) {
+  const flattened = []
+  for (const doc of docs) {
+    flattened.push(doc)
+    if (doc.children) {
+      flattened.push(...doc.children)
+    }
+  }
+  return flattened
+}
 
 // Search functionality
 const searchQuery = ref('')
@@ -191,7 +142,8 @@ onMounted(async () => {
 
 async function buildSearchIndex() {
   const items = []
-  for (const doc of docs.value) {
+  const flatDocs = flattenDocs(docsConfig)
+  for (const doc of flatDocs) {
     try {
       const content = await $fetch(`/api/docs/${doc.slug || 'README'}`)
       items.push({
