@@ -27,21 +27,15 @@ function generateDocRoutes() {
 
     const docRoutes = walk(contentDir)
 
-    const baseRoutes = [
+    const routes = [
       '/',
       '/docs', // Main docs page (README)
       '/imprint',
       ...docRoutes
-    ].filter(r => !r.includes('development-timeline'))
+    ]
     
-    // CRITICAL: For GitHub Pages compatibility, we need to generate both
-    // clean URLs (/docs/page) and trailing slash URLs (/docs/page/)
-    // This ensures both URL formats work properly with static hosting
-    const trailingSlashRoutes = baseRoutes
-      .filter(route => route !== '/' && !route.includes('.'))
-      .map(route => route + '/')
-    
-    return [...baseRoutes, ...trailingSlashRoutes]
+    // Remove development-timeline if present
+    return routes.filter(r => !r.includes('development-timeline'))
   } catch (error: any) {
     console.warn('Could not auto-generate doc routes:', error.message)
     // Fallback to manual routes if auto-generation fails
@@ -71,11 +65,11 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
 
-  // CRITICAL: Build hooks to ensure both URL variants work on GitHub Pages
+  // CRITICAL: Build hooks to create GitHub Pages compatible file structure
   hooks: {
     'nitro:build:public-assets': async (nitro) => {
-      // This hook runs after static generation and creates clean URL files
-      // by copying directory index.html files to parent directory as HTML files
+      // This hook creates HTML files for clean URLs to prevent GitHub Pages
+      // from redirecting /docs/page to /docs/page/
       const fs = await import('fs')
       const path = await import('path')
       
@@ -84,22 +78,22 @@ export default defineNuxtConfig({
       
       if (!fs.existsSync(docsDir)) return
       
-      // Find all directories with index.html files and create clean URL variants
+      // Find all directories with index.html and create clean URL HTML files
       const processDirectory = (dirPath: string, relativePath = '') => {
         const entries = fs.readdirSync(dirPath, { withFileTypes: true })
         
         for (const entry of entries) {
-          if (entry.isDirectory()) {
+          if (entry.isDirectory() && !entry.name.startsWith('_') && !entry.name.startsWith('.')) {
             const fullPath = path.join(dirPath, entry.name)
             const indexPath = path.join(fullPath, 'index.html')
             
-            // If directory has index.html, create a clean URL file
+            // If directory has index.html, create clean URL HTML file
             if (fs.existsSync(indexPath)) {
               const cleanUrlPath = path.join(dirPath, `${entry.name}.html`)
-              if (!fs.existsSync(cleanUrlPath)) {
-                fs.copyFileSync(indexPath, cleanUrlPath)
-                console.log(`✓ Created clean URL: ${relativePath}/${entry.name}.html`)
-              }
+              
+              // Copy index.html as clean URL file
+              fs.copyFileSync(indexPath, cleanUrlPath)
+              console.log(`✓ Created clean URL file: ${relativePath}/${entry.name}.html`)
             }
             
             // Recursively process subdirectories
@@ -111,6 +105,7 @@ export default defineNuxtConfig({
       processDirectory(docsDir, 'docs')
     }
   },
+
 
   // Static site generation for GitHub Pages
   // CRITICAL: This configuration ensures proper static file generation
