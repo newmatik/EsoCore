@@ -16,3 +16,7 @@ Provides 3‑axis vibration analysis with FFT processing and RMS metrics for rot
 
 ## Edge Integration
 Streams processed metrics and spectra to the Edge over RS‑485; configurable sampling and alarms via the web UI.
+
+
+## Related
+- [BOM: vibration sensor](/docs/bom/vibration-sensor)

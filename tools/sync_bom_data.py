@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Sync BOM CSV files from the hardware directory into the website/public/docs/data directory.
+Sync BOM CSV files from the hardware directory into the website/public/bom directory.
 
 Mapping rules:
- - hardware/edge/bom.csv            -> website/public/docs/data/bom-main.csv
- - hardware/cables/bom.csv          -> website/public/docs/data/bom-cables.csv
- - hardware/sensors/<name>/bom.csv  -> website/public/docs/data/bom-<slug(name)>.csv
+ - hardware/edge/bom.csv            -> website/public/bom/bom-main.csv
+ - hardware/cables/bom.csv          -> website/public/bom/bom-cables.csv
+ - hardware/sensors/<name>/bom.csv  -> website/public/bom/bom-<slug(name)>.csv
 
 Where slug(name) lowercases the sensor folder name and replaces non-alphanumerics
 with hyphens, collapsing repeats (e.g., "vibration sensor" -> "vibration-sensor").
@@ -78,7 +78,7 @@ def sync_sensors(hardware_dir: Path, data_dir: Path, *, dry_run: bool, verbose: 
 
 
 def parse_args(argv: List[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Sync hardware BOM CSVs to website/public/docs/data")
+    parser = argparse.ArgumentParser(description="Sync hardware BOM CSVs to website/public/bom")
     parser.add_argument(
         "--hardware-dir",
         type=Path,
@@ -87,7 +87,7 @@ def parse_args(argv: List[str]) -> argparse.Namespace:
     parser.add_argument(
         "--data-dir",
         type=Path,
-        help="Path to website/public/docs/data directory (default: <repo>/website/public/docs/data)",
+        help="Path to website/public/bom directory (default: <repo>/website/public/bom)",
     )
     parser.add_argument(
         "--only",
@@ -110,7 +110,7 @@ def main(argv: List[str]) -> int:
     repo_root = find_repo_root()
 
     hardware_dir = args.hardware_dir or (repo_root / "hardware")
-    data_dir = args.data_dir or (repo_root / "website" / "public" / "docs" / "data")
+    data_dir = args.data_dir or (repo_root / "website" / "public" / "bom")
 
     if args.verbose:
         print(f"Repo root: {repo_root}")

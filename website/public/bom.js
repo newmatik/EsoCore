@@ -151,6 +151,7 @@
             d.Qty,
             d.Unit.toFixed(2),
             d.Notes,
+            d.Package,
             '$' + d.Ext.toFixed(2),
           ]
           tr.innerHTML = cells.map(c => '<td>' + c + '</td>').join('')

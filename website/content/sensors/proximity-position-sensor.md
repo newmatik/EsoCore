@@ -15,3 +15,7 @@ Multi‑sensor positioning with inductive, capacitive, encoder, magnetic reed, a
 
 ## Edge Integration
 Position data and status over RS‑485; thresholds and IO mapping configured in the Edge UI.
+
+
+## Related
+- [BOM: proximity position sensor](/docs/bom/proximity-position-sensor)

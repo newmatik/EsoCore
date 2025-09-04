@@ -14,3 +14,7 @@ Monitors lubricant condition via turbidity, viscosity, water content, temperatur
 
 ## Edge Integration
 Provides oil health parameters and trends over RS‑485; configurable alert thresholds.
+
+
+## Related
+- [BOM: oil quality sensor](/docs/bom/oil-quality-sensor)

@@ -181,6 +181,19 @@ const docs = ref([
     slug: 'bom',
     title: 'Bill of Materials',
     icon: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16l4-2 4 2 4-2 4 2V9z"/></svg>',
+    children: [
+      { slug: 'bom/edge', title: 'Edge', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>' },
+      { slug: 'bom/vibration-sensor', title: 'Vibration Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
+      { slug: 'bom/acoustic-sensor', title: 'Acoustic Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
+      { slug: 'bom/current-sensor', title: 'Current Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
+      { slug: 'bom/air-quality-sensor', title: 'Air Quality Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
+      { slug: 'bom/light-sensor', title: 'Light Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
+      { slug: 'bom/oil-quality-sensor', title: 'Oil Quality Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
+      { slug: 'bom/pressure-sensor', title: 'Pressure Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
+      { slug: 'bom/temperature-spot-sensor', title: 'Temperature Spot Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
+      { slug: 'bom/proximity-position-sensor', title: 'Proximity Position Sensor', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v6m0 0l-3-3m3 3 3-3"/><path d="M12 8v6m0 0l-3 3m3-3 3 3"/><path d="M8 12h8"/><circle cx="12" cy="12" r="3"/></svg>' },
+      { slug: 'bom/cables', title: 'Cables & Interconnects', icon: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>' }
+    ]
   },
   {
     slug: 'license',
@@ -288,17 +301,27 @@ async function initBomWidgets() {
 
   // BOM CSV mappings
   const idToCsv = {
-    'bom-main': '/docs/data/bom-main.csv',
-    'bom-vibration': '/docs/data/bom-vibration-sensor.csv',
-    'bom-acoustic': '/docs/data/bom-acoustic-sensor.csv',
-    'bom-current': '/docs/data/bom-current-sensor.csv',
-    'bom-air-quality': '/docs/data/bom-air-quality-sensor.csv',
-    'bom-light': '/docs/data/bom-light-sensor.csv',
-    'bom-oil-quality': '/docs/data/bom-oil-quality-sensor.csv',
-    'bom-pressure': '/docs/data/bom-pressure-sensor.csv',
-    'bom-temperature-spot': '/docs/data/bom-temperature-spot-sensor.csv',
-    'bom-proximity-position': '/docs/data/bom-proximity-position-sensor.csv',
-    'bom-cables': '/docs/data/bom-cables.csv',
+    'bom-main': '/bom/bom-main.csv',
+    'bom-vibration': '/bom/bom-vibration-sensor.csv',
+    'bom-acoustic': '/bom/bom-acoustic-sensor.csv',
+    'bom-current': '/bom/bom-current-sensor.csv',
+    'bom-air-quality': '/bom/bom-air-quality-sensor.csv',
+    'bom-light': '/bom/bom-light-sensor.csv',
+    'bom-oil-quality': '/bom/bom-oil-quality-sensor.csv',
+    'bom-pressure': '/bom/bom-pressure-sensor.csv',
+    'bom-temperature-spot': '/bom/bom-temperature-spot-sensor.csv',
+    'bom-proximity-position': '/bom/bom-proximity-position-sensor.csv',
+    'bom-cables': '/bom/bom-cables.csv',
+    // support per-BOM page mount ids that include "-sensor"
+    'bom-vibration-sensor': '/bom/bom-vibration-sensor.csv',
+    'bom-acoustic-sensor': '/bom/bom-acoustic-sensor.csv',
+    'bom-current-sensor': '/bom/bom-current-sensor.csv',
+    'bom-air-quality-sensor': '/bom/bom-air-quality-sensor.csv',
+    'bom-light-sensor': '/bom/bom-light-sensor.csv',
+    'bom-oil-quality-sensor': '/bom/bom-oil-quality-sensor.csv',
+    'bom-pressure-sensor': '/bom/bom-pressure-sensor.csv',
+    'bom-temperature-spot-sensor': '/bom/bom-temperature-spot-sensor.csv',
+    'bom-proximity-position-sensor': '/bom/bom-proximity-position-sensor.csv',
   }
 
   // Render BOM tables

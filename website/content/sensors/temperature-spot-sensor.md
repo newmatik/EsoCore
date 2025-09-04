@@ -15,3 +15,7 @@ High‑precision temperature measurement using NTCs, RTDs, thermocouples, and IR
 
 ## Edge Integration
 Publishes temperature channels over RS‑485 with gradients and thresholds; fully configurable.
+
+
+## Related
+- [BOM: temperature spot sensor](/docs/bom/temperature-spot-sensor)

@@ -15,3 +15,7 @@ Isolated Hall‑effect current sensing with motor load analysis, harmonic conten
 
 ## Edge Integration
 Streams RMS and power metrics over RS‑485; thresholds and alarms configurable in the Edge UI.
+
+
+## Related
+- [BOM: current sensor](/docs/bom/current-sensor)

@@ -19,3 +19,6 @@ The Light Sensor Module provides multi‑spectrum light analysis for industrial 
 
 ## Edge Integration
 Connects to the Edge via RS‑485. Auto‑discovery registers capabilities; thresholds and sampling are configurable in the web UI.
+
+## Related
+- [BOM: Light Sensor](/docs/bom/light-sensor)

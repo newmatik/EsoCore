@@ -16,3 +16,7 @@ Monitors temperature, humidity, CO₂, VOCs, particulate matter (PM2.5/PM10), an
 
 ## Edge Integration
 Communicates with the Edge over RS‑485; auto‑discovered and configurable via the web UI.
+
+
+## Related
+- [BOM: air quality sensor](/docs/bom/air-quality-sensor)

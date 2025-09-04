@@ -15,3 +15,7 @@ Combines audible and ultrasonic sensing for leak detection, tool wear monitoring
 
 ## Edge Integration
 Provides spectra and diagnostic parameters over RS‑485; configurable in the Edge UI.
+
+
+## Related
+- [BOM: acoustic sensor](/docs/bom/acoustic-sensor)

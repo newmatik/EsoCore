@@ -15,3 +15,7 @@ Multi‑range pressure sensing for hydraulic and pneumatic systems with diagnost
 
 ## Edge Integration
 Real‑time pressure data and alarms via RS‑485; sampling/filters configurable in the Edge UI.
+
+
+## Related
+- [BOM: pressure sensor](/docs/bom/pressure-sensor)
