@@ -1,3 +1,15 @@
+// CRITICAL: EsoCore Documentation Configuration
+// This file contains the complete documentation structure and routing configuration.
+// 
+// IMPORTANT: This configuration works in conjunction with:
+// - nuxt.config.ts (static route generation)
+// - server/plugins/trailing-slash-redirect.ts (runtime redirects)
+// - public/_redirects (GitHub Pages redirects)
+// - pages/docs/[...slug].vue (dynamic routing)
+//
+// DO NOT MODIFY the slug values without updating all related routing files.
+// The slug values must match the actual markdown file names in the content directory.
+
 // Icon definitions - reusable SVG icons
 const icons = {
   introduction: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5V6.5a2 2 0 0 1 2-2h0l4 2 4-2h0a2 2 0 0 1 2 2v13"/><path d="M6 20V6"/></svg>',
@@ -118,7 +130,10 @@ export const docsConfig = [
   },
 ]
 
-// Helper functions
+// Helper functions for sidebar navigation and routing
+// CRITICAL: These functions determine which navigation groups are expanded
+// and what links are generated. They must work consistently across all
+// documentation pages to prevent navigation inconsistencies.
 export function isGroupExpanded(group, currentSlug) {
   if (!group.children) return false
   
