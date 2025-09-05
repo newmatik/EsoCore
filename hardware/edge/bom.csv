@@ -1,12 +1,11 @@
 Category,Item,MPN,Supplier,Qty,Unit,Notes,Package
 MCU,STM32H747 Dual-core Cortex-M7/M4 LQFP176,STM32H747IIT6,ST,1,13.50,Main MCU (dual-core),SMD
-Wireless,WiFi/BT module ESP32-WROOM-32,ESP32-WROOM-32,Espressif,1,4.50,WiFi 802.11b/g/n + Bluetooth 5.0,Module
-Storage,Industrial microSD 16GB MLC -40C to 85C,ISD-16GB-MLC,Apacer or Innodisk,1,6.80,Logging and buffering,SMD
+Wireless,WiFi/BT module ESP32-S3-WROOM-1-N16R8,ESP32-S3-WROOM-1-N16R8,Espressif,1,4.50,WiFi 802.11b/g/n + Bluetooth 5.0,Module
+Storage,Generic microSD 16GB MLC -40C to 85C,ISD-16GB-MLC,Generic,1,6.80,Logging and buffering,SMD
 Connector,MicroSD push-push holder,DM3AT-SF-PEJM5,Hirose,1,0.35,MicroSD socket,SMD
 Power,Integrated buck converter 12-24V to 3.3V 3A,TPS54331DR,Texas Instruments,1,2.80,Integrated power solution with enable and power good,SMD
 Backup,Supercapacitor 2.7V 10F,850617021004,Wurth,3,4.50,Bank of three high-capacity supercaps for 30+ sec runtime,THT
 Protection,24V TVS diode SMAJ24A,SMAJ24A,Littelfuse,2,0.09,Input surge protection,SMD
-Protection,USB ESD protection array 4-ch,TPD4EUSB30DQAR,Texas Instruments,1,0.08,USB data protection (±15kV ESD),SMD
 Protection,GPIO ESD protection array 2-ch,SP0502BAHTG,Littelfuse,4,0.06,Sensor connector protection (±15kV ESD),SMD
 Protection,Resettable polyfuse 1.1A hold MF-MSMF110,MF-MSMF110/33X-2,BOURNS,1,0.10,Input overcurrent protection,SMD
 Signal Integrity,USB 2.0 common-mode choke 90ohm,DLW21SN900SQ2L,TDK,1,0.08,Reduce USB EMI,SMD

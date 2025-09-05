@@ -1,28 +1,34 @@
 Category,Item,MPN,Supplier,Qty,Unit,Notes,Package
 MCU,STM32H747 Dual-core Cortex-M7/M4 LQFP176,STM32H747IIT6,ST,1,13.50,Main MCU (dual-core),SMD
-Wireless,WiFi/BT module ESP32-WROOM-32,ESP32-WROOM-32,Espressif,1,4.50,WiFi 802.11b/g/n + Bluetooth 5.0,Module
-Storage,Industrial microSD 16GB MLC -40C to 85C,ISD-16GB-MLC,Apacer or Innodisk,1,6.80,Logging and buffering,SMD
+Wireless,WiFi/BT module ESP32-S3-WROOM-1-N16R8,ESP32-S3-WROOM-1-N16R8,Espressif,1,4.50,WiFi 802.11b/g/n + Bluetooth 5.0,Module
+Storage,Generic microSD 16GB MLC -40C to 85C,ISD-16GB-MLC,Generic,1,6.80,Logging and buffering,SMD
 Connector,MicroSD push-push holder,DM3AT-SF-PEJM5,Hirose,1,0.35,MicroSD socket,SMD
 Power,Integrated buck converter 12-24V to 3.3V 3A,TPS54331DR,Texas Instruments,1,2.80,Integrated power solution with enable and power good,SMD
 Backup,Supercapacitor 2.7V 10F,850617021004,Wurth,3,4.50,Bank of three high-capacity supercaps for 30+ sec runtime,THT
 Protection,24V TVS diode SMAJ24A,SMAJ24A,Littelfuse,2,0.09,Input surge protection,SMD
-Protection,USB ESD protection array 4-ch,TPD4EUSB30DQAR,Texas Instruments,1,0.08,USB data protection (±15kV ESD),SMD
 Protection,GPIO ESD protection array 2-ch,SP0502BAHTG,Littelfuse,4,0.06,Sensor connector protection (±15kV ESD),SMD
 Protection,Resettable polyfuse 1.1A hold MF-MSMF110,MF-MSMF110/33X-2,BOURNS,1,0.10,Input overcurrent protection,SMD
 Signal Integrity,USB 2.0 common-mode choke 90ohm,DLW21SN900SQ2L,TDK,1,0.08,Reduce USB EMI,SMD
 Connector,USB-C receptacle mid-mount,632723300021,Wurth,1,0.35,USB-C for service,THT
-Connector,Power input terminal block 2-pin 5.08mm,691137710002,Wurth,1,0.12,12-24V power input,THT
+Connector,Power input pluggable PCB mate 2-pin 5.00mm,2EDGR-5.0-02P,Degson,1,0.12,12-24V power input; 90° angled PCB edge; mates with 2EDGK-5.0-02P,THT
+Connector,Power input pluggable plug 2-pin 5.00mm,2EDGK-5.0-02P,Degson,1,0.12,Field-side plug; mates with 2EDGR-5.0-02P,Accessory
 IO,SMD Optocoupler for 24V inputs,PC817X2NIP1B,Sharp,10,0.06,Safety and general inputs (5kV isolation),SMD
 IO,SMD Solid State Relay 5V,AQY212EHAZ,Panasonic,1,1.10,Service indicator or interlock (60V/500mA),SMD
 Clock,32.768kHz SMD RTC crystal,ABS07-32.768KHZ-T,ABRACON,1,0.12,Industrial temp range (-40°C to 85°C),SMD
 Clock,25MHz HSE crystal oscillator,ABM8G-25.000MHZ-18-D2Y-T,ABRACON,1,0.18,STM32 external clock source (±50ppm),SMD
 Ethernet,10/100 Ethernet PHY DP83825I,DP83825IRMQR,Texas Instruments,1,1.50,PHY for optional Ethernet,WQFN-24
-Connector,Sensor bus primary port 4-pin terminal block,691137710004,Wurth,1,0.18,Main RS-485 sensor bus out,THT
-Connector,Sensor bus secondary port 4-pin terminal block,691137710004,Wurth,1,0.18,Daisy-chain or secondary bus,THT
-Connector,Safety I/O input terminal block 8-pin,691137710008,Wurth,1,0.32,Safety edges emergency stops light curtains,THT
-Connector,Safety I/O output terminal block 6-pin,691137710006,Wurth,1,0.24,Safety relay outputs and monitoring,THT
-Connector,General I/O terminal block 6-pin (x2),691137710006,Wurth,2,0.24,Digital inputs analog inputs relay outputs,THT
-Connector,Fieldbus terminal block 6-pin,691137710006,Wurth,1,0.24,Modbus RTU PROFIBUS connections,THT
+Connector,Sensor bus primary pluggable PCB mate 4-pin 5.00mm,2EDGR-5.0-04P,Degson,1,0.18,Main RS-485 sensor bus out; 90° angled PCB edge; mates with 2EDGK-5.0-04P,THT
+Connector,Sensor bus primary pluggable plug 4-pin 5.00mm,2EDGK-5.0-04P,Degson,1,0.18,Field-side plug; mates with 2EDGR-5.0-04P,Accessory
+Connector,Sensor bus secondary pluggable PCB mate 4-pin 5.00mm,2EDGR-5.0-04P,Degson,1,0.18,Daisy-chain or secondary bus; 90° angled PCB edge; mates with 2EDGK-5.0-04P,THT
+Connector,Sensor bus secondary pluggable plug 4-pin 5.00mm,2EDGK-5.0-04P,Degson,1,0.18,Field-side plug; mates with 2EDGR-5.0-04P,Accessory
+Connector,Safety I/O input pluggable PCB mate 8-pin 5.00mm,2EDGR-5.0-08P,Degson,1,0.32,Safety edges emergency stops light curtains; 90° angled PCB edge; mates with 2EDGK-5.0-08P,THT
+Connector,Safety I/O input pluggable plug 8-pin 5.00mm,2EDGK-5.0-08P,Degson,1,0.32,Field-side plug; mates with 2EDGR-5.0-08P,Accessory
+Connector,Safety I/O output pluggable PCB mate 6-pin 5.00mm,2EDGR-5.0-06P,Degson,1,0.24,Safety relay outputs and monitoring; 90° angled PCB edge; mates with 2EDGK-5.0-06P,THT
+Connector,Safety I/O output pluggable plug 6-pin 5.00mm,2EDGK-5.0-06P,Degson,1,0.24,Field-side plug; mates with 2EDGR-5.0-06P,Accessory
+Connector,General I/O pluggable PCB mate 6-pin 5.00mm (x2),2EDGR-5.0-06P,Degson,2,0.24,Digital inputs analog inputs relay outputs; 90° angled PCB edge; mates with 2EDGK-5.0-06P,THT
+Connector,General I/O pluggable plug 6-pin 5.00mm (x2),2EDGK-5.0-06P,Degson,2,0.24,Field-side plug; mates with 2EDGR-5.0-06P,Accessory
+Connector,Fieldbus pluggable PCB mate 6-pin 5.00mm,2EDGR-5.0-06P,Degson,1,0.24,Modbus RTU PROFIBUS connections; 90° angled PCB edge; mates with 2EDGK-5.0-06P,THT
+Connector,Fieldbus pluggable plug 6-pin 5.00mm,2EDGK-5.0-06P,Degson,1,0.24,Field-side plug; mates with 2EDGR-5.0-06P,Accessory
 Sensor Bus,RS-485 transceiver for sensor network,SN65HVD72D,Texas Instruments,1,0.85,Sensor bus interface,SOIC-8
 Sensor Bus,12V power supply for sensor bus 2A,TPS54331DR,Texas Instruments,1,2.40,Distributed power for sensor modules,SMD
 Sensor Bus,Bus termination resistor 120 ohm,ERJ-3EKF1200V,Panasonic,2,0.02,End-of-line termination,SMD
@@ -39,7 +45,8 @@ RTC Backup,Schottky diode for VBAT isolation,BAT54WS-7-F,Diodes Inc,1,0.03,Preve
 Fieldbus,Isolated RS-485 transceiver for Modbus RTU,ADM2582EBRWZ,Analog Devices,1,4.20,Isolation and integrated DC/DC,SMD
 Fieldbus,PROFIBUS-compliant RS-485 transceiver,SN65HVD1176DR,Texas Instruments,1,1.90,Meets PROFIBUS electrical levels,SMD
 Fieldbus,DB-9 male connector with shield for PROFIBUS,DS1037-09FNAKT74-0CC,Connfly,1,1.00,90° angled THT D-Sub male, shielded,THT
-Fieldbus,3-pin 5.08mm terminal block for RS-485,691137710003,Wurth,1,0.16,A/B/GND screw terminal,THT
+Fieldbus,Pluggable PCB mate 3-pin 5.00mm for RS-485,2EDGR-5.0-03P,Degson,1,0.16,A/B/GND screw terminal; 90° angled PCB edge; mates with 2EDGK-5.0-03P,THT
+Fieldbus,Pluggable plug 3-pin 5.00mm for RS-485,2EDGK-5.0-03P,Degson,1,0.16,Field-side plug; mates with 2EDGR-5.0-03P,Accessory
 Fieldbus,120 ohm termination resistor 0805,R0805-120R,Generic,1,0.01,Bus termination selectable,SMD
 Fieldbus,8-position SMD DIP switch,DSHP08TS-S,XKB,1,0.22,Addressing and termination enable (SMD DIP),SMD
 PoE,PoE controller with integrated switching,LTC4267CGN-3#PBF,Analog Devices,1,8.50,IEEE 802.3af compliant PD controller,SSOP-16

@@ -6,11 +6,15 @@ Sensor,CO2 Sensor SCD40,SCD40,Sensirion,1,15.60,NDIR CO2 sensor with automatic s
 Communication,RS-485 transceiver half-duplex,SN65HVD72D,Texas Instruments,1,0.85,Bus interface for digital communication,SMD
 Power,Buck converter 12V to 5V 1A,TPS62173DSGT,Texas Instruments,1,1.65,Power for particulate sensor (needs 5V),SMD
 Power,LDO 5V to 3.3V 500mA,MCP1700T-3302E/TT,Microchip,1,0.12,Clean 3.3V for MCU and air quality sensors,SMD
-Connector,4-pin screw terminal block 5.08mm,691137710004,Wurth,1,0.18,Bus connection (12V GND Data+ Data-),THT
+Connector,RS-485 IN pluggable PCB mate 4-pin 5.00mm,2EDGR-5.0-04P,Degson,1,0.18,IN: A/B/24V/GND; mates with 2EDGK-5.0-04P; loop-through,THT
+Connector,RS-485 IN pluggable plug 4-pin 5.00mm,2EDGK-5.0-04P,Degson,1,0.18,Field-side plug for IN; A/B/24V/GND,Accessory
+Connector,RS-485 OUT pluggable PCB mate 4-pin 5.00mm,2EDGR-5.0-04P,Degson,1,0.18,OUT: A/B/24V/GND; mates with 2EDGK-5.0-04P; loop-through,THT
+Connector,RS-485 OUT pluggable plug 4-pin 5.00mm,2EDGK-5.0-04P,Degson,1,0.18,Field-side plug for OUT; A/B/24V/GND,Accessory
 Connector,Cable gland PG9 for 4-conductor cable,PG9-GLAND,Wiska,1,1.50,Strain relief and environmental sealing,THT
 Protection,ESD protection diode array 4-ch,SP0503BAHTG,Littelfuse,1,0.08,Bus and power line protection,SMD
+Fieldbus,Termination resistor 120 ohm 0805,R0805-120R,Generic,1,0.01,RS-485 line termination switched by DIP 8,SMD
 Clock,8MHz crystal for MCU,ABMM2-8.000MHZ-E2-T,ABRACON,1,0.12,MCU external clock source,SMD
-Addressing,4-position SMD DIP switch,DSHP04TS-S,XKB,1,0.12,Module address configuration (SMD DIP),SMD
+Addressing,8-position SMD DIP switch,DSHP08TS-S,XKB,1,0.22,1-7=Modbus addr; 8=120Ω termination enable; silkscreen: 1-7=ADDR,8=TERM,ON/OFF,SMD
 Status,Status LED green 0603,LTST-C190KGKT,Lite-On,1,0.01,Operational status indication,SMD
 Passives,Resistors and capacitors 0603 assorted,R0603 assortment,Generic,1,0.30,Bus termination, filter, and bias network,SMD
 Mechanical,Air intake filter mesh 1mm,SS-MESH-1MM,Generic,1,0.50,Protection for particulate sensor,Mechanical
