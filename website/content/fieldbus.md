@@ -9,7 +9,7 @@ It focuses on physical interfaces, topology, addressing, timing, EMC, and certif
 
 ## Single Ethernet Port Architecture
 
-**EsoCore v1 uses ONE Ethernet port and ONE IP address for all IP-based services.**
+**EsoCore uses ONE Ethernet port and ONE IP address for all IP-based services.**
 This unified architecture is the industry-standard approach for field devices and fully supported by specifications:
 
 - **HTTPS Web UI** (port 443): On-device configuration and diagnostics
@@ -26,15 +26,6 @@ This is how field devices are designed—not a limitation but an intentional des
 
 **Network Load**: Follow PI recommendations to keep total link utilization below 50%.
 EsoCore's web UI and diagnostics are designed with rate limiting to respect real-time cycle requirements.
-
-### Optional 2-Port Configuration (Future)
-
-Some PROFINET devices expose two RJ45 jacks for **line topology** (daisy-chain wiring).
-This uses an integrated Ethernet switch; both ports remain **one logical interface with one MAC/IP address**.
-The 2-port option is for physical topology convenience, not protocol separation.
-
-EsoCore v1 ships with one RJ45 port.
-A 2-port variant with integrated switch can be provisioned via expansion header in future hardware revisions if line topology is required.
 
 ---
 
@@ -133,7 +124,7 @@ A 2-port variant with integrated switch can be provisioned via expansion header 
 ### Physical Layer & Topology
 
 - Standard Ethernet (RJ45 with magnetics)
-- **Single-port design**: EsoCore v1 uses one Ethernet port shared with web UI and Modbus TCP
+- **Single-port design**: EsoCore uses one Ethernet port shared with web UI and Modbus TCP
 - Star or line topology via switches; 2-port devices with integrated switch are available in future revisions for daisy-chain wiring
 
 ### Real‑Time Classes
