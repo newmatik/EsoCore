@@ -9,11 +9,12 @@ MD033:
     - sup    # Superscripts
     - sub    # Subscripts
 
-# Relax line length for technical documentation
+# Line length requirement per project standards
 MD013:
-  line_length: 700  # Very lenient for legal/technical content
-  heading_line_length: 250
-  code_block_line_length: 300
+  line_length: 150
+  code_blocks: false
+  tables: false
+  headings: false
 
 # Allow multiple top-level headings in files that need them (like changelogs, multi-section docs)
 MD025: false
