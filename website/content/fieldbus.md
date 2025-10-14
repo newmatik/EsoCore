@@ -2,7 +2,39 @@
 
 # Industrial Fieldbus Protocols
 
-This page outlines the practical aspects of supporting Modbus, PROFIBUS and PROFINET on EsoCore hardware and firmware. It focuses on physical interfaces, topology, addressing, timing, EMC, and certification considerations so designs are robust in industrial environments.
+This page outlines the practical aspects of supporting Modbus, PROFIBUS and PROFINET on EsoCore hardware and firmware.
+It focuses on physical interfaces, topology, addressing, timing, EMC, and certification considerations so designs are robust in industrial environments.
+
+---
+
+## Single Ethernet Port Architecture
+
+**EsoCore v1 uses ONE Ethernet port and ONE IP address for all IP-based services.**
+This unified architecture is the industry-standard approach for field devices and fully supported by specifications:
+
+- **HTTPS Web UI** (port 443): On-device configuration and diagnostics
+- **Modbus TCP** (port 502): PLC/SCADA integration
+- **PROFINET Device** (RT): Real-time cyclic I/O via Layer-2 frames (EtherType 0x8892)
+
+### How It Works
+
+**Quality of Service (QoS)**: PROFINET RT frames use 802.1Q priority tagging (PCP=6) to ensure deterministic real-time performance.
+Industrial switches prioritize RT traffic above best-effort HTTP or Modbus TCP, preventing conflicts.
+
+**Industry Practice**: PROFINET Design Guidelines explicitly allow unrestricted TCP/IP traffic alongside PROFINET RT on the same interface.
+This is how field devices are designed—not a limitation but an intentional design validated by PI (PROFIBUS & PROFINET International).
+
+**Network Load**: Follow PI recommendations to keep total link utilization below 50%.
+EsoCore's web UI and diagnostics are designed with rate limiting to respect real-time cycle requirements.
+
+### Optional 2-Port Configuration (Future)
+
+Some PROFINET devices expose two RJ45 jacks for **line topology** (daisy-chain wiring).
+This uses an integrated Ethernet switch; both ports remain **one logical interface with one MAC/IP address**.
+The 2-port option is for physical topology convenience, not protocol separation.
+
+EsoCore v1 ships with one RJ45 port.
+A 2-port variant with integrated switch can be provisioned via expansion header in future hardware revisions if line topology is required.
 
 ---
 
@@ -48,17 +80,20 @@ This page outlines the practical aspects of supporting Modbus, PROFIBUS and PROF
 
 ### Physical Layer
 
-- Standard 10/100 Ethernet (existing RJ45 + PHY)
+- Standard 10/100 Ethernet (shared with web UI and PROFINET)
+- Uses the same RJ45 port, PHY, and IP address as other Ethernet services
 
 ### Topology & Addressing
 
-- IP addressing via DHCP or static
+- IP addressing via DHCP or static (same IP as web UI and PROFINET)
 - TCP port 502
 
 ### Firmware Notes
 
 - Lightweight TCP stack with Modbus application server
 - Same function codes as RTU with PDU carried over TCP
+- Coexists with PROFINET RT via QoS/priority handling
+- Multiple simultaneous client connections supported
 
 ---
 
@@ -98,27 +133,31 @@ This page outlines the practical aspects of supporting Modbus, PROFIBUS and PROF
 ### Physical Layer & Topology
 
 - Standard Ethernet (RJ45 with magnetics)
-- Star or line topology via switches; device may be single‑port
+- **Single-port design**: EsoCore v1 uses one Ethernet port shared with web UI and Modbus TCP
+- Star or line topology via switches; 2-port devices with integrated switch are available in future revisions for daisy-chain wiring
 
 ### Real‑Time Classes
 
-- RT (Real Time): cyclic I/O over VLAN‑tagged frames
+- RT (Real Time): cyclic I/O over VLAN‑tagged frames (EtherType 0x8892, PCP=6)
 - IRT (Isochronous Real Time): tighter jitter with special switch silicon (future option)
 
 ### Addressing & Discovery
 
 - IP via DCP set name/IP, discovery with LLDP
 - GSDML file describes device to engineering tools
+- **One IP address**: All services (web UI, Modbus TCP, PROFINET) accessible via the same IP
 
 ### Firmware Notes
 
 - Prioritized traffic, bounded cycle times (2–4 ms typical for RT)
 - Alarms, diagnostics, records; SNMP/LLDP for topology
+- QoS handling ensures RT frames take priority over best-effort IP traffic
+- Rate-limited web UI and diagnostics to maintain <50% link utilization
 
 ### BOM & Connectors
 
-- Existing Ethernet PHY and MagJack
-- Optional 2‑port switch (future revision) for line topology devices
+- Existing Ethernet PHY and MagJack (shared with all Ethernet protocols)
+- Optional 2‑port switch (future revision) for line topology; still one logical interface/IP
 
 ---
 

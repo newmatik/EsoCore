@@ -16,7 +16,7 @@ IO,SMD Optocoupler for 24V inputs,PC817X2NIP1B,Sharp,10,0.06,Safety and general 
 IO,SMD Solid State Relay 5V,AQY212EHAZ,Panasonic,1,1.10,Service indicator or interlock (60V/500mA),SMD
 Clock,32.768kHz SMD RTC crystal,ABS07-32.768KHZ-T,ABRACON,1,0.12,Industrial temp range (-40°C to 85°C),SMD
 Clock,25MHz HSE crystal oscillator,ABM8G-25.000MHZ-18-D2Y-T,ABRACON,1,0.18,STM32 external clock source (±50ppm),SMD
-Ethernet,10/100 Ethernet PHY DP83825I,DP83825IRMQR,Texas Instruments,1,1.50,PHY for optional Ethernet,WQFN-24
+Ethernet,10/100 Ethernet PHY DP83825I,DP83825IRMQR,Texas Instruments,1,1.50,PHY for unified Ethernet interface (web UI + Modbus TCP + PROFINET on one port),WQFN-24
 Connector,Sensor bus primary pluggable PCB mate 4-pin 5.00mm,2EDGR-5.0-04P,Degson,1,0.18,Main RS-485 sensor bus out; 90° angled PCB edge; mates with 2EDGK-5.0-04P,THT
 Connector,Sensor bus primary pluggable plug 4-pin 5.00mm,2EDGK-5.0-04P,Degson,1,0.18,Field-side plug; mates with 2EDGR-5.0-04P,Accessory
 Connector,Sensor bus secondary pluggable PCB mate 4-pin 5.00mm,2EDGR-5.0-04P,Degson,1,0.18,Daisy-chain or secondary bus; 90° angled PCB edge; mates with 2EDGK-5.0-04P,THT
@@ -36,9 +36,9 @@ Connector,SWD debug header 2x5 1.27mm,3220-10-0300-00,Samtec compatible,1,0.10,P
 UI,Tact switch 4.5mm SMD,TS-1187A-B-A-B,XKB,2,0.03,Reset and boot buttons,SMD
 UI,Status LED green 0603,LTST-C190KGKT,Lite-On,2,0.01,System status,SMD
 UI,0.96in OLED 128x64 I2C 3.3V,WEO012864V,Winstar,1,2.80,On-device debug/menu display,SMD
-UI,Menu buttons SMD tact 4.5mm,TS-1187A-B-A-B,XKB,3,0.03,Up Down Enter navigation,SMD
+UI,Menu buttons SMD tact 4.5mm,TS-1187A-B-A-B,XKB,4,0.03,Up Down Enter Back navigation,SMD
 Passives,Resistors and capacitors 0603 assorted,R0603 assortment,Generic,1,0.50,Estimated per-board passives,SMD
-Ethernet,MagJack RJ45 with magnetics optional,HR911105A,Hanrun,1,0.90,If Ethernet is used instead of WiFi,THT
+Ethernet,MagJack RJ45 with magnetics optional,HR911105A,Hanrun,1,0.90,Unified Ethernet port for web UI (HTTPS) + Modbus TCP (port 502) + PROFINET Device (RT),THT
 RTC Backup,CR2032 lithium coin cell,CR-2032,Panasonic,1,0.25,RTC backup battery,THT
 RTC Backup,CR2032 SMD holder,1060TR,Keystone,1,0.32,Coin cell holder for VBAT,SMD
 RTC Backup,Schottky diode for VBAT isolation,BAT54WS-7-F,Diodes Inc,1,0.03,Prevents backfeed into coin cell,SMD

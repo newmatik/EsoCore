@@ -23,10 +23,16 @@ This document defines the hardware specifications for the EsoCore Edge device �
 
 ### Industrial Fieldbus Support
 
+EsoCore uses **one Ethernet port (one IP address)** for all IP-based protocols: on-device web UI (HTTPS), Modbus TCP, and PROFINET Device.
+This unified architecture is the industry-standard approach for field devices, with QoS/priority handling (802.1Q PCP=6) ensuring PROFINET RT performance
+alongside best-effort IP traffic.
+
 - **Modbus RTU (RS‑485 half‑duplex)**: isolated transceiver, A/B/GND terminal block, on‑board termination (120 Ω) enable via DIP switch
-- **Modbus TCP**: supported over the existing Ethernet interface
+- **Modbus TCP**: supported over the single Ethernet interface (TCP port 502)
 - **PROFIBUS DP**: isolated RS‑485 PHY compatible with PROFIBUS levels, DB‑9 male connector with shield, termination enable via DIP
-- **PROFINET Device (single‑port)**: supported over Ethernet with RJ45 MagJack and PHY; optional 2‑port switch can be provisioned via expansion header in future revisions
+- **PROFINET Device**: supported over the single Ethernet interface (RT via Layer‑2 frames, EtherType 0x8892);
+  optional 2‑port switch with integrated switching can be provisioned via expansion header in future revisions
+  for line topology (daisy-chain wiring), still one logical interface/IP
 
 ### Power System
 
@@ -40,7 +46,8 @@ This document defines the hardware specifications for the EsoCore Edge device �
 
 ## Sensor Bus Architecture
 
-EsoCore uses a **distributed sensor network** where each sensor module contains its own MCU for local processing and standardized digital communication. This architecture provides:
+EsoCore uses a **distributed sensor network** where each sensor module contains its own MCU for local processing and standardized digital communication.
+This architecture provides:
 
 - **Scalability**: Connect multiple sensors of the same type (e.g., 3 air quality, 2 vibration sensors)
 - **Flexibility**: Add/remove sensors based on specific machine requirements
@@ -50,8 +57,11 @@ EsoCore uses a **distributed sensor network** where each sensor module contains 
 
 ### Integration Strategy
 
-- **Modular by design**: New sensor types (including partner‑specific or proprietary modules) can be introduced without any changes to the Edge or firmware architecture. The RS‑485 protocol layer abstracts capabilities, so the platform scales by adding sensor modules rather than redesigning hardware.
-- **Hot‑plug and discovery**: Auto‑enumeration assigns addresses and registers sensor capabilities at runtime, enabling field upgrades and customer‑specific configurations.
+- **Modular by design**: New sensor types (including partner‑specific or proprietary modules) can be introduced
+  without any changes to the Edge or firmware architecture.
+  The RS‑485 protocol layer abstracts capabilities, so the platform scales by adding sensor modules rather than redesigning hardware.
+- **Hot‑plug and discovery**: Auto‑enumeration assigns addresses and registers sensor capabilities at runtime,
+  enabling field upgrades and customer‑specific configurations.
 
 ### Sensor Bus Protocol Selection
 
@@ -109,7 +119,8 @@ EsoCore uses a **distributed sensor network** where each sensor module contains 
 ## User Interface (on-device)
 
 - **OLED Status Display**: 0.96" 128×64 monochrome OLED (I²C, 3.3 V) mounted on board for debugging, provisioning info, and basic menu UI
-- **Menu Buttons**: 3 × SMD tactile buttons placed below the display (Up/Down/Enter) for simple navigation; two additional buttons reserved for Reset/Boot already specified
+- **Menu Buttons**: 4 × SMD tactile buttons placed below the display (Up/Down/Enter/Back) for menu navigation;
+  two additional buttons reserved for Reset/Boot already specified
 - **Electrical**: I²C pulled‑up to 3.3 V; debounce in firmware; ESD protection on button lines via existing arrays
 - **Mechanical**: Keepout and bezel height to ensure readability in enclosure; optional standoffs for display support
 
@@ -130,8 +141,9 @@ EsoCore uses a **distributed sensor network** where each sensor module contains 
   - IEEE 802.3af compliant PoE Powered Device (PD) controller
   - RJ45 MagJack connector with integrated isolation transformer
   - Automatic power source detection and management
+  - **Single port hosts**: web UI (HTTPS), Modbus TCP, and PROFINET Device on one IP address
 - **2.4 GHz Wi‑Fi** via certified industrial module (u‑blox NINA‑W1/W10x or similar) with proven security maintenance
-- **Fieldbus**: RS‑485 isolated transceiver (Modbus RTU), PROFIBUS‑compatible RS‑485 PHY with DB‑9; Modbus TCP/PROFINET over Ethernet
+- **Fieldbus**: RS‑485 isolated transceiver (Modbus RTU), PROFIBUS‑compatible RS‑485 PHY with DB‑9; Modbus TCP/PROFINET share the single Ethernet interface
 
 ### Safety I/O (EN ISO 13849 compliant)
 
