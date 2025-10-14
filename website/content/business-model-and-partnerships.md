@@ -59,30 +59,26 @@ EsoCore follows an open‑core model under the Apache 2.0 License: the core is f
 
 ## Funding and Partnership Structure
 
-### Initial Funding Partners
+### Partnership Model
 
-EsoCore's development is funded through strategic partnerships with two leading industrial companies who recognize the transformative potential of this technology:
+EsoCore is currently developed and funded by Newmatik, with an open invitation for strategic partners to join the ecosystem. While the platform is being built independently to ensure its completion and quality, we welcome partnerships with companies who see value in this technology for their markets.
 
-#### Company A: Industrial Door Sector
+**Early Partner Advantages:**
 
-- **Industry Focus**: Industrial door and access control systems
-- **Application**: Monitoring and control of sectional doors, overhead doors, and automated door systems
-- **Use Case**: Predictive maintenance, operational analytics, and safety compliance for industrial door installations
-- **Market Position**: Established manufacturer seeking to enhance their product offerings with IoT capabilities
+Partners who join the project early will have significantly greater influence over:
 
-#### Company B: Manufacturing Equipment Sector
-
-- **Industry Focus**: Precision machining and manufacturing equipment
-- **Application**: Real-time monitoring of milling machines, drilling equipment, and precision manufacturing tools
-- **Use Case**: Tool wear detection, quality assurance, vibration analysis, and production optimization
-- **Market Position**: Technology company providing monitoring solutions for manufacturing environments
+- **Roadmap Priorities**: Direct input on feature development and release scheduling
+- **Technical Direction**: Influence on architecture decisions and implementation approaches  
+- **Market Focus**: Guidance on industry-specific requirements and use cases
+- **Sensor Integration**: Priority development of sensor modules for specific applications
+- **Custom Development**: Preferential access to Newmatik's engineering resources
 
 ### Partnership Benefits
 
-- **Non-Competing Markets**: Both partners operate in distinct industrial sectors with minimal market overlap, ensuring mutual benefit without direct competition.
+- **Non-Competing Markets**: Partners can operate in distinct industrial sectors with minimal market overlap, ensuring mutual benefit without direct competition.
 - **Brand Independence**: Partners can market and sell EsoCore technology under their own brand names, maintaining their market identity and customer relationships.
 - **Ongoing Development**: Newmatik ensures continuous platform evolution, feature development, and security updates, providing partners with long-term technology advancement without internal R&D costs.
-- **Market Expansion**: Additional partners can join the ecosystem at any time, expanding the platform's reach and accelerating development through shared investment.
+- **Market Expansion**: Partners can join the ecosystem at any time, expanding the platform's reach and accelerating development through shared investment.
 
 ---
 
