@@ -35,7 +35,7 @@ Sensor Bus,Bus termination resistor 120 ohm,ERJ-3EKF1200V,Panasonic,2,0.02,End-o
 Connector,SWD debug header 2x5 1.27mm,3220-10-0300-00,Samtec compatible,1,0.10,Programming and debug,THT
 UI,Tact switch 4.5mm SMD,TS-1187A-B-A-B,XKB,2,0.03,Reset and boot buttons,SMD
 UI,Status LED green 0603,LTST-C190KGKT,Lite-On,2,0.01,System status,SMD
-UI,0.96in OLED 128x64 I2C 3.3V,WEO012864V,Winstar,1,2.80,On-device debug/menu display,SMD
+UI,1.5in OLED 128x64 I2C 3.3V,WEO015664A,Winstar,1,4.50,On-device debug/menu display,SMD
 UI,Menu buttons SMD tact 4.5mm,TS-1187A-B-A-B,XKB,4,0.03,Up Down Enter Back navigation,SMD
 Passives,Resistors and capacitors 0603 assorted,R0603 assortment,Generic,1,0.50,Estimated per-board passives,SMD
 Ethernet,MagJack RJ45 with magnetics optional,HR911105A,Hanrun,1,0.90,Unified Ethernet port for web UI (HTTPS) + Modbus TCP (port 502) + PROFINET Device (RT),THT
