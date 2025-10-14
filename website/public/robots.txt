@@ -1,2 +1,7 @@
 User-Agent: *
-Disallow:
+Allow: /
+Disallow: /api/
+Disallow: /_nuxt/
+Disallow: /.nuxt/
+
+Sitemap: https://www.esocore.com/sitemap.xml

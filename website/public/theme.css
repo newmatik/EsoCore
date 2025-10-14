@@ -529,3 +529,61 @@ a:hover {
   color: var(--muted);
   font-size: 13px;
 }
+
+/* Use case cards and links */
+.use-case-link {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+.use-case-link:hover {
+  color: var(--text);
+  transform: translateX(4px);
+}
+
+/* Resources grid */
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  margin-top: 48px;
+  margin-bottom: 48px;
+}
+.resource-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  transition: all 0.2s ease;
+}
+.resource-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.resource-card h4 {
+  margin: 0 0 16px 0;
+  font-size: 18px;
+  color: var(--accent);
+}
+.resource-card ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.resource-card li {
+  margin: 8px 0;
+}
+.resource-card a {
+  display: block;
+  padding: 6px 0;
+  color: var(--text);
+  transition: all 0.2s ease;
+}
+.resource-card a:hover {
+  color: var(--accent);
+  padding-left: 8px;
+}
