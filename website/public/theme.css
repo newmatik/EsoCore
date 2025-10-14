@@ -532,16 +532,18 @@ a:hover {
 
 /* Navigation group with details/summary */
 details.nav-group {
-  margin: 0;
+  margin: 1px 0;
 }
 
 details.nav-group summary.nav-group-header {
   cursor: pointer;
   list-style: none;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display: block;
+  padding: 6px 8px;
+  border-radius: 8px;
+  color: var(--muted);
   user-select: none;
+  transition: all 0.2s ease;
 }
 
 details.nav-group summary.nav-group-header::-webkit-details-marker {
@@ -552,8 +554,23 @@ details.nav-group summary.nav-group-header::marker {
   display: none;
 }
 
-details.nav-group summary.nav-group-header:hover {
+details.nav-group summary.nav-group-header:hover,
+details.nav-group summary.nav-group-header.active {
+  color: var(--text);
   background: rgba(255, 255, 255, 0.05);
+}
+
+details.nav-group summary.nav-group-header .icon {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  vertical-align: middle;
+  color: var(--accent);
+}
+
+details.nav-group summary.nav-group-header .label {
+  vertical-align: middle;
 }
 
 details.nav-group .nav-sublist {
