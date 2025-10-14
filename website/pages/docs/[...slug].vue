@@ -38,16 +38,14 @@
               </template>
               <template v-else>
                 <div class="nav-group">
-                  <button
-                    type="button"
+                  <div
                     class="nav-group-header"
-                    :class="{ active: isGroupOpen(doc) }"
-                    @click="toggleGroup(doc.key || doc.slug)"
+                    :class="{ active: isGroupExpanded(doc, currentSlug) }"
                   >
                     <span class="icon" aria-hidden="true" v-html="doc.icon" />
                     <span class="label">{{ doc.title }}</span>
-                  </button>
-                  <ul class="nav-sublist" v-show="isGroupOpen(doc)">
+                  </div>
+                  <ul class="nav-sublist" v-show="isGroupExpanded(doc, currentSlug)">
                     <li v-for="child in doc.children" :key="child.slug">
                       <NuxtLink
                         :to="child.slug ? `/docs/${child.slug}` : '/docs'"
@@ -97,45 +95,6 @@ const slug = computed(() => {
 
 // Track current slug for active navigation
 const currentSlug = computed(() => slug.value)
-
-// Manage expanded groups
-const expandedGroups = ref(new Set())
-
-// Initialize expanded groups based on current route
-onMounted(() => {
-  docsConfig.forEach(doc => {
-    if (doc.children && isGroupExpanded(doc, currentSlug.value)) {
-      expandedGroups.value.add(doc.key || doc.slug)
-    }
-  })
-})
-
-// Update expanded groups when route changes
-watch(currentSlug, (newSlug) => {
-  docsConfig.forEach(doc => {
-    if (doc.children) {
-      const key = doc.key || doc.slug
-      if (isGroupExpanded(doc, newSlug)) {
-        expandedGroups.value.add(key)
-      }
-    }
-  })
-})
-
-// Toggle group expansion
-function toggleGroup(key) {
-  if (expandedGroups.value.has(key)) {
-    expandedGroups.value.delete(key)
-  } else {
-    expandedGroups.value.add(key)
-  }
-}
-
-// Check if group is expanded
-function isGroupOpen(doc) {
-  const key = doc.key || doc.slug
-  return expandedGroups.value.has(key) || isGroupExpanded(doc, currentSlug.value)
-}
 
 // Helper function to flatten docs for search indexing
 function flattenDocs(docs) {
