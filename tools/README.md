@@ -4,7 +4,7 @@ Utility scripts (e.g., sync, build, release)
 
 ## step_linter.py
 
-**STEP File Linter and Normalizer**
+### STEP File Linter and Normalizer
 
 A comprehensive tool for cleaning up and standardizing STEP files in the hardware library.
 
@@ -37,7 +37,7 @@ A comprehensive tool for cleaning up and standardizing STEP files in the hardwar
 
 ### Example Output
 
-```
+```text
 STEP Linter starting in normal mode
 Target path: ../hardware/library/3d
 Found 39 STEP files in ../hardware/library/3d

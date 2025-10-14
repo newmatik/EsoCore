@@ -1,0 +1,29 @@
+# Cursor Rules for EsoCore Project
+
+## BOM Management
+
+**When BOM files are modified:**
+
+- After editing any `bom.csv` file in the `hardware/` directory (edge, cables, or sensors), always run the sync script to update the website data:
+
+  ```bash
+  python3 tools/sync_bom_data.py
+  ```
+
+- This ensures that the website's public BOM data (`website/public/bom/*.csv`) stays in sync with the source BOM files in the hardware directories.
+
+**BOM file locations:**
+
+- `hardware/edge/bom.csv` → syncs to `website/public/bom/bom-main.csv`
+- `hardware/cables/bom.csv` → syncs to `website/public/bom/bom-cables.csv`
+- `hardware/sensors/<name>/bom.csv` → syncs to `website/public/bom/bom-<slug>.csv`
+
+## Markdown Line Length
+
+**Line length requirements:**
+
+- All markdown files must have a maximum line length of 150 characters
+- When editing markdown files, always check and fix line length issues
+- Break long lines appropriately while preserving all content
+- For bullet points, use 2-space indentation for continuation lines
+- Maintain proper formatting, links, and readability

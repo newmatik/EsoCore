@@ -19,5 +19,6 @@ This section lists BOM pages for the Edge and each sensor module. Open a specifi
 - [Cables & Interconnects](/docs/bom/cables)
 
 Notes:
+
 - Prices are indicative and exclude assembly.
 - CSV sources live under `/public/docs/data/*.csv` and are rendered by the docs app.

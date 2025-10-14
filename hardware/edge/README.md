@@ -21,7 +21,9 @@
   - RS‑485 sensor bus (SN65HVD72), termination selectable
   - Fieldbus: Isolated Modbus RTU, PROFIBUS-compatible RS‑485 (DB‑9)
 - I/O connectors:
-  - Pluggable terminal blocks (Degson): plugs `2EDGK-5.0-xxP` mating with PCB connectors `2EDGR-5.0-xxP`; all PCB mates are 90° angled at PCB edge for enclosure access
+  - Pluggable terminal blocks (Degson): plugs `2EDGK-5.0-xxP` mating with
+    PCB connectors `2EDGR-5.0-xxP`; all PCB mates are 90° angled at PCB edge
+    for enclosure access
   - 2× 4-pin sensor bus: plug `2EDGK-5.0-04P` ↔ PCB mate `2EDGR-5.0-04P`
   - Safety I/O: 8-pin input `2EDGK-5.0-08P` ↔ `2EDGR-5.0-08P`, 6-pin output `2EDGK-5.0-06P` ↔ `2EDGR-5.0-06P`
   - General I/O: 2× 6-pin `2EDGK-5.0-06P` ↔ `2EDGR-5.0-06P` (DI, AI, relay)
@@ -61,8 +63,12 @@
 ## Layout Guidance
 
 ### Component Placement
-- **Display and UI**: Place 1.5" OLED display and buttons (Reset/Boot/Menu) on front face for easy access
-- **Buttons**: Position Reset/Boot/Menu buttons directly below the display with sufficient spacing for easy operation; ensure no obstructions above button areas
+
+- **Display and UI**: Place 1.5" OLED display and buttons (Reset/Boot/Menu)
+  on front face for easy access
+- **Buttons**: Position Reset/Boot/Menu buttons directly below the display with
+  sufficient spacing for easy operation; ensure no obstructions above button
+  areas
 - **Connectors**:
   - Group all pluggable terminal blocks (Degson green connectors) along the top edge
   - Place USB-C, Ethernet RJ45, and DB-9 along the bottom edge
@@ -70,6 +76,7 @@
 - **Tall components**: Keep away from left and right edges to maintain housing clearance
 
 ### Electrical Layout
+
 - Separate power/PoE, digital, and analog zones; star ground tie at ADC/MCU ref
 - Keep RS‑485, Ethernet, and USB return paths tight; add stitching vias near chokes
 - Place TVS/ESD close to connectors; keep supercap high-current paths short

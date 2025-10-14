@@ -1,0 +1,29 @@
+# Markdownlint configuration for EsoCore project
+default: true
+
+# Allow HTML in specific files that need it for rendering
+MD033:
+  allowed_elements:
+    - div    # Needed for BOM rendering
+    - br     # Occasional line breaks
+    - sup    # Superscripts
+    - sub    # Subscripts
+
+# Relax line length for technical documentation
+MD013:
+  line_length: 700  # Very lenient for legal/technical content
+  heading_line_length: 250
+  code_block_line_length: 300
+
+# Allow multiple top-level headings in files that need them (like changelogs, multi-section docs)
+MD025: false
+
+# Allow emphasis as heading in specific contexts
+MD036: false
+
+# Allow bare URLs in technical documentation  
+MD034: false
+
+# Allow trailing punctuation in headings for specific cases
+MD026:
+  punctuation: ".,;:"  # Exclude colon to allow "BOM:" style headings

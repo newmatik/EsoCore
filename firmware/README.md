@@ -2,11 +2,13 @@
 
 ## Industrial IoT Edge Computing Platform
 
-**EsoCore** is a comprehensive firmware platform for industrial IoT applications, featuring real-time edge intelligence, robust communication protocols, and enterprise-grade reliability.
+**EsoCore** is a comprehensive firmware platform for industrial IoT applications,
+featuring real-time edge intelligence, robust communication protocols, and
+enterprise-grade reliability.
 
 ## 🏗️ Architecture
 
-```
+```text
 EsoCore Edge Device ─── RS-485 ─── Sensor Modules
      │                                        │
      ├── WiFi/HTTP API                       ├── Vibration Analysis
@@ -29,11 +31,13 @@ EsoCore Edge Device ─── RS-485 ─── Sensor Modules
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - ARM GCC toolchain (`arm-none-eabi-gcc`)
 - GNU Make
 - STM32F4 (Edge) and STM32G0 (Sensors) target support
 
 ### Build Commands
+
 ```bash
 # Build everything
 make all
@@ -52,7 +56,7 @@ make flash_vibration
 
 ## 📁 Project Structure
 
-```
+```text
 firmware/
 ├── common/                 # Shared components
 │   ├── communication/     # WiFi, HTTP, RS-485, Modbus
@@ -85,6 +89,7 @@ firmware/
 ## 🔧 Configuration
 
 ### Edge Device
+
 ```c
 #define WIFI_SSID           "EsoCore_Network"
 #define SERVER_URL          "https://api.esocore.com"
@@ -93,6 +98,7 @@ firmware/
 ```
 
 ### Sensor Modules
+
 ```c
 #define SENSOR_DEVICE_ADDRESS   0x02
 #define SENSOR_DEVICE_TYPE      ESOCORE_DEVICE_TYPE_VIBRATION
@@ -102,6 +108,7 @@ firmware/
 ## 📊 System Monitoring
 
 ### Health Monitoring
+
 ```c
 esocore_config_status_t status;
 esocore_config_get_status(&status);
@@ -109,6 +116,7 @@ uint8_t health = status.system_health; // 0-100
 ```
 
 ### Event Logging
+
 ```c
 esocore_event_log(ESOCORE_EVENT_SENSOR_DATA_READY,
                  ESOCORE_EVENT_SEVERITY_INFO,
@@ -116,6 +124,7 @@ esocore_event_log(ESOCORE_EVENT_SENSOR_DATA_READY,
 ```
 
 ### Performance Metrics
+
 - CPU usage monitoring
 - Memory utilization tracking
 - Network latency measurement
@@ -126,6 +135,7 @@ esocore_event_log(ESOCORE_EVENT_SENSOR_DATA_READY,
 ## 🔌 API Reference
 
 ### HTTP Endpoints
+
 - `GET /api/status` - System status
 - `POST /api/heartbeat` - Heartbeat
 - `GET /api/sensors` - Sensor list
@@ -134,6 +144,7 @@ esocore_event_log(ESOCORE_EVENT_SENSOR_DATA_READY,
 - `POST /api/firmware/check` - OTA updates
 
 ### RS-485 Protocol
+
 - `DISCOVER` - Device discovery
 - `HEARTBEAT` - Connection monitoring
 - `DATA_REQUEST/RESPONSE` - Sensor data exchange
