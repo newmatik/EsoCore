@@ -10,11 +10,11 @@ A comprehensive tool for cleaning up and standardizing STEP files in the hardwar
 
 ### Features
 
-- ✅ Fix FILE_NAME attributes to match actual filenames
-- ✅ Remove duplicate ISO-10303-21 lines
-- ✅ Normalize formatting and spacing for consistency
-- ✅ Standardize header format across all files
-- ✅ Support for both individual files and directories
+- Fix FILE_NAME attributes to match actual filenames
+- Remove duplicate ISO-10303-21 lines
+- Normalize formatting and spacing for consistency
+- Standardize header format across all files
+- Support for both individual files and directories
 
 ### Usage
 
@@ -49,7 +49,7 @@ PROCESSING COMPLETE
 Files processed: 39
 Files changed: 15
 Errors: 0
-✅ All STEP files processed successfully
+All STEP files processed successfully
 ```
 
 ## Copyright and License

@@ -6,7 +6,7 @@
 featuring real-time edge intelligence, robust communication protocols, and
 enterprise-grade reliability.
 
-## 🏗️ Architecture
+## Architecture
 
 ```text
 EsoCore Edge Device ─── RS-485 ─── Sensor Modules
@@ -19,7 +19,7 @@ EsoCore Edge Device ─── RS-485 ─── Sensor Modules
      └── Configuration Management            └── More...
 ```
 
-## 🎯 Key Features
+## Key Features
 
 - **Edge Intelligence**: TinyML with anomaly detection and predictive maintenance
 - **Industrial Communication**: RS-485, Modbus RTU, WiFi, HTTP/HTTPS
@@ -28,7 +28,7 @@ EsoCore Edge Device ─── RS-485 ─── Sensor Modules
 - **Enterprise Storage**: microSD with compression and power-safe writes
 - **Remote Management**: OTA updates, configuration sync, health monitoring
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -54,7 +54,7 @@ make flash_edge
 make flash_vibration
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```text
 firmware/
@@ -73,7 +73,7 @@ firmware/
 └── Makefile              # Build system
 ```
 
-## 🛠️ Supported Sensors
+## Supported Sensors
 
 | Sensor Type | Key Capabilities | Use Cases |
 |-------------|------------------|-----------|
@@ -86,7 +86,7 @@ firmware/
 | **Temperature** | NTC/RTD/Thermocouple, high precision | Thermal management |
 | **Proximity** | Inductive/capacitive/laser sensing | Position detection |
 
-## 🔧 Configuration
+## Configuration
 
 ### Edge Device
 
@@ -105,7 +105,7 @@ firmware/
 #define DATA_TRANSMIT_INTERVAL_MS 2000
 ```
 
-## 📊 System Monitoring
+## System Monitoring
 
 ### Health Monitoring
 
@@ -132,7 +132,7 @@ esocore_event_log(ESOCORE_EVENT_SENSOR_DATA_READY,
 - Storage compression ratios
 - Power consumption monitoring
 
-## 🔌 API Reference
+## API Reference
 
 ### HTTP Endpoints
 
@@ -150,7 +150,7 @@ esocore_event_log(ESOCORE_EVENT_SENSOR_DATA_READY,
 - `DATA_REQUEST/RESPONSE` - Sensor data exchange
 - `CONFIG_UPDATE` - Configuration updates
 
-## 🧪 Testing
+## Testing
 
 ```bash
 make test              # Unit tests
@@ -158,15 +158,15 @@ make integration_test  # Integration tests
 make benchmark         # Performance tests
 ```
 
-## 📄 License
+## License
 
 Apache License 2.0
 
-## 🆘 Support
+## Support
 
 - Issues: [GitHub Issues](https://github.com/your-org/esocore-firmware/issues)
 - Wiki: [Documentation](https://github.com/your-org/esocore-firmware/wiki)
 
 ---
 
-**EsoCore** - Industrial IoT with Edge Intelligence 🚀
+**EsoCore** - Industrial IoT with Edge Intelligence

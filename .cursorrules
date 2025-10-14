@@ -27,3 +27,11 @@
 - Break long lines appropriately while preserving all content
 - For bullet points, use 2-space indentation for continuation lines
 - Maintain proper formatting, links, and readability
+
+## README Files
+
+**Content guidelines:**
+
+- Never use emojis in README files
+- Keep content professional and clear
+- Use plain text section headers without decorative characters
