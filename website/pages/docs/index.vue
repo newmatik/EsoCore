@@ -37,15 +37,12 @@
                 </NuxtLink>
               </template>
               <template v-else>
-                <div class="nav-group">
-                  <div
-                    class="nav-group-header"
-                    :class="{ active: isGroupExpanded(doc, currentSlug) }"
-                  >
+                <details class="nav-group" :open="isGroupExpanded(doc, currentSlug)">
+                  <summary class="nav-group-header" :class="{ active: isGroupExpanded(doc, currentSlug) }">
                     <span class="icon" aria-hidden="true" v-html="doc.icon" />
                     <span class="label">{{ doc.title }}</span>
-                  </div>
-                  <ul class="nav-sublist" v-show="isGroupExpanded(doc, currentSlug)">
+                  </summary>
+                  <ul class="nav-sublist">
                     <li v-for="child in doc.children" :key="child.slug">
                       <NuxtLink
                         :to="child.slug ? `/docs/${child.slug}` : '/docs'"
@@ -56,7 +53,7 @@
                       </NuxtLink>
                     </li>
                   </ul>
-                </div>
+                </details>
               </template>
             </li>
           </ul>

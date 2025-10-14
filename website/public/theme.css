@@ -530,26 +530,34 @@ a:hover {
   font-size: 13px;
 }
 
-/* Navigation group header buttons */
-.nav-group-header button,
-button.nav-group-header {
-  width: 100%;
-  background: none;
-  border: none;
-  padding: 0;
+/* Navigation group with details/summary */
+details.nav-group {
   margin: 0;
-  font: inherit;
-  color: inherit;
-  text-align: left;
+}
+
+details.nav-group summary.nav-group-header {
   cursor: pointer;
+  list-style: none;
   display: flex;
   align-items: center;
   gap: 8px;
+  user-select: none;
 }
 
-.nav-group-header button:hover,
-button.nav-group-header:hover {
+details.nav-group summary.nav-group-header::-webkit-details-marker {
+  display: none;
+}
+
+details.nav-group summary.nav-group-header::marker {
+  display: none;
+}
+
+details.nav-group summary.nav-group-header:hover {
   background: rgba(255, 255, 255, 0.05);
+}
+
+details.nav-group .nav-sublist {
+  margin-top: 4px;
 }
 
 /* Use case cards and links */
