@@ -10,18 +10,21 @@ EsoCore monitoring data to your existing workflows, automate maintenance process
 EsoCore supports multiple integration pathways to fit into your existing industrial infrastructure:
 
 **Industrial Protocols:**
+
 - Modbus RTU/TCP
 - PROFINET Device
 - PROFIBUS DP
 - OPC UA (planned)
 
 **IT Systems:**
+
 - REST API for custom integrations
 - Webhook notifications for events
 - Database access for analytics
 - File exports (CSV, JSON, Parquet)
 
 **Common Integrations:**
+
 - CMMS (Computerized Maintenance Management Systems)
 - SCADA (Supervisory Control and Data Acquisition)
 - MES (Manufacturing Execution Systems)
@@ -39,6 +42,7 @@ EsoCore provides a comprehensive REST API for programmatic access to all platfor
 **Base URL:** `https://[EDGE-DEVICE-IP]/api/v1/`
 
 **Authentication:**
+
 ```http
 X-API-Key: your-api-key-here
 ```
@@ -48,6 +52,7 @@ X-API-Key: your-api-key-here
 ### Authentication
 
 **Generate API Key:**
+
 1. Login to web UI
 2. Navigate to Settings → API Keys
 3. Click "Generate New Key"
@@ -57,6 +62,7 @@ X-API-Key: your-api-key-here
 7. Store securely
 
 **Using API Key:**
+
 ```python
 import requests
 
@@ -74,6 +80,7 @@ response = requests.get(
 ### Key API Endpoints
 
 **Device Information:**
+
 ```http
 GET /api/v1/device/info           # Device details
 GET /api/v1/device/health          # System health status
@@ -82,6 +89,7 @@ GET /api/v1/sensors/{id}/          # Specific sensor details
 ```
 
 **Telemetry Data:**
+
 ```http
 GET /api/v1/telemetry/             # Latest readings
 GET /api/v1/telemetry/history/     # Historical data
@@ -89,6 +97,7 @@ GET /api/v1/telemetry/sensor/{id}/ # Sensor-specific data
 ```
 
 Query parameters:
+
 - `start_time`: ISO 8601 timestamp
 - `end_time`: ISO 8601 timestamp
 - `sensor_id`: Filter by sensor
@@ -96,6 +105,7 @@ Query parameters:
 - `limit`: Maximum results (default 1000)
 
 **Alerts:**
+
 ```http
 GET /api/v1/alerts/                # Active alerts
 GET /api/v1/alerts/history/        # Alert history
@@ -104,6 +114,7 @@ GET /api/v1/alerts/rules/          # Alert rules
 ```
 
 **Configuration:**
+
 ```http
 GET /api/v1/config/                # Current configuration
 PUT /api/v1/config/                # Update configuration
@@ -113,6 +124,7 @@ POST /api/v1/config/restart        # Restart services
 ### Example Integrations
 
 **Python Integration:**
+
 ```python
 import requests
 from datetime import datetime, timedelta
@@ -176,6 +188,7 @@ if alerts:
 ```
 
 **JavaScript/Node.js Integration:**
+
 ```javascript
 const axios = require('axios');
 
@@ -228,6 +241,7 @@ client.getCurrentReadings()
 Integrate EsoCore with Computerized Maintenance Management Systems to automatically create work orders based on equipment condition.
 
 **Supported CMMS Platforms:**
+
 - SAP PM
 - IBM Maximo
 - Infor EAM
@@ -250,6 +264,7 @@ Configure EsoCore to send alerts directly to CMMS:
    - Payload template: Map EsoCore data to CMMS fields
 
 2. **Payload Example:**
+
 ```json
 {
     "equipment_id": "{{device_id}}",
@@ -323,6 +338,7 @@ If CMMS supports email-to-ticket:
    - Configure email template with required CMMS fields in subject/body
 
 2. **Email Template:**
+
 ```
 Subject: [EQUIPMENT:{{device_name}}][PRIORITY:{{severity}}] {{alert_type}}
 
@@ -388,6 +404,7 @@ def create_sap_notification(alert):
 Expose EsoCore data to SCADA via Modbus TCP:
 
 **Configuration:**
+
 1. EsoCore Web UI → Settings → Fieldbus → Modbus TCP
 2. Enable Modbus TCP Server
 3. Port: 502 (default) or custom
@@ -397,6 +414,7 @@ Expose EsoCore data to SCADA via Modbus TCP:
    - Map sensors to register ranges
 
 **Register Map Example:**
+
 | Register | Parameter | Type | Unit |
 |----------|-----------|------|------|
 | 40001-40002 | Motor 1 Vibration RMS | Float | mm/s |
@@ -409,6 +427,7 @@ Expose EsoCore data to SCADA via Modbus TCP:
 **SCADA Configuration:**
 
 *Allen-Bradley / Rockwell:*
+
 ```
 Controller: Modbus/TCP
 IP Address: 192.168.1.100
@@ -419,6 +438,7 @@ Scan Rate: 1000ms
 ```
 
 *Siemens WinCC:*
+
 ```
 Driver: ModbusTCP.chn
 IP: 192.168.1.100
@@ -428,6 +448,7 @@ Update Cycle: 1s
 ```
 
 *Ignition SCADA:*
+
 ```python
 # Add device
 Name: EsoCore_Edge1
@@ -444,6 +465,7 @@ Motor1_Status: Int16, 40007, 1 register
 ### OPC UA Integration (Planned)
 
 Future release will include OPC UA server:
+
 - Standard OPC UA information model
 - TLS-encrypted communication
 - User authentication
@@ -459,6 +481,7 @@ Future release will include OPC UA server:
 Connect equipment health data to production systems:
 
 **Use Cases:**
+
 - Display equipment health on production dashboards
 - Prevent production scheduling on degraded equipment
 - Correlate quality issues with equipment condition
@@ -532,6 +555,7 @@ class MESIntegration:
 Connect equipment data to business systems:
 
 **Use Cases:**
+
 - Automatic spare parts ordering based on predictions
 - Maintenance cost tracking and budgeting
 - Asset lifecycle management
@@ -540,6 +564,7 @@ Connect equipment data to business systems:
 **Integration Points:**
 
 *Procurement:*
+
 ```python
 # Trigger spare parts order based on alert
 def trigger_parts_order(alert):
@@ -558,6 +583,7 @@ def trigger_parts_order(alert):
 ```
 
 *Finance:*
+
 ```python
 # Track actual maintenance costs vs predicted
 def track_maintenance_roi():
@@ -593,6 +619,7 @@ def track_maintenance_roi():
 ### Data Export for Analytics
 
 **CSV Export:**
+
 ```python
 # Export historical data for analysis
 def export_to_csv(device_id, start_date, end_date):
@@ -614,6 +641,7 @@ def export_to_csv(device_id, start_date, end_date):
 ```
 
 **Database Integration:**
+
 ```python
 # Sync to data warehouse
 import psycopg2
@@ -654,6 +682,7 @@ def sync_to_warehouse():
 ```
 
 **Power BI Integration:**
+
 ```python
 # Power BI REST API integration
 def publish_to_powerbi(dataset_id, table_name, data):
@@ -682,6 +711,7 @@ def publish_to_powerbi(dataset_id, table_name, data):
 ### Security
 
 **API Key Management:**
+
 - Generate separate keys for each integration
 - Use read-only keys when possible
 - Rotate keys regularly (quarterly recommended)
@@ -689,6 +719,7 @@ def publish_to_powerbi(dataset_id, table_name, data):
 - Never commit keys to source control
 
 **Network Security:**
+
 - Use TLS/HTTPS for all API connections
 - Implement firewall rules limiting access
 - Use VPN for remote integrations
@@ -697,6 +728,7 @@ def publish_to_powerbi(dataset_id, table_name, data):
 ### Performance
 
 **Optimize API Usage:**
+
 - Cache data when appropriate
 - Use bulk endpoints vs many individual calls
 - Implement exponential backoff for retries
@@ -704,6 +736,7 @@ def publish_to_powerbi(dataset_id, table_name, data):
 - Use webhooks instead of polling when possible
 
 **Data Management:**
+
 - Only query data you need (use filters)
 - Limit historical queries to necessary time ranges
 - Implement pagination for large datasets
@@ -712,6 +745,7 @@ def publish_to_powerbi(dataset_id, table_name, data):
 ### Reliability
 
 **Error Handling:**
+
 ```python
 import time
 from requests.adapters import HTTPAdapter
@@ -734,6 +768,7 @@ response = session.get(url, headers=headers)
 ```
 
 **Monitoring:**
+
 - Log all integration errors
 - Track API response times
 - Monitor data freshness
@@ -769,4 +804,3 @@ Successful integration amplifies the value of equipment monitoring by connecting
 infrastructure and workflows.
 
 [API Documentation](/docs/api-specification) | [Installation Guide](/docs/getting-started/installation-guide) | [Quick Start](/docs/getting-started/quick-start)
-

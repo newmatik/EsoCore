@@ -1,7 +1,7 @@
 # EsoCore Installation Guide
 
-Complete installation guide for deploying EsoCore industrial IoT monitoring across your facility. This comprehensive guide covers hardware installation, network
-configuration, sensor deployment, cloud platform setup, and system integration for production deployments.
+Complete installation guide for deploying EsoCore industrial IoT monitoring across your facility. This comprehensive guide covers hardware
+installation, network configuration, sensor deployment, cloud platform setup, and system integration for production deployments.
 
 ---
 
@@ -10,6 +10,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 ### Hardware Requirements
 
 **Per Monitored Machine:**
+
 - 1× EsoCore Edge device (STM32H747-based)
 - 1-5× Sensor modules (based on monitoring requirements)
 - Power supply (12-24V DC, 2A minimum) OR PoE-capable network switch
@@ -18,6 +19,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 - RS-485 cable (4-conductor shielded, Belden 3105A or equivalent)
 
 **Tools Required:**
+
 - Screwdrivers (Phillips and flathead)
 - Wire strippers and crimpers
 - Multimeter for voltage verification
@@ -28,17 +30,20 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 ### Network Requirements
 
 **Connectivity Options:**
+
 - Ethernet with DHCP (recommended)
 - Static IP assignment
 - PoE (IEEE 802.3af) for power and network
 - WiFi (2.4 GHz, WPA2 minimum)
 
 **Bandwidth:**
+
 - Minimal: <1 KB/min per device normal operation
 - Peak: 10-50 KB during anomaly events
 - Cloud sync: 50-100 MB/month per device
 
 **Firewall Requirements:**
+
 - Outbound HTTPS (port 443) for cloud sync
 - Optional: Inbound HTTPS (port 443) for local web UI access
 - Optional: Modbus TCP (port 502), PROFINET for integration
@@ -46,12 +51,14 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 ### Skills Required
 
 **Basic Installation:**
+
 - Industrial equipment familiarity
 - Basic electrical knowledge (12-24V DC safety)
 - Network configuration basics
 - Reading installation diagrams
 
 **Advanced Installation:**
+
 - Industrial protocol knowledge (Modbus, PROFINET)
 - System integration experience
 - Network troubleshooting capabilities
@@ -63,6 +70,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 ### Step 1: Equipment Assessment
 
 **Identify Monitoring Priorities:**
+
 1. List all equipment to be monitored
 2. Classify by criticality (High/Medium/Low)
 3. Document historical failure modes
@@ -70,6 +78,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 5. Calculate total hardware requirements
 
 **Site Survey:**
+
 - Verify power availability (12-24V or PoE)
 - Check network connectivity at each location
 - Identify sensor mounting locations
@@ -77,6 +86,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 - Document environmental conditions
 
 **Create Installation Plan:**
+
 - Deployment schedule (phased approach recommended)
 - Resource allocation (personnel, tools, time)
 - Downtime windows for installation
@@ -86,12 +96,14 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 ### Step 2: Hardware Procurement
 
 **Edge Devices:**
+
 - Quantity needed: [_____]
 - Configuration: Standard or custom
 - Accessories: Mounting hardware, power supplies
 - Lead time: 2-4 weeks typical
 
 **Sensor Modules:**
+
 - Vibration sensors: [_____]
 - Temperature sensors: [_____]
 - Current sensors: [_____]
@@ -100,6 +112,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 - Other sensors: [_____]
 
 **Cables and Accessories:**
+
 - RS-485 cable length needed: [_____] meters
 - Ethernet cables: [_____]
 - Power cables: [_____]
@@ -107,6 +120,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 - Cable management: Ties, conduit, labels
 
 **Spare Parts:**
+
 - Recommend 10% spare sensors
 - 2-3 spare Edge devices
 - Spare cables and connectors
@@ -118,6 +132,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 ### Physical Installation
 
 **Location Selection:**
+
 - Within 100 meters of sensors (RS-485 range limit)
 - Protected from physical damage
 - Temperature: -20°C to +60°C
@@ -128,12 +143,14 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 **Mounting Options:**
 
 *DIN Rail Mount:*
+
 1. Measure required rail space (10cm width typical)
 2. Position device on 35mm DIN rail
 3. Press down until clips engage
 4. Verify secure mounting
 
 *Wall Mount:*
+
 1. Mark mounting hole locations
 2. Drill holes appropriate for wall material
 3. Install anchors if needed
@@ -141,6 +158,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 5. Ensure level and secure mounting
 
 *Panel Mount:*
+
 1. Cut opening in panel per template
 2. Insert device from front
 3. Secure with provided brackets
@@ -174,6 +192,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 8. Check network connectivity
 
 **Power Verification:**
+
 - Display shows firmware version and IP address
 - Status LEDs indicate normal operation
 - No error messages on display
@@ -219,10 +238,46 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 9. Verify connectivity
 
 **Network Troubleshooting:**
+
 - No IP address: Check DHCP server, cable connection
 - Cannot access web UI: Check firewall, use HTTPS not HTTP
 - Intermittent connectivity: Check WiFi signal strength, interference
 - Slow response: Check network congestion, bandwidth
+
+### USB Connection (Maintenance and Development)
+
+**Purpose:**
+
+The USB connection on the EsoCore Edge device is used exclusively for:
+
+- **Firmware flashing:** Updating device firmware
+- **Serial communication:** Terminal access for diagnostics and direct device communication
+
+**Important Notes:**
+
+- USB is NOT used for normal operation or data collection
+- USB is NOT used for network connectivity or data transfer
+- Use network interfaces (Ethernet/WiFi) for operational communication
+- USB access requires physical connection to the device
+
+**Serial Terminal Access:**
+
+1. Connect USB cable between Edge device and computer
+2. Install appropriate USB-to-serial drivers if needed
+3. Use terminal application (PuTTY, screen, minicom):
+   - Baud rate: 115200
+   - Data bits: 8
+   - Parity: None
+   - Stop bits: 1
+4. Access diagnostic commands and system logs
+
+**Firmware Updates:**
+
+1. Download firmware file (.bin or .hex)
+2. Connect via USB
+3. Enter bootloader mode (follow device-specific procedure)
+4. Flash firmware using appropriate tool
+5. Device reboots with new firmware
 
 ---
 
@@ -231,6 +286,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 ### Vibration Sensor Installation
 
 **Location Selection:**
+
 - Close to rotating components (bearings, gears)
 - Rigid mounting surface (not flexible sheet metal)
 - Accessible for future inspection
@@ -239,6 +295,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 **Mounting Methods:**
 
 *Stud Mount (Preferred - Best Accuracy):*
+
 1. Drill and tap mounting hole (M6 or M8 typical)
 2. Clean mounting surface thoroughly
 3. Apply thin layer of coupling compound
@@ -247,6 +304,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 6. Verify sensor is firmly mounted
 
 *Magnetic Mount (Quick Installation):*
+
 1. Clean mounting surface (remove paint, oil, rust)
 2. Ensure surface is flat and smooth
 3. Place magnet base on surface
@@ -254,6 +312,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 5. Apply safety cable as backup
 
 *Adhesive Mount (Temporary or Testing):*
+
 1. Clean surface with isopropyl alcohol
 2. Apply industrial adhesive or epoxy
 3. Press sensor firmly to surface
@@ -261,6 +320,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 5. Verify bond before leaving
 
 **Wiring:**
+
 1. Route 4-conductor shielded cable to sensor
 2. Strip wire ends carefully
 3. Connect to terminal block:
@@ -272,6 +332,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 5. Connect shield to ground at one end only
 
 **DIP Switch Addressing:**
+
 1. Each sensor needs unique address (1-254)
 2. Set address using binary DIP switches
 3. Example addresses:
@@ -285,6 +346,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 ### Temperature Sensor Installation
 
 **Mounting Locations:**
+
 - Bearing housings (direct contact)
 - Motor bodies
 - Hydraulic reservoirs
@@ -294,6 +356,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 **Installation:**
 
 *Surface Mount:*
+
 1. Clean mounting surface
 2. Apply thermal compound for good contact
 3. Secure sensor with clamp or adhesive
@@ -301,6 +364,7 @@ configuration, sensor deployment, cloud platform setup, and system integration f
 5. Verify good thermal contact
 
 *Thermowell Installation (Process Fluids):*
+
 1. Install thermowell in process per specifications
 2. Fill thermowell with thermal compound
 3. Insert temperature sensor
@@ -325,6 +389,7 @@ Set unique DIP switch address
 8. For 3-phase motors: Install clamp on each phase
 
 **Important Safety Notes:**
+
 - **Never** work on live circuits without proper training
 - Follow lockout/tagout procedures
 - Verify circuits are de-energized before installation
@@ -338,18 +403,21 @@ Set unique DIP switch address
 ### Additional Sensor Types
 
 **Pressure Sensors:**
+
 - Install in pressure taps with appropriate fittings
 - Use thread sealant or tape
 - Verify pressure range matches application
 - Consider pulsation dampeners if needed
 
 **Acoustic Sensors:**
+
 - Mount near sound source (bearings, valves, leaks)
 - Avoid mounting on vibrating surfaces
 - Use foam isolation pad if needed
 - Protect from moisture and contamination
 
 **Proximity/Position Sensors:**
+
 - Mount with specified air gap
 - Align with target surface/object
 - Verify detection distance
@@ -358,6 +426,7 @@ Set unique DIP switch address
 ### RS-485 Bus Wiring
 
 **Cable Routing:**
+
 1. Use 4-conductor shielded cable (Belden 3105A or equivalent)
 2. Keep away from power cables (minimum 12" separation)
 3. Avoid parallel runs with AC power
@@ -366,7 +435,8 @@ Set unique DIP switch address
 6. Avoid sharp bends (minimum 4× cable diameter radius)
 
 **Daisy Chain Topology:**
-```
+
+```text
 Edge Device → Sensor 1 → Sensor 2 → Sensor 3 → ... → Last Sensor
 ```
 
@@ -377,12 +447,14 @@ Edge Device → Sensor 1 → Sensor 2 → Sensor 3 → ... → Last Sensor
 5. Shield grounded at one end only (usually at Edge device)
 
 **Termination:**
+
 - Install 120Ω termination resistor at last sensor
 - Some sensors have DIP switch for built-in termination
 - Required for proper signal integrity
 - Edge device typically has built-in termination on its end
 
 **Bus Power:**
+
 - Edge device supplies +12V to sensor bus
 - Total current limit: 2A
 - Typical sensor consumption: 50-150mA each
@@ -396,6 +468,7 @@ Edge Device → Sensor 1 → Sensor 2 → Sensor 3 → ... → Last Sensor
 ### Initial Setup
 
 **Access Web Interface:**
+
 1. Note IP address from Edge device display
 2. Open web browser on computer (same network)
 3. Navigate to: `https://[IP_ADDRESS]`
@@ -405,6 +478,7 @@ Edge Device → Sensor 1 → Sensor 2 → Sensor 3 → ... → Last Sensor
    - Password: `esocore`
 
 **First-Time Setup Wizard:**
+
 1. Change admin password (required)
 2. Set device name and location
 3. Configure timezone and NTP server
@@ -414,6 +488,7 @@ Edge Device → Sensor 1 → Sensor 2 → Sensor 3 → ... → Last Sensor
 ### Sensor Discovery
 
 **Automatic Discovery:**
+
 1. Navigate to: Sensors → Discovery
 2. Click "Scan RS-485 Bus"
 3. System discovers all connected sensors
@@ -422,6 +497,7 @@ Edge Device → Sensor 1 → Sensor 2 → Sensor 3 → ... → Last Sensor
 
 **Assign Descriptive Names:**
 For each sensor:
+
 1. Click sensor to edit
 2. Change name from default to descriptive:
    - "Motor 1 Drive End Bearing"
@@ -438,27 +514,32 @@ For each sensor:
 Configure appropriate rates for each sensor type:
 
 *Vibration Sensors:*
+
 - Analysis windows: 1-3 kHz for 1-5 seconds
 - Window frequency: Every 5-15 minutes
 - Continuous RMS: 1-10 Hz
 - Alert evaluation: Every 30-60 seconds
 
 *Temperature Sensors:*
+
 - Sampling rate: 0.1-1 Hz (every 1-10 seconds)
 - Alert evaluation: Every 60 seconds
 - Thermal time constant consideration
 
 *Current Sensors:*
+
 - Sampling rate: 100-500 Hz
 - RMS calculation: 1-10 Hz
 - Power analysis: Every 1-5 seconds
 
 *Pressure Sensors:*
+
 - Sampling rate: 1-10 Hz
 - Alert evaluation: Every 10-60 seconds
 - Filtering for pulsations if needed
 
 **Measurement Ranges:**
+
 - Select appropriate range for application
 - Avoid saturation (clipping)
 - Optimize for signal-to-noise ratio
@@ -467,18 +548,21 @@ Configure appropriate rates for each sensor type:
 ### Baseline Collection
 
 **Understanding Baselines:**
+
 - System needs 2-4 weeks to learn normal operation
 - Automatic process (no interaction required)
 - Alerts disabled during baseline period
 - Must include all operating modes
 
 **Monitoring Progress:**
+
 1. Navigate to Dashboard → Baseline Status
 2. View percentage complete for each sensor
 3. Green checkmarks indicate sufficient data
 4. Typical completion: 2-4 weeks
 
 **Accelerating Baseline:**
+
 - Operate equipment through all modes
 - Include startups and shutdowns
 - Cover different load conditions
@@ -503,6 +587,7 @@ Configure appropriate rates for each sensor type:
 **Notification Methods:**
 
 *Email:*
+
 1. Settings → Notifications → Email
 2. Enter SMTP server details:
    - Server: smtp.example.com
@@ -514,11 +599,13 @@ Configure appropriate rates for each sensor type:
 5. Test email delivery
 
 *Local Outputs:*
+
 1. Wire relay outputs to alarm devices
 2. Configure trigger conditions
 3. Test before relying on
 
 *CMMS Integration:*
+
 1. Settings → Integrations → CMMS
 2. Enter CMMS API endpoint
 3. Configure authentication
@@ -532,6 +619,7 @@ Configure appropriate rates for each sensor type:
 ### Self-Hosted Deployment
 
 **Server Requirements:**
+
 - Linux server (Ubuntu 20.04+ recommended)
 - 4 CPU cores minimum
 - 8 GB RAM minimum
@@ -563,6 +651,7 @@ docker-compose exec web python manage.py collectstatic
 ```
 
 **Access Platform:**
+
 - Admin interface: https://[SERVER_IP]/admin
 - API endpoint: https://[SERVER_IP]/api/
 - Configure DNS and SSL certificates for production
@@ -570,12 +659,14 @@ docker-compose exec web python manage.py collectstatic
 ### Managed Cloud Service
 
 **Sign Up:**
+
 1. Visit: https://cloud.esocore.com (if using managed service)
 2. Create account
 3. Select plan based on device count
 4. Enter payment information
 
 **Device Provisioning:**
+
 1. Navigate to Devices → Add Device
 2. Enter device serial number
 3. Generate API key
@@ -583,6 +674,7 @@ docker-compose exec web python manage.py collectstatic
 5. Device status shows "Pending"
 
 **Edge Device Configuration:**
+
 1. On Edge device web UI: Settings → Cloud
 2. Enter cloud platform URL
 3. Enter device API key
@@ -598,6 +690,7 @@ docker-compose exec web python manage.py collectstatic
 ### Modbus Integration
 
 **Modbus RTU (RS-485):**
+
 1. Connect Modbus devices to dedicated RS-485 port
 2. Configure in web UI:
    - Settings → Fieldbus → Modbus RTU
@@ -608,6 +701,7 @@ docker-compose exec web python manage.py collectstatic
 4. Verify data appears in dashboard
 
 **Modbus TCP:**
+
 1. Configure in web UI:
    - Settings → Fieldbus → Modbus TCP
    - Enable Modbus TCP server
@@ -628,11 +722,13 @@ docker-compose exec web python manage.py collectstatic
 ### REST API Integration
 
 **Authentication:**
+
 - API key authentication
 - Include in header: `X-API-Key: [your-key]`
 
 **Common Endpoints:**
-```
+
+```http
 GET /api/v1/devices/              # List devices
 GET /api/v1/sensors/              # List sensors
 GET /api/v1/telemetry/            # Get sensor data
@@ -641,6 +737,7 @@ GET /api/v1/health/               # System health
 ```
 
 **Example Integration:**
+
 ```python
 import requests
 
@@ -660,6 +757,7 @@ data = response.json()
 ### Installation Verification Checklist
 
 **Hardware:**
+
 - [ ] All Edge devices powered and online
 - [ ] All sensors discovered and responding
 - [ ] Network connectivity stable
@@ -667,6 +765,7 @@ data = response.json()
 - [ ] No error LEDs or messages
 
 **Configuration:**
+
 - [ ] Admin password changed from default
 - [ ] Device names and locations set
 - [ ] All sensors named descriptively
@@ -675,6 +774,7 @@ data = response.json()
 - [ ] Network settings correct (static IP if applicable)
 
 **Data Collection:**
+
 - [ ] Live data visible on dashboard
 - [ ] Sensor readings appear reasonable
 - [ ] Data logging to SD card verified
@@ -682,6 +782,7 @@ data = response.json()
 - [ ] No data gaps or errors
 
 **Alerts:**
+
 - [ ] Test email notifications working
 - [ ] CMMS integration tested (if configured)
 - [ ] Local alarm outputs tested (if used)
@@ -690,6 +791,7 @@ data = response.json()
 ### Functional Testing
 
 **Test Scenarios:**
+
 1. **Normal Operation:** Verify data collection during normal equipment operation
 2. **Network Loss:** Disconnect network, verify local operation and data buffering
 3. **Power Loss:** Simulate power loss, verify safe shutdown and data integrity
@@ -697,6 +799,7 @@ data = response.json()
 5. **Alert Testing:** Create alert condition, verify notification delivery
 
 **Performance Verification:**
+
 - Response time: <100ms for edge processing
 - Data accuracy: Compare to reference instruments
 - Alert latency: <1 second from detection to notification
@@ -711,24 +814,28 @@ data = response.json()
 Create documentation package including:
 
 **Equipment List:**
+
 - Edge device serial numbers and locations
 - Sensor serial numbers and locations
 - IP addresses (static or DHCP)
 - API keys and credentials (securely stored)
 
 **Wiring Diagrams:**
+
 - RS-485 bus topology
 - Power connections
 - Network connections
 - Integration connections
 
 **Configuration:**
+
 - Network settings
 - Sensor configurations
 - Alert thresholds
 - Integration settings
 
 **Contact Information:**
+
 - Technical support
 - Vendor contacts
 - Internal IT contacts
@@ -737,18 +844,21 @@ Create documentation package including:
 ### User Training
 
 **Operator Training:**
+
 - Accessing web interface
 - Viewing dashboard and data
 - Responding to alerts
 - Basic troubleshooting
 
 **Maintenance Training:**
+
 - System overview
 - Alert interpretation
 - Planned maintenance based on alerts
 - Advanced configuration
 
 **Administrator Training:**
+
 - User management
 - System configuration
 - Integration management
@@ -761,18 +871,21 @@ Create documentation package including:
 ### Routine Maintenance
 
 **Monthly:**
+
 - Review system health dashboard
 - Verify all sensors responding
 - Check SD card health
 - Review alert logs
 
 **Quarterly:**
+
 - Clean sensors and connections
 - Inspect cable conditions
 - Verify sensor mounting secure
 - Update firmware if available
 
 **Annually:**
+
 - Sensor calibration verification
 - Battery backup replacement (if applicable)
 - SD card replacement (preventive)
@@ -798,4 +911,3 @@ See [Quick Start Guide](/docs/getting-started/quick-start) for detailed troubles
 Comprehensive installation complete! Your industrial IoT monitoring system is now operational and protecting your critical equipment.
 
 [Quick Start Guide](/docs/getting-started/quick-start) | [Integration Guide](/docs/getting-started/integration-guide) | [API Documentation](/docs/api-specification)
-

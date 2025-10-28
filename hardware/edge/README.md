@@ -16,7 +16,8 @@
 - Backup: Three 2.7 V 10 F supercaps for ≥30 s safe shutdown
 - Protection: TVS on input and interfaces; ESD arrays on USB/GPIO/sensor bus
 - Interfaces:
-  - USB-C device/service with common-mode choke
+  - USB-C device/service with common-mode choke (firmware flashing and terminal communication only; not used for
+    normal operation or data collection)
   - Ethernet 10/100 (DP83825I) with MagJack; PoE PD (LTC4267) option
   - RS‑485 sensor bus (SN65HVD72), termination selectable
   - Fieldbus: Isolated Modbus RTU, PROFIBUS-compatible RS‑485 (DB‑9)
