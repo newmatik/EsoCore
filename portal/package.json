@@ -37,7 +37,7 @@
   "devDependencies": {
     "@iconify-json/lucide": "^1.2.90",
     "@nuxt/eslint-config": "^0.7.0",
-    "@types/node": "^22.9.0",
+    "@types/node": "^25.2.3",
     "eslint": "^9.0.0",
     "eslint-plugin-vue": "^9.29.0",
     "prettier": "^3.3.3",
