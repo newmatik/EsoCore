@@ -159,7 +159,7 @@ See detailed specs in [Hardware: Edge](/docs/esocore-edge).
 - **Connectivity**: Dual industrial Ethernet with physical network separation (preferred) or robust Wi-Fi module for reliable data transmission.
 - **Storage**: Industrial-grade microSD with wear leveling for 30+ days of local data buffering.
 - **Primary Power**: Dedicated 24 V DC with aggressive surge/ESD protection, input filtering, and brownout-safe behavior.
-- **Backup System**: Supercapacitor bank (30F) providing ≥30 seconds for safe shutdown during power outages.
+- **Backup System**: Supercapacitor bank (20 F, with optional second unit for ≥30 s runtime) providing ≥30 seconds for safe shutdown during power outages.
 - **Environmental**: IP54-IP65 enclosure, -20°C to +60°C operation, industrial EMC compliance.
 
 Detailed Specifications: See [Hardware: Edge](/docs/esocore-edge) for complete component specifications, compliance standards, and reference designs.

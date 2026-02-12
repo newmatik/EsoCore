@@ -246,10 +246,11 @@ docker run -p 8000:8000 EsoCore-server
 
 ```text
 server/
-├── sentinel_api/          # Main Django project
+├── sentinel_api/          # Main Django project (active; used by manage.py, wsgi, asgi)
 │   ├── settings.py
 │   ├── urls.py
 │   └── wsgi.py
+├── edgesentinel_api/      # Legacy; unused. All runtime config is in sentinel_api.
 ├── devices/                   # Device management app
 ├── assets/                    # Asset management app
 ├── telemetry/                 # Telemetry data app
@@ -271,4 +272,4 @@ server/
 
 ## License
 
-Copyright © 2025 Newmatik. All rights reserved. Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.
+Copyright © 2026 Newmatik. All rights reserved. Licensed under the Apache License, Version 2.0. See `website/content/license.md` for details.

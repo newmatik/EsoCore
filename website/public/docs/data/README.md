@@ -1,14 +1,5 @@
-# BOM data (generated from hardware)
+# Documentation data
 
-This folder contains CSV exports of the Bill of Materials used by the website.
-
-- Source of truth: `hardware/`
-- Destination: this folder `website/docs/data`
-- Files here are overwritten during sync. Do not edit these CSVs manually.
-
-Run the sync script to copy the latest BOMs from `hardware/`:
-
-```bash
-# From the repo root
-python3 tools/sync_bom_data.py --verbose
-```
+BOM (Bill of Materials) CSVs are **not** stored in this folder. They are synced from `hardware/` to `website/public/bom/` by the script
+`tools/sync_bom_data.py`. Run that script from the repo root after editing any BOM in `hardware/edge/`, `hardware/cables/`, or
+`hardware/sensors/*/`. See the repo root README or `.cursorrules` for the BOM workflow.

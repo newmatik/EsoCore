@@ -97,7 +97,8 @@ rationale and minimum setup.
 
 ## Data and Testing
 
-- **Data formats**: See the [Data Format Specification](/docs/data-format-specification) page for CSV/JSON schemas.
+- **Data formats**: See the [Data Format Specification](/docs/data-format-specification) page for JSON schemas and data structures (device data and
+  events). CSV is used for BOM and exports elsewhere.
 - **Tests**:
   - Firmware: on-target tests with assertions; host-side unit tests for libraries
   - Cloud: pytest for Python apps; Playwright for UI if applicable

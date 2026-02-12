@@ -92,12 +92,12 @@
 ## CAD Toolchain
 
 - Tool: Altium Designer
-- Project: `hardware/edge/v1.4.0/Altium/PCB/EsoCore_Edge.PcbDoc`
-- Schematics: `hardware/edge/v1.4.0/Altium/Schematics/*.SchDoc` (14 sheets)
-- Footprint library: `hardware/edge/v1.4.0/Altium/Footprint library/EsoCore.PcbLib`
+- Project: `hardware/edge/Altium/PCB/EsoCore_Edge.PcbDoc`
+- Schematics: `hardware/edge/Altium/Schematics/*.SchDoc` (14 sheets)
+- Footprint library: `hardware/edge/Altium/Footprint library/EsoCore.PcbLib`
 - Notes: Open the `.PcbDoc` in Altium Designer; edit schematics/layout in `.SchDoc`/`.PcbDoc`. Generate fabrication
   outputs via Altium Designer.
 
 ## Copyright and License
 
-Copyright © 2025 Newmatik. All rights reserved. Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.
+Copyright © 2026 Newmatik. All rights reserved. Licensed under the Apache License, Version 2.0. See `website/content/license.md` for details.

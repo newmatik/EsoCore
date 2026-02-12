@@ -11,8 +11,8 @@ The public website and docs live in `website/`. See `website/README.md` for loca
 ## Structure
 
 - `website/` – Public website (published folder)
-  - `assets/` – Shared styles and scripts used by the site and docs app
-  - `docs/` – Documentation content and shell
+  - `content/` – Documentation source (Markdown); served at `/docs/` on the site
+  - `public/` – Static assets including BOM CSVs
 - `server/` – Django REST API backend
   - Django + Django REST Framework application
   - Core data models and API endpoints
@@ -20,7 +20,7 @@ The public website and docs live in `website/`. See `website/README.md` for loca
   - User dashboard and device management interface
   - Real-time monitoring and alerting
 - `hardware/` – Hardware sources (see READMEs in subfolders)
-  - `core/`
+  - `edge/`
   - `sensors/`
     - `vibration sensor/`
     - `acoustic sensor/`
@@ -64,15 +64,15 @@ See `portal/README.md` for setup and development instructions.
 Notes on BOMs:
 
 - Canonical BOM CSVs live in each device folder under `hardware/` (e.g., `hardware/edge/`, `hardware/sensors/*/`, `hardware/cables/`).
-- The docs app reads CSVs from `website/docs/data/` for public rendering.
-- After editing BOMs in `hardware/…/`, copy them to `website/docs/data/` to update the site.
+- The website reads CSVs from `website/public/bom/` for public rendering.
+- After editing BOMs in `hardware/…/`, run `python3 tools/sync_bom_data.py` to update the site.
 
 Each folder under `hardware/` contains a `README.md` with more details.
 
 ## Documentation
 
-- **[Hardware: Edge](website/docs/esocore-edge.md)** - Core device specifications and connectivity
-- **[Hardware: Sensors](website/docs/esocore-sensors.md)** - Complete sensor module catalog and applications
+- **[Hardware: Edge](website/content/esocore-edge.md)** – Core device specifications and connectivity (also at `/docs/esocore-edge` on the site)
+- **[Hardware: Sensors](website/content/esocore-sensors.md)** – Complete sensor module catalog and applications (also at `/docs/esocore-sensors` on the site)
 
 ## Open source
 
@@ -88,4 +88,4 @@ The hardware requirements and BOM include options for industrial fieldbus protoc
 
 ## Legal
 
-Copyright © 2025 Newmatik. All rights reserved. Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.
+Copyright © 2026 Newmatik. All rights reserved. Licensed under the Apache License, Version 2.0. See `website/content/license.md` for details.

@@ -1,4 +1,4 @@
-# Markdownlint configuration for EsoCore project
+# Markdownlint configuration for EsoCore project (single source of truth; do not add .markdownlint.jsonc)
 default: true
 
 # Allow HTML in specific files that need it for rendering
