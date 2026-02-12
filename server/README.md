@@ -126,7 +126,7 @@ CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 
 ### Branding (Admin Title)
 
-Admin branding is configured in `sentinel_api/branding.py`.
+Admin branding is configured in `esocore_api/branding.py`.
 
 Defaults:
 
@@ -246,7 +246,7 @@ docker run -p 8000:8000 EsoCore-server
 
 ```text
 server/
-├── sentinel_api/          # Main Django project (active; used by manage.py, wsgi, asgi)
+├── esocore_api/          # Main Django project (active; used by manage.py, wsgi, asgi)
 │   ├── settings.py
 │   ├── urls.py
 │   └── wsgi.py

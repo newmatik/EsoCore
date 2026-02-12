@@ -28,7 +28,7 @@ The server code lives in the `server/` directory of the repository:
 
 ```
 server/
-├── sentinel_api/              # Django project configuration
+├── esocore_api/              # Django project configuration
 │   ├── settings.py            # Database, middleware, installed apps
 │   ├── urls.py                # Root URL routing
 │   ├── auth_views.py          # Login, logout, current user endpoints

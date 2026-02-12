@@ -1,5 +1,5 @@
 """
-URL configuration for sentinel_api project.
+URL configuration for esocore_api project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.2/topics/http/urls/
@@ -28,9 +28,9 @@ from rest_framework import routers
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from sentinel_api.auth_views import login_view, logout_view, me_view
-from sentinel_api.branding import ADMIN_TITLE
-from sentinel_api.dashboard_views import dashboard_summary
+from esocore_api.auth_views import login_view, logout_view, me_view
+from esocore_api.branding import ADMIN_TITLE
+from esocore_api.dashboard_views import dashboard_summary
 
 # API Router for management endpoints
 router = routers.DefaultRouter()
