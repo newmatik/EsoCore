@@ -1,21 +1,22 @@
 # Edge Intelligence & TinyML
 
-This document defines the edge intelligence capabilities, machine learning models, and algorithmic processing used by the EsoCore system for real-time
-anomaly detection and predictive maintenance.
+This document defines the edge intelligence capabilities, machine learning models, and algorithmic processing used
+by the EsoCore system for real-time anomaly detection and predictive maintenance.
 
 ---
 
 ## Why Edge Intelligence?
 
-Process data locally for faster response, reduced bandwidth, enhanced privacy, and reliable operation during connectivity outages. Critical for
-mission-critical and high-security environments.
+Process data locally for faster response, reduced bandwidth, enhanced privacy, and reliable operation during
+connectivity outages. Critical for mission-critical and high-security environments.
 
 ## Algorithmic Processing
 
 ### Traditional Algorithms
 
 - **Statistical Analysis**: Rolling averages, standard deviation, trend analysis for baseline establishment
-- **Signal Processing**: FFT for frequency domain analysis, bandpass filtering, peak detection
+- **Signal Processing**: FFT for frequency domain analysis, bandpass filtering, peak detection on 24-bit ADC data
+  (50 kSPS per channel from the ADS1274)
 - **Rule-Based Logic**: Threshold monitoring, rate-of-change detection, pattern matching
 - **Trend Analysis**: Drift detection, degradation curves, usage pattern recognition
 
@@ -100,21 +101,35 @@ Acoustic Pattern Recognition:
 
 ## Firmware Architecture
 
-### Edge Intelligence Task
+### Edge Intelligence in the Superloop
 
-The firmware includes a dedicated RTOS task for ML processing:
+The firmware uses a bare-metal cooperative superloop on the STM32H747 Cortex-M7 at 480 MHz. The TinyML engine runs
+as a polled module within the main loop alongside all other subsystems:
 
 - **TinyML inference** for vibration/acoustic anomaly detection
 - **Pattern recognition** algorithms
 - **Predictive algorithms** for maintenance scheduling
-- **Real-time processing** with <100ms latency
+- **Real-time processing** with <100ms inference latency
 
-### Integration with Other Tasks
+### Data Sources
 
-- **Sensor Task**: Provides preprocessed data to ML models
-- **Event Logger**: Records ML predictions and confidence scores
-- **Sync Task**: Prioritizes anomaly data for cloud transmission
-- **Safety I/O**: ML can trigger safety relay outputs for detected anomalies; safety input events feed into ML models
+The analog input subsystem provides high-fidelity data for ML processing. Each of the 4 analog channels captures
+24-bit samples at up to 50 kSPS via DMA double-buffered transfer from the ADS1274 simultaneous ADC. The signal
+chain includes:
+
+- **IEPE/DC mode selection** (TMUX1101 analog switch) for accelerometers vs. voltage sensors
+- **Programmable gain** (PGA280) from 1x to 128x for optimal dynamic range
+- **4-pole Sallen-Key anti-aliasing filter** at 15 kHz cutoff
+- **RMS and peak calculation** computed per acquisition block in firmware
+
+### Integration with Other Modules
+
+- **Analog Input**: Provides continuous DMA-captured 24-bit data to ML models with RMS/peak preprocessing
+- **Event Logger**: Records ML predictions, confidence scores, and anomaly classifications
+- **Ethernet Manager**: Prioritizes anomaly data on Port B (IT network) for cloud transmission
+- **Safety I/O**: ML can trigger safety relay or SSR outputs for detected anomalies; safety input events feed
+  into ML models
+- **Sensor Bus**: External RS-485 sensor modules provide additional data streams for correlation analysis
 
 ---
 
@@ -174,10 +189,10 @@ The firmware includes a dedicated RTOS task for ML processing:
 
 ### Real-Time Constraints
 
-- **Inference latency**: <100ms for safety-critical decisions
-- **Sampling rate**: Support up to 3kHz for vibration analysis
+- **Inference latency**: <100ms for safety-critical decisions on the 480 MHz Cortex-M7
+- **Sampling rate**: Up to 50 kSPS per channel (24-bit, 4 channels simultaneous via ADS1274)
 - **Response time**: <1 second for anomaly detection
-- **Memory efficiency**: <32KB RAM usage during inference
+- **Memory efficiency**: <32KB RAM usage during inference; DMA buffers placed in dedicated SRAM regions
 
 ### Accuracy Targets
 
