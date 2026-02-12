@@ -712,4 +712,4 @@ Expand based on pilot success:
 Ensure critical infrastructure reliability with comprehensive pump and compressor monitoring. Prevent catastrophic failures, optimize energy
 consumption, and maximize equipment availability.
 
-[Schedule consultation](#) | [Request pilot program](#) | [View technical specs](/docs/esocore-edge)
+[View technical specs](/docs/esocore-edge)

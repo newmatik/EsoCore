@@ -33,10 +33,14 @@ const icons = {
   start: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>',
   faq: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>',
   smallDoc: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
+  firmware: '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>',
+  portal: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>',
+  server: '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><path d="M6 6h.01"/><path d="M6 18h.01"/></svg>',
 }
 
 // Shared docs configuration
 export const docsConfig = [
+  // -- Product Overview --
   {
     slug: '',
     title: 'Introduction',
@@ -57,55 +61,26 @@ export const docsConfig = [
       { slug: 'getting-started/integration-guide', title: 'Integration Guide', icon: icons.smallDoc },
     ],
   },
+
+  // -- Edge Hardware --
   {
-    key: 'solutions',
-    title: 'Solutions',
-    icon: icons.solutions,
-    children: [
-      { slug: 'solutions/predictive-maintenance', title: 'Predictive Maintenance', icon: icons.smallDoc },
-      { slug: 'solutions/equipment-downtime-prevention', title: 'Downtime Prevention', icon: icons.smallDoc },
-    ],
-  },
-  {
-    key: 'industries',
-    title: 'Industries',
-    icon: icons.industry,
-    children: [
-      { slug: 'industries/cnc-machine-monitoring', title: 'CNC Machine Monitoring', icon: icons.smallDoc },
-      { slug: 'industries/industrial-door-monitoring', title: 'Industrial Door Monitoring', icon: icons.smallDoc },
-      { slug: 'industries/injection-molding-monitoring', title: 'Injection Molding', icon: icons.smallDoc },
-      { slug: 'industries/conveyor-monitoring', title: 'Conveyor Systems', icon: icons.smallDoc },
-      { slug: 'industries/pump-compressor-monitoring', title: 'Pumps & Compressors', icon: icons.smallDoc },
-    ],
-  },
-  {
-    key: 'comparisons',
-    title: 'Comparisons',
-    icon: icons.compare,
-    children: [
-      { slug: 'comparisons/open-source-vs-proprietary', title: 'Open Source vs Proprietary', icon: icons.smallDoc },
-      { slug: 'comparisons/edge-ai-vs-cloud-monitoring', title: 'Edge AI vs Cloud', icon: icons.smallDoc },
-    ],
-  },
-  {
+    key: 'edge-hardware',
     slug: 'esocore-edge',
-    title: 'Hardware: Edge',
+    title: 'Edge Hardware',
     icon: icons.hardware,
+    children: [
+      { slug: 'esocore-edge', title: 'Overview', icon: icons.overview },
+      { slug: 'ethernet', title: 'Dual Ethernet Ports', icon: icons.smallDoc },
+      { slug: 'edge-analog-inputs', title: 'Analog Input Specification', icon: icons.smallDoc },
+      { slug: 'fieldbus', title: 'Industrial Fieldbus Protocols', icon: icons.smallDoc },
+    ],
   },
-  {
-    slug: 'ethernet',
-    title: 'Dual Ethernet Ports',
-    icon: icons.hardware,
-  },
-  {
-    slug: 'edge-analog-inputs',
-    title: 'Analog Input Specification',
-    icon: icons.hardware,
-  },
+
+  // -- Sensors --
   {
     key: 'sensors',
     slug: 'esocore-sensors',
-    title: 'Hardware: Sensors',
+    title: 'Sensors',
     icon: icons.sensor,
     children: [
       { slug: 'esocore-sensors', title: 'Overview', icon: icons.overview },
@@ -120,51 +95,66 @@ export const docsConfig = [
       { slug: 'sensors/proximity-position-sensor', title: 'Proximity Position Sensor', icon: icons.sensorSmall },
     ],
   },
+
+  // -- Firmware --
   {
-    slug: 'edge-intelligence',
-    title: 'Edge Intelligence',
-    icon: icons.intelligence,
+    key: 'firmware',
+    slug: 'firmware-overview',
+    title: 'Firmware',
+    icon: icons.firmware,
+    children: [
+      { slug: 'firmware-overview', title: 'Overview', icon: icons.overview },
+      { slug: 'edge-intelligence', title: 'Edge Intelligence & TinyML', icon: icons.intelligence },
+      { slug: 'data-format-specification', title: 'Data Format Specification', icon: icons.database },
+    ],
   },
+
+  // -- Cloud Platform --
   {
-    slug: 'data-format-specification',
-    title: 'Data Format Specification',
-    icon: icons.database,
-  },
-  {
-    slug: 'api-specification',
-    title: 'API Specification',
-    icon: icons.api,
-  },
-  {
-    slug: 'cloud-infrastructure',
-    title: 'Cloud Infrastructure',
+    key: 'cloud-platform',
+    slug: 'backend-server',
+    title: 'Cloud Platform',
     icon: icons.cloud,
+    children: [
+      { slug: 'backend-server', title: 'Backend Server', icon: icons.server },
+      { slug: 'portal', title: 'Portal', icon: icons.portal },
+      { slug: 'api-specification', title: 'API Specification', icon: icons.api },
+      { slug: 'cloud-infrastructure', title: 'Cloud Infrastructure', icon: icons.smallDoc },
+    ],
   },
+
+  // -- Development --
   {
-    slug: 'testing-procedures',
-    title: 'Testing & Validation',
-    icon: icons.check,
-  },
-  {
-    slug: 'development-environment',
-    title: 'Development Environment',
+    key: 'development',
+    title: 'Development',
     icon: icons.terminal,
+    children: [
+      { slug: 'development-environment', title: 'Development Environment', icon: icons.smallDoc },
+      { slug: 'testing-procedures', title: 'Testing & Validation', icon: icons.check },
+    ],
   },
+
+  // -- Business & Market --
   {
-    slug: 'business-model-and-partnerships',
-    title: 'Business Model & Partnerships',
+    key: 'business',
+    title: 'Business & Market',
     icon: icons.business,
+    children: [
+      { slug: 'business-model-and-partnerships', title: 'Business Model & Partnerships', icon: icons.smallDoc },
+      { slug: 'competitor-analysis', title: 'Competitor Analysis', icon: icons.chart },
+      { slug: 'solutions/predictive-maintenance', title: 'Predictive Maintenance', icon: icons.solutions },
+      { slug: 'solutions/equipment-downtime-prevention', title: 'Downtime Prevention', icon: icons.solutions },
+      { slug: 'industries/cnc-machine-monitoring', title: 'CNC Machine Monitoring', icon: icons.industry },
+      { slug: 'industries/industrial-door-monitoring', title: 'Industrial Door Monitoring', icon: icons.industry },
+      { slug: 'industries/injection-molding-monitoring', title: 'Injection Molding', icon: icons.industry },
+      { slug: 'industries/conveyor-monitoring', title: 'Conveyor Systems', icon: icons.industry },
+      { slug: 'industries/pump-compressor-monitoring', title: 'Pumps & Compressors', icon: icons.industry },
+      { slug: 'comparisons/open-source-vs-proprietary', title: 'Open Source vs Proprietary', icon: icons.compare },
+      { slug: 'comparisons/edge-ai-vs-cloud-monitoring', title: 'Edge AI vs Cloud', icon: icons.compare },
+    ],
   },
-  {
-    slug: 'competitor-analysis',
-    title: 'Competitor Analysis',
-    icon: icons.chart,
-  },
-  {
-    slug: 'fieldbus',
-    title: 'Industrial Fieldbus Protocols',
-    icon: icons.terminal,
-  },
+
+  // -- Reference --
   {
     key: 'bom',
     slug: 'bom',
@@ -197,37 +187,58 @@ export const docsConfig = [
 // documentation pages to prevent navigation inconsistencies.
 export function isGroupExpanded(group, currentSlug) {
   if (!group.children) return false
-  
+
   // Use stable key-based matching for groups
+  if (group.key === 'edge-hardware') {
+    return currentSlug === 'esocore-edge'
+      || currentSlug === 'ethernet'
+      || currentSlug === 'edge-analog-inputs'
+      || currentSlug === 'fieldbus'
+  }
+
   if (group.key === 'sensors') {
     return currentSlug === 'esocore-sensors' || currentSlug.startsWith('sensors/')
   }
-  
+
+  if (group.key === 'firmware') {
+    return currentSlug === 'firmware-overview'
+      || currentSlug === 'edge-intelligence'
+      || currentSlug === 'data-format-specification'
+  }
+
+  if (group.key === 'cloud-platform') {
+    return currentSlug === 'backend-server'
+      || currentSlug === 'portal'
+      || currentSlug === 'api-specification'
+      || currentSlug === 'cloud-infrastructure'
+  }
+
+  if (group.key === 'development') {
+    return currentSlug === 'development-environment'
+      || currentSlug === 'testing-procedures'
+  }
+
+  if (group.key === 'business') {
+    return currentSlug === 'business-model-and-partnerships'
+      || currentSlug === 'competitor-analysis'
+      || currentSlug.startsWith('solutions/')
+      || currentSlug.startsWith('industries/')
+      || currentSlug.startsWith('comparisons/')
+  }
+
   if (group.key === 'bom') {
     return currentSlug === 'bom' || currentSlug.startsWith('bom/')
   }
-  
+
   if (group.key === 'getting-started') {
     return currentSlug.startsWith('getting-started/')
   }
-  
-  if (group.key === 'solutions') {
-    return currentSlug.startsWith('solutions/')
-  }
-  
-  if (group.key === 'industries') {
-    return currentSlug.startsWith('industries/')
-  }
-  
-  if (group.key === 'comparisons') {
-    return currentSlug.startsWith('comparisons/')
-  }
-  
+
   // Fallback to slug-based matching
   if (group.slug) {
     return currentSlug === group.slug || currentSlug.startsWith(group.slug + '/')
   }
-  
+
   return false
 }
 

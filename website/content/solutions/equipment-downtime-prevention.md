@@ -553,4 +553,4 @@ Track results and scale based on proven value:
 Stop reacting to equipment failures and start preventing them. EsoCore provides the early warning systems and analytics you need to transform your
 maintenance strategy and eliminate costly unplanned downtime.
 
-[Schedule a consultation](#) | [Start pilot program](#)
+[View documentation](/docs)

@@ -524,4 +524,4 @@ Scale to additional machines based on pilot results:
 Maximize CNC machine uptime and performance with comprehensive condition monitoring. Detect issues early, optimize maintenance schedules, and
 eliminate costly unplanned downtime.
 
-[Schedule consultation](#) | [Request pilot program](#) | [View technical specs](/docs/esocore-edge)
+[View technical specs](/docs/esocore-edge)

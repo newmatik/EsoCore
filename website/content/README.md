@@ -26,10 +26,11 @@ existing factory systems, making it universally deployable across diverse manufa
 ### Development Model
 
 EsoCore is developed and maintained by Newmatik through a collaborative partnership model with strategic industrial partners. The entire
-platform—including hardware designs, firmware, and cloud components—is fully open source under the Apache 2.0 License, ensuring maximum flexibility
-and preventing vendor lock-in. Partners can develop proprietary market-specific customizations while benefiting from shared platform development costs
-and continuous innovation. This unique approach combines open-source principles with commercial viability, creating a sustainable ecosystem where
-partners retain full independence and can fork the project if needed.
+platform—including hardware designs, firmware, and cloud components—is fully open source under the Apache 2.0 License,
+ensuring maximum flexibility and preventing vendor lock-in. Partners can develop proprietary market-specific
+customizations while benefiting from shared platform development costs and continuous innovation. This unique approach
+combines open-source principles with commercial viability, creating a sustainable ecosystem where partners retain full
+independence and can fork the project if needed.
 
 ### Competitive Position
 
@@ -159,7 +160,8 @@ See detailed specs in [Hardware: Edge](/docs/esocore-edge).
 - **Connectivity**: Dual industrial Ethernet with physical network separation (preferred) or robust Wi-Fi module for reliable data transmission.
 - **Storage**: Industrial-grade microSD with wear leveling for 30+ days of local data buffering.
 - **Primary Power**: Dedicated 24 V DC with aggressive surge/ESD protection, input filtering, and brownout-safe behavior.
-- **Backup System**: Supercapacitor bank (20 F, with optional second unit for ≥30 s runtime) providing ≥30 seconds for safe shutdown during power outages.
+- **Backup System**: Supercapacitor bank (20 F, with optional second unit for ≥30 s runtime) providing ≥30 seconds for
+  safe shutdown during power outages.
 - **Environmental**: IP54-IP65 enclosure, -20°C to +60°C operation, industrial EMC compliance.
 
 Detailed Specifications: See [Hardware: Edge](/docs/esocore-edge) for complete component specifications, compliance standards, and reference designs.
@@ -178,79 +180,35 @@ designs.
 
 ---
 
-## Firmware architecture
+## Firmware
 
-We standardize on Zephyr RTOS for the edge device firmware. The following task model maps well to STM32 and remains portable across supported Zephyr
-boards.
+The firmware is written in C (C11) and targets two STM32 families: STM32H7 for the Edge device and STM32G0 for sensor
+modules. It is built with ARM GCC and GNU Make.
 
-### RTOS & Services
+Key firmware responsibilities include sensor sampling, safety I/O monitoring, local data storage (JSON with zstd
+compression on microSD), on-device TinyML inference for anomaly detection, cloud synchronization over REST, and OTA
+firmware updates.
 
-- **Sensor Task**: sampling scheduler (configurable rates; e.g., temp/RH 1 Hz, stator temp 1 Hz, vibration bursts at 1–3 kHz for 1–5 s windows,
-  acoustics windows in audible/ultrasound bands, current 100–500 Hz).
-- **Safety I/O Task**: manage 6 dual-channel safety inputs (cross-monitoring, fault detection) and safety relay/SSR outputs; handle interlocking
-  logic based on safety input events or ML anomaly detection.
-- **Feature Task**: on‑device statistics (RMS vibration, kurtosis, crest factor, bandpower; avg/max torque/current; cycle detection).
-- **Edge Intelligence Task**: TinyML inference for vibration/acoustic anomaly detection, pattern recognition, predictive algorithms.
-- **Power Monitor Task**: continuous voltage/current monitoring, brownout detection, supercap charge management.
-- **Logwriter Task**: append to SD (atomic, CRC), rotate files by size/time.
-- **Event Logger Task**: capture system events (connectivity, power, errors, safety) with timestamps and context.
-- **Safe Shutdown Task**: triggered by power loss; emergency data flush, graceful peripheral shutdown, final event log.
-- **Sync Task**: queue → batch → compress → REST upload with backoff.
-- **Comms Task**: TLS sockets (mbedTLS/wolfSSL), NTP, DHCP, captive portal for provisioning.
-- **OTA Task**: download, verify (Ed25519 or ECDSA), A/B swap, rollback.
-- **Watchdog & Health**: feed WDT, record resets, SD health, sensor self‑tests, supercap health monitoring.
-
-### Data Storage & Event Logging
-
-- **Local Storage**: JSON format with zstandard compression for human-readable, audit-friendly data storage on industrial SD cards. Power-safe writes
-  ensure zero data loss during outages.
-- **Event Logging**: Comprehensive system event capture including connectivity, power, safety, and security events with automated workflow triggers.
-- **Data Integrity**: CRC32 checksums per record, SHA-256 per file, and atomic operations ensure 100% data reliability during power loss events.
-
-Detailed Specifications: See [Data Format Specification](/docs/data-format-specification) for complete JSON schemas, event types, file structure
-details.
-
-### Edge Intelligence & AI
-
-- **AI-Powered Analytics**: On-device TinyML models for vibration and acoustic anomaly detection using lightweight neural networks (<16KB) optimized
-  for STM32 processors.
-- **Real-Time Processing**: <1 second anomaly detection with 90% reduction in data transmission through intelligent filtering and priority queuing.
-- **Privacy & Reliability**: Sensitive data never leaves the device, ensuring GDPR/HIPAA compliance and continued operation during connectivity
-  outages.
-- **Continuous Learning**: OTA model updates with federated learning for fleet-wide intelligence improvement without compromising data privacy.
-
-Detailed Specifications: See [Edge Intelligence](/docs/edge-intelligence) for complete TinyML model specifications, training pipelines, and
-performance benchmarks.
-
-### Cloud Synchronization
-
-- **Reliable Upload**: Compressed JSON batches with idempotency keys, exponential backoff, and priority queuing ensure zero data loss during network
-  outages.
-- **Security**: TLS encryption with device-specific API keys, HMAC authentication, and OTA key rotation for enterprise-grade security.
-- **Offline Resilience**: 30+ day local buffering with automatic resume from last sync point when connectivity returns.
-
-Detailed Specifications: See [Cloud Infrastructure](/docs/cloud-infrastructure) and [API Specification](/docs/api-specification) for complete REST API
-documentation, authentication methods, and sync protocols.
+See [Firmware](/docs/firmware-overview) for the complete architecture, code structure, build system, and toolchain setup
+instructions.
 
 ---
 
 ## Cloud Platform
 
-### Technology Stack
+The cloud platform consists of two applications:
 
-**Django REST Framework Server + Nuxt.js Portal**: Scalable backend with REST APIs, role-based access control, workflow automation, and modern
-responsive frontend with real-time dashboard capabilities. Alternative platforms can be substituted based on customer requirements.
+- **[Backend Server](/docs/backend-server)**: A Django REST Framework application (Python) that handles device
+  registration, telemetry ingestion, event processing, alerting, and exposes REST APIs. Supports PostgreSQL in
+  production with auto-generated OpenAPI documentation.
+- **[Portal](/docs/portal)**: A Nuxt 3 web application (Vue.js / TypeScript) providing real-time dashboards, device
+  management, fleet monitoring, and alerting interfaces. Built with Nuxt UI and Tailwind CSS.
 
-### Edge Features
+The server authenticates devices via API keys and users via session-based auth. The portal communicates with the server
+over REST APIs.
 
-- **Device Management**: Centralized device registry with provisioning, configuration, and OTA firmware management across the entire fleet.
-- **Data Analytics**: Time-series data storage with real-time dashboards showing device health, usage patterns, and predictive maintenance insights.
-- **Event Automation**: Intelligent workflow engine that automatically creates maintenance tickets, sends alerts, and escalates issues based on
-  configurable rules.
-- **Access Control**: Role-based access ensuring customers see only their devices while providing administrative oversight capabilities.
-
-Detailed Specifications: See [API Specification](/docs/api-specification) for complete platform architecture, database design, and integration
-details.
+See also: [API Specification](/docs/api-specification) and
+[Cloud Infrastructure](/docs/cloud-infrastructure) for deployment details.
 
 ---
 
@@ -302,32 +260,38 @@ Detailed Procedures: See [Testing Procedures](/docs/testing-procedures) for comp
 
 ## Technical Documentation
 
-This page provides the business case and system overview. Detailed technical specifications are organized in separate documents:
+This page provides the business case and system overview. The documentation is organized into the following sections,
+accessible from the sidebar:
 
-### Edge Specifications
+### Hardware
 
-- **[Hardware: Edge](/docs/esocore-edge)** - Edge device specifications and connectivity
-- **[Hardware: Sensors](/docs/esocore-sensors)** - Complete sensor module catalog and applications
-- **[Data Format Specification](/docs/data-format-specification)** - JSON schemas, event types, file structures, and data integrity protocols
-- **[API Specification](/docs/api-specification)** - REST API documentation, authentication, cloud platform architecture
-- **[Cloud Infrastructure](/docs/cloud-infrastructure)** - Django REST Framework Server and Nuxt.js Portal deployment options
-- **[Edge Intelligence](/docs/edge-intelligence)** - TinyML models, AI algorithms, training pipelines, and performance benchmarks
+- **[Edge Hardware](/docs/esocore-edge)** -- Edge device specifications, dual Ethernet, analog inputs, fieldbus
+  protocols
+- **[Sensors](/docs/esocore-sensors)** -- Complete sensor module catalog with individual datasheets
 
-### Development & Operations
+### Software
 
-- **[Business Model & Partnerships](/docs/business-model-and-partnerships)** - Development model, funding structure, open source philosophy, and
-  partnership framework
-- **[Competitor Analysis](/docs/competitor-analysis)** - Market landscape, competitive positioning, and strategic differentiation in industrial doors
-  and CNC machine monitoring
-- **[Testing Procedures](/docs/testing-procedures)** - Comprehensive testing protocols, validation procedures, and acceptance criteria
+- **[Firmware](/docs/firmware-overview)** -- C11 firmware architecture, toolchain, build system, and setup guide
+- **[Edge Intelligence](/docs/edge-intelligence)** -- TinyML models, anomaly detection, and training pipelines
+- **[Data Format Specification](/docs/data-format-specification)** -- JSON schemas, event types, and storage format
 
-### Quick Reference
+### Cloud Platform
 
-- **Business Case**: See sections 1-2 above
-- **Hardware Overview**: Section 3 (details in hardware docs)
-- **Software Architecture**: Section 4 (details in API and edge intelligence docs)
-- **Security & Management**: Section 6 (details in API docs)
-- **Quality Assurance**: Section 7 (details in testing docs)
+- **[Backend Server](/docs/backend-server)** -- Django REST API: architecture, endpoints, and local setup
+- **[Portal](/docs/portal)** -- Nuxt 3 frontend: dashboards, device management, and local setup
+- **[API Specification](/docs/api-specification)** -- Detailed REST API documentation and data models
+- **[Cloud Infrastructure](/docs/cloud-infrastructure)** -- Deployment architecture and hosting options
+
+### Development and Operations
+
+- **[Development Environment](/docs/development-environment)** -- Toolchain setup across all disciplines
+- **[Testing Procedures](/docs/testing-procedures)** -- Test protocols, validation procedures, and acceptance criteria
+
+### Business
+
+- **[Business Model & Partnerships](/docs/business-model-and-partnerships)** -- Partnership framework and open source
+  philosophy
+- **[Competitor Analysis](/docs/competitor-analysis)** -- Market landscape and competitive positioning
 
 ---
 

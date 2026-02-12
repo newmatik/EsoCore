@@ -553,4 +553,4 @@ begin detecting developing issues. You're now on the path to predictive maintena
 
 **Questions?** Join our community discussions or contact support@newmatik.com
 
-[View Full Documentation](/docs) | [Installation Guide](/docs/getting-started/installation-guide) | [Get Support](#)
+[View Full Documentation](/docs) | [Installation Guide](/docs/getting-started/installation-guide) | [Get Support](https://github.com/newmatik/EsoCore/issues)

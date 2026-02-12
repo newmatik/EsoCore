@@ -1,7 +1,8 @@
 # BOM: Pressure Sensor
 
-This page shows the current parts list and estimated pricing.
+The pressure sensor module bill of materials covers the MEMS piezoresistive pressure transducer,
+instrumentation amplifier, calibration EEPROM, RS-485 transceiver, and supporting passives.
+All components are rated for hydraulic and pneumatic monitoring in industrial environments. For
+specifications, see the [Pressure Sensor Module](/docs/sensors/pressure-sensor) documentation.
 
 <div id="bom-pressure-sensor">Loading BOM...</div>
-
-> Source: CSV under /public/bom/bom-pressure-sensor.csv

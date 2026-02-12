@@ -677,4 +677,4 @@ Expand based on pilot success:
 Optimize injection molding operations with comprehensive equipment and process monitoring. Reduce downtime, improve quality, and maximize production
 efficiency.
 
-[Schedule consultation](#) | [Request pilot program](#) | [View technical specs](/docs/esocore-edge)
+[View technical specs](/docs/esocore-edge)

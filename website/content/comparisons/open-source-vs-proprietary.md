@@ -499,4 +499,4 @@ compared to decades of vendor independence and cost savings.
 
 Break free from vendor lock-in. Choose EsoCore for complete control over your industrial monitoring infrastructure.
 
-[Explore EsoCore](/docs) | [Start pilot program](#)
+[Explore EsoCore](/docs)

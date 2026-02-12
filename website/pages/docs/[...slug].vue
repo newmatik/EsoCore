@@ -166,8 +166,54 @@ const pageTitle = computed(() => {
   return titleFromSlug(slug.value)
 })
 
+// Auto-generate meta description from first paragraph after the H1
+const pageDescription = computed(() => {
+  if (!content.value) return ''
+
+  // Remove the H1 line, then find the first non-empty paragraph (skip --- lines, empty lines)
+  const lines = content.value.split('\n')
+  let pastH1 = false
+  const paragraphLines = []
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (!pastH1) {
+      if (trimmed.startsWith('# ')) {
+        pastH1 = true
+      }
+      continue
+    }
+    // Skip horizontal rules and empty lines before content
+    if (trimmed === '---' || trimmed === '') {
+      if (paragraphLines.length > 0) break // end of first paragraph
+      continue
+    }
+    // Skip headings - we only want the first paragraph text
+    if (trimmed.startsWith('#')) break
+    paragraphLines.push(trimmed)
+  }
+
+  let desc = paragraphLines.join(' ')
+  // Strip markdown formatting (bold, links, code)
+  desc = desc.replace(/\*\*(.+?)\*\*/g, '$1')
+  desc = desc.replace(/\[(.+?)\]\(.+?\)/g, '$1')
+  desc = desc.replace(/`(.+?)`/g, '$1')
+  // Truncate to ~160 chars at word boundary
+  if (desc.length > 160) {
+    desc = desc.slice(0, 157).replace(/\s+\S*$/, '') + '...'
+  }
+  return desc
+})
+
 useHead({
   title: pageTitle,
+  meta: [
+    { name: 'description', content: pageDescription },
+    { property: 'og:title', content: pageTitle },
+    { property: 'og:description', content: pageDescription },
+    { name: 'twitter:title', content: pageTitle },
+    { name: 'twitter:description', content: pageDescription },
+  ],
 })
 
 // BOM mounts detection

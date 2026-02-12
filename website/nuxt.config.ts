@@ -1,7 +1,8 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { readdirSync } from 'fs'
-import { defineNuxtConfig } from 'nuxt/config'
 import { join } from 'path'
+
+const SITE_URL = 'https://www.esocore.com'
 
 // Automatically generate docs routes from content directory (recursive)
 // CRITICAL: This function generates both clean URLs and trailing slash variants
@@ -62,8 +63,11 @@ function generateDocRoutes() {
 }
 
 export default defineNuxtConfig({
-  compatibilityDate: '2024-04-03',
+  compatibilityDate: '2025-01-01',
   devtools: { enabled: true },
+
+  // Explicitly keep root-level directory structure (Nuxt 4 defaults to app/)
+  srcDir: '.',
 
   // CRITICAL: Build hooks to create GitHub Pages compatible file structure
   hooks: {
@@ -103,6 +107,18 @@ export default defineNuxtConfig({
       }
       
       processDirectory(docsDir, 'docs')
+
+      // Generate sitemap.xml from all prerendered routes
+      const routes = generateDocRoutes()
+      const today = new Date().toISOString().split('T')[0]
+      const sitemapEntries = routes.map(route => {
+        const priority = route === '/' ? '1.0' : route === '/docs' ? '0.8' : '0.6'
+        const changefreq = route === '/' ? 'weekly' : 'monthly'
+        return `  <url>\n    <loc>${SITE_URL}${route}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`
+      })
+      const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapEntries.join('\n')}\n</urlset>\n`
+      fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), sitemap)
+      console.log(`✓ Generated sitemap.xml with ${routes.length} URLs`)
     }
   },
 
@@ -155,10 +171,13 @@ export default defineNuxtConfig({
           content: 'Edge-native intelligence, observability and control.',
         },
         { property: 'og:type', content: 'website' },
+        { property: 'og:site_name', content: 'EsoCore' },
+        { property: 'og:image', content: `${SITE_URL}/og-image.png` },
+        { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:image', content: `${SITE_URL}/og-image.png` },
       ],
       link: [
         { rel: 'icon', href: '/icon.svg', type: 'image/svg+xml' },
-        { rel: 'icon', href: '/icon.png', type: 'image/png' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         {

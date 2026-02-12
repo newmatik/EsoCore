@@ -515,4 +515,4 @@ Expand based on pilot success:
 Ensure industrial door reliability with comprehensive monitoring. Detect issues early, optimize maintenance schedules, and
 eliminate costly unexpected failures.
 
-[Schedule consultation](#) | [Request pilot program](#) | [View Edge specifications](/docs/esocore-edge)
+[View Edge specifications](/docs/esocore-edge)

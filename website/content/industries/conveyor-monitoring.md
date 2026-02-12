@@ -602,4 +602,4 @@ Expand based on pilot success:
 Ensure continuous material flow with comprehensive conveyor monitoring. Detect issues early, optimize throughput, and prevent costly production
 disruptions.
 
-[Schedule consultation](#) | [Request pilot program](#) | [View technical specs](/docs/esocore-edge)
+[View technical specs](/docs/esocore-edge)

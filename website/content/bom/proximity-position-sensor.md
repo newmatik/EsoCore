@@ -1,7 +1,9 @@
 # BOM: Proximity Position Sensor
 
-This page shows the current parts list and estimated pricing.
+The proximity and position sensor module bill of materials covers the inductive sensing coil,
+LC oscillator front-end, detection threshold comparator, RS-485 transceiver, and supporting
+passives. Components are rated for reliable non-contact position and proximity detection in
+industrial machinery. For specifications, see the
+[Proximity Position Sensor Module](/docs/sensors/proximity-position-sensor) documentation.
 
 <div id="bom-proximity-position-sensor">Loading BOM...</div>
-
-> Source: CSV under /public/bom/bom-proximity-position-sensor.csv

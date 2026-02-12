@@ -581,4 +581,4 @@ This hybrid architecture, implemented by EsoCore, provides optimal balance of ca
 
 Empower your industrial operations with edge AI. Deploy EsoCore for real-time equipment monitoring without cloud dependency.
 
-[Explore EsoCore](/docs) | [View Edge AI Architecture](/docs/edge-intelligence) | [Start pilot program](#)
+[Explore EsoCore](/docs) | [View Edge AI Architecture](/docs/edge-intelligence)

@@ -430,4 +430,4 @@ Track results and expand monitoring based on proven ROI:
 Transform your maintenance strategy from reactive to predictive with EsoCore. Start with a pilot program on your most critical equipment and
 experience the benefits of data-driven maintenance decision making.
 
-[Contact us for pilot program details](#) | [View technical documentation](/docs)
+[View technical documentation](/docs)

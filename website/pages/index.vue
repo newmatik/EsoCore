@@ -27,13 +27,14 @@
           </div>
         </div>
         <div class="hero-art" aria-hidden="true">
-          <img ref="heroImage" src="/pcb.png" alt="" />
+          <img ref="heroImage" src="/pcb.png" alt="EsoCore Edge industrial IoT circuit board for predictive maintenance" />
         </div>
       </div>
     </section>
 
     <section class="features">
       <div class="container">
+        <h2 class="sr-only">Key Features</h2>
         <div class="features-grid">
           <div class="panel feature">
             <div class="kicker">Edge-first</div>
@@ -53,7 +54,7 @@
           <div class="panel feature">
             <div class="kicker">Modular sensors</div>
             <h3>RS‑485 digital sensor bus</h3>
-            <p>Plug‑and‑play sensor modules enable fast integration of new or sensors.</p>
+            <p>Plug‑and‑play sensor modules enable fast integration of new or existing sensors.</p>
           </div>
           <div class="panel feature">
             <div class="kicker">Modern Development Framework</div>
