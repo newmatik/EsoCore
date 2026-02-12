@@ -70,7 +70,7 @@ jobs:
           ls -la .output/public/CNAME || echo "CNAME file not found in output"
           
       - name: Upload static site
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: website/.output/public
   deploy:
