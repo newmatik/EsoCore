@@ -1,91 +1,137 @@
-# EsoCore – Monorepo (Docs, Hardware, Firmware, Software)
+# EsoCore
 
 [![Sponsor](https://img.shields.io/badge/Sponsor-Newmatik-blue?style=for-the-badge&logo=github-sponsors)](https://www.newmatik.com)
 
-This repository contains the public documentation website and the source for hardware, firmware, and supporting software for EsoCore.
+EsoCore (Edge Sensor Observation, Control, Operations, Reliability Engine) is an open-source industrial IoT platform
+for monitoring factory machinery and equipment. It spans the full stack from PCB hardware and embedded firmware to a
+Django REST API backend and a Nuxt.js user portal.
 
-## Website
+## Repository Structure
 
-The public website and docs live in `website/`. See `website/README.md` for local development and deployment instructions.
+```text
+esocore/
+  server/       Django REST API backend
+  portal/       Nuxt.js user portal (dashboard, devices, alerts)
+  website/      Public documentation site (static Nuxt.js, GitHub Pages)
+  firmware/     Embedded C firmware for Edge (STM32H7) and sensors (STM32G0)
+  hardware/     PCB designs (Altium), BOMs, Gerber, STEP, schematics
+  tools/        Utility scripts (BOM sync, STEP linter)
+  assets/       Shared icons and images
+```
 
-## Structure
+## Tech Stack
 
-- `website/` – Public website (published folder)
-  - `content/` – Documentation source (Markdown); served at `/docs/` on the site
-  - `public/` – Static assets including BOM CSVs
-- `server/` – Django REST API backend
-  - Django + Django REST Framework application
-  - Core data models and API endpoints
-- `portal/` – Nuxt.js frontend application
-  - User dashboard and device management interface
-  - Real-time monitoring and alerting
-- `hardware/` – Hardware sources (see READMEs in subfolders)
-  - `edge/`
-  - `sensors/`
-    - `vibration sensor/`
-    - `acoustic sensor/`
-    - `current sensor/`
-    - `air quality sensor/`
-    - `light sensor/`
-    - `oil quality sensor/`
-    - `pressure sensor/`
-    - `temperature spot sensor/`
-    - `proximity position sensor/`
-  - `cables/`
-  - CAD files live under each device's `altium/` folder; open the `.PcbDoc` projects with Altium Designer.
-- `firmware/` – Device and board-support firmware
-  - `stm32/`, `common/`, etc.
-- `tools/` – Utility scripts (e.g., sync, build, release)
+| Layer | Technology |
+|-------|------------|
+| Backend | Python 3.11+, Django 5, Django REST Framework, Poetry |
+| Portal | TypeScript, Nuxt 4 (Vue 3), Nuxt UI, Tailwind CSS 4, Pinia, Chart.js |
+| Website | TypeScript, Nuxt 4 (Vue 3), static generation, GitHub Pages |
+| Firmware | C (C11), STM32H7 / STM32G0, ARM GCC, GNU Make |
+| Hardware | Altium Designer, 4-layer FR4 PCBs |
 
-## Backend (Django REST API)
+## Prerequisites
 
-The server backend is built with Django and Django REST Framework, providing:
+- **Python 3.11+** and [Poetry](https://python-poetry.org/) for the server
+- **Node 22+** and [pnpm](https://pnpm.io/) for the portal and website
+- **ARM GCC** (`arm-none-eabi-gcc`) and **GNU Make** for the firmware
 
-- RESTful API endpoints for device telemetry ingestion
-- Device management and provisioning
-- User authentication and authorization
-- Real-time event processing and alerting
-- Data storage with SQLite (dev) / PostgreSQL (prod)
+## Getting Started
 
-See `server/README.md` for setup and development instructions.
+### Server (Django REST API)
 
-## Frontend (Nuxt.js Portal)
+```bash
+cd server
+poetry install
+poetry run python manage.py migrate
+poetry run python manage.py createsuperuser
+poetry run python manage.py runserver
+```
 
-The user portal is built with Nuxt.js, providing:
+The API is served at `http://localhost:8000/api/` with Swagger docs at `http://localhost:8000/api/docs/`.
 
-- Device dashboard and monitoring
-- Real-time telemetry visualization
-- Alert management and notifications
-- User management and role-based access
-- Responsive web interface
+See `server/README.md` for full setup, authentication, and deployment details.
 
-See `portal/README.md` for setup and development instructions.
+### Portal (Nuxt.js)
 
-Notes on BOMs:
+```bash
+cd portal
+pnpm install
+pnpm run dev
+```
 
-- Canonical BOM CSVs live in each device folder under `hardware/` (e.g., `hardware/edge/`, `hardware/sensors/*/`, `hardware/cables/`).
-- The website reads CSVs from `website/public/bom/` for public rendering.
-- After editing BOMs in `hardware/…/`, run `python3 tools/sync_bom_data.py` to update the site.
+The portal runs at `http://localhost:3000`.
 
-Each folder under `hardware/` contains a `README.md` with more details.
+See `portal/README.md` for configuration and branding details.
 
-## Documentation
+### Website (Documentation)
 
-- **[Hardware: Edge](website/content/esocore-edge.md)** – Core device specifications and connectivity (also at `/docs/esocore-edge` on the site)
-- **[Hardware: Sensors](website/content/esocore-sensors.md)** – Complete sensor module catalog and applications (also at `/docs/esocore-sensors` on the site)
+```bash
+cd website
+pnpm install
+pnpm run dev
+```
 
-## Open source
+To generate the static site for production:
 
-Website source: [github.com/newmatik/esocore](https://github.com/newmatik/esocore)
+```bash
+pnpm run generate
+```
+
+See `website/README.md` for deployment instructions.
+
+### Firmware
+
+```bash
+cd firmware
+make all          # Build Edge + all sensors
+make edge         # Build Edge only
+make vibration    # Build a single sensor target
+make help         # List all available targets
+```
+
+Requires the ARM GCC toolchain. See `firmware/README.md` for architecture and protocol details.
+
+## Hardware
+
+PCB designs, schematics, and BOMs are organized under `hardware/`:
+
+- `hardware/edge/` -- Edge device (STM32H747, dual Ethernet, RS-485, WiFi, IEPE inputs, safety I/O)
+- `hardware/sensors/` -- RS-485 sensor modules
+  - vibration, acoustic, current, air quality, light, oil quality, pressure, temperature spot, proximity position
+- `hardware/cables/` -- Cable assemblies
+
+CAD files are in each device's `altium/` folder (open the `.PcbDoc` projects with Altium Designer).
+See `hardware/README.md` and individual sensor READMEs for specifications.
+
+### BOM Management
+
+Canonical BOM CSVs live in each device folder under `hardware/`. The website reads CSVs from
+`website/public/bom/` for public rendering. After editing any BOM in `hardware/`, run:
+
+```bash
+python3 tools/sync_bom_data.py
+```
 
 ## Protocols
 
-The hardware requirements and BOM include options for industrial fieldbus protocols:
+The Edge device supports industrial fieldbus protocols:
 
-- Modbus RTU (RS‑485, isolated) and Modbus TCP (Ethernet)
-- PROFIBUS DP (DB‑9, switchable termination)
+- Modbus RTU (RS-485, isolated) and Modbus TCP (Ethernet)
+- PROFIBUS DP (DB-9, switchable termination)
 - PROFINET Device (over Ethernet)
+
+## Documentation
+
+- [Hardware: Edge](website/content/esocore-edge.md) -- Core device specifications and connectivity
+- [Hardware: Sensors](website/content/esocore-sensors.md) -- Sensor module catalog and applications
+- [Installation Guide](website/content/getting-started/installation-guide.md) -- Full setup walkthrough
+- Full docs are published at [www.esocore.com](https://www.esocore.com)
+
+## Open Source
+
+Source code: [github.com/newmatik/esocore](https://github.com/newmatik/esocore)
 
 ## Legal
 
-Copyright © 2026 Newmatik. All rights reserved. Licensed under the Apache License, Version 2.0. See `website/content/license.md` for details.
+Copyright 2026 Newmatik. All rights reserved.
+Licensed under the Apache License, Version 2.0. See `website/content/license.md` for details.
