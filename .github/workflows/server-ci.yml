@@ -1,0 +1,72 @@
+name: Server CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "server/**"
+      - ".github/workflows/server-ci.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "server/**"
+      - ".github/workflows/server-ci.yml"
+
+defaults:
+  run:
+    working-directory: server
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Poetry
+        run: pipx install poetry
+        working-directory: .
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "poetry"
+          cache-dependency-path: server/poetry.lock
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Ruff check
+        run: poetry run ruff check .
+
+      - name: Black check
+        run: poetry run black --check .
+
+      - name: isort check
+        run: poetry run isort --check-only .
+
+  test:
+    runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: test-secret-key-for-ci
+      DEBUG: "True"
+      ALLOWED_HOSTS: localhost,127.0.0.1
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Poetry
+        run: pipx install poetry
+        working-directory: .
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "poetry"
+          cache-dependency-path: server/poetry.lock
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Run tests
+        run: poetry run python manage.py test --verbosity=2

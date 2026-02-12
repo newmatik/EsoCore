@@ -1,3 +1,4 @@
+from django.db.models import Count
 from rest_framework import viewsets
 
 from .models import Asset, AssetCycle
@@ -9,7 +10,9 @@ class AssetViewSet(viewsets.ModelViewSet):
     serializer_class = AssetSerializer
 
     def get_queryset(self):
-        queryset = Asset.objects.select_related("site")
+        queryset = Asset.objects.select_related("site").annotate(
+            cycle_count=Count("cycles")
+        )
         if self.request.user.is_authenticated:
             # Filter assets by user's site access
             user_sites = self.request.user.sites.all()

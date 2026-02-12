@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import uuid
 from datetime import datetime
 
@@ -13,6 +14,34 @@ from rest_framework.response import Response
 from devices.models import Device, FirmwareBundle
 from events.models import SystemEvent
 from telemetry.models import TelemetryPacket, TelemetryPoint
+
+logger = logging.getLogger(__name__)
+
+
+def _authenticate_device(request):
+    """
+    Authenticate a device from request headers (X-Device-Id + X-Auth-Key / X-API-Key).
+
+    Returns (Device, None) on success or (None, Response) on failure.
+    """
+    device_id = request.META.get("HTTP_X_DEVICE_ID")
+    api_key = request.META.get("HTTP_X_AUTH_KEY") or request.META.get("HTTP_X_API_KEY")
+
+    if not device_id or not api_key:
+        return None, Response(
+            {"error": "Missing required authentication headers"},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    try:
+        device = Device.objects.get(id=device_id, api_key=api_key)
+    except Device.DoesNotExist:
+        return None, Response(
+            {"error": "Device not found or invalid API key"},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    return device, None
 
 
 @extend_schema(
@@ -68,28 +97,18 @@ def auth_handshake(request):
 @permission_classes([AllowAny])
 def telemetry_batch(request):
     """Batch telemetry data ingestion"""
+    device, err_response = _authenticate_device(request)
+    if err_response:
+        return err_response
+
     try:
-        device_id = request.META.get("HTTP_X_DEVICE_ID")
-        # Match spec header: X-Auth-Key (accept X-API-Key for backward-compat)
-        api_key = request.META.get("HTTP_X_AUTH_KEY") or request.META.get(
-            "HTTP_X_API_KEY"
-        )
         idempotency_key = request.META.get("HTTP_IDEMPOTENCY_KEY")
         content_sha256 = request.META.get("HTTP_CONTENT_SHA256")
 
-        if not all([device_id, idempotency_key]):
+        if not idempotency_key:
             return Response(
-                {"error": "Missing required headers"},
+                {"error": "Missing required Idempotency-Key header"},
                 status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # Verify device exists and API key matches
-        try:
-            device = Device.objects.get(id=device_id, api_key=api_key)
-        except Device.DoesNotExist:
-            return Response(
-                {"error": "Device not found or invalid API key"},
-                status=status.HTTP_401_UNAUTHORIZED,
             )
 
         # Check for duplicate upload
@@ -169,8 +188,12 @@ def telemetry_batch(request):
 
         return Response({"accepted": accepted, "duplicates": 0, "rejected": rejected})
 
-    except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception:
+        logger.exception("Unexpected error in telemetry_batch")
+        return Response(
+            {"error": "Internal server error"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
 
 @extend_schema(
@@ -190,35 +213,28 @@ def telemetry_batch(request):
 @permission_classes([AllowAny])
 def get_config(request):
     """Get device configuration"""
-    try:
-        device_id = request.META.get("HTTP_X_DEVICE_ID")
-        api_key = request.META.get("HTTP_X_AUTH_KEY") or request.META.get(
-            "HTTP_X_API_KEY"
-        )
+    device, err_response = _authenticate_device(request)
+    if err_response:
+        return err_response
 
-        device = Device.objects.get(id=device_id, api_key=api_key)
-
-        if hasattr(device, "configuration"):
-            config = device.configuration
-            return Response(
-                {
-                    "sampling_rates": config.sampling_rates,
-                    "thresholds": config.thresholds,
-                    "ntp_servers": config.ntp_servers,
-                    "endpoints": config.endpoints,
-                }
-            )
+    if hasattr(device, "configuration"):
+        config = device.configuration
         return Response(
             {
-                "sampling_rates": {},
-                "thresholds": {},
-                "ntp_servers": [],
-                "endpoints": {},
+                "sampling_rates": config.sampling_rates,
+                "thresholds": config.thresholds,
+                "ntp_servers": config.ntp_servers,
+                "endpoints": config.endpoints,
             }
         )
-
-    except Device.DoesNotExist:
-        return Response({"error": "Device not found"}, status=status.HTTP_404_NOT_FOUND)
+    return Response(
+        {
+            "sampling_rates": {},
+            "thresholds": {},
+            "ntp_servers": [],
+            "endpoints": {},
+        }
+    )
 
 
 @extend_schema(
@@ -240,43 +256,36 @@ def get_config(request):
 @permission_classes([AllowAny])
 def ota_check(request):
     """Check for OTA updates"""
-    try:
-        device_id = request.META.get("HTTP_X_DEVICE_ID")
-        api_key = request.META.get("HTTP_X_AUTH_KEY") or request.META.get(
-            "HTTP_X_API_KEY"
+    device, err_response = _authenticate_device(request)
+    if err_response:
+        return err_response
+
+    # Find latest firmware for device's model
+    firmware = (
+        FirmwareBundle.objects.filter(
+            supported_models__contains=[device.model],
+            channel__in=[
+                "stable",
+                device.firmware_version.split(".")[0],
+            ],  # Match major version
         )
+        .order_by("-created_at")
+        .first()
+    )
 
-        device = Device.objects.get(id=device_id, api_key=api_key)
-
-        # Find latest firmware for device's model
-        firmware = (
-            FirmwareBundle.objects.filter(
-                supported_models__contains=[device.model],
-                channel__in=[
-                    "stable",
-                    device.firmware_version.split(".")[0],
-                ],  # Match major version
-            )
-            .order_by("-created_at")
-            .first()
-        )
-
-        if firmware and firmware.version != device.firmware_version:
-            return Response(
-                {
-                    "available": True,
-                    "version": firmware.version,
-                    "hash": firmware.hash,
-                    "download_url": f"/api/firmware/{firmware.version}/download/",
-                    "release_notes": firmware.release_notes,
-                }
-            )
+    if firmware and firmware.version != device.firmware_version:
         return Response(
-            {"available": False, "current_version": device.firmware_version}
+            {
+                "available": True,
+                "version": firmware.version,
+                "hash": firmware.hash,
+                "download_url": f"/api/firmware/{firmware.version}/download/",
+                "release_notes": firmware.release_notes,
+            }
         )
-
-    except Device.DoesNotExist:
-        return Response({"error": "Device not found"}, status=status.HTTP_404_NOT_FOUND)
+    return Response(
+        {"available": False, "current_version": device.firmware_version}
+    )
 
 
 @extend_schema(
@@ -299,38 +308,31 @@ def ota_check(request):
 @permission_classes([AllowAny])
 def ota_report(request):
     """Report OTA update status"""
-    try:
-        device_id = request.META.get("HTTP_X_DEVICE_ID")
-        api_key = request.META.get("HTTP_X_AUTH_KEY") or request.META.get(
-            "HTTP_X_API_KEY"
-        )
+    device, err_response = _authenticate_device(request)
+    if err_response:
+        return err_response
 
-        device = Device.objects.get(id=device_id, api_key=api_key)
+    status_update = request.data.get("status")
+    version = request.data.get("version")
+    error_message = request.data.get("error", "")
 
-        status_update = request.data.get("status")
-        version = request.data.get("version")
-        error_message = request.data.get("error", "")
+    # Create system event for OTA status
+    event_type = f"ota_{status_update}"
+    severity = "low"
+    if status_update in ["failed", "rollback"]:
+        severity = "high"
 
-        # Create system event for OTA status
-        event_type = f"ota_{status_update}"
-        severity = "low"
-        if status_update in ["failed", "rollback"]:
-            severity = "high"
+    SystemEvent.objects.create(
+        device=device,
+        event_type=event_type,
+        severity=severity,
+        description=f"OTA update {status_update}: {version}",
+        metadata={"ota_version": version, "error": error_message},
+    )
 
-        SystemEvent.objects.create(
-            device=device,
-            event_type=event_type,
-            severity=severity,
-            description=f"OTA update {status_update}: {version}",
-            metadata={"ota_version": version, "error": error_message},
-        )
+    # Update device firmware version if successful
+    if status_update == "completed" and version:
+        device.firmware_version = version
+        device.save()
 
-        # Update device firmware version if successful
-        if status_update == "completed" and version:
-            device.firmware_version = version
-            device.save()
-
-        return Response({"status": "reported"})
-
-    except Device.DoesNotExist:
-        return Response({"error": "Device not found"}, status=status.HTTP_404_NOT_FOUND)
+    return Response({"status": "reported"})

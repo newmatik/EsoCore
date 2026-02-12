@@ -103,7 +103,11 @@ class AssetSerializerTests(TestCase):
         AssetCycle.objects.create(
             asset=self.asset, cycle_type="start/stop", start_time=now
         )
-        serializer = AssetSerializer(self.asset)
+        # Use annotated queryset (as the viewset does) for the count field
+        from django.db.models import Count
+
+        asset = Asset.objects.annotate(cycle_count=Count("cycles")).get(pk=self.asset.pk)
+        serializer = AssetSerializer(asset)
         self.assertEqual(serializer.data["cycle_count"], 1)
 
     def test_site_name_field(self):

@@ -112,7 +112,11 @@ export const useAuthStore = defineStore('auth', {
 
     _persistToken() {
       if (import.meta.client) {
-        const cookie = useCookie('auth_token', { maxAge: 60 * 60 * 24 * 7 })
+        const cookie = useCookie('auth_token', {
+          maxAge: 60 * 60 * 24 * 7,
+          secure: location.protocol === 'https:',
+          sameSite: 'strict',
+        })
         cookie.value = this.token
       }
     },

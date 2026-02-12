@@ -134,7 +134,18 @@
     </div>
 
     <div v-else class="max-w-7xl mx-auto px-4 py-16 text-center">
-      <p class="text-(--ui-text-muted)">Loading device details...</p>
+      <div v-if="errorMsg" class="max-w-md mx-auto">
+        <UCard>
+          <div class="flex items-center gap-3 text-red-600 dark:text-red-400">
+            <UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5 flex-shrink-0" />
+            <div>
+              <p class="text-sm font-medium">Failed to load device</p>
+              <p class="text-xs mt-0.5">{{ errorMsg }}</p>
+            </div>
+          </div>
+        </UCard>
+      </div>
+      <p v-else class="text-(--ui-text-muted)">Loading device details...</p>
     </div>
   </div>
 </template>
@@ -196,6 +207,7 @@ const deviceId = route.params.id as string
 const device = ref<DeviceDetail | null>(null)
 const telemetryPoints = ref<TelemetryPoint[]>([])
 const deviceEvents = ref<DeviceEvent[]>([])
+const errorMsg = ref('')
 
 function statusColor(status: string): string {
   const map: Record<string, string> = { active: 'success', inactive: 'neutral', maintenance: 'warning', offline: 'error' }
@@ -233,6 +245,7 @@ function formatThresholdKey(key: string) {
 }
 
 async function fetchDeviceData() {
+  errorMsg.value = ''
   try {
     const [deviceData, telemetryData, eventsData] = await Promise.all([
       api.get<DeviceDetail>(`/devices/devices/${deviceId}/`),
@@ -244,7 +257,9 @@ async function fetchDeviceData() {
     deviceEvents.value = eventsData.results || []
     useSeoMeta({ title: `${deviceData.serial_number} - EsoCore Portal` })
   }
-  catch (error) {
+  catch (error: unknown) {
+    const err = error as { data?: { detail?: string }; message?: string }
+    errorMsg.value = err?.data?.detail || err?.message || 'Failed to load device data'
     console.error('Failed to fetch device:', error)
   }
 }

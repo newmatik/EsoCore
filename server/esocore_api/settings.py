@@ -10,27 +10,38 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
-from django.templatetags.static import static
-
-from .branding import ADMIN_TITLE
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables from .env file
+load_dotenv(BASE_DIR / ".env")
+
+from django.templatetags.static import static  # noqa: E402
+
+from .branding import ADMIN_TITLE  # noqa: E402
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# cspell:disable-next-line
-SECRET_KEY = "django-insecure-#v8_1om$*2w#@)9lzgpo%01w6z)pd7=qn0o*od8yp@uhi7*vh3"
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-dev-only-change-me-in-production")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "False").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    h.strip() for h in os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()
+]
+
+# Authentication backends (allow login by username or email)
+AUTHENTICATION_BACKENDS = [
+    "esocore_api.backends.EmailOrUsernameBackend",
+]
 
 
 # Application definition

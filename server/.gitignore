@@ -18,6 +18,7 @@ staticfiles/
 # Environment
 .env
 .env.*
+!.env.example
 .venv/
 venv/
 

@@ -56,26 +56,15 @@ def login_view(request):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # Allow login by email or username
-    if email and not username:
-        from django.contrib.auth.models import User
-
-        try:
-            user_obj = User.objects.get(email=email)
-            username = user_obj.username
-        except User.DoesNotExist:
-            return Response(
-                {"detail": "Invalid credentials."},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
-    if not username:
+    # Allow login by email or username (resolved by EmailOrUsernameBackend)
+    identifier = username or email
+    if not identifier:
         return Response(
             {"detail": "Username or email is required."},
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    user = authenticate(username=username, password=password)
+    user = authenticate(username=identifier, password=password)
     if user is None:
         return Response(
             {"detail": "Invalid credentials."},

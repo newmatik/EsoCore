@@ -1,4 +1,3 @@
-from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from .models import Asset, AssetCycle
@@ -6,7 +5,7 @@ from .models import Asset, AssetCycle
 
 class AssetSerializer(serializers.ModelSerializer):
     site_name = serializers.CharField(source="site.name", read_only=True)
-    cycle_count = serializers.SerializerMethodField()
+    cycle_count = serializers.IntegerField(read_only=True, default=0)
 
     class Meta:
         model = Asset
@@ -29,10 +28,6 @@ class AssetSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
-
-    @extend_schema_field(serializers.IntegerField)
-    def get_cycle_count(self, obj):
-        return obj.cycles.count()
 
 
 class AssetCycleSerializer(serializers.ModelSerializer):

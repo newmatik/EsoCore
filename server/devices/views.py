@@ -1,4 +1,5 @@
-from rest_framework import viewsets
+from django.db.models import Count
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -16,7 +17,7 @@ class SiteViewSet(viewsets.ModelViewSet):
     serializer_class = SiteSerializer
 
     def get_queryset(self):
-        queryset = Site.objects.all()
+        queryset = Site.objects.annotate(device_count=Count("devices"))
         if self.request.user.is_authenticated:
             # Filter sites by user's access
             return queryset.filter(customer=self.request.user)
@@ -42,7 +43,10 @@ class DeviceViewSet(viewsets.ModelViewSet):
         if hasattr(device, "configuration"):
             serializer = DeviceConfigurationSerializer(device.configuration)
             return Response(serializer.data)
-        return Response({"error": "Configuration not found"}, status=404)
+        return Response(
+            {"error": "Configuration not found"},
+            status=status.HTTP_404_NOT_FOUND,
+        )
 
     @action(detail=True, methods=["post"])
     def update_status(self, request, pk=None):
@@ -54,7 +58,10 @@ class DeviceViewSet(viewsets.ModelViewSet):
             device.save()
             serializer = self.get_serializer(device)
             return Response(serializer.data)
-        return Response({"error": "Invalid status"}, status=400)
+        return Response(
+            {"error": "Invalid status"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 class FirmwareBundleViewSet(viewsets.ModelViewSet):

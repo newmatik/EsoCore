@@ -41,4 +41,5 @@ yarn-error.log*
 
 # Misc
 .env*
+!.env.example
 coverage/

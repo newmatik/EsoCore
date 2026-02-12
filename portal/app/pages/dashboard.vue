@@ -17,6 +17,17 @@
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Error -->
+      <UCard v-if="errorMsg" class="mb-6">
+        <div class="flex items-center gap-3 text-red-600 dark:text-red-400">
+          <UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5 flex-shrink-0" />
+          <div>
+            <p class="text-sm font-medium">Failed to load dashboard data</p>
+            <p class="text-xs mt-0.5">{{ errorMsg }}</p>
+          </div>
+        </div>
+      </UCard>
+
       <!-- Stats Cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <UCard v-for="stat in statsCards" :key="stat.label">
@@ -143,7 +154,9 @@ interface PaginatedResponse<T> {
 }
 
 const api = useApi()
+const toast = useToast()
 const refreshing = ref(false)
+const errorMsg = ref('')
 
 const summary = ref<DashboardSummary>({
   total_devices: 0,
@@ -257,6 +270,7 @@ function formatTimeAgo(dateStr: string) {
 }
 
 async function fetchDashboardData() {
+  errorMsg.value = ''
   try {
     const [summaryData, eventsData] = await Promise.all([
       api.get<DashboardSummary>('/dashboard/summary/'),
@@ -269,7 +283,9 @@ async function fetchDashboardData() {
     recentEvents.value = eventsData.results || []
     chartReady.value = true
   }
-  catch (error) {
+  catch (error: unknown) {
+    const err = error as { data?: { detail?: string }; message?: string }
+    errorMsg.value = err?.data?.detail || err?.message || 'Failed to load dashboard data'
     console.error('Failed to fetch dashboard data:', error)
   }
 }
@@ -290,8 +306,13 @@ async function acknowledgeEvent(eventId: string) {
     const event = recentEvents.value.find(e => e.id === eventId)
     if (event) event.status = 'acknowledged'
   }
-  catch (error) {
-    console.error('Failed to acknowledge event:', error)
+  catch (error: unknown) {
+    const err = error as { data?: { detail?: string }; message?: string }
+    toast.add({
+      title: 'Failed to acknowledge event',
+      description: err?.data?.detail || err?.message || 'Unknown error',
+      color: 'error',
+    })
   }
 }
 

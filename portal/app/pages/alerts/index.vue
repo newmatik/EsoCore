@@ -140,6 +140,7 @@ interface PaginatedResponse<T> {
 }
 
 const api = useApi()
+const toast = useToast()
 const loading = ref(false)
 const errorMsg = ref('')
 const events = ref<SystemEvent[]>([])
@@ -212,7 +213,14 @@ async function acknowledgeEvent(eventId: string) {
     const event = events.value.find(e => e.id === eventId)
     if (event) event.status = 'acknowledged'
   }
-  catch (error) { console.error('Failed to acknowledge event:', error) }
+  catch (error: unknown) {
+    const err = error as { data?: { detail?: string }; message?: string }
+    toast.add({
+      title: 'Failed to acknowledge event',
+      description: err?.data?.detail || err?.message || 'Unknown error',
+      color: 'error',
+    })
+  }
 }
 
 async function resolveEvent(eventId: string) {
@@ -221,7 +229,14 @@ async function resolveEvent(eventId: string) {
     const event = events.value.find(e => e.id === eventId)
     if (event) event.status = 'resolved'
   }
-  catch (error) { console.error('Failed to resolve event:', error) }
+  catch (error: unknown) {
+    const err = error as { data?: { detail?: string }; message?: string }
+    toast.add({
+      title: 'Failed to resolve event',
+      description: err?.data?.detail || err?.message || 'Unknown error',
+      color: 'error',
+    })
+  }
 }
 
 onMounted(() => {

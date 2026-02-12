@@ -1,20 +1,15 @@
-from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from .models import Device, DeviceConfiguration, FirmwareBundle, Site
 
 
 class SiteSerializer(serializers.ModelSerializer):
-    device_count = serializers.SerializerMethodField()
+    device_count = serializers.IntegerField(read_only=True, default=0)
 
     class Meta:
         model = Site
         fields = ["id", "name", "address", "device_count", "created_at", "updated_at"]
         read_only_fields = ["id", "created_at", "updated_at"]
-
-    @extend_schema_field(serializers.IntegerField)
-    def get_device_count(self, obj):
-        return obj.devices.count()
 
 
 class DeviceConfigurationSerializer(serializers.ModelSerializer):

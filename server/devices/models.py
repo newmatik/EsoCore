@@ -1,3 +1,5 @@
+import hashlib
+import hmac
 import uuid
 
 from django.contrib.auth.models import User
@@ -35,13 +37,25 @@ class Device(models.Model):
     model = models.CharField(max_length=255)
     firmware_version = models.CharField(max_length=100, blank=True)
     api_key = models.CharField(max_length=255, unique=True)
-    api_secret = models.CharField(max_length=255)
+    api_secret = models.CharField(
+        max_length=255,
+        help_text="Stored as SHA-256 hash. Use set_api_secret() to update.",
+    )
     site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name="devices")
     tags = models.JSONField(default=dict, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="active")
     last_seen = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def set_api_secret(self, raw_secret: str) -> None:
+        """Hash and store the API secret."""
+        self.api_secret = hashlib.sha256(raw_secret.encode()).hexdigest()
+
+    def check_api_secret(self, raw_secret: str) -> bool:
+        """Verify a raw secret against the stored hash (constant-time)."""
+        candidate = hashlib.sha256(raw_secret.encode()).hexdigest()
+        return hmac.compare_digest(candidate, self.api_secret)
 
     def __str__(self):
         return f"{self.serial_number} ({self.model})"

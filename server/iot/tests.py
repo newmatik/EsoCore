@@ -106,7 +106,7 @@ class TelemetryBatchTests(TestCase):
             data=json.dumps([]),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_invalid_device(self):
         response = self.client.post(
@@ -173,7 +173,7 @@ class GetConfigTests(TestCase):
             HTTP_X_DEVICE_ID=str(uuid.uuid4()),
             HTTP_X_AUTH_KEY="wrong",
         )
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class OTACheckTests(TestCase):

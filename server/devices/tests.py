@@ -126,7 +126,11 @@ class SiteSerializerTests(TestCase):
             api_secret="secret-001",
             site=self.site,
         )
-        serializer = SiteSerializer(self.site)
+        # Use annotated queryset (as the viewset does) for the count field
+        from django.db.models import Count
+
+        site = Site.objects.annotate(device_count=Count("devices")).get(pk=self.site.pk)
+        serializer = SiteSerializer(site)
         self.assertEqual(serializer.data["device_count"], 1)
 
 

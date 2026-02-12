@@ -40,8 +40,8 @@ class Command(BaseCommand):
         parser.add_argument(
             "--clear",
             action="store_true",
-            default=True,
-            help="Clear existing seed data before seeding (default: True)",
+            default=False,
+            help="Clear existing seed data before seeding",
         )
 
     def handle(self, *args, **options):
@@ -220,20 +220,23 @@ class Command(BaseCommand):
         devices = []
         for i, data in enumerate(device_data):
             api_key = f"eso-key-{i + 1:04d}-{uuid.uuid4().hex[:12]}"
-            api_secret = uuid.uuid4().hex
-            device, _ = Device.objects.get_or_create(
+            raw_secret = uuid.uuid4().hex
+            device, created = Device.objects.get_or_create(
                 serial_number=data["serial_number"],
                 defaults={
                     "model": data["model"],
                     "firmware_version": data["firmware_version"],
                     "api_key": api_key,
-                    "api_secret": api_secret,
+                    "api_secret": "",  # placeholder, set below
                     "site": data["site"],
                     "status": data["status"],
                     "last_seen": data["last_seen"],
                     "tags": data["tags"],
                 },
             )
+            if created:
+                device.set_api_secret(raw_secret)
+                device.save(update_fields=["api_secret"])
             devices.append(device)
         return devices
 

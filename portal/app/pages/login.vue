@@ -69,8 +69,8 @@
         </form>
       </UCard>
 
-      <!-- Footer hint -->
-      <p class="mt-6 text-center text-xs text-(--ui-text-dimmed)">
+      <!-- Footer hint (development only) -->
+      <p v-if="isDev" class="mt-6 text-center text-xs text-(--ui-text-dimmed)">
         Demo credentials: admin@esocore.local / admin
       </p>
     </div>
@@ -91,6 +91,7 @@ useSeoMeta({
 
 const { portalTitle } = useBranding()
 const authStore = useAuthStore()
+const isDev = import.meta.dev
 
 const email = ref('')
 const password = ref('')

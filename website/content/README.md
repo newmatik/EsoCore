@@ -201,7 +201,7 @@ The cloud platform consists of two applications:
 - **[Backend Server](/docs/backend-server)**: A Django REST Framework application (Python) that handles device
   registration, telemetry ingestion, event processing, alerting, and exposes REST APIs. Supports PostgreSQL in
   production with auto-generated OpenAPI documentation.
-- **[Portal](/docs/portal)**: A Nuxt 3 web application (Vue.js / TypeScript) providing real-time dashboards, device
+- **[Portal](/docs/portal)**: A Nuxt 4 web application (Vue.js / TypeScript) providing real-time dashboards, device
   management, fleet monitoring, and alerting interfaces. Built with Nuxt UI and Tailwind CSS.
 
 The server authenticates devices via API keys and users via session-based auth. The portal communicates with the server
@@ -278,7 +278,7 @@ accessible from the sidebar:
 ### Cloud Platform
 
 - **[Backend Server](/docs/backend-server)** -- Django REST API: architecture, endpoints, and local setup
-- **[Portal](/docs/portal)** -- Nuxt 3 frontend: dashboards, device management, and local setup
+- **[Portal](/docs/portal)** -- Nuxt 4 frontend: dashboards, device management, and local setup
 - **[API Specification](/docs/api-specification)** -- Detailed REST API documentation and data models
 - **[Cloud Infrastructure](/docs/cloud-infrastructure)** -- Deployment architecture and hosting options
 

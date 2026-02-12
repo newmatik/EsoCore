@@ -45,14 +45,19 @@ def dashboard_summary(request):
         "alert_severity_breakdown": { "low": int, "medium": int, ... }
     }
     """
-    devices = Device.objects.all()
+    # Scope all queries to the authenticated user's sites
+    user_sites = request.user.sites.all()
+
+    devices = Device.objects.filter(site__in=user_sites)
     total_devices = devices.count()
 
     status_breakdown = {}
     for choice_value, _label in Device.STATUS_CHOICES:
         status_breakdown[choice_value] = devices.filter(status=choice_value).count()
 
-    active_events = SystemEvent.objects.filter(status="active")
+    active_events = SystemEvent.objects.filter(
+        status="active", device__site__in=user_sites
+    )
     severity_breakdown = {}
     for choice_value, _label in SystemEvent.SEVERITY_CHOICES:
         severity_breakdown[choice_value] = active_events.filter(
@@ -66,8 +71,8 @@ def dashboard_summary(request):
             "offline_devices": status_breakdown.get("offline", 0),
             "maintenance_devices": status_breakdown.get("maintenance", 0),
             "active_alerts": active_events.count(),
-            "total_assets": Asset.objects.count(),
-            "total_sites": Device.objects.values("site").distinct().count(),
+            "total_assets": Asset.objects.filter(site__in=user_sites).count(),
+            "total_sites": user_sites.count(),
             "device_status_breakdown": status_breakdown,
             "alert_severity_breakdown": severity_breakdown,
         }
