@@ -37,89 +37,87 @@ EsoCore supports multiple integration pathways to fit into your existing industr
 
 ### API Overview
 
-EsoCore provides a comprehensive REST API for programmatic access to all platform features.
+EsoCore provides a REST API for programmatic access to platform features.
 
-**Base URL:** `https://[EDGE-DEVICE-IP]/api/v1/`
+> **Note:** The management API is under active development. Some integration patterns described below
+> (webhooks, alert acknowledgment, config REST API) are planned but not yet implemented.
+> Refer to the live Swagger documentation at `/api/docs/` for the current endpoint list.
 
-**Authentication:**
+**Base URL:** `https://[SERVER]/api/`
+
+**Authentication:** Token-based authentication via `Authorization` header, or API key
+via `X-Auth-Key` header (also accepts `X-API-Key` for compatibility):
 
 ```http
-X-API-Key: your-api-key-here
+Authorization: Token your-token-here
+# or for device-facing IoT endpoints:
+X-Auth-Key: your-device-api-key
 ```
 
 **Response Format:** JSON
 
 ### Authentication
 
-**Generate API Key:**
-
-1. Login to web UI
-2. Navigate to Settings → API Keys
-3. Click "Generate New Key"
-4. Enter description: "Integration with [SYSTEM]"
-5. Set permissions (read-only or read-write)
-6. Copy key (shown once only)
-7. Store securely
-
-**Using API Key:**
+Users authenticate via the login endpoint:
 
 ```python
 import requests
 
+# Get auth token
+response = requests.post(
+    "https://server/api/auth/login/",
+    json={"email": "user@example.com", "password": "password"}
+)
+token = response.json()["token"]
+
+# Use token for subsequent requests
 headers = {
-    "X-API-Key": "your-api-key",
+    "Authorization": f"Token {token}",
     "Content-Type": "application/json"
 }
 
 response = requests.get(
-    "https://edge-device/api/v1/telemetry/",
+    "https://server/api/telemetry/points/",
     headers=headers
 )
 ```
 
 ### Key API Endpoints
 
-**Device Information:**
+**Management Endpoints (token auth):**
 
 ```http
-GET /api/v1/device/info           # Device details
-GET /api/v1/device/health          # System health status
-GET /api/v1/sensors/               # List all sensors
-GET /api/v1/sensors/{id}/          # Specific sensor details
+GET /api/devices/devices/          # Device list
+GET /api/devices/sites/            # Site list
+GET /api/devices/firmware/         # Firmware bundles
+GET /api/telemetry/packets/        # Telemetry packets
+GET /api/telemetry/points/         # Telemetry data points
+GET /api/telemetry/windows/        # Telemetry windows
+GET /api/events/events/            # System events
+GET /api/events/rules/             # Alert rules
+GET /api/events/notifications/     # Notification queue
+GET /api/assets/assets/            # Asset management
+GET /api/assets/cycles/            # Asset cycles
+GET /api/users/profiles/           # User profiles
+GET /api/dashboard/summary/        # Dashboard summary
 ```
 
-**Telemetry Data:**
+**IoT Device-Facing Endpoints (API key auth via `X-Auth-Key`):**
 
 ```http
-GET /api/v1/telemetry/             # Latest readings
-GET /api/v1/telemetry/history/     # Historical data
-GET /api/v1/telemetry/sensor/{id}/ # Sensor-specific data
+POST /api/iot/v1/auth/handshake    # Device authentication
+POST /api/iot/v1/telemetry/batch   # Telemetry data ingestion
+GET  /api/iot/v1/config            # Device configuration
+GET  /api/iot/v1/ota/check         # OTA update check
+POST /api/iot/v1/ota/report        # OTA update status report
 ```
 
-Query parameters:
+Common query parameters for list endpoints:
 
-- `start_time`: ISO 8601 timestamp
-- `end_time`: ISO 8601 timestamp
-- `sensor_id`: Filter by sensor
-- `metric`: Filter by metric type (temperature, vibration_rms, etc.)
-- `limit`: Maximum results (default 1000)
-
-**Alerts:**
-
-```http
-GET /api/v1/alerts/                # Active alerts
-GET /api/v1/alerts/history/        # Alert history
-POST /api/v1/alerts/{id}/ack       # Acknowledge alert
-GET /api/v1/alerts/rules/          # Alert rules
-```
-
-**Configuration:**
-
-```http
-GET /api/v1/config/                # Current configuration
-PUT /api/v1/config/                # Update configuration
-POST /api/v1/config/restart        # Restart services
-```
+- `page`: Page number for pagination
+- `page_size`: Results per page
+- `ordering`: Sort field
+- `search`: Text search filter
 
 ### Example Integrations
 
@@ -130,61 +128,54 @@ import requests
 from datetime import datetime, timedelta
 
 class EsoCoreClient:
-    def __init__(self, base_url, api_key):
+    def __init__(self, base_url, token):
         self.base_url = base_url
         self.headers = {
-            "X-API-Key": api_key,
+            "Authorization": f"Token {token}",
             "Content-Type": "application/json"
         }
 
-    def get_current_readings(self):
-        """Get latest sensor readings"""
+    def get_devices(self):
+        """Get all devices"""
         response = requests.get(
-            f"{self.base_url}/telemetry/",
+            f"{self.base_url}/devices/devices/",
             headers=self.headers
         )
         return response.json()
 
-    def get_sensor_history(self, sensor_id, hours=24):
-        """Get sensor history"""
-        end_time = datetime.now()
-        start_time = end_time - timedelta(hours=hours)
-
+    def get_telemetry_points(self, **params):
+        """Get telemetry data points"""
         response = requests.get(
-            f"{self.base_url}/telemetry/history/",
+            f"{self.base_url}/telemetry/points/",
             headers=self.headers,
-            params={
-                "sensor_id": sensor_id,
-                "start_time": start_time.isoformat(),
-                "end_time": end_time.isoformat()
-            }
+            params=params
         )
         return response.json()
 
-    def get_active_alerts(self):
-        """Get all active alerts"""
+    def get_events(self, **params):
+        """Get system events"""
         response = requests.get(
-            f"{self.base_url}/alerts/",
+            f"{self.base_url}/events/events/",
             headers=self.headers,
-            params={"status": "active"}
+            params=params
         )
         return response.json()
 
 # Usage
 client = EsoCoreClient(
-    base_url="https://192.168.1.100/api/v1",
-    api_key="your-api-key"
+    base_url="https://your-server/api",
+    token="your-auth-token"
 )
 
-# Get current readings
-readings = client.get_current_readings()
-for reading in readings:
-    print(f"{reading['sensor_name']}: {reading['value']} {reading['unit']}")
+# Get devices
+devices = client.get_devices()
+for device in devices["results"]:
+    print(f"{device['name']}: {device['status']}")
 
-# Check for alerts
-alerts = client.get_active_alerts()
-if alerts:
-    print(f"WARNING: {len(alerts)} active alerts!")
+# Get recent events
+events = client.get_events()
+if events["results"]:
+    print(f"INFO: {len(events['results'])} recent events")
 ```
 
 **JavaScript/Node.js Integration:**
@@ -193,34 +184,36 @@ if alerts:
 const axios = require("axios");
 
 class EsoCoreClient {
-  constructor(baseUrl, apiKey) {
+  constructor(baseUrl, token) {
     this.baseUrl = baseUrl;
     this.headers = {
-      "X-API-Key": apiKey,
+      Authorization: `Token ${token}`,
       "Content-Type": "application/json",
     };
   }
 
-  async getCurrentReadings() {
-    const response = await axios.get(`${this.baseUrl}/telemetry/`, { headers: this.headers });
+  async getDevices() {
+    const response = await axios.get(`${this.baseUrl}/devices/devices/`, {
+      headers: this.headers,
+    });
     return response.data;
   }
 
-  async getActiveAlerts() {
-    const response = await axios.get(`${this.baseUrl}/alerts/`, {
+  async getTelemetryPoints(params = {}) {
+    const response = await axios.get(`${this.baseUrl}/telemetry/points/`, {
       headers: this.headers,
-      params: { status: "active" },
+      params,
     });
     return response.data;
   }
 }
 
 // Usage
-const client = new EsoCoreClient("https://192.168.1.100/api/v1", "your-api-key");
+const client = new EsoCoreClient("https://your-server/api", "your-auth-token");
 
 client
-  .getCurrentReadings()
-  .then((readings) => console.log(readings))
+  .getDevices()
+  .then((data) => console.log(data.results))
   .catch((error) => console.error(error));
 ```
 
@@ -282,26 +275,25 @@ CMMS polls EsoCore API periodically:
 # CMMS-side script (runs every 5 minutes)
 import requests
 
-ESOCORE_API = "https://edge-device/api/v1"
-ESOCORE_KEY = "api-key"
+ESOCORE_API = "https://your-server/api"
+ESOCORE_TOKEN = "your-auth-token"
 CMMS_API = "https://cmms/api/work-orders"
 CMMS_KEY = "cmms-api-key"
 
-# Get new alerts from EsoCore
-alerts = requests.get(
-    f"{ESOCORE_API}/alerts/",
-    headers={"X-API-Key": ESOCORE_KEY},
-    params={"status": "new", "acknowledged": False}
+# Get recent events from EsoCore
+events = requests.get(
+    f"{ESOCORE_API}/events/events/",
+    headers={"Authorization": f"Token {ESOCORE_TOKEN}"},
 ).json()
 
-# Create work orders in CMMS
-for alert in alerts:
+# Create work orders in CMMS for new events
+for event in events["results"]:
     work_order = {
-        "equipment_id": alert["device_id"],
-        "title": f"Predictive Alert: {alert['alert_type']}",
-        "description": alert["message"],
-        "priority": map_priority(alert["severity"]),
-        "due_date": calculate_due_date(alert["severity"])
+        "equipment_id": event["device"],
+        "title": f"Alert: {event['event_type']}",
+        "description": event["message"],
+        "priority": map_priority(event["severity"]),
+        "due_date": calculate_due_date(event["severity"])
     }
 
     # Create work order
@@ -310,14 +302,6 @@ for alert in alerts:
         headers={"Authorization": f"Bearer {CMMS_KEY}"},
         json=work_order
     )
-
-    if response.ok:
-        # Acknowledge alert in EsoCore
-        requests.post(
-            f"{ESOCORE_API}/alerts/{alert['id']}/ack",
-            headers={"X-API-Key": ESOCORE_KEY},
-            json={"work_order_id": response.json()["id"]}
-        )
 ```
 
 **Method 3: Email-to-Ticket**
@@ -489,7 +473,7 @@ from datetime import datetime
 class MESIntegration:
     def __init__(self, esocore_url, esocore_key, mes_url, mes_key):
         self.esocore_url = esocore_url
-        self.esocore_headers = {"X-API-Key": esocore_key}
+        self.esocore_headers = {"Authorization": f"Token {esocore_key}"}
         self.mes_url = mes_url
         self.mes_headers = {"Authorization": f"Bearer {mes_key}"}
 
@@ -497,7 +481,7 @@ class MESIntegration:
         """Update MES with equipment health status"""
         # Get equipment health from EsoCore
         devices = requests.get(
-            f"{self.esocore_url}/devices/",
+            f"{self.esocore_url}/devices/devices/",
             headers=self.esocore_headers
         ).json()
 
@@ -522,14 +506,14 @@ class MESIntegration:
         device = self.get_device_by_equipment_id(equipment_id)
 
         # Get active alerts
-        alerts = requests.get(
-            f"{self.esocore_url}/alerts/",
+        events = requests.get(
+            f"{self.esocore_url}/events/events/",
             headers=self.esocore_headers,
-            params={"device_id": device['id'], "status": "active"}
+            params={"device": device['id']}
         ).json()
 
-        # Check for critical alerts
-        critical_alerts = [a for a in alerts if a['severity'] == 'critical']
+        # Check for critical events
+        critical_alerts = [e for e in events["results"] if e.get('severity') == 'critical']
 
         return {
             "ready": len(critical_alerts) == 0,
@@ -616,7 +600,7 @@ def track_maintenance_roi():
 # Export historical data for analysis
 def export_to_csv(device_id, start_date, end_date):
     data = requests.get(
-        f"{API_URL}/telemetry/history/",
+        f"{API_URL}/telemetry/points/",
         headers=headers,
         params={
             "device_id": device_id,

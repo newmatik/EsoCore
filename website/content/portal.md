@@ -10,14 +10,14 @@ tools, and alerting interfaces.
 
 | Component | Technology | Version |
 | --- | --- | --- |
-| **Framework** | Nuxt 3 | 3.18 |
-| **UI Library** | Nuxt UI (Tailwind CSS) | 2.17 |
-| **State Management** | Pinia | 2.2 |
+| **Framework** | Nuxt 4 | 4.2 |
+| **UI Library** | Nuxt UI (Tailwind CSS 4) | 4.0 |
+| **State Management** | Pinia | 2.3 |
 | **Charts** | Chart.js + vue-chartjs | 4.4 / 5.3 |
-| **HTTP Client** | Axios | 1.7 |
+| **HTTP Client** | ofetch ($fetch) + Axios | -- |
 | **Real-time** | socket.io-client (planned) | 4.8 |
-| **Auth** | JWT (jwt-decode) | 4.0 |
-| **Utilities** | VueUse | 10.11 |
+| **Auth** | Token auth (Pinia store) | -- |
+| **Utilities** | VueUse | 12.0 |
 | **Node.js** | 22+ | -- |
 | **Package Manager** | pnpm | 9+ |
 
@@ -72,16 +72,19 @@ portal/
 │   ├── components/
 │   │   └── ThemeToggle.vue    # Dark/light mode toggle
 │   ├── composables/
+│   │   ├── useApi.ts          # API client (ofetch wrapper with auth)
 │   │   └── useBranding.ts     # Dynamic branding configuration
+│   ├── stores/
+│   │   └── auth.ts            # Authentication store (Pinia)
 │   ├── config/
 │   │   └── branding.ts        # Brand name, colors, product name
 │   ├── middleware/
 │   │   └── auth.ts            # Route guard for authenticated pages
 │   └── plugins/
+│       ├── auth.client.ts     # Auth initialization (cookie restore)
 │       └── force-dark.client.ts  # Dark mode initialization
 ├── assets/css/main.css        # Global styles
 ├── nuxt.config.ts             # Nuxt configuration
-├── tailwind.config.js         # Tailwind CSS configuration
 └── package.json
 ```
 

@@ -616,22 +616,22 @@ _CMMS Integration:_
 git clone https://github.com/newmatik/EsoCore.git
 cd EsoCore/server
 
-# Configure environment variables
-cp .env.example .env
-nano .env  # Edit configuration
-
-# Build and start services
-docker-compose up -d
+# Install Python dependencies with Poetry
+pip install poetry
+poetry install
 
 # Run database migrations
-docker-compose exec web python manage.py migrate
+poetry run python manage.py migrate
 
 # Create admin user
-docker-compose exec web python manage.py createsuperuser
+poetry run python manage.py createsuperuser
 
-# Collect static files
-docker-compose exec web python manage.py collectstatic
+# Start the server
+poetry run python manage.py runserver 0.0.0.0:8000
 ```
+
+> **Note:** Docker deployment files are planned but not yet included.
+> For production, configure a WSGI/ASGI server (e.g. Gunicorn) behind a reverse proxy (e.g. Nginx).
 
 **Access Platform:**
 
@@ -706,17 +706,17 @@ docker-compose exec web python manage.py collectstatic
 
 **Authentication:**
 
-- API key authentication
-- Include in header: `X-API-Key: [your-key]`
+- Token authentication for users (via `Authorization: Token <token>`)
+- API key authentication for devices (via `X-Auth-Key` header)
 
 **Common Endpoints:**
 
 ```http
-GET /api/v1/devices/              # List devices
-GET /api/v1/sensors/              # List sensors
-GET /api/v1/telemetry/            # Get sensor data
-POST /api/v1/alerts/ack           # Acknowledge alert
-GET /api/v1/health/               # System health
+GET /api/devices/devices/         # List devices
+GET /api/devices/sites/           # List sites
+GET /api/telemetry/points/        # Get telemetry data
+GET /api/events/events/           # Get system events
+GET /api/dashboard/summary/       # Dashboard summary
 ```
 
 **Example Integration:**
@@ -724,12 +724,12 @@ GET /api/v1/health/               # System health
 ```python
 import requests
 
-API_URL = "https://edge-device-ip/api/v1"
-API_KEY = "your-api-key"
-headers = {"X-API-Key": API_KEY}
+API_URL = "https://your-server/api"
+TOKEN = "your-auth-token"
+headers = {"Authorization": f"Token {TOKEN}"}
 
-# Get current sensor readings
-response = requests.get(f"{API_URL}/telemetry/", headers=headers)
+# Get current telemetry data
+response = requests.get(f"{API_URL}/telemetry/points/", headers=headers)
 data = response.json()
 ```
 

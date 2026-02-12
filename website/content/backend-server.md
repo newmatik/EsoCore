@@ -69,10 +69,11 @@ communication from Edge devices.
 
 | Endpoint | Method | Purpose |
 | --- | --- | --- |
-| `/api/iot/v1/auth/handshake/` | POST | Device authentication and session setup |
-| `/api/iot/v1/telemetry/batch/` | POST | Batch upload of sensor telemetry data |
-| `/api/iot/v1/config/` | GET | Retrieve device configuration |
-| `/api/iot/v1/ota/` | GET | Check for firmware updates |
+| `/api/iot/v1/auth/handshake` | POST | Device authentication and session setup |
+| `/api/iot/v1/telemetry/batch` | POST | Batch upload of sensor telemetry data |
+| `/api/iot/v1/config` | GET | Retrieve device configuration |
+| `/api/iot/v1/ota/check` | GET | Check for firmware updates |
+| `/api/iot/v1/ota/report` | POST | Report OTA update result |
 
 ### Management API (Session Authentication)
 
@@ -131,9 +132,6 @@ cd server
 # Install dependencies with Poetry
 poetry install
 
-# Create a .env file (copy from example if available)
-cp .env.example .env  # or create manually
-
 # Run database migrations
 poetry run python manage.py migrate
 
@@ -149,7 +147,8 @@ The server will be available at `http://localhost:8000`. The admin panel is at `
 
 ### Environment Variables
 
-Key environment variables (set in `.env` or shell):
+Key environment variables (set in shell or deployment config). Note: `.env` files are **not** auto-loaded
+by the Django settings; set these as real environment variables or add `python-dotenv` loading if needed:
 
 | Variable | Default | Description |
 | --- | --- | --- |

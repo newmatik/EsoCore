@@ -69,7 +69,7 @@ EsoCore supports three complementary data acquisition methods:
 ### Build Commands
 
 ```bash
-# Build everything
+# Build everything (edge + all sensor modules)
 make all
 
 # Build specific components
@@ -78,11 +78,26 @@ make vibration              # Vibration sensor
 make acoustic               # Acoustic sensor
 make current                # Current sensor
 make air_quality            # Air quality sensor
+make oil_quality            # Oil quality sensor
+make pressure               # Pressure sensor
+make temperature            # Temperature sensor
+make proximity              # Proximity sensor
+make light                  # Light sensor
 
 # Flash devices
 make flash_edge
 make flash_vibration
+make flash_acoustic
+make flash_current
+make flash_air_quality
+
+# List all available targets
+make help
 ```
+
+> **Note:** The STM32G0 HAL, CMSIS, startup, and linker files (`stm32/stm32g0/`) are not yet included in
+> the repository. Sensor module builds will fail until this directory structure is added. See the Makefile
+> for the expected layout.
 
 ## Project Structure
 
@@ -117,6 +132,7 @@ External sensor modules connect via the RS-485 multi-drop bus. Each module has i
 | **Pressure**    | Multi-range sensing, hydraulic monitoring | Process control                  |
 | **Temperature** | NTC/RTD/Thermocouple, high precision      | Thermal management               |
 | **Proximity**   | Inductive/capacitive/laser sensing        | Position detection               |
+| **Light**       | Ambient/UV/IR sensing, lux measurement    | Light level monitoring           |
 
 ## On-Board Inputs
 
@@ -175,14 +191,15 @@ esocore_event_log(ESOCORE_EVENT_SENSOR_DATA_READY,
 
 ## API Reference
 
-### HTTP Endpoints
+### Server Endpoints (IoT API)
 
-- `GET /api/status` - System status
-- `POST /api/heartbeat` - Heartbeat
-- `GET /api/sensors` - Sensor list
-- `POST /api/telemetry` - Telemetry data
-- `GET /api/config` - Configuration
-- `POST /api/firmware/check` - OTA updates
+The Edge device communicates with the EsoCore server at `/api/iot/v1/`:
+
+- `POST /api/iot/v1/auth/handshake` - Device authentication via API key
+- `POST /api/iot/v1/telemetry/batch` - Submit telemetry data batches
+- `GET  /api/iot/v1/config` - Fetch device configuration
+- `GET  /api/iot/v1/ota/check` - Check for firmware updates
+- `POST /api/iot/v1/ota/report` - Report OTA update result
 
 ### RS-485 Sensor Bus Protocol
 
@@ -191,13 +208,26 @@ esocore_event_log(ESOCORE_EVENT_SENSOR_DATA_READY,
 - `DATA_REQUEST/RESPONSE` - Sensor data exchange
 - `CONFIG_UPDATE` - Configuration updates
 
-## Testing
+## Hardware Abstraction Layer (HAL) Status
 
-```bash
-make test              # Unit tests
-make integration_test  # Integration tests
-make benchmark         # Performance tests
-```
+The firmware uses a layered architecture where higher-level modules call into HAL functions that
+interface with hardware peripherals. HAL functions are implemented as stubs (returning `true` or
+`false` without real hardware interaction) until the corresponding hardware driver is integrated.
+This is a standard pattern for embedded projects under active development.
+
+Stub functions are marked with `/* TODO: ... */` comments. Current module completion status:
+
+| Module                                    | Implemented | Stubs | Complete |
+| ----------------------------------------- | ----------- | ----- | -------- |
+| `common/communication/ethernet_manager.c` | 9           | 0     | 100%     |
+| `common/safety/safety_io.c`               | 25          | 3     | 89%      |
+| `common/ui/oled_display.c`                | 42          | 8     | 84%      |
+| `common/storage/storage_system.c`         | 18          | 12    | 60%      |
+| `common/intelligence/tinyml_engine.c`     | 20          | 15    | 57%      |
+| `common/sensors/sensor_interface.c`       | 20          | 15    | 57%      |
+| `common/communication/wifi_manager.c`     | 12          | 13    | 48%      |
+
+To find all HAL stubs, search for `TODO` comments in the `common/` directory.
 
 ## License
 
@@ -205,8 +235,8 @@ Apache License 2.0
 
 ## Support
 
-- Issues: [GitHub Issues](https://github.com/your-org/esocore-firmware/issues)
-- Wiki: [Documentation](https://github.com/your-org/esocore-firmware/wiki)
+- Issues: [GitHub Issues](https://github.com/newmatik/esocore/issues)
+- Docs: [esocore.com](https://www.esocore.com)
 
 ---
 

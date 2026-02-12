@@ -20,7 +20,7 @@ configuration are implemented. MQTT real-time messaging and advanced analytics f
 - **Database**: SQLite (development) / PostgreSQL (production)
 - **Authentication**: API Key authentication with session support
 - **API Documentation**: DRF Spectacular (OpenAPI/Swagger)
-- **Deployment**: Docker-ready with production settings
+- **Deployment**: Gunicorn / ASGI-compatible
 
 ## Quick Start
 
@@ -47,7 +47,9 @@ configuration are implemented. MQTT real-time messaging and advanced analytics f
 3. **Activate the virtual environment (Poetry 2):**
 
    ```bash
-   poetry env activate
+   # Print the activation command, then evaluate it
+   eval $(poetry env activate)
+   # Or prefix all commands with: poetry run ...
    ```
 
 4. **Run migrations:**
@@ -87,11 +89,15 @@ The API will be available at `http://localhost:8000/api/`
 
 ### Management Endpoints
 
-- `/api/devices/` - Device management
-- `/api/sites/` - Site management
+- `/api/devices/devices/` - Device management
+- `/api/devices/sites/` - Site management
+- `/api/devices/firmware/` - Firmware bundle management
 - `/api/assets/` - Asset management
 - `/api/events/` - Event management
 - `/api/telemetry/` - Telemetry data access
+- `/api/users/` - User management
+- `/api/auth/login/`, `/api/auth/logout/`, `/api/auth/me/` - User authentication
+- `/api/dashboard/summary/` - Dashboard summary
 
 ## Authentication
 
@@ -114,14 +120,19 @@ Users authenticate via Django's session framework for web interface access.
 
 ### Environment Variables
 
-Create a `.env` file in the server directory (optional for local dev):
+The following environment variables can be set for production deployment. For local development the defaults
+in `settings.py` are sufficient (SQLite, DEBUG=True).
+
+> **Note:** The `.env` file is **not** auto-loaded by the Django settings. Set these as real environment
+> variables, or add `python-dotenv` loading to `settings.py` if you prefer `.env` files.
 
 ```bash
 DEBUG=True
 SECRET_KEY=your-secret-key-here
-DATABASE_URL=sqlite:///db.sqlite3
 ALLOWED_HOSTS=localhost,127.0.0.1
 CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+BRAND_NAME=Newmatik
+PRODUCT_NAME=EsoCore
 ```
 
 ### Branding (Admin Title)
@@ -171,7 +182,7 @@ DATABASES = {
 ### Running Tests
 
 ```bash
-python manage.py test
+poetry run python manage.py test
 ```
 
 ### Code Quality Tools
@@ -227,13 +238,6 @@ Access Swagger UI at: `http://localhost:8000/api/docs/`
 
 ## Deployment
 
-### Docker
-
-```bash
-docker build -t EsoCore-server .
-docker run -p 8000:8000 EsoCore-server
-```
-
 ### Production Settings
 
 - Set `DEBUG=False`
@@ -250,7 +254,8 @@ server/
 │   ├── settings.py
 │   ├── urls.py
 │   └── wsgi.py
-├── devices/                   # Device management app
+├── devices/                   # Device management app (devices, sites, firmware)
+├── iot/                       # IoT device-facing endpoints (auth, telemetry, config, OTA)
 ├── assets/                    # Asset management app
 ├── telemetry/                 # Telemetry data app
 ├── events/                    # Event processing app

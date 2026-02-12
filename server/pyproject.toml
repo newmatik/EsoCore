@@ -9,23 +9,23 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = ">=3.11,<3.14"
-django = "5.2.5"
+django = "5.2.11"
 djangorestframework = "3.16.1"
-django-cors-headers = "4.7.0"
+django-cors-headers = "4.9.0"
 djangorestframework-api-key = "3.1.0"
-drf-spectacular = "0.28.0"
-django-filter = "25.1"
-python-dotenv = "1.0.0"
-requests = "2.31.0"
-psycopg2-binary = "2.9.10"
-django-unfold = ">=0.65.0,<0.66.0"
+drf-spectacular = "0.29.0"
+django-filter = "25.2"
+python-dotenv = "1.2.1"
+requests = "2.32.5"
+psycopg2-binary = "2.9.11"
+django-unfold = ">=0.79.0,<0.80.0"
 django-crispy-forms = ">=2.4,<3.0"
 
 
 [tool.poetry.group.dev.dependencies]
-ruff = "0.6.9"
-black = "24.4.2"
-isort = "5.13.2"
+ruff = "0.15.0"
+black = "26.1.0"
+isort = "7.0.0"
 
 # Scripts are defined in package.json style format for easier execution
 

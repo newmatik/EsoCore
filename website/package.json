@@ -4,8 +4,8 @@
   "private": true,
   "description": "EsoCore Website",
   "engines": {
-    "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
+    "node": ">=22.0.0",
+    "pnpm": ">=9.0.0"
   },
   "scripts": {
     "build": "nuxt build",
@@ -13,6 +13,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "nuxt typecheck"
@@ -24,9 +26,12 @@
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
+    "@nuxt/eslint-config": "^0.7.0",
     "@types/node": "^22.9.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-vue": "^9.29.0",
+    "prettier": "^3.3.3",
     "typescript": "^5.7.0",
-    "vue-tsc": "^2.2.0",
-    "prettier": "^3.3.3"
+    "vue-tsc": "^2.2.0"
   }
 }

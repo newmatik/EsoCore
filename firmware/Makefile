@@ -132,6 +132,9 @@ TEMPERATURE_SOURCES := \
 PROXIMITY_SOURCES := \
 	stm32/sensors/proximity_position_sensor.c
 
+LIGHT_SOURCES := \
+	stm32/sensors/light_sensor.c
+
 # MCU-specific flags
 EDGE_MCU_FLAGS := \
 	-mcpu=cortex-m7 \
@@ -178,7 +181,7 @@ else
 endif
 
 # Build rules
-.PHONY: all clean edge sensors help
+.PHONY: all clean edge sensors help light
 
 all: edge sensors
 
@@ -189,12 +192,17 @@ help:
 	@echo "  all       - Build all targets (edge and sensors)"
 	@echo "  edge      - Build Edge device firmware"
 	@echo "  sensors   - Build all sensor modules"
-	@echo "  vibration - Build vibration sensor module"
-	@echo "  acoustic  - Build acoustic sensor module"
-	@echo "  current   - Build current sensor module"
+	@echo "  vibration   - Build vibration sensor module"
+	@echo "  acoustic    - Build acoustic sensor module"
+	@echo "  current     - Build current sensor module"
 	@echo "  air_quality - Build air quality sensor module"
-	@echo "  clean     - Clean all build artifacts"
-	@echo "  help      - Show this help message"
+	@echo "  oil_quality - Build oil quality sensor module"
+	@echo "  pressure    - Build pressure sensor module"
+	@echo "  temperature - Build temperature sensor module"
+	@echo "  proximity   - Build proximity sensor module"
+	@echo "  light       - Build light sensor module"
+	@echo "  clean       - Clean all build artifacts"
+	@echo "  help        - Show this help message"
 	@echo ""
 	@echo "Build options:"
 	@echo "  DEBUG=1   - Enable debug build"
@@ -216,7 +224,7 @@ $(BUILD_DIR)/edge/$(PROJECT_NAME)_edge.elf: $(COMMON_SOURCES) $(EDGE_SOURCES)
 	@echo "Edge device firmware built successfully"
 
 # Sensor modules build
-sensors: vibration acoustic current air_quality
+sensors: vibration acoustic current air_quality oil_quality pressure temperature proximity light
 
 vibration: $(BUILD_DIR)/sensors/vibration/$(PROJECT_NAME)_vibration.elf
 
@@ -338,6 +346,21 @@ $(BUILD_DIR)/sensors/proximity/$(PROJECT_NAME)_proximity.elf: $(COMMON_SOURCES) 
 	$(OBJCOPY) -O binary $@ $(BUILD_DIR)/sensors/proximity/$(PROJECT_NAME)_proximity.bin
 	$(SIZE) $@
 	@echo "Proximity sensor firmware built successfully"
+
+light: $(BUILD_DIR)/sensors/light/$(PROJECT_NAME)_light.elf
+
+$(BUILD_DIR)/sensors/light/$(PROJECT_NAME)_light.elf: $(COMMON_SOURCES) $(SENSOR_SOURCES) $(LIGHT_SOURCES)
+	@echo "Building light sensor firmware..."
+	@mkdir -p $(BUILD_DIR)/sensors/light
+	$(CC) $(CFLAGS) $(SENSOR_MCU_FLAGS) $(SENSOR_INCLUDES) \
+		-DESOCORE_DEVICE_TYPE_LIGHT \
+		$(COMMON_SOURCES) $(SENSOR_SOURCES) $(LIGHT_SOURCES) \
+		$(LDFLAGS) -T stm32/$(SENSOR_TARGET)/linker/STM32G031G8Ux_FLASH.ld \
+		-o $@ -lm
+	$(OBJCOPY) -O ihex $@ $(BUILD_DIR)/sensors/light/$(PROJECT_NAME)_light.hex
+	$(OBJCOPY) -O binary $@ $(BUILD_DIR)/sensors/light/$(PROJECT_NAME)_light.bin
+	$(SIZE) $@
+	@echo "Light sensor firmware built successfully"
 
 # Release packaging
 release: all

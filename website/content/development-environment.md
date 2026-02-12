@@ -81,8 +81,8 @@ rationale and minimum setup.
 - **Why**: Django REST Framework provides scalable backend with REST APIs, RBAC, and database management. Nuxt.js delivers modern responsive frontend
   with real-time dashboards, accelerating time-to-market.
 - **Local dev requirements**:
-  - Django: Python 3.10–3.11, PostgreSQL/MySQL, Redis
-  - Nuxt.js: Node.js 18 LTS, pnpm
+  - Django: Python 3.11+, PostgreSQL (production) or SQLite (development)
+  - Nuxt.js: Node.js 22+, pnpm 9+
   - Development tools: Poetry for Python, VS Code/Cursor
 - **Coding standards**:
   - Python: ruff + black; JS/TS: eslint + prettier
@@ -117,8 +117,8 @@ rationale and minimum setup.
   - Dev host (Linux/macOS/Windows) with Zephyr SDK and cross-compile toolchains
   - west, CMake/Ninja, OpenOCD or J-Link, Python 3.11; optional Docker
 - **Cloud engineer**:
-  - Backend: Python 3.11, Poetry, PostgreSQL/MySQL, Redis; VS Code/Cursor
-  - Frontend: Node.js 18 LTS, pnpm, Nuxt.js; VS Code/Cursor
+  - Backend: Python 3.11+, Poetry, PostgreSQL or SQLite; VS Code/Cursor
+  - Frontend: Node.js 22+, pnpm 9+, Nuxt 4; VS Code/Cursor
 
 ## Rationale Summary
 

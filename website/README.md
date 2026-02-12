@@ -16,8 +16,8 @@ The website is built with [Nuxt.js](https://nuxt.com) and deployed as a static s
 
 ### Prerequisites
 
-- Node.js 18 or later
-- pnpm package manager
+- Node.js 18 or later (CI uses Node 22)
+- pnpm 8 or later
 
 ### Setup
 
@@ -58,11 +58,17 @@ pnpm preview
 ```text
 website/
 ├── components/         # Vue components (header, footer, etc.)
+├── composables/        # Vue composables (useDocs, etc.)
 ├── content/            # Markdown documentation files
 ├── layouts/            # Nuxt.js layouts
 ├── pages/              # Nuxt.js pages and routing
 ├── public/             # Static assets (images, CSS, BOM data)
-├── server/             # API routes for serving documentation
+│   ├── bom/            # Synced BOM CSV files
+│   └── docs/           # Documentation assets
+├── server/             # Server routes and plugins
+│   ├── api/            # API routes for serving documentation
+│   └── plugins/        # Server plugins (trailing-slash redirect)
+├── utils/              # Utility modules (docs-config, etc.)
 └── nuxt.config.ts      # Nuxt.js configuration
 ```
 

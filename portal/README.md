@@ -2,34 +2,31 @@
 
 Modern Vue.js frontend application for the EsoCore IoT monitoring system, built with Nuxt.js.
 
-**Status: Early Development** -- The portal currently has a basic scaffold with mock dashboard data.
-JWT authentication, WebSocket real-time updates, and full API integration are planned but not yet implemented.
-
 ## Features
 
-- **Dashboard**: Real-time device monitoring and telemetry visualization
-- **Device Management**: Device provisioning, configuration, and status monitoring
-- **Asset Tracking**: Equipment monitoring and maintenance scheduling
-- **Alert Management**: Real-time alerts and notification management
-- **User Management**: Role-based access control and user profiles
-- **Responsive Design**: Mobile-first responsive web interface
+- **Dashboard**: Device monitoring overview with telemetry stats and recent alerts
+- **Device Management**: Device listing with filtering, detail views with telemetry history
+- **Asset Tracking**: Equipment grid with status filtering
+- **Alert Management**: Alerts with severity filtering, acknowledgment, and resolution
+- **Authentication**: Token-based authentication with cookie persistence
+- **Dark Mode**: Forced dark theme with toggle support
+- **Branding**: Configurable brand and product names via environment variables
 
 ## Technology Stack
 
-- **Framework**: Nuxt.js 4.0 (Vue.js 3)
-- **UI Library**: Nuxt UI (Tailwind CSS + Headless UI)
-- **Charts**: Chart.js or ApexCharts for data visualization
-- **State Management**: Pinia for Vue state management
-- **HTTP Client**: Axios for API communication
-- **Authentication**: JWT-based authentication (planned)
-- **Real-time**: WebSocket support for live updates (planned)
+- **Framework**: Nuxt 4 (Vue 3)
+- **UI Library**: Nuxt UI (Tailwind CSS 4)
+- **State Management**: Pinia
+- **HTTP Client**: Nuxt `$fetch` (ofetch) with custom `useApi` composable
+- **Authentication**: DRF Token authentication with cookie persistence
+- **Icons**: Lucide (via Iconify)
 
 ## Quick Start
 
 ### Prerequisites
 
 - Node.js 22+
-- pnpm (recommended) or npm/yarn
+- pnpm 9+
 
 ### Installation
 
@@ -91,15 +88,6 @@ NUXT_PUBLIC_BRAND=Newmatik
 NUXT_PUBLIC_PRODUCT=EsoCore
 ```
 
-### Nuxt Configuration
-
-The main configuration is in `nuxt.config.ts`. Key settings include:
-
-- **SSR/SSG**: Universal rendering for SEO and performance
-- **API Proxy**: Development proxy to Django backend
-- **CSS**: Tailwind CSS integration
-- **Modules**: UI components, charts, and utilities
-
 ### Branding
 
 You can customize the displayed product name without code changes:
@@ -119,68 +107,68 @@ Defaults are defined in `app/config/branding.ts` and can be overridden at runtim
 
 ```text
 portal/
-├── app/                          # Nuxt app directory
-│   ├── app.vue                   # Root component
-│   ├── layouts/                  # Layout components
-│   │   ├── default.vue          # Default layout
-│   │   └── auth.vue             # Authentication layout
-│   ├── pages/                   # Page components (file-based routing)
-│   │   ├── index.vue            # Home page
-│   │   ├── dashboard.vue        # Main dashboard
-│   │   ├── devices/             # Device management pages
-│   │   ├── assets/              # Asset management pages
-│   │   ├── alerts/              # Alert management pages
-│   │   └── users/               # User management pages
-│   ├── components/              # Reusable components
-│   │   ├── ui/                  # UI components
-│   │   ├── charts/              # Chart components
-│   │   └── forms/               # Form components
-│   ├── composables/             # Vue composables
-│   │   ├── useApi.ts            # API communication
-│   │   ├── useAuth.ts           # Authentication
-│   │   └── useWebSocket.ts      # WebSocket connection
-│   ├── plugins/                 # Nuxt plugins
-│   │   ├── api.client.ts        # API client setup
-│   │   └── charts.client.ts     # Chart library setup
-│   └── middleware/              # Route middleware
-│       └── auth.ts              # Authentication middleware
-├── public/                      # Static assets
-├── server/                      # Server-side code (if needed)
-├── nuxt.config.ts               # Nuxt configuration
-├── tailwind.config.js           # Tailwind CSS configuration
-└── package.json                 # Dependencies and scripts
+├── app/
+│   ├── app.vue                       # Root component
+│   ├── assets/css/main.css           # Global CSS
+│   ├── components/
+│   │   └── ThemeToggle.vue           # Dark/light mode toggle
+│   ├── composables/
+│   │   ├── useApi.ts                 # API client ($fetch wrapper with auth)
+│   │   └── useBranding.ts            # Brand/product name composable
+│   ├── config/
+│   │   └── branding.ts               # Branding defaults
+│   ├── layouts/
+│   │   ├── authenticated.vue         # Layout for authenticated pages
+│   │   └── default.vue               # Default layout
+│   ├── middleware/
+│   │   └── auth.ts                   # Authentication route guard
+│   ├── pages/
+│   │   ├── index.vue                 # Landing page
+│   │   ├── login.vue                 # Login page
+│   │   ├── dashboard.vue             # Dashboard with stats and recent alerts
+│   │   ├── alerts/index.vue          # Alert list with filtering and actions
+│   │   ├── assets/index.vue          # Asset grid with status filtering
+│   │   └── devices/
+│   │       ├── index.vue             # Device list with site filtering
+│   │       └── [id].vue              # Device detail with telemetry and events
+│   ├── plugins/
+│   │   ├── auth.client.ts            # Auth token restoration on startup
+│   │   └── force-dark.client.ts      # Force dark mode on load
+│   └── stores/
+│       └── auth.ts                   # Auth state (token, user, login/logout)
+├── public/                           # Static assets (icons, robots.txt)
+├── app.config.ts                     # App-level configuration
+├── eslint.config.js                  # ESLint configuration
+├── nuxt.config.ts                    # Nuxt configuration
+├── package.json                      # Dependencies and scripts
+├── pnpm-lock.yaml                    # Lockfile
+└── tsconfig.json                     # TypeScript configuration
 ```
 
 ## API Integration
 
+The portal communicates with the Django REST backend through the `useApi` composable, which wraps
+Nuxt's `$fetch` with automatic base URL resolution, auth token injection, and 401 redirect handling.
+
 ### Authentication
 
-The portal integrates with Django's authentication system:
-
 ```typescript
-// Login
-const { login } = useAuth();
-await login({ username, password });
+const authStore = useAuthStore()
+await authStore.login(email, password)
 
-// API calls with automatic token handling
-const { data } = await $api("/devices/");
+// Authenticated API calls
+const api = useApi()
+const devices = await api.get('/devices/devices/')
 ```
 
-### Real-time Updates
+### API Endpoints Used
 
-WebSocket integration for live data:
-
-```typescript
-const { connect, subscribe } = useWebSocket();
-
-// Connect to WebSocket
-connect();
-
-// Subscribe to device updates
-subscribe("devices", (data) => {
-  // Handle real-time updates
-});
-```
+- **Auth**: `/auth/login/`, `/auth/logout/`, `/auth/me/`
+- **Dashboard**: `/dashboard/summary/`
+- **Devices**: `/devices/devices/`, `/devices/sites/`
+- **Telemetry**: `/telemetry/points/`
+- **Events**: `/events/events/`
+- **Assets**: `/assets/assets/`
 
 ## Development
 
@@ -190,28 +178,17 @@ subscribe("devices", (data) => {
 # Lint code
 pnpm run lint
 
+# Auto-fix lint issues
+pnpm run lint:fix
+
 # Format code
 pnpm run format
 
+# Check formatting
+pnpm run format:check
+
 # Type check
 pnpm run typecheck
-```
-
-### Testing
-
-```bash
-# Unit tests
-pnpm run test
-
-# E2E tests
-pnpm run test:e2e
-```
-
-### Storybook (Component Development)
-
-```bash
-# Start Storybook
-pnpm run storybook
 ```
 
 ## Deployment
@@ -232,54 +209,14 @@ EXPOSE 3000
 CMD ["node", ".output/server/index.mjs"]
 ```
 
-### Static Site Generation
-
-For static hosting:
-
-```bash
-npm run generate
-```
-
-This creates a `dist/` folder with static files ready for deployment.
-
-## Key Features Implementation
-
-### Dashboard
-
-- Real-time device status overview
-- Telemetry data visualization with interactive charts
-- Recent alerts and notifications
-- Quick actions for common tasks
-
-### Device Management
-
-- Device listing with filtering and search
-- Device details and configuration
-- Firmware update management
-- Device provisioning workflow
-
-### Alert System
-
-- Alert dashboard with severity-based filtering
-- Alert acknowledgment and resolution
-- Notification preferences
-- Escalation management
-
-### User Management
-
-- User profiles and role management
-- Site and device access control
-- Customizable dashboards
-- Notification settings
-
 ## Contributing
 
 1. Follow Vue.js and Nuxt.js best practices
 2. Use TypeScript for type safety
-3. Write tests for new features
-4. Follow the established component structure
-5. Use meaningful commit messages
+3. Follow the established component structure
+4. Use meaningful commit messages
 
 ## License
 
-Copyright © 2026 Newmatik. All rights reserved. Licensed under the Apache License, Version 2.0. See `website/content/license.md` for details.
+Copyright 2026 Newmatik. All rights reserved.
+Licensed under the Apache License, Version 2.0. See `website/content/license.md` for details.

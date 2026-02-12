@@ -30,6 +30,3 @@ yarn.lock
 # Auto-generated files
 .nuxt/
 .nitro/
-
-# Backup files
-_backup/
