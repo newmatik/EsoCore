@@ -1,8 +1,11 @@
 # EsoCore: Universal Industrial Machine Monitoring System
 
-EsoCore is an advanced industrial IoT platform for comprehensive monitoring of factory machinery and equipment. By capturing critical operational data—from thermal conditions to mechanical health indicators—this system enables predictive maintenance, reduces downtime, and optimizes equipment performance across manufacturing facilities.
+EsoCore is an advanced industrial IoT platform for comprehensive monitoring of factory machinery and equipment. By capturing critical operational
+data—from thermal conditions to mechanical health indicators—this system enables predictive maintenance, reduces downtime, and optimizes equipment
+performance across manufacturing facilities.
 
-EsoCore is an acronym: Edge Sensor Observation, Control, Operations, Reliability Engine. The name also recognizes our heritage—Newmatik began as ESO Electronic Service Ottenbreit GmbH in 1990—carrying that tradition forward as we build everything new and automatic today.
+EsoCore is an acronym: Edge Sensor Observation, Control, Operations, Reliability Engine. The name also recognizes our heritage—Newmatik began as ESO
+Electronic Service Ottenbreit GmbH in 1990—carrying that tradition forward as we build everything new and automatic today.
 
 ---
 
@@ -10,19 +13,30 @@ EsoCore is an acronym: Edge Sensor Observation, Control, Operations, Reliability
 
 ### The Problem
 
-Unplanned equipment failures cost manufacturers millions in lost production, emergency repairs, and quality issues. Traditional reactive maintenance leads to premature replacements, unexpected downtime, and safety hazards. This is especially critical for high-volume production, precision manufacturing, and safety-critical operations where equipment reliability is paramount.
+Unplanned equipment failures cost manufacturers millions in lost production, emergency repairs, and quality issues. Traditional reactive maintenance
+leads to premature replacements, unexpected downtime, and safety hazards. This is especially critical for high-volume production, precision
+manufacturing, and safety-critical operations where equipment reliability is paramount.
 
 ### The Solution
 
-A robust edge-to-cloud telemetry platform that continuously monitors machine health through multiple sensor streams, providing early warning of issues and actionable insights for maintenance teams. The system is designed to work with virtually all industrial machinery types and integrates with existing factory systems, making it universally deployable across diverse manufacturing environments.
+A robust edge-to-cloud telemetry platform that continuously monitors machine health through multiple sensor streams, providing early warning of issues
+and actionable insights for maintenance teams. The system is designed to work with virtually all industrial machinery types and integrates with
+existing factory systems, making it universally deployable across diverse manufacturing environments.
 
 ### Development Model
 
-EsoCore is developed and maintained by Newmatik through a collaborative partnership model with strategic industrial partners. The entire platform—including hardware designs, firmware, and cloud components—is fully open source under the Apache 2.0 License, ensuring maximum flexibility and preventing vendor lock-in. Partners can develop proprietary market-specific customizations while benefiting from shared platform development costs and continuous innovation. This unique approach combines open-source principles with commercial viability, creating a sustainable ecosystem where partners retain full independence and can fork the project if needed.
+EsoCore is developed and maintained by Newmatik through a collaborative partnership model with strategic industrial partners. The entire
+platform—including hardware designs, firmware, and cloud components—is fully open source under the Apache 2.0 License, ensuring maximum flexibility
+and preventing vendor lock-in. Partners can develop proprietary market-specific customizations while benefiting from shared platform development costs
+and continuous innovation. This unique approach combines open-source principles with commercial viability, creating a sustainable ecosystem where
+partners retain full independence and can fork the project if needed.
 
 ### Competitive Position
 
-EsoCore differentiates itself in the industrial IoT market through cross-domain capability (supporting both industrial doors and CNC machines in one platform), edge-first TinyML architecture for ultra-low latency anomaly detection, and comprehensive safety integration. While competitors often focus on single verticals with proprietary platforms, EsoCore's open-source foundation and unified approach provides unique value for facilities managing diverse industrial assets.
+EsoCore differentiates itself in the industrial IoT market through cross-domain capability (supporting both industrial doors and CNC machines in one
+platform), edge-first TinyML architecture for ultra-low latency anomaly detection, and comprehensive safety integration. While competitors often focus
+on single verticals with proprietary platforms, EsoCore's open-source foundation and unified approach provides unique value for facilities managing
+diverse industrial assets.
 
 ### Key Benefits
 
@@ -75,7 +89,8 @@ EsoCore differentiates itself in the industrial IoT market through cross-domain 
 - Mining equipment (crushers, mills, separators)
 - Energy equipment (turbines, generators)
 
-For these demanding applications, EsoCore provides the complete operational visibility and zero-downtime reliability that traditional reactive maintenance cannot deliver.
+For these demanding applications, EsoCore provides the complete operational visibility and zero-downtime reliability that traditional reactive
+maintenance cannot deliver.
 
 ---
 
@@ -96,7 +111,7 @@ For these demanding applications, EsoCore provides the complete operational visi
   - Process parameters (pressure, flow, speed) via analog/digital interfaces
 - **Local durability**: store on SD in a standardized, append-only, audit-friendly format with integrity checks.
 - **Reliable sync**: upload to a cloud IoT platform via REST with strong auth, resumable uploads, and conflict-free idempotency.
-- **Mixed connectivity**: Wi‑Fi or Ethernet (optional PoE), with automatic backfill after outages.
+- **Mixed connectivity**: Wi-Fi or dual Ethernet, with automatic backfill after outages.
 - **Fleet-grade ops**: secure provisioning, OTA firmware, device health, alerts, dashboards, and role-based access.
 
 ---
@@ -109,21 +124,30 @@ For these demanding applications, EsoCore provides the complete operational visi
 | ------------------ | --------------------------------------------- | ----------------------------------------------------- |
 | **Edge**           | STM32H747 (dual-core M7/M4)                   | Real-time sensor data collection and local processing |
 | **Cloud Platform** | Django REST Framework Server + Nuxt.js Portal | Data management, analytics, and user interfaces       |
-| **Connectivity**   | Ethernet/PoE or Wi-Fi                         | Reliable data transmission with offline resilience    |
+| **Connectivity**   | Dual Ethernet or Wi-Fi                        | Reliable data transmission with offline resilience    |
 | **Storage**        | Industrial microSD + Cloud DB                 | Local buffering and long-term data persistence        |
 
 ### Technology Choices Rationale
 
 - **STM32 MCU**: Proven ecosystem with robust peripherals, extensive RTOS support, and hardware crypto acceleration
-- **Django REST Framework Server + Nuxt.js Portal**: Scalable backend with REST APIs, role-based access control, and modern responsive frontend with real-time dashboards
+- **Django REST Framework Server + Nuxt.js Portal**: Scalable backend with REST APIs, role-based access control, and modern responsive frontend with
+  real-time dashboards
 - **Industrial microSD**: Provides local resilience for 30+ days of offline operation
 - **TLS over REST**: Simple, firewall-friendly protocol with strong security
 
-### Modular RS‑485 Sensor Architecture
+### Data Acquisition Architecture
 
-- **Distributed sensor bus (RS‑485)**: Sensor modules with local MCUs connect over an industrial RS‑485 multi‑drop bus, enabling plug‑and‑play expansion.
-- **No Edge redesign**: New sensor types can be added—customer‑specific, proprietary, or exclusive—without changing the Edge or platform architecture.
-- **Scalable and robust**: Digital, noise‑immune wiring up to 100 m with auto‑discovery and hot‑plug support. See detailed specs in [Hardware: Edge](/docs/esocore-edge).
+EsoCore supports three complementary data acquisition methods:
+
+- **RS-485 Sensor Bus**: Distributed sensor modules with local MCUs connect over an industrial RS-485 multi-drop bus, enabling plug-and-play
+  expansion. New sensor types can be added without changing the Edge or platform architecture. Digital, noise-immune wiring up to 100 m with
+  auto-discovery and hot-plug support.
+- **On-Board IEPE Analog Inputs (4 channels)**: Dedicated signal chain for IEPE/ICP vibration accelerometers wired directly to the Edge device.
+  24-bit simultaneous ADC at 50 kSPS per channel with programmable gain and anti-aliasing filter.
+- **On-Board Safety Digital Inputs (6 channels)**: Dual-channel optocoupled 24 V inputs (EN ISO 13849 Cat. 3) with cross-monitoring for safety
+  devices (e-stops, light curtains, safety edges) and general-purpose signals (cycle counts, machine states).
+
+See detailed specs in [Hardware: Edge](/docs/esocore-edge).
 
 ---
 
@@ -132,9 +156,9 @@ For these demanding applications, EsoCore provides the complete operational visi
 ### Edge Platform
 
 - **Microcontroller**: STM32H747 dual core (Cortex-M7/M4) with hardware crypto, sufficient for TLS and edge AI processing.
-- **Connectivity**: Industrial Ethernet with PoE option (preferred) or robust Wi-Fi module for reliable data transmission.
+- **Connectivity**: Dual industrial Ethernet with physical network separation (preferred) or robust Wi-Fi module for reliable data transmission.
 - **Storage**: Industrial-grade microSD with wear leveling for 30+ days of local data buffering.
-- **Primary Power**: 12-24V DC with surge protection, optional PoE compatibility.
+- **Primary Power**: Dedicated 24 V DC with aggressive surge/ESD protection, input filtering, and brownout-safe behavior.
 - **Backup System**: Supercapacitor bank (30F) providing ≥30 seconds for safe shutdown during power outages.
 - **Environmental**: IP54-IP65 enclosure, -20°C to +60°C operation, industrial EMC compliance.
 
@@ -142,23 +166,29 @@ Detailed Specifications: See [Hardware: Edge](/docs/esocore-edge) for complete c
 
 ### Sensor Suite
 
-- **Environmental**: Comprehensive air quality monitoring (temperature, humidity, CO₂, VOCs, particulate matter) + light intensity monitoring (visible, UV, IR, color, spectral) + oil quality monitoring (viscosity, contamination, water content) for thermal management and environmental compliance.
-- **Mechanical**: 3-axis vibration (1-3kHz), acoustic monitoring (audible + ultrasonic), multi-range pressure sensors (hydraulic/pneumatic), proximity/position sensors (automation, cycle counting), motor current sensing for torque/load monitoring.
-- **Thermal**: Targeted temperature monitoring with NTC thermistors, RTD sensors, thermocouples, and IR sensors for bearings, gearboxes, and extreme environments.
-- **Safety I/O**: EN ISO 13849 compliant inputs for safety edges, emergency stops, light curtains with <10ms response time.
-
-Detailed Specifications: See [Hardware: Sensors](/docs/esocore-sensors) for complete component specifications, compliance standards, and reference designs.
+- **Environmental**: Comprehensive air quality monitoring (temperature, humidity, CO₂, VOCs, particulate matter) + light intensity monitoring
+  (visible, UV, IR, color, spectral) + oil quality monitoring (viscosity, contamination, water content) for thermal management and environmental
+  compliance.
+- **Mechanical**: 3-axis vibration (1-3kHz), acoustic monitoring (audible + ultrasonic), multi-range pressure sensors (hydraulic/pneumatic),
+  proximity/position sensors (automation, cycle counting), motor current sensing for torque/load monitoring.
+- **Thermal**: Targeted temperature monitoring with NTC thermistors, RTD sensors, thermocouples, and IR sensors for bearings, gearboxes, and extreme
+  environments.
+Detailed Specifications: See [Hardware: Sensors](/docs/esocore-sensors) for complete component specifications, compliance standards, and reference
+designs.
 
 ---
 
 ## Firmware architecture
 
-We standardize on Zephyr RTOS for the edge device firmware. The following task model maps well to STM32 and remains portable across supported Zephyr boards.
+We standardize on Zephyr RTOS for the edge device firmware. The following task model maps well to STM32 and remains portable across supported Zephyr
+boards.
 
 ### RTOS & Services
 
-- **Sensor Task**: sampling scheduler (configurable rates; e.g., temp/RH 1 Hz, stator temp 1 Hz, vibration bursts at 1–3 kHz for 1–5 s windows, acoustics windows in audible/ultrasound bands, current 100–500 Hz).
-- **Safety I/O Task**: monitor safety edges, emergency stops, light curtains; handle safety interlocks with <10ms response time.
+- **Sensor Task**: sampling scheduler (configurable rates; e.g., temp/RH 1 Hz, stator temp 1 Hz, vibration bursts at 1–3 kHz for 1–5 s windows,
+  acoustics windows in audible/ultrasound bands, current 100–500 Hz).
+- **Safety I/O Task**: manage 6 dual-channel safety inputs (cross-monitoring, fault detection) and safety relay/SSR outputs; handle interlocking
+  logic based on safety input events or ML anomaly detection.
 - **Feature Task**: on‑device statistics (RMS vibration, kurtosis, crest factor, bandpower; avg/max torque/current; cycle detection).
 - **Edge Intelligence Task**: TinyML inference for vibration/acoustic anomaly detection, pattern recognition, predictive algorithms.
 - **Power Monitor Task**: continuous voltage/current monitoring, brownout detection, supercap charge management.
@@ -172,28 +202,35 @@ We standardize on Zephyr RTOS for the edge device firmware. The following task m
 
 ### Data Storage & Event Logging
 
-- **Local Storage**: JSON format with zstandard compression for human-readable, audit-friendly data storage on industrial SD cards. Power-safe writes ensure zero data loss during outages.
+- **Local Storage**: JSON format with zstandard compression for human-readable, audit-friendly data storage on industrial SD cards. Power-safe writes
+  ensure zero data loss during outages.
 - **Event Logging**: Comprehensive system event capture including connectivity, power, safety, and security events with automated workflow triggers.
 - **Data Integrity**: CRC32 checksums per record, SHA-256 per file, and atomic operations ensure 100% data reliability during power loss events.
 
-Detailed Specifications: See [Data Format Specification](/docs/data-format-specification) for complete JSON schemas, event types, file structure details.
+Detailed Specifications: See [Data Format Specification](/docs/data-format-specification) for complete JSON schemas, event types, file structure
+details.
 
 ### Edge Intelligence & AI
 
-- **AI-Powered Analytics**: On-device TinyML models for vibration and acoustic anomaly detection using lightweight neural networks (<16KB) optimized for STM32 processors.
+- **AI-Powered Analytics**: On-device TinyML models for vibration and acoustic anomaly detection using lightweight neural networks (<16KB) optimized
+  for STM32 processors.
 - **Real-Time Processing**: <1 second anomaly detection with 90% reduction in data transmission through intelligent filtering and priority queuing.
-- **Privacy & Reliability**: Sensitive data never leaves the device, ensuring GDPR/HIPAA compliance and continued operation during connectivity outages.
+- **Privacy & Reliability**: Sensitive data never leaves the device, ensuring GDPR/HIPAA compliance and continued operation during connectivity
+  outages.
 - **Continuous Learning**: OTA model updates with federated learning for fleet-wide intelligence improvement without compromising data privacy.
 
-Detailed Specifications: See [Edge Intelligence](/docs/edge-intelligence) for complete TinyML model specifications, training pipelines, and performance benchmarks.
+Detailed Specifications: See [Edge Intelligence](/docs/edge-intelligence) for complete TinyML model specifications, training pipelines, and
+performance benchmarks.
 
 ### Cloud Synchronization
 
-- **Reliable Upload**: Compressed JSON batches with idempotency keys, exponential backoff, and priority queuing ensure zero data loss during network outages.
+- **Reliable Upload**: Compressed JSON batches with idempotency keys, exponential backoff, and priority queuing ensure zero data loss during network
+  outages.
 - **Security**: TLS encryption with device-specific API keys, HMAC authentication, and OTA key rotation for enterprise-grade security.
 - **Offline Resilience**: 30+ day local buffering with automatic resume from last sync point when connectivity returns.
 
-Detailed Specifications: See [Cloud Infrastructure](/docs/cloud-infrastructure) and [API Specification](/docs/api-specification) for complete REST API documentation, authentication methods, and sync protocols.
+Detailed Specifications: See [Cloud Infrastructure](/docs/cloud-infrastructure) and [API Specification](/docs/api-specification) for complete REST API
+documentation, authentication methods, and sync protocols.
 
 ---
 
@@ -201,16 +238,19 @@ Detailed Specifications: See [Cloud Infrastructure](/docs/cloud-infrastructure) 
 
 ### Technology Stack
 
-**Django REST Framework Server + Nuxt.js Portal**: Scalable backend with REST APIs, role-based access control, workflow automation, and modern responsive frontend with real-time dashboard capabilities. Alternative platforms can be substituted based on customer requirements.
+**Django REST Framework Server + Nuxt.js Portal**: Scalable backend with REST APIs, role-based access control, workflow automation, and modern
+responsive frontend with real-time dashboard capabilities. Alternative platforms can be substituted based on customer requirements.
 
 ### Edge Features
 
 - **Device Management**: Centralized device registry with provisioning, configuration, and OTA firmware management across the entire fleet.
 - **Data Analytics**: Time-series data storage with real-time dashboards showing device health, usage patterns, and predictive maintenance insights.
-- **Event Automation**: Intelligent workflow engine that automatically creates maintenance tickets, sends alerts, and escalates issues based on configurable rules.
+- **Event Automation**: Intelligent workflow engine that automatically creates maintenance tickets, sends alerts, and escalates issues based on
+  configurable rules.
 - **Access Control**: Role-based access ensuring customers see only their devices while providing administrative oversight capabilities.
 
-Detailed Specifications: See [API Specification](/docs/api-specification) for complete platform architecture, database design, and integration details.
+Detailed Specifications: See [API Specification](/docs/api-specification) for complete platform architecture, database design, and integration
+details.
 
 ---
 
@@ -226,18 +266,18 @@ Detailed Specifications: See [API Specification](/docs/api-specification) for co
 
 ### Quality Assurance Framework
 
-- **Comprehensive Testing**: Multi-layered validation including unit tests, hardware-in-loop testing, safety compliance verification, and end-to-end system validation.
+- **Comprehensive Testing**: Multi-layered validation including unit tests, hardware-in-loop testing, safety compliance verification, and end-to-end
+  system validation.
 
 ### Performance Benchmarks
 
 - 72-hour offline tolerance with full data recovery
-- <10ms safety I/O response times
 - 99.5%+ OTA success rate
 - <0.01% data loss rate over 30-day soak tests
 
-### Safety & Compliance
+### Compliance
 
-- EN ISO 13849 functional safety validation, EMC testing, and environmental qualification testing.
+- EMC testing (EN 61000), functional safety (EN ISO 13849), electrical safety (EN 60204-1), and environmental qualification testing.
 
 Detailed Procedures: See [Testing Procedures](/docs/testing-procedures) for complete test protocols, acceptance criteria, and validation procedures.
 
@@ -254,7 +294,7 @@ Detailed Procedures: See [Testing Procedures](/docs/testing-procedures) for comp
 ## Technology Decisions
 
 - **Data Format**: JSON with zstd compression for maintainability and debugging ease.
-- **Connectivity**: Ethernet+PoE preferred for industrial environments; Wi-Fi for retrofits.
+- **Connectivity**: Dual Ethernet preferred for industrial environments; Wi-Fi for retrofits.
 - **Protocols**: REST for all device communications; MQTT optional for real-time commands.
 - **Database**: Django with PostgreSQL and optional TimescaleDB for heavy analytics workloads.
 
@@ -275,8 +315,10 @@ This page provides the business case and system overview. Detailed technical spe
 
 ### Development & Operations
 
-- **[Business Model & Partnerships](/docs/business-model-and-partnerships)** - Development model, funding structure, open source philosophy, and partnership framework
-- **[Competitor Analysis](/docs/competitor-analysis)** - Market landscape, competitive positioning, and strategic differentiation in industrial doors and CNC machine monitoring
+- **[Business Model & Partnerships](/docs/business-model-and-partnerships)** - Development model, funding structure, open source philosophy, and
+  partnership framework
+- **[Competitor Analysis](/docs/competitor-analysis)** - Market landscape, competitive positioning, and strategic differentiation in industrial doors
+  and CNC machine monitoring
 - **[Testing Procedures](/docs/testing-procedures)** - Comprehensive testing protocols, validation procedures, and acceptance criteria
 
 ### Quick Reference

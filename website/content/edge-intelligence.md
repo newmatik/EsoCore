@@ -1,12 +1,14 @@
 # Edge Intelligence & TinyML
 
-This document defines the edge intelligence capabilities, machine learning models, and algorithmic processing used by the EsoCore system for real-time anomaly detection and predictive maintenance.
+This document defines the edge intelligence capabilities, machine learning models, and algorithmic processing used by the EsoCore system for real-time
+anomaly detection and predictive maintenance.
 
 ---
 
 ## Why Edge Intelligence?
 
-Process data locally for faster response, reduced bandwidth, enhanced privacy, and reliable operation during connectivity outages. Critical for mission-critical and high-security environments.
+Process data locally for faster response, reduced bandwidth, enhanced privacy, and reliable operation during connectivity outages. Critical for
+mission-critical and high-security environments.
 
 ## Algorithmic Processing
 
@@ -112,7 +114,7 @@ The firmware includes a dedicated RTOS task for ML processing:
 - **Sensor Task**: Provides preprocessed data to ML models
 - **Event Logger**: Records ML predictions and confidence scores
 - **Sync Task**: Prioritizes anomaly data for cloud transmission
-- **Safety I/O**: ML can trigger safety responses for detected anomalies
+- **Safety I/O**: ML can trigger safety relay outputs for detected anomalies; safety input events feed into ML models
 
 ---
 

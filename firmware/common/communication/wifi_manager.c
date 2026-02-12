@@ -26,40 +26,40 @@ static bool wifi_connected = false;
 static uint32_t connection_attempts = 0;
 static uint32_t last_connection_attempt = 0;
 
-/* ESP32-WROOM-32 specific implementation */
-/* Adapted for ESP32 WiFi module with UART AT command interface */
+/* ESP32-S3-WROOM-1-N16R8 specific implementation */
+/* Adapted for ESP32-S3 WiFi module with UART AT command interface */
 
 /* ============================================================================
  * WiFi Hardware Abstraction Layer
  * ============================================================================ */
 
 /**
- * @brief Initialize ESP32-WROOM-32 hardware module
+ * @brief Initialize ESP32-S3-WROOM-1 hardware module
  *
  * @return true if hardware initialization successful, false otherwise
  */
 static bool wifi_hw_init(void) {
-    /* ESP32-WROOM-32 specific initialization:
+    /* ESP32-S3-WROOM-1 specific initialization:
      * - Hardware reset via EN pin (if available)
      * - Configure UART interface (115200 baud, 8N1)
-     * - Wait for "ready" message from ESP32
+     * - Wait for "ready" message from ESP32-S3
      * - Send AT command to test communication
      * - Configure basic WiFi parameters
      * - Set WiFi mode (station/AP)
      */
 
-    /* Example ESP32 AT command sequence:
+    /* Example ESP32-S3 AT command sequence:
      * 1. Send "AT" - should respond with "OK"
      * 2. Send "AT+CWMODE=1" - set station mode
      * 3. Send "AT+CIPMUX=0" - single connection mode
      * 4. Send "AT+CIPMODE=0" - normal transmission mode
      */
 
-    return true; /* TODO: Implement actual ESP32 communication */
+    return true; /* TODO: Implement actual ESP32-S3 communication */
 }
 
 /**
- * @brief Send AT command to ESP32-WROOM-32
+ * @brief Send AT command to ESP32-S3-WROOM-1
  *
  * @param command AT command string (without \r\n)
  * @param response Buffer for response

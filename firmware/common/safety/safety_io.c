@@ -5,8 +5,11 @@
  * This file contains the implementation of the safety I/O system compliant with
  * EN ISO 13849-1 functional safety standard for machinery safety.
  *
+ * The system manages 6 dual-channel safety digital inputs (12 optocouplers)
+ * with cross-monitoring, plus safety relay and SSR outputs.
+ *
  * @author EsoCore Development Team
- * @copyright Copyright © 2025 Newmatik. All rights reserved.
+ * @copyright Copyright (c) 2025 Newmatik. All rights reserved.
  * @license Apache License, Version 2.0
  */
 
@@ -46,29 +49,30 @@ static uint32_t last_test_pulse = 0;
 static bool safety_hw_init(void) {
     /* TODO: Implement hardware-specific safety I/O initialization */
     /* This would typically involve:
-     * - Configuring GPIO pins for safety inputs/outputs
-     * - Setting up optocoupler circuits
+     * - Configuring 12 GPIO pins for dual-channel safety inputs (2 per channel)
+     * - Setting up optocoupler circuits for cross-monitoring
+     * - Configuring relay driver GPIO (DRV110APWR)
+     * - Setting up relay feedback monitoring
+     * - Configuring SSR output GPIO (AQY212EHAZ)
      * - Configuring watchdog timer
-     * - Setting up emergency stop circuits
-     * - Configuring dual-channel monitoring
+     * - Setting up test pulse generation
      */
     return true;
 }
 
 /**
- * @brief Read safety input channel
+ * @brief Read safety input channel (single optocoupler)
  *
- * @param channel Input channel number
- * @param dual_channel true to read dual channel, false for single
+ * @param channel Input channel number (0-5)
+ * @param read_channel_b true to read Channel B, false for Channel A
  * @return true if input is active, false otherwise
  */
-static bool safety_hw_read_input(uint8_t channel, bool dual_channel) {
+static bool safety_hw_read_input(uint8_t channel, bool read_channel_b) {
     /* TODO: Implement hardware input reading */
     /* This would typically involve:
-     * - Reading GPIO pin state
+     * - Reading GPIO pin state for the specified optocoupler
+     *   (Channel A or Channel B of the dual-channel pair)
      * - Debouncing input signal
-     * - Checking dual-channel consistency
-     * - Detecting stuck-at faults
      */
     return false;
 }
@@ -83,7 +87,7 @@ static bool safety_hw_read_input(uint8_t channel, bool dual_channel) {
 static bool safety_hw_write_output(uint8_t channel, bool state) {
     /* TODO: Implement hardware output writing */
     /* This would typically involve:
-     * - Controlling relay driver
+     * - Controlling relay driver (DRV110APWR for safety relay)
      * - Safety relay energization
      * - Feedback monitoring
      * - Short-circuit detection
@@ -109,11 +113,6 @@ static bool safety_hw_read_output_feedback(uint8_t channel) {
  */
 static bool safety_hw_feed_watchdog(void) {
     /* TODO: Implement watchdog feeding */
-    /* This would typically involve:
-     * - Writing to watchdog register
-     * - Updating watchdog counter
-     * - Checking watchdog timeout
-     */
     return true;
 }
 
@@ -127,7 +126,6 @@ static bool safety_hw_emergency_stop(void) {
     /* This would typically involve:
      * - De-energizing all safety outputs
      * - Activating emergency stop circuit
-     * - Notifying safety controller
      */
     return true;
 }
@@ -137,9 +135,13 @@ static bool safety_hw_emergency_stop(void) {
  * ============================================================================ */
 
 /**
- * @brief Update safety input status
+ * @brief Update safety input status with dual-channel cross-monitoring
  *
- * @param channel Input channel number
+ * Reads both optocouplers (Channel A and Channel B) for the given input
+ * channel and performs cross-monitoring. If the two channels disagree,
+ * a cross-monitor fault is raised.
+ *
+ * @param channel Input channel number (0-5)
  */
 static void safety_update_input_status(uint8_t channel) {
     if (channel >= SAFETY_INPUT_CHANNELS) {
@@ -147,25 +149,16 @@ static void safety_update_input_status(uint8_t channel) {
     }
 
     safety_input_status_t *input = &safety_inputs[channel];
-    bool current_state = safety_hw_read_input(channel, safety_config.enable_dual_channel_monitoring);
 
-    /* Update timing */
-    uint32_t current_time = 0; /* TODO: Get current time */
+    /* Read both channels of the dual-channel pair */
+    bool channel_a = safety_hw_read_input(channel, false);
+    bool channel_b = safety_hw_read_input(channel, true);
 
-    if (current_state != input->active) {
-        if (current_state) {
-            input->activation_time = current_time;
-        } else {
-            input->deactivation_time = current_time;
-        }
-        input->active = current_state;
-    }
+    input->channel_a_state = channel_a;
+    input->channel_b_state = channel_b;
 
-    /* Check for stuck-at faults */
-    if (safety_config.enable_dual_channel_monitoring) {
-        bool channel_a = safety_hw_read_input(channel, false);
-        bool channel_b = safety_hw_read_input(channel, true);
-
+    /* Cross-monitoring: both channels must agree */
+    if (safety_config.enable_cross_monitoring) {
         if (channel_a != channel_b) {
             input->cross_monitor_fail = true;
             safety_status.fault_code = SAFETY_FAULT_CROSS_MONITOR;
@@ -174,13 +167,24 @@ static void safety_update_input_status(uint8_t channel) {
         }
     }
 
+    /* Determine agreed input state (only valid if channels agree) */
+    bool current_state = channel_a && channel_b;
+
+    /* Update timing */
+    uint32_t current_time = 0; /* TODO: Get current time */
+
+    if (current_state != input->active) {
+        if (current_state) {
+            input->activation_time = current_time;
+            input->activation_count++;
+        } else {
+            input->deactivation_time = current_time;
+        }
+        input->active = current_state;
+    }
+
     /* Update fault status */
     input->fault = input->cross_monitor_fail || input->stuck_at;
-
-    /* Count activations */
-    if (current_state && !input->active) {
-        input->activation_count++;
-    }
 }
 
 /**
@@ -224,10 +228,14 @@ static void safety_check_system_faults(void) {
     /* Reset fault code */
     safety_status.fault_code = SAFETY_FAULT_NONE;
 
-    /* Check input faults */
+    /* Check input faults (dual-channel cross-monitoring) */
     for (uint8_t i = 0; i < SAFETY_INPUT_CHANNELS; i++) {
         if (safety_inputs[i].fault) {
-            safety_status.fault_code = SAFETY_FAULT_INPUT_STUCK;
+            if (safety_inputs[i].cross_monitor_fail) {
+                safety_status.fault_code = SAFETY_FAULT_CROSS_MONITOR;
+            } else {
+                safety_status.fault_code = SAFETY_FAULT_INPUT_STUCK;
+            }
             break;
         }
     }
@@ -253,12 +261,15 @@ static void safety_check_system_faults(void) {
 
 /**
  * @brief Perform safety test pulse
+ *
+ * Periodically tests all safety inputs (dual-channel consistency) and
+ * safety outputs (feedback verification).
  */
 static void safety_perform_test_pulse(void) {
     uint32_t current_time = 0; /* TODO: Get current time */
 
     if (current_time - last_test_pulse >= SAFETY_TEST_PULSE_INTERVAL) {
-        /* Test safety inputs */
+        /* Test safety inputs (dual-channel cross-monitoring) */
         for (uint8_t i = 0; i < SAFETY_INPUT_CHANNELS; i++) {
             safety_update_input_status(i);
         }
@@ -297,7 +308,6 @@ bool safety_io_init(const safety_system_config_t *config) {
 
     /* Initialize safety status */
     memset(&safety_status, 0, sizeof(safety_system_status_t));
-    safety_status.status = SAFETY_STATE_SAFE;
     safety_status.current_state = SAFETY_STATE_SAFE;
     safety_status.safe_state_enforced = true;
 
@@ -339,7 +349,7 @@ bool safety_io_configure_input(uint8_t channel, const safety_input_config_t *con
     }
 
     /* Store configuration (would be used by hardware layer) */
-    /* TODO: Apply configuration to hardware */
+    /* TODO: Apply dual-channel GPIO configuration to hardware */
 
     return true;
 }
@@ -488,7 +498,7 @@ uint16_t safety_io_run_diagnostics(void) {
         return diagnostic_result;
     }
 
-    /* Test safety inputs */
+    /* Test safety inputs (dual-channel cross-monitoring) */
     for (uint8_t i = 0; i < SAFETY_INPUT_CHANNELS; i++) {
         safety_update_input_status(i);
         if (safety_inputs[i].fault) {
@@ -514,7 +524,7 @@ uint16_t safety_io_run_diagnostics(void) {
 }
 
 /**
- * @brief Test safety input channel
+ * @brief Test safety input channel (dual-channel consistency)
  */
 bool safety_io_test_input(uint8_t channel) {
     if (!safety_initialized || channel >= SAFETY_INPUT_CHANNELS) {
@@ -574,7 +584,7 @@ bool safety_io_get_fault_description(uint8_t fault_code, char *buffer, uint16_t 
             description = "Safety input stuck at high/low";
             break;
         case SAFETY_FAULT_CROSS_MONITOR:
-            description = "Cross-monitoring failure";
+            description = "Dual-channel cross-monitoring failure";
             break;
         case SAFETY_FAULT_WATCHDOG:
             description = "Watchdog timeout";
@@ -638,11 +648,6 @@ bool safety_io_is_safe_state(void) {
  */
 bool safety_io_get_event_log(char *buffer, uint16_t buffer_size, uint16_t *num_entries) {
     /* TODO: Implement event log retrieval */
-    /* This would typically involve:
-     * - Reading from circular event buffer
-     * - Formatting events as text
-     * - Returning number of entries
-     */
     return false;
 }
 
@@ -666,7 +671,8 @@ bool safety_io_validate_function(const char *function_type) {
     /* This would typically involve:
      * - Testing specific safety functions
      * - Verifying SIL/PL compliance
-     * - Checking response times
+     * - Checking response times (<10ms requirement)
+     * - Verifying dual-channel consistency
      */
     return true;
 }

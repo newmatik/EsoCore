@@ -2,6 +2,9 @@
 
 Modern Vue.js frontend application for the EsoCore IoT monitoring system, built with Nuxt.js.
 
+**Status: Early Development** -- The portal currently has a basic scaffold with mock dashboard data.
+JWT authentication, WebSocket real-time updates, and full API integration are planned but not yet implemented.
+
 ## Features
 
 - **Dashboard**: Real-time device monitoring and telemetry visualization
@@ -18,8 +21,8 @@ Modern Vue.js frontend application for the EsoCore IoT monitoring system, built 
 - **Charts**: Chart.js or ApexCharts for data visualization
 - **State Management**: Pinia for Vue state management
 - **HTTP Client**: Axios for API communication
-- **Authentication**: JWT-based authentication
-- **Real-time**: WebSocket support for live updates
+- **Authentication**: JWT-based authentication (planned)
+- **Real-time**: WebSocket support for live updates (planned)
 
 ## Quick Start
 
@@ -156,11 +159,11 @@ The portal integrates with Django's authentication system:
 
 ```typescript
 // Login
-const { login } = useAuth()
-await login({ username, password })
+const { login } = useAuth();
+await login({ username, password });
 
 // API calls with automatic token handling
-const { data } = await $api('/devices/')
+const { data } = await $api("/devices/");
 ```
 
 ### Real-time Updates
@@ -168,15 +171,15 @@ const { data } = await $api('/devices/')
 WebSocket integration for live data:
 
 ```typescript
-const { connect, subscribe } = useWebSocket()
+const { connect, subscribe } = useWebSocket();
 
 // Connect to WebSocket
-connect()
+connect();
 
 // Subscribe to device updates
-subscribe('devices', data => {
+subscribe("devices", (data) => {
   // Handle real-time updates
-})
+});
 ```
 
 ## Development
@@ -279,5 +282,4 @@ This creates a `dist/` folder with static files ready for deployment.
 
 ## License
 
-Copyright © 2025 Newmatik. All rights reserved.
-Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.
+Copyright © 2025 Newmatik. All rights reserved. Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.

@@ -84,7 +84,7 @@ BOM (Bill of Materials) data is synchronized from the hardware designs using the
 python3 tools/sync_bom_data.py
 ```
 
-This copies CSV files from `hardware/` to `website/public/docs/data/` for use in the documentation.
+This copies CSV files from `hardware/` to `website/public/bom/` for use in the documentation.
 
 ## Deployment
 

@@ -2,9 +2,8 @@
 
 ## Overview
 
-The Light Sensor Module provides multi‑spectrum light analysis for industrial
-safety and process control, combining visible light, UV, IR, color and spectral
-sensing.
+The Light Sensor Module provides multi‑spectrum light analysis for industrial safety and process control, combining visible light, UV, IR, color and
+spectral sensing.
 
 ## Features
 

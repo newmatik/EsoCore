@@ -1,12 +1,12 @@
 /**
  * @file wifi_manager.h
- * @brief WiFi Manager for EsoCore Edge Device (ESP32-WROOM-32)
+ * @brief WiFi Manager for EsoCore Edge Device (ESP32-S3-WROOM-1-N16R8)
  *
  * This file provides WiFi connectivity management for the EsoCore Edge device,
- * using ESP32-WROOM-32 module with UART AT command interface.
+ * using ESP32-S3-WROOM-1-N16R8 module with UART AT command interface.
  *
  * Features:
- * - ESP32 AT command protocol implementation
+ * - ESP32-S3 AT command protocol implementation
  * - WiFi connection management (802.11b/g/n)
  * - Bluetooth 5.0 support
  * - Network scanning and selection
@@ -17,11 +17,11 @@
  * - Power management modes
  * - Fallback and roaming capabilities
  *
- * ESP32-Specific Features:
- * - Dual-core Xtensa LX6 processor (240MHz each)
- * - Hardware encryption acceleration
+ * ESP32-S3-Specific Features:
+ * - Dual-core Xtensa LX7 processor (240MHz each)
+ * - Hardware encryption acceleration (AES, SHA, RSA, ECC)
  * - Ultra-low power sleep modes
- * - Rich peripheral set (SPI, I2C, ADC, etc.)
+ * - 16 MB flash, 8 MB PSRAM
  *
  * @author EsoCore Development Team
  * @copyright Copyright © 2025 Newmatik. All rights reserved.
@@ -42,7 +42,7 @@ extern "C" {
  * WiFi Configuration
  * ============================================================================ */
 
-/* ESP32-WROOM-32 Configuration */
+/* ESP32-S3-WROOM-1-N16R8 Configuration */
 #define WIFI_SSID_MAX_LENGTH     32
 #define WIFI_PASSWORD_MAX_LENGTH 64
 #define WIFI_MAX_NETWORKS        16

@@ -1,6 +1,8 @@
 # Competitive Analysis
 
-EsoCore operates in the industrial IoT monitoring space, targeting two distinct verticals: **Industrial Doors** (sectional doors, overhead doors, automated door systems) and **CNC/Milling Machines** (precision manufacturing equipment). This analysis examines direct and indirect competitors in both markets, evaluating their approaches to edge intelligence, predictive maintenance, safety compliance, and integration capabilities.
+EsoCore operates in the industrial IoT monitoring space, targeting two distinct verticals: **Industrial Doors** (sectional doors, overhead doors,
+automated door systems) and **CNC/Milling Machines** (precision manufacturing equipment). This analysis examines direct and indirect competitors in
+both markets, evaluating their approaches to edge intelligence, predictive maintenance, safety compliance, and integration capabilities.
 
 ---
 
@@ -21,7 +23,8 @@ Our competitive analysis focuses on six key dimensions:
 
 ## Industrial Doors IoT Solutions
 
-Industrial door monitoring focuses on preventing downtime, ensuring safety compliance, and optimizing operational efficiency for high-speed roll-up doors, sectional warehouse doors, and automated gate systems.
+Industrial door monitoring focuses on preventing downtime, ensuring safety compliance, and optimizing operational efficiency for high-speed roll-up
+doors, sectional warehouse doors, and automated gate systems.
 
 ### Key Door IoT Competitors
 
@@ -75,7 +78,8 @@ Industrial door monitoring focuses on preventing downtime, ensuring safety compl
 
 ### Industrial Doors Market Summary
 
-The industrial door IoT market is emerging with a mix of OEM-specific solutions (ASSA ABLOY) and open platforms (Maveo Pro). Most competitors focus on either usage analytics OR predictive maintenance, with limited integration of both approaches.
+The industrial door IoT market is emerging with a mix of OEM-specific solutions (ASSA ABLOY) and open platforms (Maveo Pro). Most competitors focus on
+either usage analytics OR predictive maintenance, with limited integration of both approaches.
 
 ---
 
@@ -147,7 +151,8 @@ CNC machine monitoring emphasizes performance optimization, condition monitoring
 
 ### CNC Monitoring Market Summary
 
-The CNC monitoring market is mature with established players offering different approaches: native OEM integration (Fanuc), broad manufacturing platforms (MachineMetrics), and specialized analytics (Senseye, Augury). Competition is intense with clear differentiation needed.
+The CNC monitoring market is mature with established players offering different approaches: native OEM integration (Fanuc), broad manufacturing
+platforms (MachineMetrics), and specialized analytics (Senseye, Augury). Competition is intense with clear differentiation needed.
 
 ---
 
@@ -175,9 +180,9 @@ The CNC monitoring market is mature with established players offering different 
 
 #### 4. **Safety-Integrated Design**
 
-- **Advantage**: Safety event detection as first-class feature, not add-on
-- **Value**: Bridges monitoring and control for proactive safety responses
-- **Compliance**: Designed for EN ISO 13849 integration from ground up
+- **Advantage**: Built-in dual-channel safety digital inputs (EN ISO 13849 Cat. 3), analog inputs, and safety relay outputs
+- **Value**: Monitoring and safety interlocking from a single device without external safety controllers
+- **Flexibility**: 6 safety digital inputs + 4 analog inputs + safety relay + SSR in one platform
 
 #### 5. **OEM Partnership Model**
 
@@ -189,21 +194,22 @@ The CNC monitoring market is mature with established players offering different 
 
 - **Advantage**: Add new sensor types (including proprietary partner modules) without redesigning the Edge
 - **Value**: Faster time‑to‑market for customer‑specific requirements and exclusive sensors
-- **Differentiation**: Many competitors tie capabilities to fixed hardware kits or OEM controllers; our RS‑485 multi‑drop bus enables plug‑and‑play expansion
+- **Differentiation**: Many competitors tie capabilities to fixed hardware kits or OEM controllers; our RS‑485 multi‑drop bus enables plug‑and‑play
+  expansion
 
 ### Competitive Advantages by Market
 
 #### Industrial Doors Market
 
 - **Multi-brand support** vs OEM-locked solutions (ASSA ABLOY)
-- **Enhanced safety response** with automated interventions
+- **Integrated safety I/O** for safety monitoring and interlocking (EN ISO 13849)
 - **Cost-effective TinyML** vs expensive gateway hardware
 - **Comprehensive analytics** combining usage + predictive maintenance
 
 #### CNC Machine Market
 
 - **TinyML bandwidth efficiency** vs cloud-heavy competitors
-- **Safety event monitoring** not offered by production-focused platforms
+- **Comprehensive safety I/O** with dual-channel safety inputs and relay outputs not offered by production-focused platforms
 - **Developer-friendly integration** for solution providers
 - **Mid-market focus** between enterprise platforms and basic monitoring
 
@@ -246,15 +252,18 @@ The CNC monitoring market is mature with established players offering different 
 
 ## Conclusion
 
-EsoCore enters competitive markets with clear differentiators: cross-domain capability, edge-first TinyML architecture, and open source foundation. Success depends on executing these advantages while building domain credibility through strategic partnerships.
+EsoCore enters competitive markets with clear differentiators: cross-domain capability, edge-first TinyML architecture, and open source foundation.
+Success depends on executing these advantages while building domain credibility through strategic partnerships.
 
-The industrial doors market offers significant opportunity with limited dedicated competition, while the CNC machine market requires precise positioning against established players. EsoCore's unique combination of safety focus, edge intelligence, and open architecture provides a viable path to market leadership in both verticals.
+The industrial doors market offers significant opportunity with limited dedicated competition, while the CNC machine market requires precise
+positioning against established players. EsoCore's unique combination of comprehensive I/O, edge intelligence, and open architecture provides a viable path
+to market leadership in both verticals.
 
 Key success factors:
 
 - Demonstrate technical superiority through pilot results
 - Leverage partnerships for market credibility and domain expertise
-- Maintain focus on safety and reliability as core differentiators
+- Maintain focus on reliability, safety compliance, and integrated safety I/O as core differentiators
 - Build ecosystem around open platform for long-term competitive advantage
 
 ---

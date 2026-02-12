@@ -143,7 +143,7 @@ const renderedContent = computed(() => {
   // Configure marked options
   marked.setOptions({
     gfm: true,
-    breaks: true,
+    breaks: false,
     headerIds: true,
   })
 

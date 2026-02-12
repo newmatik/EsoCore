@@ -13,9 +13,8 @@
 - MCU: STM32G031K8T6 (TSSOP20), 8 MHz crystal
 - Sensor: ACS723 ±30 A Hall current sensor (higher range, better linearity)
 - Isolation: RS‑485 transceiver ADM2582E (integrated iso + DC/DC)
-- Power: Isolated 12V→5V DC/DC (MEA1S1205SC) → 3.3 V LDO (MCP1700)
-- Connectors: Two pluggable RS‑485 ports (IN and OUT): plug `2EDGK-5.0-04P` ↔
-  PCB mate `2EDGR-5.0-04P`; silk labels A/B/24V/GND; signal loop‑through;
+- Power: Isolated 12V→5V DC/DC (NXE1S1205MC) → 3.3 V LDO (MCP1700)
+- Connectors: Two pluggable RS‑485 ports (IN and OUT): plug `2EDGK-5.0-04P` ↔ PCB mate `2EDGR-5.0-04P`; silk labels A/B/12V/GND; signal loop‑through;
   PG9 cable gland
 - Protection: GDT surge suppressor on power; ESD arrays at bus/power
 - Addressing: 8‑position SMD DIP; 1–7 = Modbus address bits, 8 = 120 Ω termination enable; silkscreen: "1‑7=ADDR, 8=TERM, ON/OFF"
@@ -50,5 +49,4 @@
 
 ## Copyright and License
 
-Copyright © 2025 Newmatik. All rights reserved.
-Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.
+Copyright © 2025 Newmatik. All rights reserved. Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.

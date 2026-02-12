@@ -1,0 +1,12 @@
+node_modules/
+portal/node_modules/
+website/node_modules/
+server/venv/
+server/node_modules/
+portal/.nuxt/
+website/.nuxt/
+portal/.output/
+website/.output/
+website/dist/
+server/db.sqlite3
+

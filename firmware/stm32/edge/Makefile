@@ -1,7 +1,7 @@
-# Makefile for EsoCore Edge Device (STM32F4)
+# Makefile for EsoCore Edge Device (STM32H7)
 #
 # This Makefile builds the Edge device firmware using ARM GCC toolchain.
-# Make sure you have the STM32CubeF4 HAL library installed.
+# Make sure you have the STM32CubeH7 HAL library installed.
 #
 # Usage:
 #   make all        - Build all targets
@@ -24,7 +24,7 @@ SRC_DIRS = . ../../common
 INC_DIRS = . ../../common
 
 # Target MCU
-MCU = STM32F407VG
+MCU = STM32H747IIT6
 
 # Toolchain
 CC = arm-none-eabi-gcc
@@ -39,8 +39,8 @@ GDB = arm-none-eabi-gdb
 # ============================================================================
 
 # CPU and architecture
-CPU = -mcpu=cortex-m4
-FPU = -mfpu=fpv4-sp-d16
+CPU = -mcpu=cortex-m7
+FPU = -mfpu=fpv5-d16
 FLOAT_ABI = -mfloat-abi=hard
 
 # MCU specific flags
@@ -114,12 +114,12 @@ $(BUILD_DIR)/$(PROJECT_NAME).bin: $(BUILD_DIR)/$(PROJECT_NAME).elf
 
 # Flash to device (requires OpenOCD)
 flash: $(BUILD_DIR)/$(PROJECT_NAME).elf
-	openocd -f interface/stlink.cfg -f target/stm32f4x.cfg \
+	openocd -f interface/stlink.cfg -f target/stm32h7x.cfg \
 		-c "program $(BUILD_DIR)/$(PROJECT_NAME).elf verify reset exit"
 
 # Debug (requires OpenOCD and GDB)
 debug: $(BUILD_DIR)/$(PROJECT_NAME).elf
-	openocd -f interface/stlink.cfg -f target/stm32f4x.cfg &
+	openocd -f interface/stlink.cfg -f target/stm32h7x.cfg &
 	$(GDB) $(BUILD_DIR)/$(PROJECT_NAME).elf -ex "target remote localhost:3333"
 
 # Clean build artifacts

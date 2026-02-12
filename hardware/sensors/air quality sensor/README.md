@@ -16,7 +16,7 @@
 - CO2 Sensor: SCD40 (NDIR CO2 with auto-calibration)
 - Bus: RS‑485 half‑duplex (SN65HVD72), bias/termination network
 - Power: 12 V bus → 5 V buck (TPS62173) + 3.3 V LDO (MCP1700)
-- Connectors: Two pluggable RS‑485 ports (IN and OUT): plug `2EDGK-5.0-04P` ↔ PCB mate `2EDGR-5.0-04P`; silk labels A/B/24V/GND; signal loop‑through
+- Connectors: Two pluggable RS‑485 ports (IN and OUT): plug `2EDGK-5.0-04P` ↔ PCB mate `2EDGR-5.0-04P`; silk labels A/B/12V/GND; signal loop‑through
 - Protection: ESD array on bus and power lines
 - Addressing: 8‑position SMD DIP; 1–7 = Modbus address bits, 8 = 120 Ω termination enable; silkscreen: "1‑7=ADDR, 8=TERM, ON/OFF"
 - Indicators: Green status LED
@@ -51,5 +51,4 @@
 
 ## Copyright and License
 
-Copyright © 2025 Newmatik. All rights reserved.
-Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.
+Copyright © 2025 Newmatik. All rights reserved. Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.

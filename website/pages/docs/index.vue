@@ -107,7 +107,7 @@ const renderedReadmeContent = computed(() => {
 
   marked.setOptions({
     gfm: true,
-    breaks: true,
+    breaks: false,
     headerIds: true,
   })
 

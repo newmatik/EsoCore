@@ -21,4 +21,4 @@ This section lists BOM pages for the Edge and each sensor module. Open a specifi
 Notes:
 
 - Prices are indicative and exclude assembly.
-- CSV sources live under `/public/docs/data/*.csv` and are rendered by the docs app.
+- CSV sources live under `/public/bom/*.csv` and are rendered by the docs app.

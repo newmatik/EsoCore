@@ -18,8 +18,7 @@
 - Sensor: VL53L0X laser distance sensor for precision positioning
 - Bus: RS‑485 half‑duplex (SN65HVD72), bias/termination network
 - Power: 12 V bus → 3.3 V buck (TPS62172) + LDO (MCP1700) for clean analog
-- Connectors: Two pluggable RS‑485 ports (IN and OUT): plug `2EDGK-5.0-04P` ↔
-  PCB mate `2EDGR-5.0-04P`; silk labels A/B/24V/GND; signal loop‑through;
+- Connectors: Two pluggable RS‑485 ports (IN and OUT): plug `2EDGK-5.0-04P` ↔ PCB mate `2EDGR-5.0-04P`; silk labels A/B/12V/GND; signal loop‑through;
   PG9 cable gland
 - Protection: ESD arrays on bus/power lines
 - Addressing: 8‑position SMD DIP; 1–7 = Modbus address bits, 8 = 120 Ω termination enable; silkscreen: "1‑7=ADDR, 8=TERM, ON/OFF"
@@ -66,5 +65,4 @@
 
 ## Copyright and License
 
-Copyright © 2025 Newmatik. All rights reserved.
-Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.
+Copyright © 2025 Newmatik. All rights reserved. Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.

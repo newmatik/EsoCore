@@ -13,7 +13,7 @@ installation, network configuration, sensor deployment, cloud platform setup, an
 
 - 1× EsoCore Edge device (STM32H747-based)
 - 1-5× Sensor modules (based on monitoring requirements)
-- Power supply (12-24V DC, 2A minimum) OR PoE-capable network switch
+- 24V DC power supply (2A minimum, dedicated external supply recommended)
 - Industrial microSD card (8GB+, SLC or MLC with wear leveling)
 - Ethernet cable (Cat5e or better) OR WiFi access
 - RS-485 cable (4-conductor shielded, Belden 3105A or equivalent)
@@ -31,9 +31,8 @@ installation, network configuration, sensor deployment, cloud platform setup, an
 
 **Connectivity Options:**
 
-- Ethernet with DHCP (recommended)
-- Static IP assignment
-- PoE (IEEE 802.3af) for power and network
+- Dual Ethernet with DHCP on IT port and static IP on machine port (recommended)
+- Static IP assignment on both ports
 - WiFi (2.4 GHz, WPA2 minimum)
 
 **Bandwidth:**
@@ -79,7 +78,7 @@ installation, network configuration, sensor deployment, cloud platform setup, an
 
 **Site Survey:**
 
-- Verify power availability (12-24V or PoE)
+- Verify 24V DC power availability
 - Check network connectivity at each location
 - Identify sensor mounting locations
 - Plan cable routing paths
@@ -142,14 +141,14 @@ installation, network configuration, sensor deployment, cloud platform setup, an
 
 **Mounting Options:**
 
-*DIN Rail Mount:*
+_DIN Rail Mount:_
 
 1. Measure required rail space (10cm width typical)
 2. Position device on 35mm DIN rail
 3. Press down until clips engage
 4. Verify secure mounting
 
-*Wall Mount:*
+_Wall Mount:_
 
 1. Mark mounting hole locations
 2. Drill holes appropriate for wall material
@@ -157,7 +156,7 @@ installation, network configuration, sensor deployment, cloud platform setup, an
 4. Secure device with provided screws
 5. Ensure level and secure mounting
 
-*Panel Mount:*
+_Panel Mount:_
 
 1. Cut opening in panel per template
 2. Insert device from front
@@ -166,9 +165,9 @@ installation, network configuration, sensor deployment, cloud platform setup, an
 
 ### Power Connection
 
-**Option A: DC Power (12-24V)**
+**24V DC Power Connection:**
 
-1. Verify power supply voltage: [_____]V DC
+1. Verify power supply voltage: 24V DC nominal
 2. Confirm current capacity: 2A minimum
 3. Identify polarity (typically red = +, black = -)
 4. **Double-check polarity before connecting!**
@@ -179,17 +178,6 @@ installation, network configuration, sensor deployment, cloud platform setup, an
 7. Apply power
 8. Verify power LED illuminates
 9. Check OLED display shows boot sequence
-
-**Option B: Power over Ethernet (PoE)**
-
-1. Verify network switch supports IEEE 802.3af PoE
-2. Verify switch has available PoE budget (12.95W per device)
-3. Connect Ethernet cable to device
-4. Connect other end to PoE switch
-5. Device auto-detects and powers on
-6. Verify PoE LED illuminates
-7. Verify power LED illuminates
-8. Check network connectivity
 
 **Power Verification:**
 
@@ -294,7 +282,7 @@ The USB connection on the EsoCore Edge device is used exclusively for:
 
 **Mounting Methods:**
 
-*Stud Mount (Preferred - Best Accuracy):*
+_Stud Mount (Preferred - Best Accuracy):_
 
 1. Drill and tap mounting hole (M6 or M8 typical)
 2. Clean mounting surface thoroughly
@@ -303,7 +291,7 @@ The USB connection on the EsoCore Edge device is used exclusively for:
 5. Tighten to specified torque
 6. Verify sensor is firmly mounted
 
-*Magnetic Mount (Quick Installation):*
+_Magnetic Mount (Quick Installation):_
 
 1. Clean mounting surface (remove paint, oil, rust)
 2. Ensure surface is flat and smooth
@@ -311,7 +299,7 @@ The USB connection on the EsoCore Edge device is used exclusively for:
 4. Verify strong magnetic attachment
 5. Apply safety cable as backup
 
-*Adhesive Mount (Temporary or Testing):*
+_Adhesive Mount (Temporary or Testing):_
 
 1. Clean surface with isopropyl alcohol
 2. Apply industrial adhesive or epoxy
@@ -355,7 +343,7 @@ The USB connection on the EsoCore Edge device is used exclusively for:
 
 **Installation:**
 
-*Surface Mount:*
+_Surface Mount:_
 
 1. Clean mounting surface
 2. Apply thermal compound for good contact
@@ -363,7 +351,7 @@ The USB connection on the EsoCore Edge device is used exclusively for:
 4. Insulate from ambient if needed
 5. Verify good thermal contact
 
-*Thermowell Installation (Process Fluids):*
+_Thermowell Installation (Process Fluids):_
 
 1. Install thermowell in process per specifications
 2. Fill thermowell with thermal compound
@@ -371,9 +359,7 @@ The USB connection on the EsoCore Edge device is used exclusively for:
 4. Secure compression fitting
 5. Allow thermal stabilization (15-30 minutes)
 
-**Wiring:**
-Same 4-conductor bus connection as vibration sensors
-Set unique DIP switch address
+**Wiring:** Same 4-conductor bus connection as vibration sensors Set unique DIP switch address
 
 ### Current Sensor Installation
 
@@ -396,9 +382,7 @@ Set unique DIP switch address
 - Use appropriate PPE
 - Follow electrical codes and regulations
 
-**Wiring:**
-Same 4-conductor bus connection
-Set unique DIP switch address
+**Wiring:** Same 4-conductor bus connection Set unique DIP switch address
 
 ### Additional Sensor Types
 
@@ -495,8 +479,7 @@ Edge Device → Sensor 1 → Sensor 2 → Sensor 3 → ... → Last Sensor
 4. Review discovered sensors list
 5. Verify expected sensors found
 
-**Assign Descriptive Names:**
-For each sensor:
+**Assign Descriptive Names:** For each sensor:
 
 1. Click sensor to edit
 2. Change name from default to descriptive:
@@ -513,26 +496,26 @@ For each sensor:
 
 Configure appropriate rates for each sensor type:
 
-*Vibration Sensors:*
+_Vibration Sensors:_
 
 - Analysis windows: 1-3 kHz for 1-5 seconds
 - Window frequency: Every 5-15 minutes
 - Continuous RMS: 1-10 Hz
 - Alert evaluation: Every 30-60 seconds
 
-*Temperature Sensors:*
+_Temperature Sensors:_
 
 - Sampling rate: 0.1-1 Hz (every 1-10 seconds)
 - Alert evaluation: Every 60 seconds
 - Thermal time constant consideration
 
-*Current Sensors:*
+_Current Sensors:_
 
 - Sampling rate: 100-500 Hz
 - RMS calculation: 1-10 Hz
 - Power analysis: Every 1-5 seconds
 
-*Pressure Sensors:*
+_Pressure Sensors:_
 
 - Sampling rate: 1-10 Hz
 - Alert evaluation: Every 10-60 seconds
@@ -586,7 +569,7 @@ Configure appropriate rates for each sensor type:
 
 **Notification Methods:**
 
-*Email:*
+_Email:_
 
 1. Settings → Notifications → Email
 2. Enter SMTP server details:
@@ -598,13 +581,13 @@ Configure appropriate rates for each sensor type:
 4. Select severity levels to notify
 5. Test email delivery
 
-*Local Outputs:*
+_Local Outputs:_
 
 1. Wire relay outputs to alarm devices
 2. Configure trigger conditions
 3. Test before relying on
 
-*CMMS Integration:*
+_CMMS Integration:_
 
 1. Settings → Integrations → CMMS
 2. Enter CMMS API endpoint
@@ -910,4 +893,5 @@ See [Quick Start Guide](/docs/getting-started/quick-start) for detailed troubles
 
 Comprehensive installation complete! Your industrial IoT monitoring system is now operational and protecting your critical equipment.
 
-[Quick Start Guide](/docs/getting-started/quick-start) | [Integration Guide](/docs/getting-started/integration-guide) | [API Documentation](/docs/api-specification)
+[Quick Start Guide](/docs/getting-started/quick-start) | [Integration Guide](/docs/getting-started/integration-guide) |
+[API Documentation](/docs/api-specification)

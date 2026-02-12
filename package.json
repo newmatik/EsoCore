@@ -1,0 +1,16 @@
+{
+  "name": "esocore",
+  "private": true,
+  "scripts": {
+    "lint:md": "markdownlint --config .markdownlint.jsonc --ignore-path .markdownlintignore \"**/*.md\" \"**/*.markdown\"",
+    "format:md": "prettier --config .prettierrc.json --ignore-path .prettierignore --write \"**/*.md\" \"**/*.markdown\"",
+    "format:md:check": "prettier --config .prettierrc.json --ignore-path .prettierignore --check \"**/*.md\" \"**/*.markdown\"",
+    "lint:md:watch": "chokidar \"**/*.md\" \"**/*.markdown\" --initial --ignore \"**/node_modules/**\" --ignore \"**/.git/**\" --ignore \"server/venv/**\" --ignore \"**/.nuxt/**\" --command \"prettier --config .prettierrc.json --ignore-path .prettierignore --write \\\"{path}\\\" && markdownlint --config .markdownlint.jsonc --ignore-path .markdownlintignore \\\"{path}\\\"\""
+  },
+  "devDependencies": {
+    "chokidar-cli": "^3.0.0",
+    "markdownlint-cli": "^0.39.0",
+    "prettier": "^3.2.5"
+  }
+}
+

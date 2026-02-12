@@ -1,6 +1,7 @@
 # Testing & Validation Procedures
 
-This document defines the comprehensive testing procedures, validation protocols, and acceptance criteria for the EsoCore edge-to-cloud monitoring system.
+This document defines the comprehensive testing procedures, validation protocols, and acceptance criteria for the EsoCore edge-to-cloud monitoring
+system.
 
 ---
 
@@ -13,7 +14,7 @@ This document defines the comprehensive testing procedures, validation protocols
 - **File rotation**: SD card file management and rotation logic
 - **Clock drift**: RTC accuracy and NTP synchronization
 - **Event logging**: System event capture and formatting
-- **Safety I/O response**: Safety input detection and response timing
+- **Safety I/O**: Dual-channel input cross-monitoring, safety relay and SSR output control and feedback
 
 ### Hardware-in-Loop (HIL) Testing
 
@@ -31,11 +32,14 @@ This document defines the comprehensive testing procedures, validation protocols
 
 ### Safety I/O Testing
 
-- **Response time verification**: Confirm <10ms response for safety inputs
-- **Safety circuit diagnostics**: Verify built-in safety circuit monitoring
-- **Emergency stop sequences**: Test complete safety shutdown procedures
-- **Light curtain integration**: Verify optical safety barrier functionality
-- **Safety edge testing**: Pressure-sensitive edge response validation
+- **Dual-channel input verification**: Confirm all 6 safety input channels read consistently across both optocouplers (Channel A and
+  Channel B); verify cross-monitoring detects injected mismatch within <10 ms
+- **Stuck-at fault detection**: Verify periodic test pulses identify inputs stuck high or low
+- **Safety relay verification**: Confirm dual-channel relay (G7SA-2A2B-DC24) correct energize/de-energize behavior
+- **SSR output testing**: Verify AQY212EHAZ solid-state relay switching and load handling
+- **Feedback monitoring**: Verify relay feedback signals match commanded state
+- **Coil driver testing**: Verify DRV110APWR driver economization and contact monitoring
+- **Safe state enforcement**: Verify cross-monitor fault triggers de-energization of safety relay within response time budget
 
 ### Power Management Testing
 
@@ -105,7 +109,8 @@ This document defines the comprehensive testing procedures, validation protocols
 ### Event System Requirements
 
 - **Event logging**: All system events captured and transmitted within 30 s of connectivity restoration
-- **Safety I/O response**: Safety inputs respond within <10ms; safety events logged with <1ms timestamp accuracy
+- **Safety I/O**: Dual-channel input cross-monitoring verified; safety relay energize/de-energize cycles verified; relay feedback
+  consistent with commanded state; response time <10 ms confirmed
 - **Power management**: Supercap provides ≥30s safe shutdown time; graceful shutdown completes in <20s
 - **Safe shutdown reliability**: 100% data integrity during 1000+ simulated power loss events
 
@@ -129,7 +134,7 @@ This document defines the comprehensive testing procedures, validation protocols
 
 - **Production hardware**: Final hardware revision testing
 - **Real doors**: 5-10 pilot door installations
-- **Network diversity**: Various connectivity types (Ethernet, Wi-Fi, PoE)
+- **Network diversity**: Various connectivity types (dual Ethernet, Wi-Fi)
 - **Environmental conditions**: Temperature and humidity variations
 
 ### Production Environment
@@ -201,8 +206,7 @@ This document defines the comprehensive testing procedures, validation protocols
 
 ### Safety Certifications
 
-- **EN ISO 13849** compliance verification for safety-related systems
-- **IEC 61508** functional safety standard validation
+- **EN ISO 13849** functional safety compliance for dual-channel safety digital inputs
 - **EN 60204-1** electrical safety compliance
 
 ### EMC Testing

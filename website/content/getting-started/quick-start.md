@@ -1,7 +1,7 @@
 # EsoCore Quick Start Guide
 
-Get up and running with EsoCore industrial IoT monitoring in under 30 minutes. This guide walks you through your first equipment monitoring deployment, from
-hardware setup to viewing live sensor data and configuring alerts.
+Get up and running with EsoCore industrial IoT monitoring in under 30 minutes. This guide walks you through your first equipment monitoring
+deployment, from hardware setup to viewing live sensor data and configuring alerts.
 
 ---
 
@@ -10,24 +10,28 @@ hardware setup to viewing live sensor data and configuring alerts.
 Before starting, ensure you have:
 
 **Hardware:**
+
 - 1 EsoCore Edge device (STM32H747-based)
 - 1 or more sensor modules (vibration, temperature, or current sensor recommended for first deployment)
-- 12-24V DC power supply or PoE-capable network switch
-- Ethernet cable or WiFi credentials
+- 24V DC power supply (dedicated external supply recommended for maximum robustness)
+- Ethernet cables (2x recommended: one for machine network, one for IT network) or WiFi credentials
 - microSD card (industrial grade, 8GB+ recommended)
 
 **Network:**
+
 - Ethernet connection (preferred) or WiFi access
 - DHCP or static IP configuration
 - Outbound HTTPS access for cloud sync (optional)
 - Local network access for configuration web UI
 
 **Skills:**
+
 - Basic understanding of industrial equipment
 - Ability to mount sensors on equipment
 - Basic networking knowledge (helpful but not required)
 
 **Time Required:**
+
 - Hardware installation: 15-30 minutes
 - Initial configuration: 10-15 minutes
 - Baseline data collection: 2-4 weeks (automatic, no interaction needed)
@@ -40,12 +44,14 @@ Before starting, ensure you have:
 ### Edge Device Installation
 
 **Location Selection:**
+
 - Within 100 meters of monitored equipment (for RS-485 sensor bus)
 - Protected from physical damage and extreme temperatures
 - Good WiFi signal if not using Ethernet
-- Access to power (12-24V DC or PoE)
+- Access to 24V DC power supply
 
 **Mounting:**
+
 1. Mount Edge device on DIN rail or wall mount
 2. Ensure adequate ventilation around device
 3. Position so status display and buttons are accessible
@@ -53,27 +59,25 @@ Before starting, ensure you have:
 
 **Power Connection:**
 
-*Option A: DC Power (12-24V)*
-1. Connect DC power supply to terminal block
+_24V DC Power:_
+
+1. Connect 24V DC power supply to terminal block
 2. Observe polarity marking on device
 3. Reverse polarity protection prevents damage but won't power on if backwards
 4. Power LED should illuminate when correctly connected
 
-*Option B: Power over Ethernet (PoE)*
-1. Connect PoE-capable Ethernet cable
-2. Device automatically detects and draws power
-3. Network and power via single cable (easiest option)
-4. Verify PoE LED illuminates
-
 **Network Connection:**
 
-*Option A: Ethernet (Recommended)*
-1. Connect Ethernet cable to Edge device
-2. Device obtains IP via DHCP by default
-3. Note displayed IP address from OLED screen
-4. Static IP configuration available via web UI
+_Option A: Dual Ethernet (Recommended)_
 
-*Option B: WiFi*
+1. Connect Ethernet cable to Port A (Machine Network) for PLC/SCADA integration
+2. Connect Ethernet cable to Port B (IT Network) for cloud sync and remote access
+3. Port A defaults to static IP; Port B obtains IP via DHCP
+4. Note displayed IP addresses from OLED screen
+5. Static IP configuration available via web UI for both ports
+
+_Option B: WiFi_
+
 1. Power on device (initially in WiFi setup mode)
 2. Connect phone/laptop to "EsoCore-XXXX" WiFi network
 3. Browse to 192.168.4.1
@@ -83,6 +87,7 @@ Before starting, ensure you have:
 ### Sensor Installation
 
 **Vibration Sensor (Example):**
+
 1. Clean mounting surface on equipment
 2. Apply thin layer of coupling compound (for best accuracy)
 3. Mount sensor with stud or magnet base
@@ -93,6 +98,7 @@ Before starting, ensure you have:
    - General: Closest to rotating components
 
 **Temperature Sensor (Example):**
+
 1. Identify critical temperature measurement point
 2. Mount sensor in contact with surface
 3. Secure with thermal adhesive or mechanical clamp
@@ -100,6 +106,7 @@ Before starting, ensure you have:
 5. Locations: Bearing housings, motor bodies, hydraulic tanks
 
 **Current Sensor (Example):**
+
 1. Identify motor power leads
 2. Clamp CT around single phase conductor
 3. Do not clamp around bundled cable (measures net current = 0)
@@ -107,6 +114,7 @@ Before starting, ensure you have:
 5. Secure CT to prevent movement
 
 **Sensor Bus Wiring:**
+
 1. Run 4-conductor shielded cable from Edge to first sensor
 2. Connect to sensor terminal block:
    - Power+ (red)
@@ -118,6 +126,7 @@ Before starting, ensure you have:
 5. Install 120Ω termination resistor at final sensor
 
 **DIP Switch Addressing:**
+
 1. Each sensor needs unique address (1-254)
 2. Set via DIP switches on sensor module
 3. Binary encoding: 00000001 = address 1, 00000010 = address 2, etc.
@@ -138,17 +147,20 @@ Before starting, ensure you have:
 ### Device Configuration
 
 **Network Settings:**
+
 1. Navigate to Settings → Network
 2. Configure static IP if required (optional, DHCP works for most)
 3. Set DNS servers if needed
 4. Configure NTP server for time synchronization (critical for data timestamps)
 
 **Change Default Password:**
+
 1. Navigate to Settings → Security
 2. Change admin password to secure value
 3. Document password securely
 
 **Sensor Discovery:**
+
 1. Navigate to Sensors → Discovery
 2. Click "Scan Bus" button
 3. System auto-discovers all connected sensors
@@ -156,6 +168,7 @@ Before starting, ensure you have:
 5. Assign descriptive names (e.g., "Motor 1 Bearing DE", "Pump Inlet Pressure")
 
 **Sensor Configuration:**
+
 1. Click on each sensor to configure
 2. Set sampling rates:
    - Vibration: 1-3 kHz for analysis windows
@@ -184,9 +197,11 @@ If using cloud platform for historical analytics:
 
 ### Understanding Baselines
 
-EsoCore needs 2-4 weeks of normal operation data to establish baseline patterns for each machine. This is automatic—no interaction required, just let it run.
+EsoCore needs 2-4 weeks of normal operation data to establish baseline patterns for each machine. This is automatic—no interaction required, just let
+it run.
 
 **What's Happening:**
+
 - Sensors continuously collect data
 - Edge device processes and stores on local SD card
 - Statistical baselines calculated for:
@@ -198,6 +213,7 @@ EsoCore needs 2-4 weeks of normal operation data to establish baseline patterns 
 - Hour-of-day and day-of-week patterns recognized
 
 **During Baseline Period:**
+
 - Alerts are disabled (learning mode)
 - Status dashboard shows live data
 - Data is stored locally on SD card (30+ days capacity)
@@ -205,6 +221,7 @@ EsoCore needs 2-4 weeks of normal operation data to establish baseline patterns 
 - OLED display shows "Baseline Mode" status
 
 **After Baseline Period:**
+
 - System automatically enables anomaly detection
 - Alert thresholds configured based on learned baselines
 - Monitoring transitions from passive to active mode
@@ -219,6 +236,7 @@ EsoCore needs 2-4 weeks of normal operation data to establish baseline patterns 
 5. Typically completes in 2-4 weeks depending on equipment operating patterns
 
 **Accelerating Baseline Collection:**
+
 - Ensure equipment operates in all typical modes
 - Include startup and shutdown cycles
 - Cover different load conditions if applicable
@@ -262,6 +280,7 @@ While baseline collects, you can view live sensor data:
 ### FFT Waterfall Display
 
 For vibration sensors:
+
 1. Navigate to Analytics → FFT Analysis
 2. View waterfall display showing frequency content over time
 3. Identify specific frequencies of interest
@@ -289,6 +308,7 @@ Once baseline collection completes (2-4 weeks), configure alerting:
 ### Alert Methods
 
 **Email Alerts:**
+
 1. Navigate to Settings → Notifications → Email
 2. Enter SMTP server details
 3. Configure recipient list
@@ -296,16 +316,19 @@ Once baseline collection completes (2-4 weeks), configure alerting:
 5. Test email delivery
 
 **SMS Alerts (via SMTP-to-SMS gateway):**
+
 1. Use carrier's email-to-SMS gateway
 2. Configure as email recipient
 3. Example: 5551234567@txt.att.net
 
 **Local Alarm Output:**
+
 1. Wire relay output to alarm light or horn
 2. Configure trigger conditions
 3. Test before relying on
 
 **CMMS Integration:**
+
 1. Navigate to Settings → Integrations → CMMS
 2. Enter CMMS API endpoint
 3. Configure authentication
@@ -315,6 +338,7 @@ Once baseline collection completes (2-4 weeks), configure alerting:
 ### Alert Rules
 
 Create custom alert logic:
+
 1. Navigate to Settings → Alert Rules
 2. Click "New Rule"
 3. Define conditions:
@@ -333,6 +357,7 @@ Create custom alert logic:
 ### When Alert Triggers
 
 **Investigation Workflow:**
+
 1. Review alert details:
    - Which sensor triggered?
    - What parameter exceeded threshold?
@@ -358,6 +383,7 @@ Create custom alert logic:
    - Document planned action
 
 **Maintenance Execution:**
+
 1. Perform identified maintenance (bearing replacement, etc.)
 2. Note findings during maintenance
 3. Verify issue was as predicted
@@ -365,6 +391,7 @@ Create custom alert logic:
 5. Update EsoCore with maintenance record
 
 **Post-Maintenance:**
+
 1. Equipment returns to normal operation
 2. Sensor values return to baseline
 3. System recalculates baseline to include new component
@@ -378,18 +405,21 @@ Create custom alert logic:
 After success with first machine:
 
 **Add More Sensors to Same Machine:**
+
 1. Install additional sensor modules
 2. Connect to RS-485 bus
 3. System auto-discovers
 4. Configure and start baseline
 
 **Add Additional Machines:**
+
 1. Install Edge device on next machine
 2. Follow same setup process
 3. Leverage learnings from first deployment
 4. Standardize sensor packages by equipment type
 
 **Fleet Analytics:**
+
 1. With multiple machines monitored, compare performance
 2. Identify outliers (best and worst performers)
 3. Benchmark similar equipment
@@ -402,9 +432,9 @@ After success with first machine:
 ### Issue: Edge Device Won't Power On
 
 **Troubleshooting:**
-- Verify 12-24V DC polarity is correct
-- Check power supply output voltage
-- If using PoE, verify switch supports 802.3af
+
+- Verify 24V DC polarity is correct
+- Check power supply output voltage (should be 24V DC nominal)
 - Check for blown fuse (if equipped)
 - Power LED should be solid when powered
 
@@ -413,6 +443,7 @@ After success with first machine:
 ### Issue: Cannot Connect to Web UI
 
 **Troubleshooting:**
+
 - Verify device and computer on same network
 - Check IP address on OLED display
 - Try pinging device IP
@@ -424,6 +455,7 @@ After success with first machine:
 ### Issue: Sensors Not Discovered
 
 **Troubleshooting:**
+
 - Verify sensor power LED is illuminated
 - Check RS-485 wiring (Data+, Data-, Power+, Power-)
 - Verify shield is grounded at one end only
@@ -436,6 +468,7 @@ After success with first machine:
 ### Issue: False Alerts After Baseline
 
 **Troubleshooting:**
+
 - Review alert threshold settings
 - Check if equipment operation changed
 - Verify sensors are securely mounted
@@ -449,6 +482,7 @@ After success with first machine:
 **Note:** This might be real, not an issue!
 
 **Investigation:**
+
 - Compare to equipment specifications
 - Check if readings correlate with equipment condition
 - Verify sensor mounting is secure and proper
@@ -514,10 +548,9 @@ After completing this guide, you should have:
 
 ---
 
-Congratulations! You've completed your first EsoCore deployment. Over the next 2-4 weeks, the system will learn your equipment's normal behavior and begin
-detecting developing issues. You're now on the path to predictive maintenance and reduced downtime.
+Congratulations! You've completed your first EsoCore deployment. Over the next 2-4 weeks, the system will learn your equipment's normal behavior and
+begin detecting developing issues. You're now on the path to predictive maintenance and reduced downtime.
 
 **Questions?** Join our community discussions or contact support@newmatik.com
 
 [View Full Documentation](/docs) | [Installation Guide](/docs/getting-started/installation-guide) | [Get Support](#)
-

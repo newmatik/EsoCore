@@ -4,10 +4,10 @@ Sensor,Isolated Hall current sensor ±30A,ACS723LLCTR-30AB,Allegro,1,4.20,Higher
 Communication,RS-485 transceiver isolated,ADM2582EBRWZ,Analog Devices,1,4.20,Isolated bus interface for safety,SMD
 Power,Isolated DC-DC 12V to 5V 1W,NXE1S1205MC,Murata,1,9.20,Primary isolation for safety,SMD
 Power,LDO 5V to 3.3V,MCP1700T-3302E/TT,Microchip,1,0.12,MCU power supply,SMD
-Connector,RS-485 IN pluggable PCB mate 4-pin 5.00mm,2EDGR-5.0-04P,Degson,1,0.18,IN: A/B/24V/GND; mates with 2EDGK-5.0-04P; loop-through,THT
-Connector,RS-485 IN pluggable plug 4-pin 5.00mm,2EDGK-5.0-04P,Degson,1,0.18,Field-side plug for IN; A/B/24V/GND,Accessory
-Connector,RS-485 OUT pluggable PCB mate 4-pin 5.00mm,2EDGR-5.0-04P,Degson,1,0.18,OUT: A/B/24V/GND; mates with 2EDGK-5.0-04P; loop-through,THT
-Connector,RS-485 OUT pluggable plug 4-pin 5.00mm,2EDGK-5.0-04P,Degson,1,0.18,Field-side plug for OUT; A/B/24V/GND,Accessory
+Connector,RS-485 IN pluggable PCB mate 4-pin 5.00mm,2EDGR-5.0-04P,Degson,1,0.18,IN: A/B/12V/GND; mates with 2EDGK-5.0-04P; loop-through,THT
+Connector,RS-485 IN pluggable plug 4-pin 5.00mm,2EDGK-5.0-04P,Degson,1,0.18,Field-side plug for IN; A/B/12V/GND,Accessory
+Connector,RS-485 OUT pluggable PCB mate 4-pin 5.00mm,2EDGR-5.0-04P,Degson,1,0.18,OUT: A/B/12V/GND; mates with 2EDGK-5.0-04P; loop-through,THT
+Connector,RS-485 OUT pluggable plug 4-pin 5.00mm,2EDGK-5.0-04P,Degson,1,0.18,Field-side plug for OUT; A/B/12V/GND,Accessory
 Connector,Cable gland PG9 for 4-conductor cable,PG9-GLAND,Wiska,1,1.50,Strain relief and environmental sealing,THT
 Connector,Motor cable clamp-on 20A,CT-20A-CLAMP,Generic,1,15.50,Non-invasive installation on motor cable,Mechanical
 Protection,Surge suppressor for power lines,GDT-230-3R,Bourns,1,0.45,Protection from motor switching spikes,SMD

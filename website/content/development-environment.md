@@ -1,13 +1,15 @@
 # Development Environment
 
-This page documents the end-to-end development tooling used across hardware, firmware, mechanical, edge software, and cloud for EsoCore, with rationale and minimum setup.
+This page documents the end-to-end development tooling used across hardware, firmware, mechanical, edge software, and cloud for EsoCore, with
+rationale and minimum setup.
 
 ---
 
 ## PCB Design and Schematics
 
 - **Primary toolchain**: Altium Designer
-- **Why**: Professional EDA suite with comprehensive schematic capture, PCB layout, 3D visualization, and manufacturing output generation. Industry-standard tool with extensive component libraries and advanced features.
+- **Why**: Professional EDA suite with comprehensive schematic capture, PCB layout, 3D visualization, and manufacturing output generation.
+  Industry-standard tool with extensive component libraries and advanced features.
 
   ### High-Speed Design Capabilities
 
@@ -28,7 +30,8 @@ This page documents the end-to-end development tooling used across hardware, fir
 ## Enclosures and Mechanical
 
 - **Primary toolchain**: Autodesk Fusion 360
-- **Why**: Professional parametric 3D modeler with strong STEP interoperability, integrated CAM capabilities, generative design, and cloud collaboration for mechanical design.
+- **Why**: Professional parametric 3D modeler with strong STEP interoperability, integrated CAM capabilities, generative design, and cloud
+  collaboration for mechanical design.
 - **Artifacts**:
   - Exchange: .step (AP214/AP242), .stl for 3D printing, drawings as .dxf/.pdf
   - 3D print profiles: PrusaSlicer/Cura project files when applicable
@@ -58,7 +61,8 @@ This page documents the end-to-end development tooling used across hardware, fir
 
 - **OS target**: Zephyr RTOS on STM32 (Cortex-M4/M7)
 - **Languages**: C/C++ for firmware and services; Python/Node.js optional for host-side tooling
-- **Why**: Zephyr provides deterministic real-time scheduling, mature drivers, networking (when needed), secure OTA patterns, and an MCU-focused footprint with long-term support. Tooling is standardized around CMake and west for reproducible builds and CI.
+- **Why**: Zephyr provides deterministic real-time scheduling, mature drivers, networking (when needed), secure OTA patterns, and an MCU-focused
+  footprint with long-term support. Tooling is standardized around CMake and west for reproducible builds and CI.
 - **Tooling**:
   - Build system: Zephyr (CMake + west); Ninja as default generator
   - Cross-compile: Zephyr SDK or arm-none-eabi-gcc toolchain; optional Docker for reproducibility
@@ -67,14 +71,15 @@ This page documents the end-to-end development tooling used across hardware, fir
 
 ### Edge Device Hardware & OS prerequisites
 
-- STM32-based main board (Cortex-M4/M7) with Ethernet (PoE optional), microSD, RS-485, RTC, and secure boot/OTA pathway.
+- STM32-based main board (Cortex-M4/M7) with dual Ethernet, microSD, RS-485, RTC, and secure boot/OTA pathway.
 - Tooling on dev host: Zephyr SDK, west, CMake/Ninja, OpenOCD or J-Link tools; Python runtime for scripting.
 
 ## Cloud / Django REST Framework Server + Nuxt.js Portal
 
 - **Stack**: Django REST Framework Server (Python) + Nuxt.js Portal (Node.js/Vue.js)
 - **Editors**: VS Code or Cursor
-- **Why**: Django REST Framework provides scalable backend with REST APIs, RBAC, and database management. Nuxt.js delivers modern responsive frontend with real-time dashboards, accelerating time-to-market.
+- **Why**: Django REST Framework provides scalable backend with REST APIs, RBAC, and database management. Nuxt.js delivers modern responsive frontend
+  with real-time dashboards, accelerating time-to-market.
 - **Local dev requirements**:
   - Django: Python 3.10–3.11, PostgreSQL/MySQL, Redis
   - Nuxt.js: Node.js 18 LTS, pnpm
@@ -87,7 +92,8 @@ This page documents the end-to-end development tooling used across hardware, fir
 ## Editors and Productivity
 
 - **VS Code / Cursor**: Shared workspace settings and recommended extensions (C/C++, Python, Docker, Markdown, YAML, GitLens, Cortex-Debug).
-- **GitHub**: All source is versioned on GitHub; issues and PRs are the canonical workflow. Use feature branches and conventional commits where possible.
+- **GitHub**: All source is versioned on GitHub; issues and PRs are the canonical workflow. Use feature branches and conventional commits where
+  possible.
 
 ## Data and Testing
 

@@ -2,6 +2,9 @@
 
 Django REST Framework backend for the EsoCore IoT monitoring system.
 
+**Status: In Development** -- Core REST API endpoints for device authentication, telemetry ingestion, and
+configuration are implemented. MQTT real-time messaging and advanced analytics features are planned.
+
 ## Features
 
 - **Device Management**: Register and manage IoT devices with API key authentication
@@ -55,8 +58,8 @@ Django REST Framework backend for the EsoCore IoT monitoring system.
 
 5. **Set up code quality tools (optional):**
 
-   The project includes `package.json` with pnpm scripts for code quality tools.
-   These are pre-configured and ready to use with the Poetry environment.
+   The project includes `package.json` with pnpm scripts for code quality tools. These are pre-configured and ready to use with the Poetry
+   environment.
 
 6. **Create superuser:**
 
@@ -268,5 +271,4 @@ server/
 
 ## License
 
-Copyright © 2025 Newmatik. All rights reserved.
-Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.
+Copyright © 2025 Newmatik. All rights reserved. Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.

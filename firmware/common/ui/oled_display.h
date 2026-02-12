@@ -4,7 +4,7 @@
  *
  * This file implements the OLED display interface for the EsoCore Edge device,
  * providing a user interface for status monitoring, configuration, and diagnostics.
- * Supports 0.96" 128×64 monochrome OLED displays with I²C interface.
+ * Supports 1.5" 128×64 monochrome OLED displays (Winstar WEO015664A) with I²C interface.
  *
  * Features:
  * - 128x64 monochrome OLED display support

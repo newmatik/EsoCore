@@ -4,22 +4,28 @@
  *
  * This file implements the safety I/O system compliant with EN ISO 13849-1
  * functional safety standard for machinery safety. The system provides
- * optocoupled safety inputs and relay outputs for industrial safety applications.
+ * 6 dual-channel safety digital inputs and relay outputs for industrial
+ * safety applications.
  *
  * Safety Integrity Level (SIL): SIL 2
  * Performance Level (PL): PL d
  * Category: Category 3
  *
+ * Each of the 6 digital input channels uses a pair of optocouplers
+ * (Channel A + Channel B) monitoring the same 24V signal through independent
+ * paths. Firmware cross-monitors both channels: if they disagree, a fault is
+ * raised and the system enters safe state.
+ *
  * Features:
- * - Optocoupled safety inputs (24V) for safety edges, light curtains, E-stops
- * - Dual-channel safety inputs with cross-monitoring
- * - Safety relay outputs for door control and fault indication
- * - Automatic fault detection and diagnostics
+ * - 6 dual-channel safety digital inputs (12 optocouplers, 2 per channel)
+ * - Cross-monitoring with automatic fault detection
+ * - Periodic test pulses for stuck-at fault detection
+ * - Safety relay output (G7SA-2A2B-DC24) and SSR output (AQY212EHAZ)
  * - Watchdog supervision and safe state enforcement
- * - EN ISO 13849-1 compliant safety functions
+ * - EN ISO 13849-1 Category 3 compliant safety functions
  *
  * @author EsoCore Development Team
- * @copyright Copyright © 2025 Newmatik. All rights reserved.
+ * @copyright Copyright (c) 2025 Newmatik. All rights reserved.
  * @license Apache License, Version 2.0
  */
 
@@ -37,11 +43,12 @@ extern "C" {
  * Safety I/O Configuration
  * ============================================================================ */
 
-#define SAFETY_INPUT_CHANNELS       6   /* Number of safety input channels */
-#define SAFETY_OUTPUT_CHANNELS      4   /* Number of safety output channels */
+#define SAFETY_INPUT_CHANNELS       6   /* Number of dual-channel safety input channels */
+#define SAFETY_OUTPUT_CHANNELS      2   /* Number of relay output channels (safety relay + SSR) */
 #define SAFETY_TEST_PULSE_INTERVAL  100 /* Test pulse interval (ms) */
 #define SAFETY_WATCHDOG_TIMEOUT     500 /* Watchdog timeout (ms) */
 #define SAFETY_FAULT_RESET_TIME     3000 /* Fault reset time (ms) */
+#define SAFETY_RESPONSE_TIME_MAX    10  /* Maximum allowed response time (ms) */
 
 /* Safety Input Types */
 typedef enum {
@@ -50,26 +57,23 @@ typedef enum {
     SAFETY_INPUT_LIGHT_CURTAIN = 2,    /* Light curtain interruption */
     SAFETY_INPUT_DOOR_SENSOR   = 3,    /* Door position sensor */
     SAFETY_INPUT_TWO_HAND      = 4,    /* Two-hand control */
-    SAFETY_INPUT_MAGNETIC      = 5,    /* Magnetic safety switch */
+    SAFETY_INPUT_GENERAL       = 5,    /* General-purpose digital input */
 } safety_input_type_t;
 
 /* Safety Output Types */
 typedef enum {
-    SAFETY_OUTPUT_DOOR_LOCK   = 0,    /* Door lock solenoid */
-    SAFETY_OUTPUT_MOTOR_BRAKE = 1,    /* Motor brake control */
-    SAFETY_OUTPUT_FAULT_LIGHT = 2,    /* Fault indicator light */
-    SAFETY_OUTPUT_RESET_ENABLE = 3,   /* Reset enable signal */
+    SAFETY_OUTPUT_RELAY       = 0,    /* Dual-channel safety relay (G7SA-2A2B-DC24) */
+    SAFETY_OUTPUT_SSR         = 1,    /* Solid-state relay (AQY212EHAZ) */
 } safety_output_type_t;
 
-/* Safety Input Configuration */
+/* Safety Input Configuration (dual-channel per input) */
 typedef struct {
     safety_input_type_t type;             /* Input type */
     bool enabled;                         /* Input enabled */
     bool normally_closed;                 /* NC or NO configuration */
     uint32_t debounce_time_ms;            /* Debounce time */
-    bool dual_channel;                    /* Dual-channel monitoring */
-    uint8_t channel_a_pin;                /* Primary channel GPIO pin */
-    uint8_t channel_b_pin;                /* Secondary channel GPIO pin */
+    uint8_t channel_a_pin;                /* Channel A optocoupler GPIO pin */
+    uint8_t channel_b_pin;                /* Channel B optocoupler GPIO pin */
     char description[32];                 /* Input description */
 } safety_input_config_t;
 
@@ -88,8 +92,7 @@ typedef struct {
     uint32_t watchdog_timeout_ms;         /* Watchdog timeout */
     uint32_t test_pulse_interval_ms;      /* Test pulse interval */
     uint32_t fault_reset_time_ms;         /* Fault reset time */
-    bool enable_dual_channel_monitoring;  /* Enable dual-channel monitoring */
-    bool enable_cross_monitoring;         /* Enable cross-monitoring */
+    bool enable_cross_monitoring;         /* Enable dual-channel cross-monitoring */
     bool enable_safe_state_enforcement;   /* Enable safe state enforcement */
     uint8_t safety_category;              /* Safety category (1-4) */
     char system_description[64];          /* System description */
@@ -127,10 +130,12 @@ typedef enum {
  * ============================================================================ */
 
 typedef struct {
-    bool active;                          /* Input active state */
+    bool active;                          /* Input active state (agreed by both channels) */
+    bool channel_a_state;                 /* Channel A optocoupler state */
+    bool channel_b_state;                 /* Channel B optocoupler state */
     bool fault;                           /* Input fault detected */
     bool stuck_at;                        /* Stuck-at fault */
-    bool cross_monitor_fail;              /* Cross-monitoring failure */
+    bool cross_monitor_fail;              /* Cross-monitoring failure (A != B) */
     uint32_t activation_time;             /* Last activation timestamp */
     uint32_t deactivation_time;           /* Last deactivation timestamp */
     uint32_t activation_count;            /* Total activation count */
@@ -167,7 +172,7 @@ typedef struct {
 
 #define SAFETY_FAULT_NONE              0x00
 #define SAFETY_FAULT_INPUT_STUCK       0x01  /* Input stuck at high/low */
-#define SAFETY_FAULT_CROSS_MONITOR     0x02  /* Cross-monitoring failure */
+#define SAFETY_FAULT_CROSS_MONITOR     0x02  /* Dual-channel cross-monitoring failure */
 #define SAFETY_FAULT_WATCHDOG          0x03  /* Watchdog timeout */
 #define SAFETY_FAULT_OUTPUT_SHORT      0x04  /* Output short circuit */
 #define SAFETY_FAULT_OUTPUT_FEEDBACK   0x05  /* Output feedback mismatch */
@@ -198,7 +203,7 @@ bool safety_io_deinit(void);
  * @brief Configure safety input channel
  *
  * @param channel Input channel number (0-5)
- * @param config Pointer to input configuration
+ * @param config Pointer to input configuration (includes both GPIO pins for dual-channel)
  * @return true if configuration successful, false otherwise
  */
 bool safety_io_configure_input(uint8_t channel, const safety_input_config_t *config);
@@ -206,7 +211,7 @@ bool safety_io_configure_input(uint8_t channel, const safety_input_config_t *con
 /**
  * @brief Configure safety output channel
  *
- * @param channel Output channel number (0-3)
+ * @param channel Output channel number (0-1)
  * @param config Pointer to output configuration
  * @return true if configuration successful, false otherwise
  */
@@ -215,7 +220,7 @@ bool safety_io_configure_output(uint8_t channel, const safety_output_config_t *c
 /**
  * @brief Get safety input status
  *
- * @param channel Input channel number
+ * @param channel Input channel number (0-5)
  * @param status Pointer to status structure to fill
  * @return true if status retrieved successfully, false otherwise
  */
@@ -270,9 +275,9 @@ bool safety_io_force_stop(const char *reason);
 uint16_t safety_io_run_diagnostics(void);
 
 /**
- * @brief Test safety input channel
+ * @brief Test safety input channel (dual-channel consistency check)
  *
- * @param channel Input channel number
+ * @param channel Input channel number (0-5)
  * @return true if test passed, false otherwise
  */
 bool safety_io_test_input(uint8_t channel);

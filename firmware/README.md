@@ -2,29 +2,59 @@
 
 ## Industrial IoT Edge Computing Platform
 
-**EsoCore** is a comprehensive firmware platform for industrial IoT applications,
-featuring real-time edge intelligence, robust communication protocols, and
-enterprise-grade reliability.
+**EsoCore** is a comprehensive firmware platform for industrial IoT applications, featuring real-time edge intelligence, robust communication
+protocols, and enterprise-grade reliability.
 
 ## Architecture
 
 ```text
-EsoCore Edge Device ─── RS-485 ─── Sensor Modules
-     │                                        │
-     ├── WiFi/HTTP API                       ├── Vibration Analysis
-     ├── TinyML Engine                       ├── Acoustic Monitoring
-     ├── Safety I/O                          ├── Current Analysis
-     ├── Power Management                    ├── Air Quality
-     ├── Storage System                      ├── Oil Quality
-     └── Configuration Management            └── More...
+                          Data Acquisition
+                   ┌──────────┬────────────────────┐
+                   │          │                    │
+              RS-485 Bus   4x Analog          6x Safety DI
+              (Sensor       (Dual-mode          (Dual-channel
+               Modules)      IEPE/DC)            optocoupled)
+                   │          │                    │
+                   └──────┬───┴────────────────────┘
+                          │
+                   EsoCore Edge Device (STM32H747)
+                          │
+          ┌───────────────┼───────────────┐
+          │               │               │
+     Dual Ethernet    WiFi/HTTP      Fieldbus
+     Port A  Port B    API           RS-485
+     (OT)   (IT)                     Modbus RTU
+                                     PROFIBUS
+     Internal Services:              Interbus
+     ├── TinyML Engine
+     ├── Safety I/O (6 dual-channel inputs + relay + SSR)
+     ├── Power Management (24V DC + supercap)
+     ├── Storage System (microSD)
+     └── Configuration Management
 ```
+
+### Data Acquisition Paths
+
+EsoCore supports three complementary data acquisition methods:
+
+- **RS-485 Sensor Bus**: Distributed sensor modules with local MCUs connect over an industrial RS-485 multi-drop bus. Each module performs its own
+  conditioning and preprocessing. Supports auto-discovery and hot-plug. Best for: diverse sensor types, long cable runs (up to 100 m), scalable
+  multi-sensor deployments.
+- **Dual-Mode Analog Inputs (4 channels)**: On-board signal chain with per-channel mode selection via TMUX1101 analog switch. In IEPE mode:
+  constant-current source enabled, AC-coupled for vibration accelerometers. In DC mode: current source off, direct bypass for 0-10 V, 4-20 mA,
+  or other analog sensors. Both modes share 24-bit simultaneous ADC (ADS1274) at 50 kSPS, PGA (PGA280), and 15 kHz anti-aliasing filter. Best
+  for: high-fidelity vibration monitoring or general-purpose analog sensing directly wired to the Edge device.
+- **Safety Digital Inputs (6 channels)**: Dual-channel optocoupled 24V inputs with cross-monitoring (EN ISO 13849 Cat. 3). Each channel uses
+  two independent optocouplers; firmware verifies agreement between both channels. Response time <10 ms. Best for: safety devices (e-stops,
+  light curtains, safety edges, door sensors) as well as general machine state monitoring, production counting, and PLC integration.
 
 ## Key Features
 
 - **Edge Intelligence**: TinyML with anomaly detection and predictive maintenance
-- **Industrial Communication**: RS-485, Modbus RTU, WiFi, HTTP/HTTPS
-- **Safety Compliance**: EN ISO 13849 safety I/O with emergency stops
-- **Power Resilience**: PoE + supercapacitor backup
+- **Industrial Communication**: Dual Ethernet, RS-485, Modbus RTU/TCP, PROFINET, PROFIBUS, Interbus, WiFi, HTTP/HTTPS
+- **Data Acquisition**: RS-485 sensor bus + 4 dual-mode analog inputs (IEPE/DC, 24-bit) + 6 safety digital inputs (dual-channel)
+- **Safety I/O**: 6 dual-channel inputs (EN ISO 13849 Cat. 3) + safety relay (G7SA-2A2B-DC24) + SSR (AQY212EHAZ)
+- **Power Resilience**: 24V DC with aggressive surge/ESD protection + supercapacitor backup
 - **Enterprise Storage**: microSD with compression and power-safe writes
 - **Remote Management**: OTA updates, configuration sync, health monitoring
 
@@ -34,7 +64,7 @@ EsoCore Edge Device ─── RS-485 ─── Sensor Modules
 
 - ARM GCC toolchain (`arm-none-eabi-gcc`)
 - GNU Make
-- STM32F4 (Edge) and STM32G0 (Sensors) target support
+- STM32H7 (Edge) and STM32G0 (Sensors) target support
 
 ### Build Commands
 
@@ -61,7 +91,7 @@ firmware/
 ├── common/                 # Shared components
 │   ├── communication/     # WiFi, HTTP, RS-485, Modbus
 │   ├── storage/           # Sensor interface, microSD
-│   ├── safety/            # EN ISO 13849 safety I/O
+│   ├── safety/            # EN ISO 13849 safety I/O (dual-channel inputs + relay outputs)
 │   ├── management/        # Power, configuration management
 │   ├── intelligence/      # Event system, TinyML
 │   └── ui/                # OLED display
@@ -73,18 +103,29 @@ firmware/
 └── Makefile              # Build system
 ```
 
-## Supported Sensors
+## RS-485 Sensor Bus Modules
 
-| Sensor Type | Key Capabilities | Use Cases |
-|-------------|------------------|-----------|
-| **Vibration** | 3-axis FFT, bearing fault detection | Predictive maintenance |
-| **Acoustic** | SPL measurement, ultrasound detection | Noise monitoring, leak detection |
-| **Current** | Harmonic analysis, motor load detection | Power quality, motor monitoring |
-| **Air Quality** | IAQ calculation, health risk assessment | Environmental monitoring |
-| **Oil Quality** | Turbidity, viscosity, water content | Lubrication monitoring |
-| **Pressure** | Multi-range sensing, hydraulic monitoring | Process control |
-| **Temperature** | NTC/RTD/Thermocouple, high precision | Thermal management |
-| **Proximity** | Inductive/capacitive/laser sensing | Position detection |
+External sensor modules connect via the RS-485 multi-drop bus. Each module has its own MCU and performs local conditioning:
+
+| Sensor Type     | Key Capabilities                          | Use Cases                        |
+| --------------- | ----------------------------------------- | -------------------------------- |
+| **Vibration**   | 3-axis FFT, bearing fault detection       | Predictive maintenance           |
+| **Acoustic**    | SPL measurement, ultrasound detection     | Noise monitoring, leak detection |
+| **Current**     | Harmonic analysis, motor load detection   | Power quality, motor monitoring  |
+| **Air Quality** | IAQ calculation, health risk assessment   | Environmental monitoring         |
+| **Oil Quality** | Turbidity, viscosity, water content       | Lubrication monitoring           |
+| **Pressure**    | Multi-range sensing, hydraulic monitoring | Process control                  |
+| **Temperature** | NTC/RTD/Thermocouple, high precision      | Thermal management               |
+| **Proximity**   | Inductive/capacitive/laser sensing        | Position detection               |
+
+## On-Board Inputs
+
+In addition to the sensor bus, the Edge device has direct on-board inputs:
+
+| Input Type       | Channels | Specification                                 | Use Cases                                     |
+| ---------------- | -------- | --------------------------------------------- | --------------------------------------------- |
+| **Analog (IEPE/DC)** | 4    | 24-bit ADC, 50 kSPS, PGA, 15 kHz AAF, TMUX1101 | IEPE accelerometers, 0-10V, 4-20mA sensors  |
+| **Safety Digital** | 6      | Dual-channel optocoupled, 24V, EN ISO 13849 Cat. 3 | E-stops, safety edges, light curtains, machine states |
 
 ## Configuration
 
@@ -143,7 +184,7 @@ esocore_event_log(ESOCORE_EVENT_SENSOR_DATA_READY,
 - `GET /api/config` - Configuration
 - `POST /api/firmware/check` - OTA updates
 
-### RS-485 Protocol
+### RS-485 Sensor Bus Protocol
 
 - `DISCOVER` - Device discovery
 - `HEARTBEAT` - Connection monitoring

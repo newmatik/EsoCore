@@ -1,7 +1,7 @@
 # EsoCore Integration Guide
 
-Comprehensive guide for integrating EsoCore with existing industrial systems including CMMS, SCADA, MES, ERP, and industrial protocols. Learn how to connect
-EsoCore monitoring data to your existing workflows, automate maintenance processes, and maximize the value of equipment health insights.
+Comprehensive guide for integrating EsoCore with existing industrial systems including CMMS, SCADA, MES, ERP, and industrial protocols. Learn how to
+connect EsoCore monitoring data to your existing workflows, automate maintenance processes, and maximize the value of equipment health insights.
 
 ---
 
@@ -136,7 +136,7 @@ class EsoCoreClient:
             "X-API-Key": api_key,
             "Content-Type": "application/json"
         }
-    
+
     def get_current_readings(self):
         """Get latest sensor readings"""
         response = requests.get(
@@ -144,12 +144,12 @@ class EsoCoreClient:
             headers=self.headers
         )
         return response.json()
-    
+
     def get_sensor_history(self, sensor_id, hours=24):
         """Get sensor history"""
         end_time = datetime.now()
         start_time = end_time - timedelta(hours=hours)
-        
+
         response = requests.get(
             f"{self.base_url}/telemetry/history/",
             headers=self.headers,
@@ -160,7 +160,7 @@ class EsoCoreClient:
             }
         )
         return response.json()
-    
+
     def get_active_alerts(self):
         """Get all active alerts"""
         response = requests.get(
@@ -190,46 +190,38 @@ if alerts:
 **JavaScript/Node.js Integration:**
 
 ```javascript
-const axios = require('axios');
+const axios = require("axios");
 
 class EsoCoreClient {
-    constructor(baseUrl, apiKey) {
-        this.baseUrl = baseUrl;
-        this.headers = {
-            'X-API-Key': apiKey,
-            'Content-Type': 'application/json'
-        };
-    }
-    
-    async getCurrentReadings() {
-        const response = await axios.get(
-            `${this.baseUrl}/telemetry/`,
-            { headers: this.headers }
-        );
-        return response.data;
-    }
-    
-    async getActiveAlerts() {
-        const response = await axios.get(
-            `${this.baseUrl}/alerts/`,
-            { 
-                headers: this.headers,
-                params: { status: 'active' }
-            }
-        );
-        return response.data;
-    }
+  constructor(baseUrl, apiKey) {
+    this.baseUrl = baseUrl;
+    this.headers = {
+      "X-API-Key": apiKey,
+      "Content-Type": "application/json",
+    };
+  }
+
+  async getCurrentReadings() {
+    const response = await axios.get(`${this.baseUrl}/telemetry/`, { headers: this.headers });
+    return response.data;
+  }
+
+  async getActiveAlerts() {
+    const response = await axios.get(`${this.baseUrl}/alerts/`, {
+      headers: this.headers,
+      params: { status: "active" },
+    });
+    return response.data;
+  }
 }
 
 // Usage
-const client = new EsoCoreClient(
-    'https://192.168.1.100/api/v1',
-    'your-api-key'
-);
+const client = new EsoCoreClient("https://192.168.1.100/api/v1", "your-api-key");
 
-client.getCurrentReadings()
-    .then(readings => console.log(readings))
-    .catch(error => console.error(error));
+client
+  .getCurrentReadings()
+  .then((readings) => console.log(readings))
+  .catch((error) => console.error(error));
 ```
 
 ---
@@ -267,16 +259,16 @@ Configure EsoCore to send alerts directly to CMMS:
 
 ```json
 {
-    "equipment_id": "{{device_id}}",
-    "alert_type": "{{alert_severity}}",
-    "description": "{{alert_message}}",
-    "priority": "{{priority_mapping}}",
-    "detected_at": "{{timestamp}}",
-    "sensor_data": {
-        "sensor": "{{sensor_name}}",
-        "value": "{{current_value}}",
-        "threshold": "{{threshold_value}}"
-    }
+  "equipment_id": "{{device_id}}",
+  "alert_type": "{{alert_severity}}",
+  "description": "{{alert_message}}",
+  "priority": "{{priority_mapping}}",
+  "detected_at": "{{timestamp}}",
+  "sensor_data": {
+    "sensor": "{{sensor_name}}",
+    "value": "{{current_value}}",
+    "threshold": "{{threshold_value}}"
+  }
 }
 ```
 
@@ -311,14 +303,14 @@ for alert in alerts:
         "priority": map_priority(alert["severity"]),
         "due_date": calculate_due_date(alert["severity"])
     }
-    
+
     # Create work order
     response = requests.post(
         CMMS_API,
         headers={"Authorization": f"Bearer {CMMS_KEY}"},
         json=work_order
     )
-    
+
     if response.ok:
         # Acknowledge alert in EsoCore
         requests.post(
@@ -373,7 +365,7 @@ def create_sap_notification(alert):
         user='INTERFACE_USER',
         passwd='password'
     )
-    
+
     # Call BAPI to create notification
     result = conn.call('BAPI_ALM_NOTIF_CREATE', {
         'NOTIFHEADER': {
@@ -387,7 +379,7 @@ def create_sap_notification(alert):
             'TASK_CODEGRP': 'PM'
         }]
     })
-    
+
     if result['RETURN']['TYPE'] == 'S':
         notification_id = result['NOTIFHEADER']['NOTIF_NO']
         return notification_id
@@ -415,18 +407,18 @@ Expose EsoCore data to SCADA via Modbus TCP:
 
 **Register Map Example:**
 
-| Register | Parameter | Type | Unit |
-|----------|-----------|------|------|
-| 40001-40002 | Motor 1 Vibration RMS | Float | mm/s |
-| 40003-40004 | Motor 1 Temperature | Float | °C |
-| 40005-40006 | Motor 1 Current Phase A | Float | A |
-| 40007 | Motor 1 Status | Int | 0=OK, 1=Warning, 2=Alert |
-| 40008 | Motor 1 Alert Code | Int | See docs |
-| ... | ... | ... | ... |
+| Register    | Parameter               | Type  | Unit                     |
+| ----------- | ----------------------- | ----- | ------------------------ |
+| 40001-40002 | Motor 1 Vibration RMS   | Float | mm/s                     |
+| 40003-40004 | Motor 1 Temperature     | Float | °C                       |
+| 40005-40006 | Motor 1 Current Phase A | Float | A                        |
+| 40007       | Motor 1 Status          | Int   | 0=OK, 1=Warning, 2=Alert |
+| 40008       | Motor 1 Alert Code      | Int   | See docs                 |
+| ...         | ...                     | ...   | ...                      |
 
 **SCADA Configuration:**
 
-*Allen-Bradley / Rockwell:*
+_Allen-Bradley / Rockwell:_
 
 ```
 Controller: Modbus/TCP
@@ -437,7 +429,7 @@ Register Map: Import CSV
 Scan Rate: 1000ms
 ```
 
-*Siemens WinCC:*
+_Siemens WinCC:_
 
 ```
 Driver: ModbusTCP.chn
@@ -447,7 +439,7 @@ Register Configuration: Import from XML
 Update Cycle: 1s
 ```
 
-*Ignition SCADA:*
+_Ignition SCADA:_
 
 ```python
 # Add device
@@ -500,7 +492,7 @@ class MESIntegration:
         self.esocore_headers = {"X-API-Key": esocore_key}
         self.mes_url = mes_url
         self.mes_headers = {"Authorization": f"Bearer {mes_key}"}
-    
+
     def update_equipment_status(self):
         """Update MES with equipment health status"""
         # Get equipment health from EsoCore
@@ -508,11 +500,11 @@ class MESIntegration:
             f"{self.esocore_url}/devices/",
             headers=self.esocore_headers
         ).json()
-        
+
         for device in devices:
             # Get current health status
             health = self.get_device_health(device['id'])
-            
+
             # Update MES equipment status
             requests.put(
                 f"{self.mes_url}/equipment/{device['equipment_id']}/status",
@@ -524,21 +516,21 @@ class MESIntegration:
                     "last_updated": datetime.now().isoformat()
                 }
             )
-    
+
     def check_production_readiness(self, equipment_id):
         """Check if equipment is ready for production"""
         device = self.get_device_by_equipment_id(equipment_id)
-        
+
         # Get active alerts
         alerts = requests.get(
             f"{self.esocore_url}/alerts/",
             headers=self.esocore_headers,
             params={"device_id": device['id'], "status": "active"}
         ).json()
-        
+
         # Check for critical alerts
         critical_alerts = [a for a in alerts if a['severity'] == 'critical']
-        
+
         return {
             "ready": len(critical_alerts) == 0,
             "alerts": critical_alerts,
@@ -563,14 +555,14 @@ Connect equipment data to business systems:
 
 **Integration Points:**
 
-*Procurement:*
+_Procurement:_
 
 ```python
 # Trigger spare parts order based on alert
 def trigger_parts_order(alert):
     # Map alert to required spare parts
     parts = get_required_parts(alert['device_type'], alert['alert_type'])
-    
+
     # Create purchase requisition in ERP
     for part in parts:
         create_purchase_req(
@@ -582,27 +574,27 @@ def trigger_parts_order(alert):
         )
 ```
 
-*Finance:*
+_Finance:_
 
 ```python
 # Track actual maintenance costs vs predicted
 def track_maintenance_roi():
     # Get prevented failures
     prevented = get_prevented_failures()
-    
+
     # Calculate avoided costs
     avoided_costs = sum([
         failure['estimated_downtime_hours'] * facility_hourly_rate +
         failure['estimated_repair_cost']
         for failure in prevented
     ])
-    
+
     # Get actual monitoring costs
     monitoring_costs = get_monitoring_system_costs()
-    
+
     # Calculate ROI
     roi = (avoided_costs - monitoring_costs) / monitoring_costs * 100
-    
+
     # Post to ERP financial module
     post_cost_savings(
         category="Predictive Maintenance",
@@ -633,7 +625,7 @@ def export_to_csv(device_id, start_date, end_date):
             "limit": 100000
         }
     ).json()
-    
+
     # Convert to pandas DataFrame
     import pandas as pd
     df = pd.DataFrame(data)
@@ -654,18 +646,18 @@ def sync_to_warehouse():
         user="esocore_sync",
         password="password"
     )
-    
+
     # Get latest data from EsoCore
     latest_data = get_latest_telemetry()
-    
+
     # Insert into warehouse
     cursor = conn.cursor()
     for reading in latest_data:
         cursor.execute("""
-            INSERT INTO equipment_telemetry 
+            INSERT INTO equipment_telemetry
             (timestamp, device_id, sensor_id, metric, value, unit)
             VALUES (%s, %s, %s, %s, %s, %s)
-            ON CONFLICT (timestamp, device_id, sensor_id, metric) 
+            ON CONFLICT (timestamp, device_id, sensor_id, metric)
             DO UPDATE SET value = EXCLUDED.value
         """, (
             reading['timestamp'],
@@ -675,7 +667,7 @@ def sync_to_warehouse():
             reading['value'],
             reading['unit']
         ))
-    
+
     conn.commit()
     cursor.close()
     conn.close()
@@ -687,10 +679,10 @@ def sync_to_warehouse():
 # Power BI REST API integration
 def publish_to_powerbi(dataset_id, table_name, data):
     import requests
-    
+
     # Get Power BI access token (OAuth2)
     token = get_powerbi_token()
-    
+
     # Push data to Power BI
     response = requests.post(
         f"https://api.powerbi.com/v1.0/myorg/datasets/{dataset_id}/tables/{table_name}/rows",
@@ -700,7 +692,7 @@ def publish_to_powerbi(dataset_id, table_name, data):
         },
         json={"rows": data}
     )
-    
+
     return response.ok
 ```
 
@@ -800,7 +792,8 @@ response = session.get(url, headers=headers)
 
 ---
 
-Successful integration amplifies the value of equipment monitoring by connecting insights to action. Choose the integration methods that best fit your existing
-infrastructure and workflows.
+Successful integration amplifies the value of equipment monitoring by connecting insights to action. Choose the integration methods that best fit your
+existing infrastructure and workflows.
 
-[API Documentation](/docs/api-specification) | [Installation Guide](/docs/getting-started/installation-guide) | [Quick Start](/docs/getting-started/quick-start)
+[API Documentation](/docs/api-specification) | [Installation Guide](/docs/getting-started/installation-guide) |
+[Quick Start](/docs/getting-started/quick-start)

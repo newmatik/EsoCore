@@ -1,8 +1,8 @@
 # Business Model and Partnerships
 
-EsoCore is developed and maintained by Newmatik through a collaborative partnership model that ensures sustainable development while
-providing partners with maximum flexibility and control. This unique approach combines open-source principles with commercial viability,
-creating a win-win ecosystem for all stakeholders.
+EsoCore is developed and maintained by Newmatik through a collaborative partnership model that ensures sustainable development while providing
+partners with maximum flexibility and control. This unique approach combines open-source principles with commercial viability, creating a win-win
+ecosystem for all stakeholders.
 
 ---
 
@@ -10,18 +10,17 @@ creating a win-win ecosystem for all stakeholders.
 
 ### Lead Developer: Newmatik
 
-**Who is Newmatik?**
-[Newmatik](https://newmatik.com) is a European electronics and software company with deep experience in PCB assembly and industrial product
-development. With EU manufacturing and a software‑driven approach to automation, Newmatik combines hardware engineering with modern cloud
-and embedded development to deliver reliable, production‑ready solutions at scale.
+**Who is Newmatik?** [Newmatik](https://newmatik.com) is a European electronics and software company with deep experience in PCB assembly and
+industrial product development. With EU manufacturing and a software‑driven approach to automation, Newmatik combines hardware engineering with modern
+cloud and embedded development to deliver reliable, production‑ready solutions at scale.
 
-**Newmatik** serves as the primary technology developer and maintainer of the EsoCore platform, providing comprehensive development
-services across all technical domains:
+**Newmatik** serves as the primary technology developer and maintainer of the EsoCore platform, providing comprehensive development services across
+all technical domains:
 
 **Hardware Development:**
 
 - Industrial-grade sensor integration and board design
-- Power management and safety compliance (EN ISO 13849)
+- Power management, functional safety compliance (EN ISO 13849), and electrical safety (EN 60204-1)
 - Environmental hardening (IP54-IP65, -20°C to +60°C operation)
 - EMC compliance and regulatory certification
 - Modular RS‑485 sensor bus enabling partner‑specific and proprietary sensor modules without Edge hardware changes
@@ -51,8 +50,8 @@ services across all technical domains:
 
 ## Business Model (Open Core)
 
-EsoCore follows an open‑core model under the Apache 2.0 License: the core is free and open source, while advanced capabilities
-and services are offered commercially.
+EsoCore follows an open‑core model under the Apache 2.0 License: the core is free and open source, while advanced capabilities and services are
+offered commercially.
 
 - **Open‑source Edge**: Free adoption to drive developer and industry traction
 - **Commercial add‑ons**: Advanced modules, integrations, monitoring dashboards
@@ -67,30 +66,30 @@ and services are offered commercially.
 
 ### Partnership Model
 
-EsoCore is currently developed and funded by Newmatik, with an open invitation for strategic partners to join the ecosystem.
-While the platform is being built independently to ensure its completion and quality, we welcome partnerships with companies who see
-value in this technology for their markets.
+EsoCore is currently developed and funded by Newmatik, with an open invitation for strategic partners to join the ecosystem. While the platform is
+being built independently to ensure its completion and quality, we welcome partnerships with companies who see value in this technology for their
+markets.
 
 **Early Partner Advantages:**
 
 Partners who join the project early will have significantly greater influence over:
 
 - **Roadmap Priorities**: Direct input on feature development and release scheduling
-- **Technical Direction**: Influence on architecture decisions and implementation approaches  
+- **Technical Direction**: Influence on architecture decisions and implementation approaches
 - **Market Focus**: Guidance on industry-specific requirements and use cases
 - **Sensor Integration**: Priority development of sensor modules for specific applications
 - **Custom Development**: Preferential access to Newmatik's engineering resources
 
 ### Partnership Benefits
 
-- **Non-Competing Markets**: Partners can operate in distinct industrial sectors with minimal market overlap, ensuring mutual benefit
-  without direct competition.
-- **Brand Independence**: Partners can market and sell EsoCore technology under their own brand names, maintaining their market identity
-  and customer relationships.
-- **Ongoing Development**: Newmatik ensures continuous platform evolution, feature development, and security updates, providing partners
-  with long-term technology advancement without internal R&D costs.
-- **Market Expansion**: Partners can join the ecosystem at any time, expanding the platform's reach and accelerating development
-  through shared investment.
+- **Non-Competing Markets**: Partners can operate in distinct industrial sectors with minimal market overlap, ensuring mutual benefit without direct
+  competition.
+- **Brand Independence**: Partners can market and sell EsoCore technology under their own brand names, maintaining their market identity and customer
+  relationships.
+- **Ongoing Development**: Newmatik ensures continuous platform evolution, feature development, and security updates, providing partners with
+  long-term technology advancement without internal R&D costs.
+- **Market Expansion**: Partners can join the ecosystem at any time, expanding the platform's reach and accelerating development through shared
+  investment.
 
 ---
 
@@ -98,28 +97,28 @@ Partners who join the project early will have significantly greater influence ov
 
 ### Edge Platform: Fully Open Source
 
-- **Complete Transparency**: All source code for hardware designs, firmware, and cloud platform components are published under the
-  Apache 2.0 License, ensuring maximum accessibility and collaboration.
-- **Hardware Specifications**: Complete PCB designs, component specifications, and manufacturing documentation are publicly available,
-  enabling partners to manufacture devices independently if desired.
-- **Community Contributions**: Open development model encourages contributions from the broader industrial IoT community, accelerating
-  innovation and improving platform robustness.
+- **Complete Transparency**: All source code for hardware designs, firmware, and cloud platform components are published under the Apache 2.0 License,
+  ensuring maximum accessibility and collaboration.
+- **Hardware Specifications**: Complete PCB designs, component specifications, and manufacturing documentation are publicly available, enabling
+  partners to manufacture devices independently if desired.
+- **Community Contributions**: Open development model encourages contributions from the broader industrial IoT community, accelerating innovation and
+  improving platform robustness.
 
 ### Intellectual Property Framework
 
-- **No Single Owner**: No individual party holds proprietary rights to the core EsoCore platform. All partners benefit equally from
-  platform improvements and developments.
-- **Shared Innovation**: Improvements to the core platform benefit all ecosystem participants, creating positive network effects and
-  shared value creation.
-- **Patent Protection**: Apache 2.0 License provides comprehensive patent protection, ensuring partners can use and distribute the
-  technology without legal concerns.
+- **No Single Owner**: No individual party holds proprietary rights to the core EsoCore platform. All partners benefit equally from platform
+  improvements and developments.
+- **Shared Innovation**: Improvements to the core platform benefit all ecosystem participants, creating positive network effects and shared value
+  creation.
+- **Patent Protection**: Apache 2.0 License provides comprehensive patent protection, ensuring partners can use and distribute the technology without
+  legal concerns.
 
 ---
 
 ## Why collaborate if it’s open source?
 
-Yes—anyone can copy, manufacture, and sell the open‑source software and hardware. Collaboration with Newmatik is still the fastest,
-lowest‑risk, and most cost‑effective path:
+Yes—anyone can copy, manufacture, and sell the open‑source software and hardware. Collaboration with Newmatik is still the fastest, lowest‑risk, and
+most cost‑effective path:
 
 - **Speed to market**: Direct access to maintainers, roadmap, and proven reference designs
 - **Lower total cost**: Avoid hidden engineering, certification, and maintenance overheads
@@ -136,28 +135,25 @@ lowest‑risk, and most cost‑effective path:
 
 While the core platform remains open source, partners retain full ownership of their market-specific implementations:
 
-- **Custom ML Models**: Partners can develop proprietary machine learning algorithms optimized for their specific equipment types and
-  failure modes.
-- **Industry-Specific Algorithms**: Specialized processing algorithms for unique sensor configurations or industry requirements remain
-  proprietary to each partner.
-- **Custom Sensor Modules**: Partners can introduce exclusive or proprietary sensors as RS‑485 modules that integrate seamlessly with
-  the platform without modifying the Edge or architecture.
+- **Custom ML Models**: Partners can develop proprietary machine learning algorithms optimized for their specific equipment types and failure modes.
+- **Industry-Specific Algorithms**: Specialized processing algorithms for unique sensor configurations or industry requirements remain proprietary to
+  each partner.
+- **Custom Sensor Modules**: Partners can introduce exclusive or proprietary sensors as RS‑485 modules that integrate seamlessly with the platform
+  without modifying the Edge or architecture.
 - **Configuration Management**: Custom device configurations, thresholds, and operational parameters specific to partner applications.
 - **Data Analytics**: Proprietary analytics and reporting capabilities tailored to specific industry needs and customer requirements.
 
 ### Development Options
 
-- **Partnership with Newmatik**: Partners can collaborate with Newmatik for custom development, leveraging our expertise while
-  maintaining ownership of proprietary components.
-- **Independent Development**: Partners have complete freedom to develop custom features in-house using the open-source platform as a
-  foundation.
-- **Hybrid Approach**: Combination of Newmatik collaboration for core features and independent development for highly specialized
-  requirements.
+- **Partnership with Newmatik**: Partners can collaborate with Newmatik for custom development, leveraging our expertise while maintaining ownership
+  of proprietary components.
+- **Independent Development**: Partners have complete freedom to develop custom features in-house using the open-source platform as a foundation.
+- **Hybrid Approach**: Combination of Newmatik collaboration for core features and independent development for highly specialized requirements.
 
-Partners with proprietary fault detection or domain-specific know‑how can work with us to implement closed‑source components for their
-customers and markets. Alternatively, we can co‑develop custom sensors and modules that may be shared openly with the community or kept
-proprietary when required. We encourage open source and ask partners to consider contributing improvements back to strengthen the shared
-platform and build a de‑facto industry standard.
+Partners with proprietary fault detection or domain-specific know‑how can work with us to implement closed‑source components for their customers and
+markets. Alternatively, we can co‑develop custom sensors and modules that may be shared openly with the community or kept proprietary when required.
+We encourage open source and ask partners to consider contributing improvements back to strengthen the shared platform and build a de‑facto industry
+standard.
 
 ---
 
@@ -165,19 +161,16 @@ platform and build a de‑facto industry standard.
 
 ### Complete Independence Option
 
-- **Self-Sufficiency**: If partners choose to discontinue their relationship with Newmatik, they have complete access to all necessary
-  components to continue independently.
-- **Fork Protection**: Apache 2.0 License ensures partners can fork the entire project, create independent development paths, and
-  maintain full control over their technology stack.
-- **No Vendor Lock-in**: Partners are never dependent on Newmatik for continued operation, providing ultimate flexibility and risk
-  mitigation.
+- **Self-Sufficiency**: If partners choose to discontinue their relationship with Newmatik, they have complete access to all necessary components to
+  continue independently.
+- **Fork Protection**: Apache 2.0 License ensures partners can fork the entire project, create independent development paths, and maintain full
+  control over their technology stack.
+- **No Vendor Lock-in**: Partners are never dependent on Newmatik for continued operation, providing ultimate flexibility and risk mitigation.
 
 ### Technical Enablement
 
-- **Complete Documentation**: Comprehensive technical documentation ensures partners can understand and modify all aspects of the
-  system.
-- **Modular Architecture**: System design facilitates easy modification and extension without requiring deep understanding of all
-  components.
+- **Complete Documentation**: Comprehensive technical documentation ensures partners can understand and modify all aspects of the system.
+- **Modular Architecture**: System design facilitates easy modification and extension without requiring deep understanding of all components.
 - **Standard Interfaces**: Use of industry-standard protocols and interfaces minimizes dependencies on proprietary components.
 
 ---
@@ -202,8 +195,7 @@ The EsoCore project is licensed under the **Apache License 2.0**, which provides
 
 ### Proprietary Component Licensing
 
-- **Partner Ownership**: All custom algorithms, configurations, and market-specific implementations remain fully owned by the developing
-  partner
+- **Partner Ownership**: All custom algorithms, configurations, and market-specific implementations remain fully owned by the developing partner
 - **Independent Licensing**: Partners may license their proprietary components under any terms they choose
 - **No Sharing Requirements**: No obligation to share proprietary enhancements with other ecosystem participants
 
@@ -250,5 +242,5 @@ The EsoCore business model creates a sustainable, flexible ecosystem that benefi
 - **Open Source Community** benefits from transparent development and the ability to contribute to platform evolution
 - **End Users** benefit from rapid innovation, competitive pricing, and freedom from vendor lock-in
 
-This collaborative approach ensures EsoCore's continued evolution while providing all stakeholders with the flexibility and independence
-necessary for long-term success in their respective markets.
+This collaborative approach ensures EsoCore's continued evolution while providing all stakeholders with the flexibility and independence necessary for
+long-term success in their respective markets.

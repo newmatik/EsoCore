@@ -1,6 +1,8 @@
 # Cloud Infrastructure
 
-EsoCore provides a comprehensive cloud infrastructure solution consisting of two main components: a scalable Django REST API backend and a modern Nuxt.js frontend portal. This infrastructure is designed to be flexible, allowing deployment as a managed SaaS service by Newmatik or self-hosted by partners.
+EsoCore provides a comprehensive cloud infrastructure solution consisting of two main components: a scalable Django REST API backend and a modern
+Nuxt.js frontend portal. This infrastructure is designed to be flexible, allowing deployment as a managed SaaS service by Newmatik or self-hosted by
+partners.
 
 ---
 
@@ -145,10 +147,10 @@ The portal communicates with the Django backend through a well-defined REST API:
 
 ```typescript
 // Example API integration
-const { data: devices } = await $api('/devices/')
-const { data: telemetry } = await $api('/telemetry/', {
+const { data: devices } = await $api("/devices/");
+const { data: telemetry } = await $api("/telemetry/", {
   params: { device_id, start_date, end_date },
-})
+});
 ```
 
 ### Real-time Updates
@@ -157,11 +159,11 @@ WebSocket connections enable real-time data streaming:
 
 ```typescript
 // Real-time device status updates
-const { connect, subscribe } = useWebSocket()
-connect()
-subscribe('devices', data => {
+const { connect, subscribe } = useWebSocket();
+connect();
+subscribe("devices", (data) => {
   // Update UI with live data
-})
+});
 ```
 
 ### Authentication Flow
@@ -294,4 +296,5 @@ ADMIN_TITLE="YourCompany EdgeMonitor Server"
 - Community forum access
 - Professional services for customizations
 
-This cloud infrastructure provides a solid foundation for IoT monitoring and management, offering the flexibility to scale with your business needs while maintaining security, performance, and reliability.
+This cloud infrastructure provides a solid foundation for IoT monitoring and management, offering the flexibility to scale with your business needs
+while maintaining security, performance, and reliability.

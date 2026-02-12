@@ -227,7 +227,7 @@ bool event_log_power(const char *event_type, uint32_t voltage_mv, uint32_t curre
  * @brief Log a safety event
  *
  * @param event_type Specific safety event type
- * @param input_channel Safety input channel
+ * @param input_channel Safety input channel (0-5)
  * @param response_time_ms Response time in milliseconds
  * @param details Additional details
  * @return true if event logged successfully, false otherwise

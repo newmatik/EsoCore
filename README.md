@@ -6,8 +6,7 @@ This repository contains the public documentation website and the source for har
 
 ## Website
 
-The public website and docs live in `website/`. See `website/README.md` for
-local development and deployment instructions.
+The public website and docs live in `website/`. See `website/README.md` for local development and deployment instructions.
 
 ## Structure
 
@@ -89,5 +88,4 @@ The hardware requirements and BOM include options for industrial fieldbus protoc
 
 ## Legal
 
-Copyright © 2025 Newmatik. All rights reserved.
-Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.
+Copyright © 2025 Newmatik. All rights reserved. Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.

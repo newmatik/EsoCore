@@ -1,6 +1,7 @@
 # Hardware: Sensors
 
-This page is a quick overview of the EsoCore sensor ecosystem. Each sensor module has its own dedicated page with full specifications and setup details.
+This page is a quick overview of the EsoCore sensor ecosystem. Each sensor module has its own dedicated page with full specifications and setup
+details.
 
 ---
 
@@ -20,8 +21,15 @@ This page is a quick overview of the EsoCore sensor ecosystem. Each sensor modul
 
 ## How They Connect
 
-- RS‑485 multi‑drop bus to the EsoCore Edge (12–24 V DC power)
-- Auto‑discovery with runtime hot‑plug support
-- DIP‑switch addressing and configurable thresholds in the Edge UI
+Sensor modules connect to the EsoCore Edge via the **RS-485 multi-drop bus** (powered by 12 V DC from the Edge device). They support auto-discovery
+with runtime hot-plug and DIP-switch addressing with configurable thresholds in the Edge UI.
 
-For details, open the relevant sensor page above.
+In addition to the sensor bus, the Edge device also has **on-board inputs** that do not require external sensor modules:
+
+- **4 dual-mode analog inputs** (IEPE or DC per channel) for vibration accelerometers or general analog sensors (24-bit, 50 kSPS per channel)
+- **6 safety digital inputs** for safety devices and controller signals (dual-channel optocoupled, 24 V, EN ISO 13849 Cat. 3)
+
+The sensor bus and on-board inputs can be used simultaneously, giving integrators maximum flexibility.
+
+For details on each sensor module, open the relevant sensor page above. For on-board input specifications, see
+[Analog Input Specification](/docs/edge-analog-inputs) and [Hardware: Edge](/docs/esocore-edge).

@@ -108,16 +108,19 @@ In addition to sensor data, the system captures operational events:
   "device_id": "DEVICE001",
   "site_id": "WAREHOUSE_A",
   "asset_id": "ASSET_3",
-  "series": "safety_edge_triggered",
+  "series": "safety_input_triggered",
   "val": null,
   "unit": null,
   "meta": {
     "event_type": "safety",
-    "severity": "warning",
-    "description": "Safety edge contact detected during operation",
-    "input_channel": "SAFETY_IN_1",
-    "asset_position": "75_percent_complete",
-    "response_time_ms": 8
+    "severity": "critical",
+    "description": "Emergency stop activated - dual-channel safety input triggered",
+    "input_channel": "SI_1",
+    "input_type": "emergency_stop",
+    "channel_a_state": true,
+    "channel_b_state": true,
+    "cross_monitor_ok": true,
+    "response_time_ms": 4
   }
 }
 ```
@@ -166,11 +169,11 @@ In addition to sensor data, the system captures operational events:
 
 ### Safety Events
 
-- `safety_edge_triggered` - Safety edge contact detected
-- `emergency_stop_activated` - Emergency stop button pressed
-- `light_curtain_breach` - Light curtain interrupted
-- `asset_obstruction` - Movement obstructed
-- `safety_circuit_fault` - Safety circuit malfunction
+- `safety_input_triggered` - Safety input activated (dual-channel confirmed)
+- `safety_cross_monitor_fault` - Dual-channel cross-monitoring mismatch detected
+- `safety_input_stuck` - Safety input stuck-at fault detected
+- `safety_relay_activated` - Safety relay output energized
+- `safety_relay_fault` - Safety relay feedback mismatch
 
 ### System Events
 
@@ -207,5 +210,6 @@ In addition to sensor data, the system captures operational events:
 - **Asset cycles**: increment on open→closed or start→stop transitions; event objects carry `cycle_id` and durations
 - **Torque proxy**: motor current RMS at 100–500 Hz; compute per‑cycle stats (avg/max)
 - **Vibration**: rolling RMS at 100–500 Hz; periodic 2–5 s high‑rate window (1–3 kHz) for spectral bands (e.g., bearing, imbalance)
-- **Acoustics**: rolling RMS and event detection; periodic windows in audible/ultrasound bands for spectral features; flag high‑amplitude events (e.g., spring break)
+- **Acoustics**: rolling RMS and event detection; periodic windows in audible/ultrasound bands for spectral features; flag high‑amplitude events
+  (e.g., spring break)
 - **Derived health KPIs**: over‑torque rate, vibration trend slope, mean time between faults

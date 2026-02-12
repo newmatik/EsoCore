@@ -2,30 +2,40 @@
 
 # Industrial Fieldbus Protocols
 
-This page outlines the practical aspects of supporting Modbus, PROFIBUS and PROFINET on EsoCore hardware and firmware.
-It focuses on physical interfaces, topology, addressing, timing, EMC, and certification considerations so designs are robust in industrial environments.
+This page outlines the practical aspects of supporting Modbus, PROFIBUS, PROFINET, and Interbus on EsoCore hardware and firmware. It focuses on
+physical interfaces, topology, addressing, timing, EMC, and certification considerations so designs are robust in industrial environments.
 
 ---
 
-## Single Ethernet Port Architecture
+## Dual Ethernet Port Architecture
 
-**EsoCore uses ONE Ethernet port and ONE IP address for all IP-based services.**
-This unified architecture is the industry-standard approach for field devices and fully supported by specifications:
+**EsoCore uses two physically separated Ethernet ports** for true network isolation between operational technology (OT) and IT infrastructure:
 
-- **HTTPS Web UI** (port 443): On-device configuration and diagnostics
-- **Modbus TCP** (port 502): PLC/SCADA integration
-- **PROFINET Device** (RT): Real-time cyclic I/O via Layer-2 frames (EtherType 0x8892)
+- **Port A (Machine Network)**: PROFINET RT, Modbus TCP, on-device web UI (HTTPS), PLC communications
+  - Static IP (e.g., 192.168.10.x), connected to machine VLAN switch
+  - No internet access; isolated from corporate network
+- **Port B (IT Network)**: HTTPS cloud sync, REST API, NTP time sync, OTA firmware updates
+  - DHCP (e.g., 10.x.x.x), connected to corporate network with firewall to internet
+
+Each port has an independent PHY (KSZ8081RNACA), independent magnetics (Wurth 7499111121), and a separate MAC address. This provides:
+
+- **True isolation**: No VLAN hopping attacks; physical separation between OT and IT
+- **Independent failure domains**: Cloud outage does not affect machine communication; machine network issues do not disrupt cloud sync
+- **Clear security boundary**: Airgap between OT and IT; compliance with industries requiring physical network separation
+- **Easier troubleshooting**: Separate LEDs per port; Wireshark on one port does not show other port's traffic
+
+See [Dual Ethernet Ports](/docs/ethernet) for full architecture details, PHY selection rationale, and PCB layout guidelines.
 
 ### How It Works
 
-**Quality of Service (QoS)**: PROFINET RT frames use 802.1Q priority tagging (PCP=6) to ensure deterministic real-time performance.
-Industrial switches prioritize RT traffic above best-effort HTTP or Modbus TCP, preventing conflicts.
+**Port A carries all real-time and machine-facing traffic.** PROFINET RT frames use 802.1Q priority tagging (PCP=6) for deterministic performance.
+Modbus TCP (port 502) and the on-device web UI (HTTPS, port 443) coexist on Port A with QoS ensuring RT priority.
 
-**Industry Practice**: PROFINET Design Guidelines explicitly allow unrestricted TCP/IP traffic alongside PROFINET RT on the same interface.
-This is how field devices are designed—not a limitation but an intentional design validated by PI (PROFIBUS & PROFINET International).
+**Port B handles all IT-facing traffic.** Cloud sync, OTA updates, NTP, and REST API access run on Port B, completely isolated from machine
+communications. This means cloud-side issues (DNS failures, certificate problems, high latency) never impact real-time machine control.
 
-**Network Load**: Follow PI recommendations to keep total link utilization below 50%.
-EsoCore's web UI and diagnostics are designed with rate limiting to respect real-time cycle requirements.
+**Network Load**: Follow PI recommendations to keep Port A link utilization below 50%. EsoCore's web UI and diagnostics on Port A are designed with
+rate limiting to respect real-time cycle requirements.
 
 ---
 
@@ -71,19 +81,19 @@ EsoCore's web UI and diagnostics are designed with rate limiting to respect real
 
 ### Physical Layer
 
-- Standard 10/100 Ethernet (shared with web UI and PROFINET)
-- Uses the same RJ45 port, PHY, and IP address as other Ethernet services
+- Standard 10/100 Ethernet on Port A (Machine Network)
+- Shares Port A with web UI and PROFINET; isolated from Port B (IT Network)
 
 ### Topology & Addressing
 
-- IP addressing via DHCP or static (same IP as web UI and PROFINET)
+- IP addressing via static IP on Port A (same IP as web UI and PROFINET on machine network)
 - TCP port 502
 
 ### Firmware Notes
 
 - Lightweight TCP stack with Modbus application server
 - Same function codes as RTU with PDU carried over TCP
-- Coexists with PROFINET RT via QoS/priority handling
+- Coexists with PROFINET RT on Port A via QoS/priority handling
 - Multiple simultaneous client connections supported
 
 ---
@@ -123,9 +133,9 @@ EsoCore's web UI and diagnostics are designed with rate limiting to respect real
 
 ### Physical Layer & Topology
 
-- Standard Ethernet (RJ45 with magnetics)
-- **Single-port design**: EsoCore uses one Ethernet port shared with web UI and Modbus TCP
-- Star or line topology via switches; 2-port devices with integrated switch are available in future revisions for daisy-chain wiring
+- Standard Ethernet (RJ45 with magnetics) on Port A (Machine Network)
+- **Dual-port design**: Port A carries PROFINET RT alongside web UI and Modbus TCP; Port B is isolated for IT traffic
+- Star or line topology via switches; dual-port design supports future MRP (Media Redundancy Protocol) capability
 
 ### Real‑Time Classes
 
@@ -136,19 +146,60 @@ EsoCore's web UI and diagnostics are designed with rate limiting to respect real
 
 - IP via DCP set name/IP, discovery with LLDP
 - GSDML file describes device to engineering tools
-- **One IP address**: All services (web UI, Modbus TCP, PROFINET) accessible via the same IP
+- **Port A IP address**: Web UI, Modbus TCP, and PROFINET all accessible via Port A's IP on the machine network
 
 ### Firmware Notes
 
 - Prioritized traffic, bounded cycle times (2–4 ms typical for RT)
 - Alarms, diagnostics, records; SNMP/LLDP for topology
-- QoS handling ensures RT frames take priority over best-effort IP traffic
-- Rate-limited web UI and diagnostics to maintain <50% link utilization
+- QoS handling ensures RT frames take priority over best-effort IP traffic on Port A
+- Rate-limited web UI and diagnostics to maintain <50% link utilization on Port A
 
 ### BOM & Connectors
 
-- Existing Ethernet PHY and MagJack (shared with all Ethernet protocols)
-- Optional 2‑port switch (future revision) for line topology; still one logical interface/IP
+- Port A Ethernet PHY (KSZ8081RNACA) and MagJack (Wurth 7499111121) for all machine-facing protocols
+- Port B Ethernet PHY and MagJack are independent and dedicated to IT traffic
+- Dual-port design supports future MRP (Media Redundancy Protocol) for line topology redundancy
+
+---
+
+## Interbus
+
+### Background
+
+Interbus is an obsolete fieldbus protocol still found on some older Bosch Rexroth controller machines. While Interbus modules are increasingly hard
+to source, customer demand for legacy equipment support requires EsoCore to provide connectivity.
+
+### Physical Layer
+
+- RS-485 differential signaling at the physical layer
+- Dedicated isolated RS-485 transceiver (ADM2582EBRWZ) separate from Modbus RTU and PROFIBUS interfaces
+- 4-pin terminal block connector (A/B/GND/Shield) with switchable 120 ohm termination
+- Cable: shielded twisted pair, 120 ohm characteristic impedance
+
+### Protocol Characteristics
+
+- **Master/slave architecture** with summation-frame approach
+- **Deterministic cyclic behavior**: strict cycle timing with defined scan rates
+- **Frame construction**: summation frame collects data from all slaves in a single bus cycle
+- **Not a generic RS-485 protocol**: despite using RS-485 at the physical layer, Interbus has its own protocol timing, frame structure, and
+  diagnostics that differ fundamentally from Modbus RTU
+
+### Firmware Considerations
+
+Adding native Interbus support is feasible in principle but non-trivial due to:
+
+- **Strict cycle timing**: master scheduling must meet deterministic deadlines
+- **Frame construction/parsing**: summation-frame protocol requires precise assembly and disassembly of multi-slave data
+- **Diagnostics**: Interbus has its own diagnostic channel and fault reporting mechanisms
+- **Scarcity of tooling**: modern, maintained embedded stacks and test equipment for Interbus are rare
+- **Validation**: limited availability of Interbus slave devices for testing and certification
+
+### BOM & Connectors
+
+- Isolated RS-485 transceiver (ADM2582EBRWZ) dedicated to Interbus
+- 4-pin pluggable terminal block (Degson 2EDGR-5.0-04P / 2EDGK-5.0-04P)
+- 120 ohm termination resistor (switchable)
 
 ---
 

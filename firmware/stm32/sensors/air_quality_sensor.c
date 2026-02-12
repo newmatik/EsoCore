@@ -70,7 +70,7 @@ static struct {
  * ============================================================================ */
 
 /**
- * @brief Initialize CO2 sensor (e.g., Sensirion SCD30)
+ * @brief Initialize CO2 sensor (Sensirion SCD40, I2C address 0x62)
  */
 static bool co2_sensor_init(void) {
     /* TODO: Implement CO2 sensor initialization */

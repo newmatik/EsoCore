@@ -1,16 +1,16 @@
 # Injection Molding Machine Monitoring and Process Optimization
 
-Comprehensive monitoring solutions for injection molding machines, auxiliary equipment, and process optimization. Detect hydraulic system issues, monitor mold
-health, track process stability, and prevent costly downtime. Optimize cycle times, reduce scrap, and maintain consistent part quality through data-driven
-condition monitoring.
+Comprehensive monitoring solutions for injection molding machines, auxiliary equipment, and process optimization. Detect hydraulic system issues,
+monitor mold health, track process stability, and prevent costly downtime. Optimize cycle times, reduce scrap, and maintain consistent part quality
+through data-driven condition monitoring.
 
 ---
 
 ## Why Monitor Injection Molding Equipment?
 
-Injection molding machines are capital-intensive assets ($100,000-$1,000,000+) operating in high-volume production environments where unplanned downtime costs
-$20,000-100,000 per hour. Process instability leads to scrap, rework, and quality issues that can cost more than equipment failures. Comprehensive monitoring
-ensures both equipment reliability and process stability.
+Injection molding machines are capital-intensive assets ($100,000-$1,000,000+) operating in high-volume production environments where unplanned
+downtime costs $20,000-100,000 per hour. Process instability leads to scrap, rework, and quality issues that can cost more than equipment failures.
+Comprehensive monitoring ensures both equipment reliability and process stability.
 
 ### The Cost of Molding Failures
 
@@ -322,9 +322,8 @@ Optimal sensor locations for comprehensive injection molding monitoring:
 
 ### General Purpose Machines (100-500 ton)
 
-**Application:** General manufacturing, medium-volume production
-**Typical Cycle Time:** 20-60 seconds
-**Critical Monitoring:** Hydraulic system, temperature control, basic process
+**Application:** General manufacturing, medium-volume production **Typical Cycle Time:** 20-60 seconds **Critical Monitoring:** Hydraulic system,
+temperature control, basic process
 
 **Monitoring Package:**
 
@@ -334,14 +333,12 @@ Optimal sensor locations for comprehensive injection molding monitoring:
 - 1 cycle timer/counter
 - Basic process monitoring
 
-**Investment:** $2,500-4,000 per machine
-**ROI:** 12-24 months for medium-volume production
+**Investment:** $2,500-4,000 per machine **ROI:** 12-24 months for medium-volume production
 
 ### High-Performance Machines (500-2000 ton)
 
-**Application:** Automotive, high-volume production
-**Typical Cycle Time:** 15-45 seconds
-**Critical Monitoring:** Complete hydraulic monitoring, precise process control
+**Application:** Automotive, high-volume production **Typical Cycle Time:** 15-45 seconds **Critical Monitoring:** Complete hydraulic monitoring,
+precise process control
 
 **Monitoring Package:**
 
@@ -351,14 +348,12 @@ Optimal sensor locations for comprehensive injection molding monitoring:
 - Advanced cycle monitoring
 - Process capability tracking
 
-**Investment:** $4,000-7,000 per machine
-**ROI:** 6-18 months for high-volume production
+**Investment:** $4,000-7,000 per machine **ROI:** 6-18 months for high-volume production
 
 ### Multi-Component and Stack Molds
 
-**Application:** Complex assemblies, overmolding
-**Typical Cycle Time:** 30-90 seconds
-**Critical Monitoring:** Multiple injection units, complex temperature control
+**Application:** Complex assemblies, overmolding **Typical Cycle Time:** 30-90 seconds **Critical Monitoring:** Multiple injection units, complex
+temperature control
 
 **Monitoring Package:**
 
@@ -368,14 +363,12 @@ Optimal sensor locations for comprehensive injection molding monitoring:
 - Multi-cavity monitoring
 - Sequential process tracking
 
-**Investment:** $6,000-10,000 per machine
-**ROI:** 8-20 months depending on part complexity
+**Investment:** $6,000-10,000 per machine **ROI:** 8-20 months depending on part complexity
 
 ### All-Electric Machines
 
-**Application:** Precision parts, clean room production
-**Typical Cycle Time:** Variable
-**Critical Monitoring:** Servo motor performance, precise process control
+**Application:** Precision parts, clean room production **Typical Cycle Time:** Variable **Critical Monitoring:** Servo motor performance, precise
+process control
 
 **Monitoring Package:**
 
@@ -385,8 +378,7 @@ Optimal sensor locations for comprehensive injection molding monitoring:
 - Precision position monitoring
 - Energy efficiency tracking
 
-**Investment:** $3,500-6,000 per machine
-**ROI:** 10-20 months
+**Investment:** $3,500-6,000 per machine **ROI:** 10-20 months
 
 ---
 
@@ -664,8 +656,7 @@ Expand based on pilot success:
 
 - [Predictive Maintenance Guide](/docs/solutions/predictive-maintenance)
 - [Equipment Downtime Prevention](/docs/solutions/equipment-downtime-prevention)
-- [Industrial IoT Best Practices](/docs/guides/industrial-iot-best-practices)
-- [ROI Calculator](/docs/roi/cost-savings-calculator)
+
 
 ### Technical Documentation
 
@@ -683,6 +674,7 @@ Expand based on pilot success:
 
 ---
 
-Optimize injection molding operations with comprehensive equipment and process monitoring. Reduce downtime, improve quality, and maximize production efficiency.
+Optimize injection molding operations with comprehensive equipment and process monitoring. Reduce downtime, improve quality, and maximize production
+efficiency.
 
 [Schedule consultation](#) | [Request pilot program](#) | [View technical specs](/docs/esocore-edge)

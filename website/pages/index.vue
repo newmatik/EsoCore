@@ -113,9 +113,9 @@
           <div class="use-case">
             <h3>Industrial Door Systems</h3>
             <p>
-              Track cycle counts, spring health, motor current, and safety compliance for sectional doors, high-speed roll-up doors, and
-              automated gate systems. Ensure EN ISO 13849 safety compliance while optimizing maintenance intervals and preventing unexpected
-              failures.
+              Track cycle counts, spring health, motor current, and operational state for sectional doors, high-speed roll-up doors, and
+              automated gate systems. Optimize maintenance intervals and prevent unexpected failures with data-driven condition
+              monitoring.
             </p>
             <NuxtLink to="/docs/industries/industrial-door-monitoring" class="use-case-link">Learn more →</NuxtLink>
           </div>
@@ -175,9 +175,9 @@
           <div class="benefit">
             <h3>Safety Compliance Built-In</h3>
             <p>
-              EN ISO 13849 compliant safety I/O handles emergency stops, light curtains, and safety edges with <10ms response times. Safety
-              event monitoring is a first-class feature, not an afterthought, making EsoCore ideal for safety-critical industrial
-              applications.
+              6 dual-channel safety digital inputs with cross-monitoring (EN ISO 13849 Cat. 3) for e-stops, light curtains, and safety edges.
+              Built-in safety relay (dual-channel, 2NO+2NC) and SSR output for interlocking. Combined with 4 dual-mode analog inputs, EsoCore
+              provides comprehensive safety-rated I/O for industrial monitoring and interlocking applications.
             </p>
           </div>
           <div class="benefit">
@@ -210,7 +210,6 @@
             <ul>
               <li><NuxtLink to="/docs/solutions/predictive-maintenance">Predictive Maintenance</NuxtLink></li>
               <li><NuxtLink to="/docs/solutions/equipment-downtime-prevention">Downtime Prevention</NuxtLink></li>
-              <li><NuxtLink to="/docs/guides/what-is-predictive-maintenance">What is Predictive Maintenance?</NuxtLink></li>
             </ul>
           </div>
           <div class="resource-card">
@@ -218,15 +217,6 @@
             <ul>
               <li><NuxtLink to="/docs/comparisons/open-source-vs-proprietary">Open Source vs Proprietary</NuxtLink></li>
               <li><NuxtLink to="/docs/comparisons/edge-ai-vs-cloud-monitoring">Edge AI vs Cloud</NuxtLink></li>
-              <li><NuxtLink to="/docs/guides/choosing-iot-platform">Choosing an IoT Platform</NuxtLink></li>
-            </ul>
-          </div>
-          <div class="resource-card">
-            <h4>Business Case</h4>
-            <ul>
-              <li><NuxtLink to="/docs/roi/cost-savings-calculator">Cost Savings Calculator</NuxtLink></li>
-              <li><NuxtLink to="/docs/roi/total-cost-ownership">Total Cost of Ownership</NuxtLink></li>
-              <li><NuxtLink to="/docs/roi/business-case-predictive-maintenance">Building Your Business Case</NuxtLink></li>
             </ul>
           </div>
         </div>

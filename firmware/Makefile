@@ -21,7 +21,7 @@ SIZE := arm-none-eabi-size
 
 # Target configurations
 TARGETS := edge sensors
-EDGE_TARGET := stm32f4
+EDGE_TARGET := stm32h7
 SENSOR_TARGET := stm32g0
 
 # Build options
@@ -76,7 +76,7 @@ EDGE_SOURCES := \
 	stm32/$(EDGE_TARGET)/hal/timer.c \
 	stm32/$(EDGE_TARGET)/hal/adc.c \
 	stm32/$(EDGE_TARGET)/hal/ethernet.c \
-	stm32/$(EDGE_TARGET)/startup/startup_stm32f4xx.s
+	stm32/$(EDGE_TARGET)/startup/startup_stm32h747xx.s
 
 SENSOR_SOURCES := \
 	stm32/sensors/main.c \
@@ -116,11 +116,12 @@ PROXIMITY_SOURCES := \
 
 # MCU-specific flags
 EDGE_MCU_FLAGS := \
-	-mcpu=cortex-m4 \
+	-mcpu=cortex-m7 \
 	-mthumb \
-	-mfpu=fpv4-sp-d16 \
+	-mfpu=fpv5-d16 \
 	-mfloat-abi=hard \
-	-DSTM32F407xx \
+	-DSTM32H747xx \
+	-DCORE_CM7 \
 	-DUSE_HAL_DRIVER
 
 SENSOR_MCU_FLAGS := \
@@ -189,7 +190,7 @@ $(BUILD_DIR)/edge/$(PROJECT_NAME)_edge.elf: $(COMMON_SOURCES) $(EDGE_SOURCES)
 	@mkdir -p $(BUILD_DIR)/edge
 	$(CC) $(CFLAGS) $(EDGE_MCU_FLAGS) $(EDGE_INCLUDES) \
 		$(COMMON_SOURCES) $(EDGE_SOURCES) \
-		$(LDFLAGS) -T stm32/$(EDGE_TARGET)/linker/STM32F407VGTx_FLASH.ld \
+		$(LDFLAGS) -T stm32/$(EDGE_TARGET)/linker/STM32H747IITx_FLASH_CM7.ld \
 		-o $@ -lm
 	$(OBJCOPY) -O ihex $@ $(BUILD_DIR)/edge/$(PROJECT_NAME)_edge.hex
 	$(OBJCOPY) -O binary $@ $(BUILD_DIR)/edge/$(PROJECT_NAME)_edge.bin
@@ -333,7 +334,7 @@ release: all
 flash_edge: $(BUILD_DIR)/edge/$(PROJECT_NAME)_edge.hex
 	@echo "Flashing Edge device firmware..."
 	# Add your programming command here (OpenOCD, ST-Link, etc.)
-	# openocd -f interface/stlink.cfg -f target/stm32f4x.cfg -c "program $< verify reset exit"
+	# openocd -f interface/stlink.cfg -f target/stm32h7x.cfg -c "program $< verify reset exit"
 
 flash_vibration: $(BUILD_DIR)/sensors/vibration/$(PROJECT_NAME)_vibration.hex
 	@echo "Flashing vibration sensor firmware..."

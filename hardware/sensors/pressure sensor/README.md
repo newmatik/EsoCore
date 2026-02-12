@@ -11,13 +11,12 @@
 ## Hardware
 
 - MCU: STM32G031K8T6 (TSSOP20), 8 MHz crystal
-- Sensor: MPL3115A2 (0-10bar differential pressure)
-- Sensor: BMP388 (0-100bar industrial pressure)
-- Sensor: BMP280 (0-1bar low-pressure monitoring)
+- Sensor: MPRLS0300YG00001BB (0-10 bar gauge pressure, Honeywell, I2C/SPI)
+- Sensor: BMP388 (barometric pressure, 300-1250 hPa / 0.3-1.25 bar absolute)
+- Sensor: BMP280 (barometric pressure, 300-1100 hPa / 0.3-1.1 bar absolute)
 - Bus: RS‑485 half‑duplex (SN65HVD72), bias/termination network
 - Power: 12 V bus → 3.3 V buck (TPS62172) + LDO (MCP1700) for clean analog
-- Connectors: Two pluggable RS‑485 ports (IN and OUT): plug `2EDGK-5.0-04P` ↔
-  PCB mate `2EDGR-5.0-04P`; silk labels A/B/24V/GND; signal loop‑through;
+- Connectors: Two pluggable RS‑485 ports (IN and OUT): plug `2EDGK-5.0-04P` ↔ PCB mate `2EDGR-5.0-04P`; silk labels A/B/12V/GND; signal loop‑through;
   PG9 cable gland
 - Protection: ESD arrays on bus/power, pressure relief valve
 - Addressing: 8‑position SMD DIP; 1–7 = Modbus address bits, 8 = 120 Ω termination enable; silkscreen: "1‑7=ADDR, 8=TERM, ON/OFF"
@@ -63,5 +62,4 @@
 
 ## Copyright and License
 
-Copyright © 2025 Newmatik. All rights reserved.
-Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.
+Copyright © 2025 Newmatik. All rights reserved. Licensed under the Apache License, Version 2.0. See `website/docs/license.md` for details.
