@@ -4,7 +4,8 @@ from datetime import datetime
 
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-from rest_framework import status
+from drf_spectacular.utils import OpenApiResponse, extend_schema, inline_serializer
+from rest_framework import serializers, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -14,6 +15,19 @@ from events.models import SystemEvent
 from telemetry.models import TelemetryPacket, TelemetryPoint
 
 
+@extend_schema(
+    request=None,
+    responses=inline_serializer(
+        name="AuthHandshakeResponse",
+        fields={
+            "nonce": serializers.CharField(),
+            "server_time": serializers.CharField(),
+            "version": serializers.CharField(),
+        },
+    ),
+    summary="Device authentication handshake",
+    tags=["iot"],
+)
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def auth_handshake(request):
@@ -25,6 +39,31 @@ def auth_handshake(request):
     return Response({"nonce": nonce, "server_time": server_time, "version": "1.0.0"})
 
 
+@extend_schema(
+    request=serializers.ListSerializer(child=inline_serializer(
+        name="TelemetryItem",
+        fields={
+            "timestamp": serializers.CharField(),
+            "metric": serializers.CharField(),
+            "value": serializers.FloatField(),
+            "unit": serializers.CharField(required=False),
+            "meta": serializers.DictField(required=False),
+        },
+    )),
+    responses={
+        200: inline_serializer(
+            name="TelemetryBatchResponse",
+            fields={
+                "accepted": serializers.IntegerField(),
+                "duplicates": serializers.IntegerField(),
+                "rejected": serializers.IntegerField(),
+            },
+        ),
+        409: OpenApiResponse(description="Duplicate upload"),
+    },
+    summary="Batch telemetry ingestion",
+    tags=["iot"],
+)
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def telemetry_batch(request):
@@ -134,6 +173,19 @@ def telemetry_batch(request):
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@extend_schema(
+    responses=inline_serializer(
+        name="DeviceConfigResponse",
+        fields={
+            "sampling_rates": serializers.DictField(),
+            "thresholds": serializers.DictField(),
+            "ntp_servers": serializers.ListField(child=serializers.CharField()),
+            "endpoints": serializers.DictField(),
+        },
+    ),
+    summary="Get device configuration",
+    tags=["iot"],
+)
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def get_config(request):
@@ -169,6 +221,21 @@ def get_config(request):
         return Response({"error": "Device not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
+@extend_schema(
+    responses=inline_serializer(
+        name="OTACheckResponse",
+        fields={
+            "available": serializers.BooleanField(),
+            "version": serializers.CharField(required=False),
+            "hash": serializers.CharField(required=False),
+            "download_url": serializers.CharField(required=False),
+            "release_notes": serializers.CharField(required=False),
+            "current_version": serializers.CharField(required=False),
+        },
+    ),
+    summary="Check for OTA updates",
+    tags=["iot"],
+)
 @api_view(["GET"])
 @permission_classes([AllowAny])
 def ota_check(request):
@@ -212,6 +279,22 @@ def ota_check(request):
         return Response({"error": "Device not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
+@extend_schema(
+    request=inline_serializer(
+        name="OTAReportRequest",
+        fields={
+            "status": serializers.CharField(),
+            "version": serializers.CharField(),
+            "error": serializers.CharField(required=False),
+        },
+    ),
+    responses=inline_serializer(
+        name="OTAReportResponse",
+        fields={"status": serializers.CharField()},
+    ),
+    summary="Report OTA update status",
+    tags=["iot"],
+)
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def ota_report(request):
