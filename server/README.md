@@ -250,7 +250,6 @@ server/
 │   ├── settings.py
 │   ├── urls.py
 │   └── wsgi.py
-├── edgesentinel_api/      # Legacy; unused. All runtime config is in sentinel_api.
 ├── devices/                   # Device management app
 ├── assets/                    # Asset management app
 ├── telemetry/                 # Telemetry data app
