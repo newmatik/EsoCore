@@ -1,993 +1,449 @@
 /**
  * @file power_management.c
- * @brief Power Management System Implementation
+ * @brief Power Management Implementation for EsoCore Edge v1.5.0.0
  *
- * This file contains the implementation of the power management system for EsoCore devices,
- * providing support for PoE (Power over Ethernet), supercapacitor backup, and intelligent power distribution.
+ * 24V DC input with brownout detection, multi-rail monitoring, supercapacitor
+ * backup, and power sequencing. All PoE functionality has been removed for
+ * v1.5.0.0 (dedicated 24V DC input replaces PoE).
  *
  * @author EsoCore Development Team
- * @copyright Copyright © 2025 Newmatik. All rights reserved.
+ * @copyright Copyright (c) 2026 Newmatik. All rights reserved.
  * @license Apache License, Version 2.0
  */
 
 #include "power_management.h"
 #include <string.h>
-#include <stdio.h>
 
 /* ============================================================================
- * Private Data Structures
+ * Default Thresholds (from bsp_edge_v150.h values)
+ * ============================================================================ */
+
+#define DEFAULT_BROWNOUT_WARNING_MV     21000
+#define DEFAULT_BROWNOUT_SHUTDOWN_MV    19000
+#define DEFAULT_OVERVOLTAGE_MV          28500
+#define DEFAULT_TEMP_LIMIT_C            70
+#define DEFAULT_BROWNOUT_HOLDOFF_MS     50
+
+/* Rail nominal/min/max (from BSP) */
+static const uint16_t rail_nominal_mv[ESOCORE_RAIL_COUNT] = {
+    24000, 5000, 3300, 3300, 1200, 12000, 3800
+};
+static const uint16_t rail_min_mv[ESOCORE_RAIL_COUNT] = {
+    20000, 4750, 3135, 3135, 1140, 11400, 2000
+};
+static const uint16_t rail_max_mv[ESOCORE_RAIL_COUNT] = {
+    28000, 5250, 3465, 3465, 1260, 12600, 3800
+};
+
+/* Fault flag for each rail */
+static const uint16_t rail_fault_flag[ESOCORE_RAIL_COUNT] = {
+    ESOCORE_POWER_FAULT_UNDERVOLTAGE,
+    ESOCORE_POWER_FAULT_RAIL_5V,
+    ESOCORE_POWER_FAULT_RAIL_3V3D,
+    ESOCORE_POWER_FAULT_RAIL_3V3A,
+    ESOCORE_POWER_FAULT_RAIL_1V2,
+    ESOCORE_POWER_FAULT_RAIL_12V,
+    ESOCORE_POWER_FAULT_SUPERCAP_LOW,
+};
+
+/* ============================================================================
+ * Private State
  * ============================================================================ */
 
 static bool power_initialized = false;
+static esocore_power_config_t config;
+static esocore_power_status_t status;
+static esocore_power_callback_t event_callback = NULL;
+static void *callback_context = NULL;
 
-/* Power source configurations */
-static esocore_power_source_config_t power_sources[ESOCORE_MAX_POWER_SOURCES];
-static esocore_power_monitoring_t source_monitoring[ESOCORE_MAX_POWER_SOURCES];
-static bool source_enabled[ESOCORE_MAX_POWER_SOURCES];
+/* Brownout state machine */
+static uint32_t brownout_start_tick = 0;
+static bool brownout_active = false;
 
-/* Power consumer configurations */
-static esocore_power_consumer_config_t power_consumers[ESOCORE_MAX_POWER_CONSUMERS];
-static esocore_power_monitoring_t consumer_monitoring[ESOCORE_MAX_POWER_CONSUMERS];
-static bool consumer_enabled[ESOCORE_MAX_POWER_CONSUMERS];
-
-/* Power management state */
-static esocore_power_status_t power_status;
-static esocore_power_threshold_t power_thresholds;
-
-/* Supercapacitor management */
-static uint16_t supercap_voltage_mv = ESOCORE_SUPERCAP_VOLTAGE_MAX;
-static uint8_t supercap_charge_percent = 100;
-static bool supercap_charging = false;
-
-/* PoE management */
-static uint16_t poe_voltage_mv = 0;
-static uint8_t poe_power_class = 0;
-static bool poe_detected = false;
-
-/* Statistics */
-static uint32_t total_energy_consumed_wh = 0;
-static uint32_t average_power_mw = 0;
-static uint32_t peak_power_mw = 0;
+/* Uptime tracking */
+static uint32_t last_poll_tick = 0;
 
 /* ============================================================================
- * Hardware Abstraction Layer
+ * Hardware Abstraction (to be replaced with actual HAL calls)
  * ============================================================================ */
 
+/* Forward declaration -- implemented by BSP using hal_adc.h */
+extern void hal_adc_read_all_rails(uint32_t rail_mv[5]);
+extern int8_t hal_adc_read_temperature(void);
+extern uint32_t system_clock_get_tick(void);
+
 /**
- * @brief Initialize power hardware
+ * @brief Read all power rail voltages via internal ADC
  */
-static bool power_hw_init(void) {
-    /* TODO: Initialize power management hardware */
-    /* This would typically involve:
-     * - Configuring ADC for voltage/current monitoring
-     * - Setting up PoE detection circuits
-     * - Configuring supercapacitor charging circuits
-     * - Setting up power switching relays
-     */
-    return true;
+static void power_hw_read_rails(void)
+{
+    uint32_t adc_rails[5];
+    hal_adc_read_all_rails(adc_rails);
+
+    status.rail_voltage_mv[ESOCORE_RAIL_24V]      = (uint16_t)adc_rails[0];
+    status.rail_voltage_mv[ESOCORE_RAIL_5V]        = (uint16_t)adc_rails[1];
+    status.rail_voltage_mv[ESOCORE_RAIL_3V3_DIG]   = (uint16_t)adc_rails[2];
+    status.rail_voltage_mv[ESOCORE_RAIL_1V2]        = (uint16_t)adc_rails[3];
+    status.rail_voltage_mv[ESOCORE_RAIL_12V_SBUS]   = (uint16_t)adc_rails[4];
+
+    /* 3.3V analog rail -- read separately if on a different ADC channel */
+    /* For now, approximate from digital rail (same LDO input) */
+    status.rail_voltage_mv[ESOCORE_RAIL_3V3_ANA] =
+        status.rail_voltage_mv[ESOCORE_RAIL_3V3_DIG];
+
+    /* Supercap voltage -- read from dedicated ADC channel */
+    /* TODO: Read PWR_MON_SUPERCAP pin via hal_adc */
+    status.rail_voltage_mv[ESOCORE_RAIL_SUPERCAP] = 3800; /* Placeholder */
+
+    /* Temperature */
+    status.temperature_c = hal_adc_read_temperature();
 }
 
 /**
- * @brief Read voltage from power source
+ * @brief Notify registered callback of a power event
  */
-static bool power_hw_read_source_voltage(esocore_power_source_t source, uint16_t *voltage_mv) {
-    /* TODO: Read voltage from specific power source */
-    switch (source) {
-        case ESOCORE_POWER_SOURCE_POE:
-            *voltage_mv = poe_voltage_mv;
-            break;
-        case ESOCORE_POWER_SOURCE_SUPERCAP:
-            *voltage_mv = supercap_voltage_mv;
-            break;
-        default:
-            *voltage_mv = 0;
-            return false;
+static void power_notify(esocore_power_event_t event)
+{
+    if (event_callback) {
+        event_callback(event, status.fault_flags, callback_context);
     }
-    return true;
-}
-
-/**
- * @brief Read current from power source
- */
-static bool power_hw_read_source_current(esocore_power_source_t source, uint16_t *current_ma) {
-    /* TODO: Read current from specific power source */
-    *current_ma = 0; /* Placeholder */
-    return true;
-}
-
-/**
- * @brief Read voltage from power consumer
- */
-static bool power_hw_read_consumer_voltage(esocore_power_consumer_t consumer, uint16_t *voltage_mv) {
-    /* TODO: Read voltage at consumer */
-    *voltage_mv = 3300; /* Placeholder 3.3V */
-    return true;
-}
-
-/**
- * @brief Read current from power consumer
- */
-static bool power_hw_read_consumer_current(esocore_power_consumer_t consumer, uint16_t *current_ma) {
-    /* TODO: Read current at consumer */
-    *current_ma = 0; /* Placeholder */
-    return true;
-}
-
-/**
- * @brief Enable/disable power source
- */
-static bool power_hw_enable_source(esocore_power_source_t source, bool enable) {
-    /* TODO: Enable/disable specific power source */
-    source_enabled[source] = enable;
-    return true;
-}
-
-/**
- * @brief Enable/disable power consumer
- */
-static bool power_hw_enable_consumer(esocore_power_consumer_t consumer, bool enable) {
-    /* TODO: Enable/disable specific power consumer */
-    consumer_enabled[consumer] = enable;
-    return true;
-}
-
-/**
- * @brief Check PoE power availability
- */
-static bool power_hw_check_poe_detection(bool *detected, uint16_t *voltage_mv, uint8_t *power_class) {
-    /* TODO: Check PoE detection circuit */
-    *detected = poe_detected;
-    *voltage_mv = poe_voltage_mv;
-    *power_class = poe_power_class;
-    return true;
-}
-
-/**
- * @brief Start supercapacitor charging
- */
-static bool power_hw_start_supercap_charging(void) {
-    /* TODO: Enable supercapacitor charging circuit */
-    supercap_charging = true;
-    return true;
-}
-
-/**
- * @brief Stop supercapacitor charging
- */
-static bool power_hw_stop_supercap_charging(void) {
-    /* TODO: Disable supercapacitor charging circuit */
-    supercap_charging = false;
-    return true;
-}
-
-/**
- * @brief Read supercapacitor voltage
- */
-static bool power_hw_read_supercap_voltage(uint16_t *voltage_mv) {
-    /* TODO: Read supercapacitor voltage */
-    *voltage_mv = supercap_voltage_mv;
-    return true;
-}
-
-/**
- * @brief Perform emergency power shutdown
- */
-static bool power_hw_emergency_shutdown(void) {
-    /* TODO: Emergency shutdown sequence */
-    /* This would typically involve:
-     * - Disabling all non-essential consumers
-     * - Switching to backup power if available
-     * - Saving critical data
-     * - Entering safe shutdown mode
-     */
-    return true;
-}
-
-/**
- * @brief Read system temperature
- */
-static bool power_hw_read_temperature(int8_t *temperature_celsius) {
-    /* TODO: Read system temperature */
-    *temperature_celsius = 25; /* Placeholder */
-    return true;
 }
 
 /* ============================================================================
- * Power Management Logic
+ * Brownout State Machine
  * ============================================================================ */
 
-/**
- * @brief Update power monitoring data
- */
-static void power_update_monitoring(void) {
-    uint32_t total_power_mw = 0;
-    uint32_t total_current_ma = 0;
+static void power_update_brownout(void)
+{
+    uint16_t vin = status.rail_voltage_mv[ESOCORE_RAIL_24V];
+    uint32_t now = system_clock_get_tick();
 
-    /* Update source monitoring */
-    for (uint8_t i = 0; i < ESOCORE_MAX_POWER_SOURCES; i++) {
-        if (source_enabled[i]) {
-            power_hw_read_source_voltage((esocore_power_source_t)i, &source_monitoring[i].voltage_mv);
-            power_hw_read_source_current((esocore_power_source_t)i, &source_monitoring[i].current_ma);
-            source_monitoring[i].power_mw = (source_monitoring[i].voltage_mv * source_monitoring[i].current_ma) / 1000;
-            source_monitoring[i].efficiency_percent = 85; /* Placeholder */
-            total_power_mw += source_monitoring[i].power_mw;
-            total_current_ma += source_monitoring[i].current_ma;
+    if (vin < config.brownout_shutdown_mv) {
+        /* Critical: input below shutdown threshold */
+        if (!brownout_active || (now - brownout_start_tick) > config.brownout_holdoff_ms) {
+            status.state = ESOCORE_POWER_STATE_CRITICAL;
+            status.active_source = ESOCORE_POWER_SOURCE_SUPERCAP;
+            status.fault_flags |= ESOCORE_POWER_FAULT_BROWNOUT;
+            power_notify(ESOCORE_POWER_EVENT_BROWNOUT_SHUTDOWN);
+        }
+        if (!brownout_active) {
+            brownout_active = true;
+            brownout_start_tick = now;
+            status.brownout_count++;
+        }
+    } else if (vin < config.brownout_warning_mv) {
+        /* Warning: input dropping */
+        if (!brownout_active) {
+            brownout_active = true;
+            brownout_start_tick = now;
+        }
+        if ((now - brownout_start_tick) > config.brownout_holdoff_ms) {
+            status.state = ESOCORE_POWER_STATE_BROWNOUT;
+            status.fault_flags |= ESOCORE_POWER_FAULT_BROWNOUT;
+            power_notify(ESOCORE_POWER_EVENT_BROWNOUT_WARNING);
+        }
+    } else {
+        /* Normal input voltage */
+        if (brownout_active) {
+            brownout_active = false;
+            status.fault_flags &= ~ESOCORE_POWER_FAULT_BROWNOUT;
+            if (status.state == ESOCORE_POWER_STATE_BROWNOUT ||
+                status.state == ESOCORE_POWER_STATE_CRITICAL) {
+                status.state = ESOCORE_POWER_STATE_NORMAL;
+                status.active_source = ESOCORE_POWER_SOURCE_DC_INPUT;
+                power_notify(ESOCORE_POWER_EVENT_RECOVERED);
+            }
         }
     }
-
-    /* Update consumer monitoring */
-    for (uint8_t i = 0; i < ESOCORE_MAX_POWER_CONSUMERS; i++) {
-        if (consumer_enabled[i]) {
-            power_hw_read_consumer_voltage((esocore_power_consumer_t)i, &consumer_monitoring[i].voltage_mv);
-            power_hw_read_consumer_current((esocore_power_consumer_t)i, &consumer_monitoring[i].current_ma);
-            consumer_monitoring[i].power_mw = (consumer_monitoring[i].voltage_mv * consumer_monitoring[i].current_ma) / 1000;
-        }
-    }
-
-    /* Update system status */
-    power_status.system_voltage_mv = 3300; /* Placeholder system voltage */
-    power_status.total_current_ma = total_current_ma;
-    power_status.consumed_power_mw = total_power_mw;
-    power_status.available_power_mw = power_thresholds.power_budget_mw - total_power_mw;
-
-    /* Update PoE status */
-    power_hw_check_poe_detection(&poe_detected, &poe_voltage_mv, &poe_power_class);
-    power_status.poe_detected = poe_detected;
-
-    /* Update supercapacitor status */
-    power_hw_read_supercap_voltage(&supercap_voltage_mv);
-    supercap_charge_percent = (supercap_voltage_mv * 100) / ESOCORE_SUPERCAP_VOLTAGE_MAX;
-    power_status.supercap_charging = supercap_charging;
-
-    /* Read temperature */
-    power_hw_read_temperature(&power_status.system_temperature_celsius);
-}
-
-/**
- * @brief Check power thresholds and handle violations
- */
-static void power_check_thresholds(void) {
-    uint8_t fault_flags = 0;
-
-    /* Check voltage thresholds */
-    if (power_status.system_voltage_mv < power_thresholds.voltage_low_mv) {
-        fault_flags |= ESOCORE_POWER_FAULT_UNDERVOLTAGE;
-        power_status.low_power_warning = true;
-    } else if (power_status.system_voltage_mv > power_thresholds.voltage_high_mv) {
-        fault_flags |= ESOCORE_POWER_FAULT_OVERVOLTAGE;
-    }
-
-    /* Check current thresholds */
-    if (power_status.total_current_ma > power_thresholds.current_high_ma) {
-        fault_flags |= ESOCORE_POWER_FAULT_OVERCURRENT;
-    }
-
-    /* Check temperature thresholds */
-    if (power_status.system_temperature_celsius > power_thresholds.temperature_high_celsius) {
-        fault_flags |= ESOCORE_POWER_FAULT_OVERTEMPERATURE;
-    }
-
-    /* Check supercapacitor level */
-    if (supercap_charge_percent < 20) {
-        fault_flags |= ESOCORE_POWER_FAULT_SUPERCAP_LOW;
-    }
-
-    /* Check PoE */
-    if (power_sources[ESOCORE_POWER_SOURCE_POE].enabled && !poe_detected) {
-        fault_flags |= ESOCORE_POWER_FAULT_POE_NEGOTIATION;
-    }
-
-    power_status.fault_flags = fault_flags;
-
-    /* Handle critical faults */
-    if (fault_flags & (ESOCORE_POWER_FAULT_UNDERVOLTAGE | ESOCORE_POWER_FAULT_SUPERCAP_LOW)) {
-        if (power_status.current_state != ESOCORE_POWER_STATE_CRITICAL) {
-            power_status.current_state = ESOCORE_POWER_STATE_CRITICAL;
-            /* TODO: Notify system of critical power condition */
-        }
-    } else if (fault_flags != 0) {
-        power_status.current_state = ESOCORE_POWER_STATE_NORMAL;
-    }
-}
-
-/**
- * @brief Optimize power distribution
- */
-static void power_optimize_distribution(void) {
-    /* TODO: Implement intelligent power distribution */
-    /* This would typically involve:
-     * - Prioritizing critical consumers
-     * - Load balancing across sources
-     * - Adjusting consumer power consumption
-     * - Predictive power management
-     */
 }
 
 /* ============================================================================
- * Public API Implementation
+ * Rail Monitoring
  * ============================================================================ */
 
-/**
- * @brief Initialize power management system
- */
-bool esocore_power_init(void) {
-    if (power_initialized) {
-        return false;
+static void power_check_rails(void)
+{
+    /* Clear rail-specific faults (will be re-asserted if still present) */
+    status.fault_flags &= (ESOCORE_POWER_FAULT_BROWNOUT |
+                           ESOCORE_POWER_FAULT_OVERTEMPERATURE);
+
+    for (int i = 0; i < ESOCORE_RAIL_COUNT; i++) {
+        uint16_t v = status.rail_voltage_mv[i];
+        if (v < rail_min_mv[i] || v > rail_max_mv[i]) {
+            status.fault_flags |= rail_fault_flag[i];
+            if (i <= ESOCORE_RAIL_12V_SBUS) {
+                power_notify(ESOCORE_POWER_EVENT_RAIL_FAULT);
+            }
+        }
     }
 
-    /* Initialize hardware */
-    if (!power_hw_init()) {
-        return false;
+    /* Overvoltage on 24V input */
+    if (status.rail_voltage_mv[ESOCORE_RAIL_24V] > config.overvoltage_mv) {
+        status.fault_flags |= ESOCORE_POWER_FAULT_OVERVOLTAGE;
     }
 
-    /* Initialize data structures */
-    memset(power_sources, 0, sizeof(power_sources));
-    memset(power_consumers, 0, sizeof(power_consumers));
-    memset(source_monitoring, 0, sizeof(source_monitoring));
-    memset(consumer_monitoring, 0, sizeof(consumer_monitoring));
-    memset(source_enabled, 0, sizeof(source_enabled));
-    memset(consumer_enabled, 0, sizeof(consumer_enabled));
+    /* Temperature */
+    if (status.temperature_c > config.temperature_limit_c) {
+        status.fault_flags |= ESOCORE_POWER_FAULT_OVERTEMPERATURE;
+        power_notify(ESOCORE_POWER_EVENT_OVERTEMPERATURE);
+    }
 
-    /* Initialize power status */
-    memset(&power_status, 0, sizeof(power_status));
-    power_status.current_state = ESOCORE_POWER_STATE_NORMAL;
-    power_status.active_source = ESOCORE_POWER_SOURCE_POE;
-    power_status.backup_source = ESOCORE_POWER_SOURCE_SUPERCAP;
+    /* Supercap low */
+    if (status.rail_voltage_mv[ESOCORE_RAIL_SUPERCAP] < 2500) {
+        status.fault_flags |= ESOCORE_POWER_FAULT_SUPERCAP_LOW;
+        power_notify(ESOCORE_POWER_EVENT_SUPERCAP_LOW);
+    }
+}
 
-    /* Initialize thresholds */
-    power_thresholds.voltage_high_mv = 3600;
-    power_thresholds.voltage_low_mv = 3000;
-    power_thresholds.current_high_ma = 2000;
-    power_thresholds.current_low_ma = 100;
-    power_thresholds.temperature_high_celsius = 70;
-    power_thresholds.temperature_low_celsius = -20;
-    power_thresholds.power_budget_mw = 10000;
+/* ============================================================================
+ * Supercapacitor
+ * ============================================================================ */
 
-    /* Initialize supercapacitor */
-    supercap_voltage_mv = ESOCORE_SUPERCAP_VOLTAGE_MAX;
-    supercap_charge_percent = 100;
+static void power_update_supercap(void)
+{
+    uint16_t v = status.rail_voltage_mv[ESOCORE_RAIL_SUPERCAP];
+    /* Charge percentage: linear map from 2.0V (0%) to 3.8V (100%) */
+    if (v <= 2000) {
+        status.supercap_charge_percent = 0;
+    } else if (v >= 3800) {
+        status.supercap_charge_percent = 100;
+    } else {
+        status.supercap_charge_percent = (uint8_t)(((uint32_t)(v - 2000) * 100) / 1800);
+    }
+}
 
-    /* Initialize PoE */
-    poe_voltage_mv = ESOCORE_POE_VOLTAGE_NOMINAL;
-    poe_power_class = 0;
+/* ============================================================================
+ * Public API
+ * ============================================================================ */
+
+bool esocore_power_init(const esocore_power_config_t *user_config)
+{
+    if (power_initialized) return false;
+
+    /* Apply configuration or defaults */
+    if (user_config) {
+        config = *user_config;
+    } else {
+        config.brownout_warning_mv = DEFAULT_BROWNOUT_WARNING_MV;
+        config.brownout_shutdown_mv = DEFAULT_BROWNOUT_SHUTDOWN_MV;
+        config.overvoltage_mv = DEFAULT_OVERVOLTAGE_MV;
+        config.temperature_limit_c = DEFAULT_TEMP_LIMIT_C;
+        config.brownout_holdoff_ms = DEFAULT_BROWNOUT_HOLDOFF_MS;
+        config.enable_supercap_backup = true;
+        config.enable_analog_sequencing = true;
+    }
+
+    /* Initialize status */
+    memset(&status, 0, sizeof(status));
+    status.state = ESOCORE_POWER_STATE_NORMAL;
+    status.active_source = ESOCORE_POWER_SOURCE_DC_INPUT;
+
+    brownout_active = false;
+    last_poll_tick = system_clock_get_tick();
 
     power_initialized = true;
     return true;
 }
 
-/**
- * @brief Deinitialize power management system
- */
-bool esocore_power_deinit(void) {
-    if (!power_initialized) {
-        return false;
-    }
-
-    /* TODO: Clean shutdown sequence */
+void esocore_power_deinit(void)
+{
     power_initialized = false;
+}
+
+void esocore_power_poll(void)
+{
+    if (!power_initialized) return;
+
+    /* Read all rail voltages */
+    power_hw_read_rails();
+
+    /* Update supercap state */
+    power_update_supercap();
+
+    /* Run brownout state machine */
+    power_update_brownout();
+
+    /* Check all rails */
+    power_check_rails();
+
+    /* Update uptime */
+    uint32_t now = system_clock_get_tick();
+    if (now - last_poll_tick >= 1000) {
+        status.uptime_seconds += (now - last_poll_tick) / 1000;
+        last_poll_tick = now;
+    }
+}
+
+bool esocore_power_get_status(esocore_power_status_t *out)
+{
+    if (!power_initialized || !out) return false;
+    *out = status;
     return true;
 }
 
-/**
- * @brief Configure power source
- */
-bool esocore_power_configure_source(esocore_power_source_t source_type,
-                                   const esocore_power_source_config_t *config) {
-    if (!power_initialized || !config) {
-        return false;
-    }
-
-    if (source_type >= ESOCORE_MAX_POWER_SOURCES) {
-        return false;
-    }
-
-    power_sources[source_type] = *config;
-    return true;
+esocore_power_state_t esocore_power_get_state(void)
+{
+    return status.state;
 }
 
-/**
- * @brief Configure power consumer
- */
-bool esocore_power_configure_consumer(esocore_power_consumer_t consumer_type,
-                                     const esocore_power_consumer_config_t *config) {
-    if (!power_initialized || !config) {
-        return false;
-    }
-
-    if (consumer_type >= ESOCORE_MAX_POWER_CONSUMERS) {
-        return false;
-    }
-
-    power_consumers[consumer_type] = *config;
-    return true;
+uint16_t esocore_power_read_rail(esocore_power_rail_t rail)
+{
+    if (rail >= ESOCORE_RAIL_COUNT) return 0;
+    return status.rail_voltage_mv[rail];
 }
 
-/**
- * @brief Get power management status
- */
-bool esocore_power_get_status(esocore_power_status_t *status) {
-    if (!power_initialized || !status) {
-        return false;
-    }
-
-    /* Update monitoring data */
-    power_update_monitoring();
-    power_check_thresholds();
-
-    memcpy(status, &power_status, sizeof(esocore_power_status_t));
-    return true;
+uint16_t esocore_power_check_faults(void)
+{
+    return status.fault_flags;
 }
 
-/**
- * @brief Get power source monitoring data
- */
-bool esocore_power_get_source_monitoring(esocore_power_source_t source_type,
-                                        esocore_power_monitoring_t *monitoring) {
-    if (!power_initialized || !monitoring || source_type >= ESOCORE_MAX_POWER_SOURCES) {
-        return false;
-    }
-
-    memcpy(monitoring, &source_monitoring[source_type], sizeof(esocore_power_monitoring_t));
-    return true;
+void esocore_power_register_callback(esocore_power_callback_t callback, void *context)
+{
+    event_callback = callback;
+    callback_context = context;
 }
 
-/**
- * @brief Get power consumer monitoring data
- */
-bool esocore_power_get_consumer_monitoring(esocore_power_consumer_t consumer_type,
-                                          esocore_power_monitoring_t *monitoring) {
-    if (!power_initialized || !monitoring || consumer_type >= ESOCORE_MAX_POWER_CONSUMERS) {
-        return false;
-    }
+bool esocore_power_emergency_shutdown(void)
+{
+    if (!power_initialized) return false;
 
-    memcpy(monitoring, &consumer_monitoring[consumer_type], sizeof(esocore_power_monitoring_t));
-    return true;
-}
+    status.state = ESOCORE_POWER_STATE_SHUTDOWN;
 
-/**
- * @brief Enable power source
- */
-bool esocore_power_enable_source(esocore_power_source_t source_type) {
-    if (!power_initialized || source_type >= ESOCORE_MAX_POWER_SOURCES) {
-        return false;
-    }
-
-    if (!power_hw_enable_source(source_type, true)) {
-        return false;
-    }
-
-    source_enabled[source_type] = true;
-    power_sources[source_type].enabled = true;
-
-    /* Update active source if this is higher priority */
-    if (power_sources[source_type].priority > power_sources[power_status.active_source].priority) {
-        power_status.active_source = source_type;
-    }
+    /* TODO: Save critical state to microSD */
+    /* TODO: De-energize safety outputs via safety_io */
+    /* TODO: Disable non-essential peripherals */
+    /* TODO: Enter lowest power state */
 
     return true;
 }
 
-/**
- * @brief Disable power source
- */
-bool esocore_power_disable_source(esocore_power_source_t source_type) {
-    if (!power_initialized || source_type >= ESOCORE_MAX_POWER_SOURCES) {
+bool esocore_power_sequence_up(void)
+{
+    if (!power_initialized) return false;
+
+    /* Step 1: Verify 24V input is present */
+    power_hw_read_rails();
+    if (status.rail_voltage_mv[ESOCORE_RAIL_24V] < rail_min_mv[ESOCORE_RAIL_24V]) {
         return false;
     }
 
-    if (!power_hw_enable_source(source_type, false)) {
+    /* Step 2: Wait for 5V buck to stabilize (should be automatic from hardware) */
+    /* In hardware, the TPS54331 starts as soon as VIN is present */
+    uint32_t timeout = system_clock_get_tick() + 100; /* 100 ms timeout */
+    while (system_clock_get_tick() < timeout) {
+        power_hw_read_rails();
+        if (status.rail_voltage_mv[ESOCORE_RAIL_5V] >= rail_min_mv[ESOCORE_RAIL_5V]) {
+            break;
+        }
+    }
+    if (status.rail_voltage_mv[ESOCORE_RAIL_5V] < rail_min_mv[ESOCORE_RAIL_5V]) {
+        status.fault_flags |= ESOCORE_POWER_FAULT_RAIL_5V;
         return false;
     }
 
-    source_enabled[source_type] = false;
-    power_sources[source_type].enabled = false;
-
-    /* Switch to backup source if active source was disabled */
-    if (power_status.active_source == source_type) {
-        power_status.active_source = power_status.backup_source;
-    }
-
-    return true;
-}
-
-/**
- * @brief Enable power consumer
- */
-bool esocore_power_enable_consumer(esocore_power_consumer_t consumer_type) {
-    if (!power_initialized || consumer_type >= ESOCORE_MAX_POWER_CONSUMERS) {
-        return false;
-    }
-
-    if (!power_hw_enable_consumer(consumer_type, true)) {
-        return false;
-    }
-
-    consumer_enabled[consumer_type] = true;
-    power_consumers[consumer_type].enabled = true;
-    power_status.active_consumers++;
-
-    return true;
-}
-
-/**
- * @brief Disable power consumer
- */
-bool esocore_power_disable_consumer(esocore_power_consumer_t consumer_type) {
-    if (!power_initialized || consumer_type >= ESOCORE_MAX_POWER_CONSUMERS) {
-        return false;
-    }
-
-    if (!power_hw_enable_consumer(consumer_type, false)) {
-        return false;
-    }
-
-    consumer_enabled[consumer_type] = false;
-    power_consumers[consumer_type].enabled = false;
-    if (power_status.active_consumers > 0) {
-        power_status.active_consumers--;
-    }
-
-    return true;
-}
-
-/**
- * @brief Switch to backup power source
- */
-bool esocore_power_switch_to_backup(void) {
-    if (!power_initialized) {
-        return false;
-    }
-
-    esocore_power_source_t temp = power_status.active_source;
-    power_status.active_source = power_status.backup_source;
-    power_status.backup_source = temp;
-
-    return true;
-}
-
-/**
- * @brief Enter low-power mode
- */
-bool esocore_power_enter_low_power(void) {
-    if (!power_initialized) {
-        return false;
-    }
-
-    /* Disable non-essential consumers */
-    for (uint8_t i = 0; i < ESOCORE_MAX_POWER_CONSUMERS; i++) {
-        if (power_consumers[i].can_sleep && consumer_enabled[i]) {
-            esocore_power_disable_consumer((esocore_power_consumer_t)i);
+    /* Step 3: Verify 3.3V digital and 1.2V core (LDOs from 5V) */
+    timeout = system_clock_get_tick() + 50;
+    while (system_clock_get_tick() < timeout) {
+        power_hw_read_rails();
+        if (status.rail_voltage_mv[ESOCORE_RAIL_3V3_DIG] >= rail_min_mv[ESOCORE_RAIL_3V3_DIG] &&
+            status.rail_voltage_mv[ESOCORE_RAIL_1V2] >= rail_min_mv[ESOCORE_RAIL_1V2]) {
+            break;
         }
     }
 
-    power_status.current_state = ESOCORE_POWER_STATE_LOW_POWER;
-    return true;
-}
-
-/**
- * @brief Exit low-power mode
- */
-bool esocore_power_exit_low_power(void) {
-    if (!power_initialized) {
-        return false;
-    }
-
-    /* Re-enable consumers */
-    for (uint8_t i = 0; i < ESOCORE_MAX_POWER_CONSUMERS; i++) {
-        if (power_consumers[i].can_sleep && !consumer_enabled[i]) {
-            esocore_power_enable_consumer((esocore_power_consumer_t)i);
-        }
-    }
-
-    power_status.current_state = ESOCORE_POWER_STATE_NORMAL;
-    return true;
-}
-
-/**
- * @brief Perform emergency shutdown
- */
-bool esocore_power_emergency_shutdown(void) {
-    if (!power_initialized) {
-        return false;
-    }
-
-    /* Emergency shutdown sequence */
-    power_hw_emergency_shutdown();
-    power_status.current_state = ESOCORE_POWER_STATE_SHUTDOWN;
-
-    return true;
-}
-
-/**
- * @brief Get supercap charge level
- */
-bool esocore_power_get_supercap_status(uint16_t *voltage_mv, uint8_t *charge_percent) {
-    if (!power_initialized || !voltage_mv || !charge_percent) {
-        return false;
-    }
-
-    power_hw_read_supercap_voltage(&supercap_voltage_mv);
-    *voltage_mv = supercap_voltage_mv;
-    *charge_percent = supercap_charge_percent;
-
-    return true;
-}
-
-/**
- * @brief Start supercap charging
- */
-bool esocore_power_start_supercap_charging(void) {
-    if (!power_initialized) {
-        return false;
-    }
-
-    return power_hw_start_supercap_charging();
-}
-
-/**
- * @brief Stop supercap charging
- */
-bool esocore_power_stop_supercap_charging(void) {
-    if (!power_initialized) {
-        return false;
-    }
-
-    return power_hw_stop_supercap_charging();
-}
-
-/**
- * @brief Check PoE power availability
- */
-bool esocore_power_check_poe(uint16_t *voltage_mv, uint8_t *power_class) {
-    if (!power_initialized || !voltage_mv || !power_class) {
-        return false;
-    }
-
-    power_hw_check_poe_detection(&poe_detected, &poe_voltage_mv, &poe_power_class);
-    *voltage_mv = poe_voltage_mv;
-    *power_class = poe_power_class;
-
-    return true;
-}
-
-/**
- * @brief Negotiate PoE power class
- */
-bool esocore_power_negotiate_poe_class(uint8_t requested_class) {
-    if (!power_initialized || requested_class > 4) {
-        return false;
-    }
-
-    /* TODO: Implement PoE power class negotiation */
-    poe_power_class = requested_class;
-    return true;
-}
-
-/**
- * @brief Get power consumption statistics
- */
-bool esocore_power_get_statistics(uint32_t *total_energy_wh, uint32_t *average_power_mw,
-                                 uint32_t *peak_power_mw_out) {
-    if (!power_initialized) {
-        return false;
-    }
-
-    if (total_energy_wh) {
-        *total_energy_wh = total_energy_consumed_wh;
-    }
-    if (average_power_mw) {
-        *average_power_mw = average_power_mw;
-    }
-    if (peak_power_mw_out) {
-        *peak_power_mw_out = peak_power_mw;
-    }
-
-    return true;
-}
-
-/**
- * @brief Reset power consumption statistics
- */
-bool esocore_power_reset_statistics(void) {
-    if (!power_initialized) {
-        return false;
-    }
-
-    total_energy_consumed_wh = 0;
-    average_power_mw = 0;
-    peak_power_mw = 0;
-
-    return true;
-}
-
-/**
- * @brief Set power management thresholds
- */
-bool esocore_power_set_thresholds(const esocore_power_threshold_t *thresholds) {
-    if (!power_initialized || !thresholds) {
-        return false;
-    }
-
-    power_thresholds = *thresholds;
-    return true;
-}
-
-/**
- * @brief Get current power thresholds
- */
-bool esocore_power_get_thresholds(esocore_power_threshold_t *thresholds) {
-    if (!power_initialized || !thresholds) {
-        return false;
-    }
-
-    *thresholds = power_thresholds;
-    return true;
-}
-
-/**
- * @brief Check for power faults
- */
-bool esocore_power_check_faults(uint8_t *fault_flags) {
-    if (!power_initialized || !fault_flags) {
-        return false;
-    }
-
-    *fault_flags = power_status.fault_flags;
-    return true;
-}
-
-/**
- * @brief Clear power fault flags
- */
-bool esocore_power_clear_faults(uint8_t fault_flags) {
-    if (!power_initialized) {
-        return false;
-    }
-
-    power_status.fault_flags &= ~fault_flags;
-    return true;
-}
-
-/**
- * @brief Get power fault description
- */
-bool esocore_power_get_fault_description(uint8_t fault_flag, char *description,
-                                        uint16_t buffer_size) {
-    if (!description || buffer_size == 0) {
-        return false;
-    }
-
-    const char *desc;
-    switch (fault_flag) {
-        case ESOCORE_POWER_FAULT_OVERVOLTAGE:
-            desc = "Overvoltage condition detected";
-            break;
-        case ESOCORE_POWER_FAULT_UNDERVOLTAGE:
-            desc = "Undervoltage condition detected";
-            break;
-        case ESOCORE_POWER_FAULT_OVERCURRENT:
-            desc = "Overcurrent condition detected";
-            break;
-        case ESOCORE_POWER_FAULT_OVERTEMPERATURE:
-            desc = "Overtemperature condition detected";
-            break;
-        case ESOCORE_POWER_FAULT_SOURCE_FAILURE:
-            desc = "Power source failure detected";
-            break;
-        case ESOCORE_POWER_FAULT_CONSUMER_FAULT:
-            desc = "Power consumer fault detected";
-            break;
-        case ESOCORE_POWER_FAULT_SUPERCAP_LOW:
-            desc = "Supercapacitor voltage low";
-            break;
-        case ESOCORE_POWER_FAULT_POE_NEGOTIATION:
-            desc = "PoE negotiation failure";
-            break;
-        default:
-            desc = "Unknown power fault";
-            break;
-    }
-
-    uint16_t len = strlen(desc);
-    if (len >= buffer_size) {
-        return false;
-    }
-
-    strcpy(description, desc);
-    return true;
-}
-
-/**
- * @brief Perform power system diagnostics
- */
-bool esocore_power_run_diagnostics(uint16_t *diagnostic_result) {
-    if (!power_initialized || !diagnostic_result) {
-        return false;
-    }
-
-    uint16_t result = 0;
-
-    /* Check all power sources */
-    for (uint8_t i = 0; i < ESOCORE_MAX_POWER_SOURCES; i++) {
-        if (source_enabled[i]) {
-            uint16_t voltage, current;
-            if (power_hw_read_source_voltage((esocore_power_source_t)i, &voltage) &&
-                power_hw_read_source_current((esocore_power_source_t)i, &current)) {
-                /* Basic sanity checks */
-                if (voltage < 1000 || voltage > 50000) {
-                    result |= (1 << i);
-                }
-            } else {
-                result |= (1 << i);
+    /* Step 4: If analog sequencing enabled, verify 3.3V analog rail */
+    if (config.enable_analog_sequencing) {
+        timeout = system_clock_get_tick() + 50;
+        while (system_clock_get_tick() < timeout) {
+            power_hw_read_rails();
+            if (status.rail_voltage_mv[ESOCORE_RAIL_3V3_ANA] >=
+                rail_min_mv[ESOCORE_RAIL_3V3_ANA]) {
+                break;
             }
         }
-    }
-
-    /* Check all power consumers */
-    for (uint8_t i = 0; i < ESOCORE_MAX_POWER_CONSUMERS; i++) {
-        if (consumer_enabled[i]) {
-            uint16_t voltage, current;
-            if (power_hw_read_consumer_voltage((esocore_power_consumer_t)i, &voltage) &&
-                power_hw_read_consumer_current((esocore_power_consumer_t)i, &current)) {
-                /* Basic sanity checks */
-                if (voltage < 1000 || voltage > 5000) {
-                    result |= (1 << (i + 8));
-                }
-            } else {
-                result |= (1 << (i + 8));
-            }
+        if (status.rail_voltage_mv[ESOCORE_RAIL_3V3_ANA] <
+            rail_min_mv[ESOCORE_RAIL_3V3_ANA]) {
+            status.fault_flags |= ESOCORE_POWER_FAULT_RAIL_3V3A;
+            return false;
         }
     }
 
-    *diagnostic_result = result;
+    /* Step 5: 12V sensor bus is enabled on demand, not at startup */
+
+    status.state = ESOCORE_POWER_STATE_NORMAL;
     return true;
 }
 
-/**
- * @brief Enable power monitoring
- */
-bool esocore_power_enable_monitoring(bool enable) {
-    if (!power_initialized) {
-        return false;
-    }
+void esocore_power_sequence_down(void)
+{
+    /* Reverse order: 12V sensor bus -> analog -> digital -> 5V */
+    /* In hardware, LDOs auto-disable when 5V drops. We just need to
+     * disable the 12V sensor bus enable GPIO. */
 
-    /* TODO: Enable/disable periodic monitoring */
-    return true;
+    /* TODO: hal_gpio_reset(SBUS_12V_EN) to disable 12V bus */
+
+    status.state = ESOCORE_POWER_STATE_SHUTDOWN;
 }
 
-/**
- * @brief Set power management state
- */
-bool esocore_power_set_state(esocore_power_state_t state) {
-    if (!power_initialized) {
-        return false;
-    }
+/* ============================================================================
+ * Supercapacitor API
+ * ============================================================================ */
 
-    power_status.current_state = state;
-    return true;
+uint8_t esocore_supercap_get_charge_level(void)
+{
+    return status.supercap_charge_percent;
 }
 
-/**
- * @brief Get power management state
- */
-bool esocore_power_get_state(esocore_power_state_t *state) {
-    if (!power_initialized || !state) {
-        return false;
-    }
-
-    *state = power_status.current_state;
-    return true;
+uint16_t esocore_supercap_get_voltage(void)
+{
+    return status.rail_voltage_mv[ESOCORE_RAIL_SUPERCAP];
 }
 
-/**
- * @brief Register power event callback
- */
-bool esocore_power_register_callback(void (*callback)(uint8_t event, void *context),
-                                    void *context) {
-    /* TODO: Implement callback registration */
-    return false;
+uint32_t esocore_supercap_estimate_runtime(uint16_t load_ma)
+{
+    if (load_ma == 0) return 0xFFFFFFFF;
+
+    /* E = 0.5 * C * (V^2 - Vmin^2) */
+    /* Runtime = E / P */
+    uint16_t v = status.rail_voltage_mv[ESOCORE_RAIL_SUPERCAP];
+    uint16_t vmin = 2000;  /* Minimum usable voltage */
+    if (v <= vmin) return 0;
+
+    /* Energy in millijoules */
+    /* C = 20F, V in volts: E = 0.5 * 20 * (v^2 - vmin^2) */
+    float v_f = (float)v / 1000.0f;
+    float vmin_f = (float)vmin / 1000.0f;
+    float energy_j = 0.5f * 20.0f * (v_f * v_f - vmin_f * vmin_f);
+
+    /* Power in watts: P = V_avg * I */
+    float v_avg = (v_f + vmin_f) / 2.0f;
+    float power_w = v_avg * ((float)load_ma / 1000.0f);
+
+    if (power_w <= 0.0f) return 0xFFFFFFFF;
+    return (uint32_t)(energy_j / power_w);
 }
 
-/**
- * @brief Unregister power event callback
- */
-bool esocore_power_unregister_callback(void) {
-    /* TODO: Implement callback unregistration */
-    return false;
+bool esocore_supercap_is_shutdown_safe(void)
+{
+    /* Need at least 5 seconds of runtime at ~500 mA for safe shutdown */
+    return esocore_supercap_estimate_runtime(500) >= 5;
 }
 
-/**
- * @brief Get power efficiency metrics
- */
-bool esocore_power_get_efficiency(uint8_t *source_efficiency, uint8_t *system_efficiency) {
-    if (!power_initialized || !source_efficiency || !system_efficiency) {
-        return false;
-    }
+/* ============================================================================
+ * Utility Functions
+ * ============================================================================ */
 
-    /* Calculate source efficiency */
-    uint32_t total_input_power = 0;
-    uint32_t total_output_power = 0;
-
-    for (uint8_t i = 0; i < ESOCORE_MAX_POWER_SOURCES; i++) {
-        if (source_enabled[i]) {
-            total_input_power += source_monitoring[i].power_mw;
-        }
-    }
-
-    for (uint8_t i = 0; i < ESOCORE_MAX_POWER_CONSUMERS; i++) {
-        if (consumer_enabled[i]) {
-            total_output_power += consumer_monitoring[i].power_mw;
-        }
-    }
-
-    if (total_input_power > 0) {
-        *source_efficiency = (total_output_power * 100) / total_input_power;
-    } else {
-        *source_efficiency = 0;
-    }
-
-    *system_efficiency = 85; /* Placeholder system efficiency */
-    return true;
+float esocore_voltage_mv_to_v(uint16_t mv)
+{
+    return (float)mv / 1000.0f;
 }
 
-/**
- * @brief Optimize power distribution
- */
-bool esocore_power_optimize_distribution(void) {
-    if (!power_initialized) {
-        return false;
-    }
-
-    power_optimize_distribution();
-    return true;
+float esocore_current_ma_to_a(int16_t ma)
+{
+    return (float)ma / 1000.0f;
 }
 
-/**
- * @brief Get power budget information
- */
-bool esocore_power_get_budget(uint32_t *available_power, uint32_t *allocated_power,
-                             uint32_t *reserved_power) {
-    if (!power_initialized) {
-        return false;
-    }
-
-    if (available_power) {
-        *available_power = power_status.available_power_mw;
-    }
-    if (allocated_power) {
-        *allocated_power = power_status.consumed_power_mw;
-    }
-    if (reserved_power) {
-        *reserved_power = power_thresholds.power_budget_mw - power_status.available_power_mw - power_status.consumed_power_mw;
-    }
-
-    return true;
-}
-
-/**
- * @brief Reserve power for critical operations
- */
-bool esocore_power_reserve_power(uint32_t power_mw) {
-    if (!power_initialized) {
-        return false;
-    }
-
-    if (power_mw > power_status.available_power_mw) {
-        return false;
-    }
-
-    power_status.available_power_mw -= power_mw;
-    return true;
-}
-
-/**
- * @brief Release reserved power
- */
-bool esocore_power_release_reserved_power(uint32_t power_mw) {
-    if (!power_initialized) {
-        return false;
-    }
-
-    power_status.available_power_mw += power_mw;
-    return true;
+float esocore_calculate_power(uint16_t voltage_mv, int16_t current_ma)
+{
+    return ((float)voltage_mv * (float)current_ma) / 1000000.0f;
 }

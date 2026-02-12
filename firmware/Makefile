@@ -6,7 +6,7 @@
 
 # Build configuration
 PROJECT_NAME := esocore
-VERSION := 1.0.0
+VERSION := 1.5.0
 BUILD_DIR := build
 RELEASE_DIR := release
 
@@ -43,7 +43,11 @@ EDGE_INCLUDES := \
 	$(COMMON_INCLUDES) \
 	-Istm32/edge \
 	-Istm32/$(EDGE_TARGET)/hal \
-	-Istm32/$(EDGE_TARGET)/cmsis
+	-Istm32/$(EDGE_TARGET)/cmsis \
+	-Istm32/$(EDGE_TARGET)/bsp \
+	-Istm32/$(EDGE_TARGET)/drivers \
+	-Icommon/analog \
+	-Icommon/communication
 
 SENSOR_INCLUDES := \
 	$(COMMON_INCLUDES) \
@@ -57,6 +61,11 @@ COMMON_SOURCES := \
 	common/communication/wifi_manager.c \
 	common/communication/http_client.c \
 	common/communication/modbus_rtu.c \
+	common/communication/ethernet_manager.c \
+	common/communication/interbus.c \
+	common/communication/sensor_bus.c \
+	common/analog/analog_input.c \
+	common/analog/signal_chain.c \
 	common/storage/sensor_interface.c \
 	common/storage/storage_system.c \
 	common/safety/safety_io.c \
@@ -68,14 +77,23 @@ COMMON_SOURCES := \
 
 EDGE_SOURCES := \
 	stm32/edge/main.c \
+	stm32/$(EDGE_TARGET)/bsp/system_clock.c \
+	stm32/$(EDGE_TARGET)/cmsis/system_stm32h7xx.c \
 	stm32/$(EDGE_TARGET)/hal/hal_init.c \
-	stm32/$(EDGE_TARGET)/hal/gpio.c \
-	stm32/$(EDGE_TARGET)/hal/uart.c \
-	stm32/$(EDGE_TARGET)/hal/spi.c \
-	stm32/$(EDGE_TARGET)/hal/i2c.c \
-	stm32/$(EDGE_TARGET)/hal/timer.c \
-	stm32/$(EDGE_TARGET)/hal/adc.c \
-	stm32/$(EDGE_TARGET)/hal/ethernet.c \
+	stm32/$(EDGE_TARGET)/hal/hal_gpio.c \
+	stm32/$(EDGE_TARGET)/hal/hal_uart.c \
+	stm32/$(EDGE_TARGET)/hal/hal_spi.c \
+	stm32/$(EDGE_TARGET)/hal/hal_i2c.c \
+	stm32/$(EDGE_TARGET)/hal/hal_timer.c \
+	stm32/$(EDGE_TARGET)/hal/hal_adc.c \
+	stm32/$(EDGE_TARGET)/hal/hal_eth.c \
+	stm32/$(EDGE_TARGET)/hal/hal_dma.c \
+	stm32/$(EDGE_TARGET)/drivers/drv_ksz8081.c \
+	stm32/$(EDGE_TARGET)/drivers/drv_ads1274.c \
+	stm32/$(EDGE_TARGET)/drivers/drv_pga280.c \
+	stm32/$(EDGE_TARGET)/drivers/drv_tmux1101.c \
+	stm32/$(EDGE_TARGET)/drivers/drv_iepe.c \
+	stm32/$(EDGE_TARGET)/drivers/drv_ssr.c \
 	stm32/$(EDGE_TARGET)/startup/startup_stm32h747xx.s
 
 SENSOR_SOURCES := \

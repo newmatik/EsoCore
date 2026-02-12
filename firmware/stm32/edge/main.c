@@ -1,608 +1,636 @@
 /**
  * @file main.c
- * @brief EsoCore Edge Device Main Application
+ * @brief EsoCore Edge Device v1.5.0.0 Main Application
  *
- * This file contains the main application for the EsoCore Edge device, integrating
- * all system components including WiFi, HTTP, Safety I/O, Storage, TinyML,
- * Configuration Management, and Event Logging.
+ * Complete system initialization and runtime loop for the EsoCore Edge device
+ * targeting the STM32H747IIT6 (Cortex-M7). Integrates all v1.5.0.0 subsystems:
+ *
+ *   - 24V DC power management with brownout detection and supercap backup
+ *   - Dual Ethernet (Port A: Machine/OT, Port B: IT/Cloud)
+ *   - 4-channel dual-mode analog inputs (IEPE + DC, 24-bit, 50 kSPS)
+ *   - 6 dual-channel safety digital inputs (EN ISO 13849 Cat. 3)
+ *   - RS-485 sensor bus with auto-discovery
+ *   - Modbus RTU, PROFIBUS DP, Interbus fieldbus interfaces
+ *   - ESP32-S3 WiFi/BT via UART AT commands
+ *   - MicroSD storage, OLED display, TinyML edge intelligence
  *
  * @author EsoCore Development Team
- * @copyright Copyright © 2025 Newmatik. All rights reserved.
+ * @copyright Copyright (c) 2026 Newmatik. All rights reserved.
  * @license Apache License, Version 2.0
  */
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <string.h>
 
-/* Core System Includes */
-#include "wifi_manager.h"
-#include "http_client.h"
-#include "safety_io.h"
-#include "storage_system.h"
-#include "tinyml_engine.h"
-#include "config_manager.h"
-#include "event_system.h"
-#include "power_management.h"
-#include "oled_display.h"
-#include "protocol.h"
-#include "../../common/sensors/sensor_interface.h"
+/* BSP and HAL */
+#include "../../stm32/stm32h7/bsp/bsp_edge_v150.h"
+#include "../../stm32/stm32h7/bsp/system_clock.h"
+#include "../../stm32/stm32h7/cmsis/stm32h747xx.h"
+#include "../../stm32/stm32h7/cmsis/system_stm32h7xx.h"
+#include "../../stm32/stm32h7/hal/hal_gpio.h"
+#include "../../stm32/stm32h7/hal/hal_spi.h"
+#include "../../stm32/stm32h7/hal/hal_uart.h"
+#include "../../stm32/stm32h7/hal/hal_i2c.h"
+#include "../../stm32/stm32h7/hal/hal_eth.h"
+#include "../../stm32/stm32h7/hal/hal_dma.h"
+#include "../../stm32/stm32h7/hal/hal_timer.h"
+#include "../../stm32/stm32h7/hal/hal_adc.h"
 
-/* Vibration Sensor for demonstration */
-#include "vibration_sensor.h"
+/* Hardware drivers */
+#include "../../stm32/stm32h7/drivers/drv_ksz8081.h"
+#include "../../stm32/stm32h7/drivers/drv_ads1274.h"
+#include "../../stm32/stm32h7/drivers/drv_pga280.h"
+#include "../../stm32/stm32h7/drivers/drv_tmux1101.h"
+#include "../../stm32/stm32h7/drivers/drv_iepe.h"
+#include "../../stm32/stm32h7/drivers/drv_ssr.h"
+
+/* Subsystem modules */
+#include "../../common/communication/ethernet_manager.h"
+#include "../../common/analog/analog_input.h"
+#include "../../common/communication/interbus.h"
+#include "../../common/communication/sensor_bus.h"
+
+/* Existing common modules */
+#include "../../common/management/power_management.h"
+#include "../../common/safety/safety_io.h"
+#include "../../common/communication/wifi_manager.h"
+#include "../../common/communication/http_client.h"
+#include "../../common/communication/modbus_rtu.h"
+#include "../../common/communication/protocol.h"
+#include "../../common/storage/storage_system.h"
+#include "../../common/management/config_manager.h"
+#include "../../common/intelligence/event_system.h"
+#include "../../common/intelligence/tinyml_engine.h"
+#include "../../common/ui/oled_display.h"
 
 /* ============================================================================
- * Configuration Macros
+ * Firmware Version
  * ============================================================================ */
 
-/* WiFi Configuration */
-#define WIFI_SSID                       "EsoCore_Network"
-#define WIFI_PASSWORD                   "esocore2025"
-#define WIFI_SECURITY_TYPE              WIFI_SECURITY_WPA2
+#define FW_VERSION_STRING   ESOCORE_FW_VERSION_STRING
 
-/* Server Configuration */
-#define SERVER_URL                      "https://api.esocore.com"
-#define SERVER_PORT                     443
-#define API_KEY                         "esocore_edge_device_key_2025"
-
-/* Device Configuration */
-#define DEVICE_ADDRESS                  0x01
-#define DEVICE_TYPE                     ESOCORE_DEVICE_TYPE_MASTER
-
-/* Timing Configuration */
-#define HEARTBEAT_INTERVAL_MS           30000   /* 30 seconds */
-#define TELEMETRY_INTERVAL_MS           5000    /* 5 seconds */
-#define SENSOR_READ_INTERVAL_MS         1000    /* 1 second */
-#define DISPLAY_UPDATE_INTERVAL_MS      2000    /* 2 seconds */
-#define OTA_CHECK_INTERVAL_MS           3600000 /* 1 hour */
 /* ============================================================================
- * Global Variables
+ * Timing Configuration (all in milliseconds)
  * ============================================================================ */
 
-/* System state */
-static bool system_initialized = false;
-static bool system_running = false;
-static uint32_t system_uptime_ms = 0;
+#define POWER_POLL_INTERVAL_MS      100     /* Power rail monitoring */
+#define SAFETY_POLL_INTERVAL_MS     10      /* Safety inputs (fast for response time) */
+#define ETHERNET_POLL_INTERVAL_MS   1       /* Ethernet RX polling */
+#define SENSOR_BUS_POLL_INTERVAL_MS 10      /* RS-485 sensor bus */
+#define INTERBUS_POLL_INTERVAL_MS   5       /* Interbus cyclic */
+#define DISPLAY_UPDATE_INTERVAL_MS  2000    /* OLED update */
+#define HEARTBEAT_INTERVAL_MS       30000   /* Cloud heartbeat */
+#define TELEMETRY_INTERVAL_MS       5000    /* Cloud telemetry */
+#define OTA_CHECK_INTERVAL_MS       3600000 /* OTA check (1 hour) */
+#define WATCHDOG_FEED_INTERVAL_MS   500     /* IWDG feed */
 
-/* Timing variables */
-static uint32_t last_heartbeat_time = 0;
-static uint32_t last_telemetry_time = 0;
-static uint32_t last_sensor_read_time = 0;
-static uint32_t last_display_update_time = 0;
-static uint32_t last_ota_check_time = 0;
-
-/* System status */
-static struct {
-    bool wifi_connected;
-    bool server_reachable;
-    bool sensors_active;
-    bool storage_available;
-    uint8_t active_sensors;
-    uint32_t total_measurements;
-    uint8_t system_health;
-} system_status;
-
-/* Demo sensor data */
-static vibration_sensor_data_t vibration_data;
+/* Device identity */
+#define DEVICE_ADDRESS              0x01
+#define DEVICE_TYPE                 0x01    /* Edge device */
 
 /* ============================================================================
- * System Initialization Functions
+ * Global SPI Handles (shared between drivers and HAL)
+ * ============================================================================ */
+
+hal_spi_handle_t g_spi3_handle;   /* ADS1274 ADC */
+hal_spi_handle_t g_spi4_handle;   /* PGA280 amplifiers */
+
+/* ============================================================================
+ * Global State
+ * ============================================================================ */
+
+static volatile bool system_running = false;
+
+/* Timing counters */
+static uint32_t last_power_poll = 0;
+static uint32_t last_safety_poll = 0;
+static uint32_t last_ethernet_poll = 0;
+static uint32_t last_sensor_bus_poll = 0;
+static uint32_t last_interbus_poll = 0;
+static uint32_t last_display_update = 0;
+static uint32_t last_heartbeat = 0;
+static uint32_t last_telemetry = 0;
+static uint32_t last_watchdog_feed = 0;
+
+/* Forward declarations */
+extern void hal_gpio_init_all(void);
+static bool init_hal_peripherals(void);
+static bool init_subsystems(void);
+static void runtime_loop(void);
+static void graceful_shutdown(void);
+static void feed_watchdog(void);
+
+/* ============================================================================
+ * IWDG (Independent Watchdog) Control
+ * ============================================================================ */
+
+#define IWDG_BASE       0x58004800UL
+#define IWDG_KR         (*(volatile uint32_t *)(IWDG_BASE + 0x00))
+#define IWDG_PR         (*(volatile uint32_t *)(IWDG_BASE + 0x04))
+#define IWDG_RLR        (*(volatile uint32_t *)(IWDG_BASE + 0x08))
+#define IWDG_SR         (*(volatile uint32_t *)(IWDG_BASE + 0x0C))
+
+static void iwdg_init(uint32_t timeout_ms)
+{
+    /* LSI ~32 kHz, prescaler /64 -> 500 Hz counter */
+    IWDG_KR = 0x5555;  /* Enable register access */
+    IWDG_PR = 4;       /* Prescaler /64 */
+    IWDG_RLR = (timeout_ms * 500) / 1000;  /* Reload value */
+    IWDG_KR = 0xCCCC;  /* Start watchdog */
+}
+
+static void feed_watchdog(void)
+{
+    IWDG_KR = 0xAAAA;  /* Reload counter */
+}
+
+/* ============================================================================
+ * Interrupt Handlers
  * ============================================================================ */
 
 /**
- * @brief Initialize WiFi connectivity
+ * @brief SysTick interrupt -- 1 ms tick
  */
-static bool initialize_wifi(void) {
-    wifi_config_t wifi_config = {
-        .ssid = WIFI_SSID,
-        .password = WIFI_PASSWORD,
-        .security = WIFI_SECURITY_TYPE,
-        .mode = WIFI_MODE_STATION,
-        .dhcp_enabled = true,
-        .max_retries = 5
+void SysTick_Handler(void)
+{
+    system_clock_tick_increment();
+}
+
+/**
+ * @brief Hard fault handler -- enter safe state and reset
+ */
+void HardFault_Handler(void)
+{
+    /* De-energize all safety outputs immediately */
+    hal_gpio_reset(SAFETY_RELAY_CTRL);
+    hal_gpio_reset(SSR_CTRL);
+
+    /* Log fault (best effort) */
+    /* TODO: Write fault info to backup SRAM for post-mortem */
+
+    /* System reset */
+    NVIC_SystemReset();
+}
+
+/**
+ * @brief DMA1 Stream 0 -- ADS1274 SPI RX complete
+ */
+void DMA1_Stream0_IRQHandler(void)
+{
+    /* TODO: Handle ADC DMA transfer complete, invoke buffer swap */
+}
+
+/**
+ * @brief Ethernet IRQ handler
+ */
+void ETH_IRQHandler(void)
+{
+    /* TODO: Handle Ethernet MAC interrupt */
+}
+
+/* ============================================================================
+ * HAL Peripheral Initialization
+ * ============================================================================ */
+
+static bool init_hal_peripherals(void)
+{
+    /* SPI3: ADS1274 ADC (16 MHz, mode 1, 8-bit for byte-level DMA) */
+    hal_spi_config_t spi3_cfg = {
+        .instance    = SPI3,
+        .mode        = SPI_MODE_1,
+        .data_size   = SPI_DATA_8BIT,
+        .prescaler   = 8,   /* 120 MHz / 8 = 15 MHz (close to 16 MHz target) */
+        .msb_first   = true,
+        .software_cs = true,
     };
+    if (!hal_spi_init(&g_spi3_handle, &spi3_cfg)) return false;
 
-    if (!wifi_manager_init(&wifi_config)) {
-        esocore_event_log(ESOCORE_EVENT_NETWORK_ERROR, ESOCORE_EVENT_SEVERITY_ERROR,
-                         (uint8_t *)"WiFi initialization failed", 0);
-        return false;
-    }
+    /* SPI4: PGA280 amplifiers (5 MHz, mode 0, 8-bit) */
+    hal_spi_config_t spi4_cfg = {
+        .instance    = SPI4,
+        .mode        = SPI_MODE_0,
+        .data_size   = SPI_DATA_8BIT,
+        .prescaler   = 32,  /* 120 MHz / 32 = 3.75 MHz (under 5 MHz target) */
+        .msb_first   = true,
+        .software_cs = true,
+    };
+    if (!hal_spi_init(&g_spi4_handle, &spi4_cfg)) return false;
 
-    if (!wifi_manager_connect()) {
-        esocore_event_log(ESOCORE_EVENT_NETWORK_DISCONNECTED, ESOCORE_EVENT_SEVERITY_WARNING,
-                         (uint8_t *)"WiFi connection failed", 0);
-        return false;
-    }
-
-    system_status.wifi_connected = true;
-    esocore_event_log(ESOCORE_EVENT_NETWORK_CONNECTED, ESOCORE_EVENT_SEVERITY_INFO,
-                     (uint8_t *)"WiFi connected successfully", 0);
+    /* Internal ADC for power monitoring */
+    if (!hal_adc_init()) return false;
 
     return true;
 }
 
-/**
- * @brief Initialize HTTP client
- */
-static bool initialize_http_client(void) {
-    http_client_config_t http_config = {
-        .server_url = SERVER_URL,
-        .server_port = SERVER_PORT,
-        .api_key = API_KEY,
-        .use_https = true,
-        .response_timeout_ms = 10000,
-        .max_retries = 3
+/* ============================================================================
+ * Subsystem Initialization
+ * ============================================================================ */
+
+static bool init_subsystems(void)
+{
+    /* --- Power Management (must be first, checks all rails) --- */
+    esocore_power_config_t pwr_cfg = {
+        .brownout_warning_mv   = ESOCORE_RAIL_24V_BROWNOUT_MV,
+        .brownout_shutdown_mv  = ESOCORE_RAIL_24V_SHUTDOWN_MV,
+        .overvoltage_mv        = ESOCORE_RAIL_24V_MAX_MV + 500,
+        .temperature_limit_c   = 70,
+        .brownout_holdoff_ms   = 50,
+        .enable_supercap_backup = true,
+        .enable_analog_sequencing = true,
     };
+    if (!esocore_power_init(&pwr_cfg)) return false;
 
-    if (!http_client_init(&http_config)) {
-        esocore_event_log(ESOCORE_EVENT_NETWORK_ERROR, ESOCORE_EVENT_SEVERITY_ERROR,
-                         (uint8_t *)"HTTP client initialization failed", 0);
-        return false;
-    }
+    /* Power-up sequencing: wait for all rails to stabilize */
+    if (!esocore_power_sequence_up()) return false;
 
-    return true;
-}
+    /* --- Event System (needed for logging) --- */
+    esocore_event_init(NULL);
 
-/**
- * @brief Initialize demo vibration sensor
- */
-static bool initialize_demo_sensor(void) {
-    vibration_sensor_config_t vib_config = {
-        .base_config = {
-            .sensor_type = ESOCORE_SENSOR_VIBRATION,
-            .sensor_id = 1,
-            .sampling_rate_hz = 1000,
-            .sample_count = 1024,
-            .measurement_interval_ms = 1000
+    /* --- Safety I/O --- */
+    safety_system_config_t safety_cfg = {
+        .watchdog_timeout_ms        = SAFETY_WATCHDOG_TIMEOUT,
+        .test_pulse_interval_ms     = SAFETY_TEST_PULSE_INTERVAL,
+        .fault_reset_time_ms        = SAFETY_FAULT_RESET_TIME,
+        .enable_cross_monitoring    = true,
+        .enable_safe_state_enforcement = true,
+        .safety_category            = 3,
+        .system_description         = "EsoCore Edge v1.5.0 Safety I/O",
+    };
+    if (!safety_io_init(&safety_cfg)) return false;
+
+    /* --- Dual Ethernet --- */
+#if ESOCORE_FEATURE_DUAL_ETHERNET
+    ethm_config_t eth_cfg = {
+        .port_config = {
+            [ETHM_PORT_A] = {
+                .role     = ETHM_ROLE_MACHINE,
+                .phy_addr = ETH1_PHY_ADDR,
+                .mac_addr = {0x00, 0x80, 0xE1, 0x00, 0x00, 0x01},
+                .ip_config = {
+                    .use_dhcp = false,
+                    .ip_addr  = {192, 168, 10, 100},
+                    .netmask  = {255, 255, 255, 0},
+                    .gateway  = {192, 168, 10, 1},
+                },
+            },
+            [ETHM_PORT_B] = {
+                .role     = ETHM_ROLE_IT,
+                .phy_addr = ETH2_PHY_ADDR,
+                .mac_addr = {0x00, 0x80, 0xE1, 0x00, 0x00, 0x02},
+                .ip_config = {
+                    .use_dhcp = true,
+                },
+            },
         },
-        .accelerometer_type = 0,  /* ADXL355 */
-        .sensitivity_mg_per_lsb = 2.0f,
-        .measurement_range = 2,   /* ±2g */
-        .enable_high_pass_filter = true,
-        .high_pass_cutoff_hz = 10.0f,
-        .enable_low_pass_filter = true,
-        .low_pass_cutoff_hz = 500.0f,
-        .enable_temperature_compensation = true,
-        .fft_window_type = 0      /* Hanning */
     };
+    ethm_init(&eth_cfg);
+#endif
 
-    if (!vibration_sensor_init(&vib_config)) {
-        esocore_event_log(ESOCORE_EVENT_SENSOR_ERROR, ESOCORE_EVENT_SEVERITY_WARNING,
-                         (uint8_t *)"Vibration sensor initialization failed", 0);
-        return false;
-    }
+    /* --- Analog Input Subsystem --- */
+#if ESOCORE_FEATURE_ANALOG_INPUTS
+    analog_config_t analog_cfg = {
+        .sample_rate_hz    = ESOCORE_ADC_SAMPLE_RATE_HZ,
+        .samples_per_block = 256,
+        .channel_config    = {
+            [0] = { .mode = ANALOG_MODE_IEPE, .gain = ANALOG_GAIN_1X,
+                     .trigger_mode = ANALOG_TRIGGER_CONTINUOUS },
+            [1] = { .mode = ANALOG_MODE_IEPE, .gain = ANALOG_GAIN_1X,
+                     .trigger_mode = ANALOG_TRIGGER_CONTINUOUS },
+            [2] = { .mode = ANALOG_MODE_DC,   .gain = ANALOG_GAIN_1X,
+                     .trigger_mode = ANALOG_TRIGGER_CONTINUOUS },
+            [3] = { .mode = ANALOG_MODE_DC,   .gain = ANALOG_GAIN_1X,
+                     .trigger_mode = ANALOG_TRIGGER_CONTINUOUS },
+        },
+    };
+    analog_input_init(&analog_cfg);
+#endif
 
-    if (!vibration_sensor_start_acquisition()) {
-        esocore_event_log(ESOCORE_EVENT_SENSOR_ERROR, ESOCORE_EVENT_SEVERITY_WARNING,
-                         (uint8_t *)"Vibration sensor acquisition start failed", 0);
-        return false;
-    }
+    /* --- RS-485 Sensor Bus --- */
+#if ESOCORE_FEATURE_SENSOR_BUS
+    sensor_bus_config_t sbus_cfg = {
+        .baudrate            = ESOCORE_SBUS_BAUDRATE,
+        .enable_termination  = true,
+        .enable_12v_power    = true,
+        .discovery_interval_ms = 5000,
+        .max_sensors         = 32,
+    };
+    sensor_bus_init(&sbus_cfg);
+#endif
 
-    system_status.sensors_active = true;
-    system_status.active_sensors = 1;
+    /* --- Interbus --- */
+#if ESOCORE_FEATURE_INTERBUS
+    interbus_config_t ibus_cfg = {
+        .baudrate           = ESOCORE_INTERBUS_BAUDRATE,
+        .node_address       = 1,
+        .enable_termination = true,
+        .cycle_time_ms      = 5,
+    };
+    interbus_init(&ibus_cfg);
+#endif
+
+    /* --- WiFi (ESP32-S3 via USART1) --- */
+#if ESOCORE_FEATURE_WIFI_ESP32
+    wifi_config_t wifi_cfg = {
+        .mode         = WIFI_MODE_STATION,
+        .dhcp_enabled = true,
+        .max_retries  = 5,
+    };
+    wifi_manager_init(&wifi_cfg);
+#endif
+
+    /* --- Storage (microSD via SDMMC1) --- */
+#if ESOCORE_FEATURE_MICROSD
+    storage_system_init();
+#endif
+
+    /* --- TinyML Engine --- */
+#if ESOCORE_FEATURE_TINYML
+    tinyml_engine_init();
+#endif
+
+    /* --- OLED Display --- */
+#if ESOCORE_FEATURE_OLED_DISPLAY
+    oled_display_init();
+    oled_display_status_screen("EsoCore Edge", FW_VERSION_STRING, "Booting...", 0);
+#endif
+
+    /* --- Protocol (RS-485 sensor communication) --- */
+    esocore_protocol_init(DEVICE_ADDRESS, DEVICE_TYPE);
 
     return true;
 }
 
 /* ============================================================================
- * System Runtime Functions
+ * Runtime Loop
  * ============================================================================ */
 
-/**
- * @brief Send heartbeat to server
- */
-static void send_heartbeat(void) {
-    uint32_t current_time = system_uptime_ms;
-
-    if (current_time - last_heartbeat_time >= HEARTBEAT_INTERVAL_MS) {
-        http_response_t response;
-
-        if (http_client_post("/api/heartbeat", (uint8_t *)"{\"status\":\"active\"}", 20,
-                           "application/json", &response)) {
-            if (response.status_code == 200) {
-                system_status.server_reachable = true;
-                esocore_event_log(ESOCORE_EVENT_NETWORK_CONNECTED, ESOCORE_EVENT_SEVERITY_DEBUG,
-                                 (uint8_t *)"Heartbeat sent successfully", 0);
-            } else {
-                system_status.server_reachable = false;
-                esocore_event_log(ESOCORE_EVENT_NETWORK_ERROR, ESOCORE_EVENT_SEVERITY_WARNING,
-                                 (uint8_t *)"Heartbeat failed", 0);
-            }
-        }
-
-        last_heartbeat_time = current_time;
-    }
-}
-
-/**
- * @brief Send telemetry data to server
- */
-static void send_telemetry(void) {
-    uint32_t current_time = system_uptime_ms;
-
-    if (current_time - last_telemetry_time >= TELEMETRY_INTERVAL_MS) {
-        char telemetry_json[512];
-        int len = snprintf(telemetry_json, sizeof(telemetry_json),
-                          "{\"timestamp\":%lu,\"uptime\":%lu,\"sensors\":%d,\"measurements\":%lu,\"health\":%d}",
-                          current_time, system_uptime_ms / 1000, system_status.active_sensors,
-                          system_status.total_measurements, system_status.system_health);
-
-        if (len > 0 && len < sizeof(telemetry_json)) {
-            http_response_t response;
-            if (http_client_post("/api/telemetry", (uint8_t *)telemetry_json, len,
-                               "application/json", &response)) {
-                if (response.status_code == 200) {
-                    esocore_event_log(ESOCORE_EVENT_SYSTEM_STARTUP, ESOCORE_EVENT_SEVERITY_DEBUG,
-                                     (uint8_t *)"Telemetry sent successfully", 0);
-                }
-            }
-        }
-
-        last_telemetry_time = current_time;
-    }
-}
-
-/**
- * @brief Read sensor data
- */
-static void read_sensor_data(void) {
-    uint32_t current_time = system_uptime_ms;
-
-    if (current_time - last_sensor_read_time >= SENSOR_READ_INTERVAL_MS) {
-        if (system_status.sensors_active) {
-            if (vibration_sensor_read_data(&vibration_data, 1000)) {
-                system_status.total_measurements++;
-
-                // Store data in storage system
-                storage_write_record((storage_data_record_t *)&vibration_data);
-
-                // Log significant events
-                if (vibration_data.overall_condition < 50) {
-                    esocore_event_log(ESOCORE_EVENT_SENSOR_ERROR, ESOCORE_EVENT_SEVERITY_WARNING,
-                                     (uint8_t *)"Poor equipment condition detected", 0);
-                }
-
-                esocore_event_log(ESOCORE_EVENT_SENSOR_DATA_READY, ESOCORE_EVENT_SEVERITY_DEBUG,
-                                 (uint8_t *)"Sensor data acquired", 0);
-            }
-        }
-
-        last_sensor_read_time = current_time;
-    }
-}
-
-/**
- * @brief Update OLED display
- */
-static void update_display(void) {
-    uint32_t current_time = system_uptime_ms;
-
-    if (current_time - last_display_update_time >= DISPLAY_UPDATE_INTERVAL_MS) {
-        char wifi_status[20] = "Disconnected";
-        if (system_status.wifi_connected) {
-            strcpy(wifi_status, "Connected");
-        }
-
-        char server_status[20] = "Offline";
-        if (system_status.server_reachable) {
-            strcpy(server_status, "Online");
-        }
-
-        oled_display_status_screen("EsoCore Edge",
-                                  system_running ? "Running" : "Initializing",
-                                  wifi_status,
-                                  system_uptime_ms / 1000);
-
-        last_display_update_time = current_time;
-    }
-}
-
-/**
- * @brief Check for OTA updates
- */
-static void check_ota_updates(void) {
-    uint32_t current_time = system_uptime_ms;
-
-    if (current_time - last_ota_check_time >= OTA_CHECK_INTERVAL_MS) {
-        http_response_t response;
-
-        if (http_client_get("/api/firmware/check?version=1.0.0", &response)) {
-            if (response.status_code == 200 && response.body) {
-                // Parse update information
-                esocore_event_log(ESOCORE_EVENT_NETWORK_OTA, ESOCORE_EVENT_SEVERITY_INFO,
-                                 (uint8_t *)"OTA update check completed", 0);
-            }
-        }
-
-        last_ota_check_time = current_time;
-    }
-}
-
-/**
- * @brief Handle system events and maintenance
- */
-static void handle_system_events(void) {
-    // Process incoming protocol messages
-    esocore_message_t message;
-    if (esocore_protocol_receive_message(&message, 10)) {
-        esocore_protocol_handle_message(&message);
-    }
-
-    // Process safety system
-    safety_system_status_t safety_status;
-    if (safety_io_get_system_status(&safety_status)) {
-        if (safety_status.fault_code != 0) {
-            esocore_event_log(ESOCORE_EVENT_SAFETY_FAULT, ESOCORE_EVENT_SEVERITY_CRITICAL,
-                             (uint8_t *)"Safety system fault detected", 0);
-        }
-    }
-
-    // Process power management
-    esocore_power_status_t power_status;
-    if (esocore_power_get_status(&power_status)) {
-        if (power_status.fault_flags != 0) {
-            esocore_event_log(ESOCORE_EVENT_POWER_FAULT, ESOCORE_EVENT_SEVERITY_ERROR,
-                             (uint8_t *)"Power system fault detected", 0);
-        }
-    }
-
-    // Flush event buffer periodically
-    esocore_event_flush_buffer();
-}
-
-/* ============================================================================
- * Main System Functions
- * ============================================================================ */
-
-/**
- * @brief Initialize all system components
- */
-static bool initialize_system(void) {
-    printf("EsoCore Edge Device Initializing...\n");
-
-    // Initialize core systems in order of dependency
-    if (!esocore_event_init(NULL)) {
-        printf("ERROR: Event system initialization failed\n");
-        return false;
-    }
-    printf("✓ Event system initialized\n");
-
-    if (!esocore_power_init()) {
-        printf("ERROR: Power management initialization failed\n");
-        return false;
-    }
-    printf("✓ Power management initialized\n");
-
-    if (!esocore_config_init()) {
-        printf("ERROR: Configuration manager initialization failed\n");
-        return false;
-    }
-    printf("✓ Configuration manager initialized\n");
-
-    if (!initialize_wifi()) {
-        printf("ERROR: WiFi initialization failed\n");
-        return false;
-    }
-    printf("✓ WiFi initialized\n");
-
-    if (!initialize_http_client()) {
-        printf("ERROR: HTTP client initialization failed\n");
-        return false;
-    }
-    printf("✓ HTTP client initialized\n");
-
-    if (!esocore_protocol_init(DEVICE_ADDRESS, DEVICE_TYPE)) {
-        printf("ERROR: Protocol initialization failed\n");
-        return false;
-    }
-    printf("✓ Protocol initialized\n");
-
-    if (!esocore_sensor_init()) {
-        printf("ERROR: Sensor interface initialization failed\n");
-        return false;
-    }
-    printf("✓ Sensor interface initialized\n");
-
-    if (!initialize_demo_sensor()) {
-        printf("WARNING: Demo sensor initialization failed - continuing without sensors\n");
-    } else {
-        printf("✓ Demo sensor initialized\n");
-    }
-
-    system_initialized = true;
-    esocore_event_log(ESOCORE_EVENT_SYSTEM_STARTUP, ESOCORE_EVENT_SEVERITY_INFO,
-                     (uint8_t *)"EsoCore Edge device startup completed", 0);
-
-    printf("EsoCore Edge Device initialization completed successfully!\n");
-    return true;
-}
-
-/**
- * @brief Main system runtime loop
- */
-static void system_runtime_loop(void) {
-    printf("EsoCore Edge Device entering runtime mode...\n");
-
+static void runtime_loop(void)
+{
     system_running = true;
 
+    /* Start continuous acquisitions */
+#if ESOCORE_FEATURE_ANALOG_INPUTS
+    analog_input_start_acquisition();
+#endif
+#if ESOCORE_FEATURE_SENSOR_BUS
+    sensor_bus_start();
+#endif
+#if ESOCORE_FEATURE_INTERBUS
+    interbus_start();
+#endif
+
+    /* Main superloop */
     while (system_running) {
-        // Update system uptime
-        system_uptime_ms += 100;  // Simulate 100ms tick
+        uint32_t now = system_clock_get_tick();
 
-        // Core system functions
-        send_heartbeat();
-        send_telemetry();
-        read_sensor_data();
-        update_display();
-        check_ota_updates();
+        /* --- Power monitoring (100 Hz) --- */
+        if (now - last_power_poll >= POWER_POLL_INTERVAL_MS) {
+            esocore_power_poll();
+            last_power_poll = now;
 
-        // System maintenance
-        handle_system_events();
+            /* Check for brownout -> initiate graceful shutdown */
+            if (esocore_power_get_state() == ESOCORE_POWER_STATE_CRITICAL) {
+                if (esocore_supercap_is_shutdown_safe()) {
+                    graceful_shutdown();
+                    return;
+                }
+            }
+        }
 
-        // Small delay to prevent busy waiting
-        // In real implementation, this would be handled by RTOS
-        for (volatile int i = 0; i < 100000; i++);
+        /* --- Safety I/O (100 Hz, <10 ms response requirement) --- */
+        if (now - last_safety_poll >= SAFETY_POLL_INTERVAL_MS) {
+            /* Safety polling is handled by safety_io internal test pulses.
+             * Here we check for faults and react. */
+            safety_system_status_t safety_status;
+            if (safety_io_get_system_status(&safety_status)) {
+                if (safety_status.fault_code != SAFETY_FAULT_NONE) {
+                    esocore_event_log(ESOCORE_EVENT_SAFETY_FAULT,
+                                     ESOCORE_EVENT_SEVERITY_CRITICAL,
+                                     (uint8_t *)"Safety fault detected", 0);
+                    /* Safety module auto-enters safe state */
+                }
+            }
+            last_safety_poll = now;
+        }
+
+        /* --- Ethernet polling (1 kHz) --- */
+#if ESOCORE_FEATURE_DUAL_ETHERNET
+        if (now - last_ethernet_poll >= ETHERNET_POLL_INTERVAL_MS) {
+            ethm_poll();
+            last_ethernet_poll = now;
+        }
+#endif
+
+        /* --- Sensor bus polling (100 Hz) --- */
+#if ESOCORE_FEATURE_SENSOR_BUS
+        if (now - last_sensor_bus_poll >= SENSOR_BUS_POLL_INTERVAL_MS) {
+            sensor_bus_poll();
+            last_sensor_bus_poll = now;
+        }
+#endif
+
+        /* --- Interbus polling (200 Hz) --- */
+#if ESOCORE_FEATURE_INTERBUS
+        if (now - last_interbus_poll >= INTERBUS_POLL_INTERVAL_MS) {
+            interbus_poll();
+            last_interbus_poll = now;
+        }
+#endif
+
+        /* --- Display update (0.5 Hz) --- */
+#if ESOCORE_FEATURE_OLED_DISPLAY
+        if (now - last_display_update >= DISPLAY_UPDATE_INTERVAL_MS) {
+            esocore_power_status_t pwr_status;
+            esocore_power_get_status(&pwr_status);
+
+            oled_display_status_screen(
+                "EsoCore Edge",
+                FW_VERSION_STRING,
+                (ethm_get_link_status(ETHM_PORT_A) == ETHM_LINK_UP) ? "ETH:OK" : "ETH:--",
+                pwr_status.uptime_seconds);
+            last_display_update = now;
+        }
+#endif
+
+        /* --- Cloud heartbeat (via Port B / WiFi) --- */
+        if (now - last_heartbeat >= HEARTBEAT_INTERVAL_MS) {
+            /* TODO: Send heartbeat via IT network (Ethernet Port B or WiFi) */
+            last_heartbeat = now;
+        }
+
+        /* --- Telemetry upload --- */
+        if (now - last_telemetry >= TELEMETRY_INTERVAL_MS) {
+            /* TODO: Collect and send telemetry data */
+            last_telemetry = now;
+        }
+
+        /* --- Process incoming protocol messages --- */
+        esocore_message_t msg;
+        if (esocore_protocol_receive_message(&msg, 0)) {
+            esocore_protocol_handle_message(&msg);
+        }
+
+        /* --- Flush event buffer --- */
+        esocore_event_flush_buffer();
+
+        /* --- Feed watchdog --- */
+        if (now - last_watchdog_feed >= WATCHDOG_FEED_INTERVAL_MS) {
+            feed_watchdog();
+            last_watchdog_feed = now;
+        }
     }
 }
 
-/**
- * @brief System shutdown sequence
- */
-static void system_shutdown(void) {
-    printf("EsoCore Edge Device shutting down...\n");
+/* ============================================================================
+ * Graceful Shutdown
+ * ============================================================================ */
 
-    // Stop sensors
-    if (system_status.sensors_active) {
-        vibration_sensor_stop_acquisition();
-        vibration_sensor_deinit();
-    }
+static void graceful_shutdown(void)
+{
+    system_running = false;
 
-    // Shutdown systems in reverse order
+    /* Log shutdown event */
     esocore_event_log(ESOCORE_EVENT_SYSTEM_SHUTDOWN, ESOCORE_EVENT_SEVERITY_INFO,
-                     (uint8_t *)"EsoCore Edge device shutting down", 0);
+                     (uint8_t *)"Graceful shutdown initiated", 0);
 
-    tinyml_engine_deinit();
-    sensor_interface_deinit();
-    esocore_protocol_deinit();
+    /* Stop acquisitions */
+#if ESOCORE_FEATURE_ANALOG_INPUTS
+    analog_input_stop_acquisition();
+#endif
+#if ESOCORE_FEATURE_SENSOR_BUS
+    sensor_bus_stop();
+#endif
+#if ESOCORE_FEATURE_INTERBUS
+    interbus_stop();
+#endif
+
+    /* Enter safety mode (de-energize all outputs) */
+    safety_io_enter_safety_mode();
+
+    /* Flush events and data to microSD */
+    esocore_event_flush_buffer();
+    /* TODO: storage_system_flush() */
+
+    /* Display shutdown message */
+#if ESOCORE_FEATURE_OLED_DISPLAY
+    oled_display_status_screen("EsoCore Edge", FW_VERSION_STRING, "SHUTDOWN", 0);
+#endif
+
+    /* Shut down subsystems in reverse order */
+#if ESOCORE_FEATURE_OLED_DISPLAY
     oled_display_deinit();
-    esocore_power_deinit();
-    esocore_config_deinit();
-    storage_system_deinit();
+#endif
+    tinyml_engine_deinit();
+#if ESOCORE_FEATURE_INTERBUS
+    interbus_deinit();
+#endif
+#if ESOCORE_FEATURE_SENSOR_BUS
+    sensor_bus_deinit();
+#endif
+#if ESOCORE_FEATURE_DUAL_ETHERNET
+    ethm_deinit();
+#endif
+    analog_input_deinit();
     safety_io_deinit();
-    http_client_deinit();
-    wifi_manager_deinit();
-    esocore_event_deinit();
 
-    printf("EsoCore Edge Device shutdown complete\n");
+    /* Power down sequence */
+    esocore_power_sequence_down();
+    esocore_power_deinit();
 }
 
-/**
- * @brief Main application entry point
- */
-int main(void) {
-    printf("=== EsoCore Edge Device ===\n");
-    printf("Industrial IoT Edge Computing Platform\n");
-    printf("Version 1.0.0 - Newmatik 2025\n\n");
+/* ============================================================================
+ * Main Entry Point
+ * ============================================================================ */
 
-    // Initialize all system components
-    if (!initialize_system()) {
-        printf("CRITICAL: System initialization failed!\n");
-        return -1;
+/**
+ * @brief Application entry point (called by Reset_Handler after SystemInit)
+ *
+ * Initialization sequence for EsoCore Edge v1.5.0.0:
+ *   1. System clock configuration (480 MHz via PLL1)
+ *   2. SysTick for 1 ms timing
+ *   3. GPIO initialization (all pins per v1.5.0.0 mapping)
+ *   4. HAL peripheral initialization (SPI, UART, I2C, etc.)
+ *   5. Power rail sequencing and verification
+ *   6. Subsystem initialization (Ethernet, analog, safety, fieldbus, ...)
+ *   7. Watchdog start
+ *   8. Enter runtime superloop
+ */
+int main(void)
+{
+    /* Step 1: Configure system clocks (25 MHz HSE -> 480 MHz SYSCLK) */
+    if (!system_clock_init()) {
+        /* Clock failure: system cannot operate. Hang with error LED. */
+        /* Note: GPIO clocks may not be running; best effort */
+        while (1) { __asm volatile("nop"); }
     }
 
-    // Enter main runtime loop
-    system_runtime_loop();
+    /* Update CMSIS SystemCoreClock variable */
+    SystemCoreClockUpdate();
 
-    // Shutdown system
-    system_shutdown();
+    /* Step 2: Start SysTick for 1 ms timing */
+    system_clock_init_systick();
 
+    /* Step 3: Initialize all GPIO pins per v1.5.0.0 board mapping */
+    hal_gpio_init_all();
+
+    /* Indicate boot in progress */
+    hal_gpio_set(LED_STATUS_GREEN);
+
+    /* Step 4: Initialize HAL peripherals (SPI, ADC) */
+    if (!init_hal_peripherals()) {
+        hal_gpio_set(LED_STATUS_RED);
+        while (1) { bsp_delay_ms(1000); }
+    }
+
+    /* Step 5+6: Initialize all subsystems */
+    if (!init_subsystems()) {
+        hal_gpio_set(LED_STATUS_RED);
+        esocore_event_log(ESOCORE_EVENT_SYSTEM_STARTUP, ESOCORE_EVENT_SEVERITY_CRITICAL,
+                         (uint8_t *)"Subsystem initialization failed", 0);
+        while (1) { bsp_delay_ms(1000); }
+    }
+
+    /* Step 7: Start independent watchdog (2 second timeout) */
+    iwdg_init(2000);
+
+    /* Log successful startup */
+    esocore_event_log(ESOCORE_EVENT_SYSTEM_STARTUP, ESOCORE_EVENT_SEVERITY_INFO,
+                     (uint8_t *)"EsoCore Edge v1.5.0.0 started", 0);
+
+    /* Turn off boot LED, system is running */
+    hal_gpio_reset(LED_STATUS_GREEN);
+
+    /* Step 8: Enter main runtime loop */
+    runtime_loop();
+
+    /* If we exit the loop, perform graceful shutdown */
+    graceful_shutdown();
+
+    /* Should never reach here; reset */
+    NVIC_SystemReset();
     return 0;
 }
 
 /* ============================================================================
- * Interrupt Handlers and System Hooks (Placeholder)
+ * BSP Helper Implementations
  * ============================================================================ */
 
 /**
- * @brief System tick handler
+ * @brief bsp_delay_ms -- blocking delay using SysTick
  */
-void SysTick_Handler(void) {
-    // Update system timing
-    system_uptime_ms++;
-}
-
-/**
- * @brief Hard fault handler
- */
-void HardFault_Handler(void) {
-    esocore_event_log(ESOCORE_EVENT_SYSTEM_RESET, ESOCORE_EVENT_SEVERITY_CRITICAL,
-                     (uint8_t *)"Hard fault occurred", 0);
-    system_running = false;
-}
-
-/**
- * @brief Watchdog handler
- */
-void WWDG_IRQHandler(void) {
-    esocore_event_log(ESOCORE_EVENT_SYSTEM_WATCHDOG, ESOCORE_EVENT_SEVERITY_CRITICAL,
-                     (uint8_t *)"Watchdog timeout", 0);
-    // Reset system
-    NVIC_SystemReset();
-}
-
-/* ============================================================================
- * STM32H747 HAL Configuration Functions
- * ============================================================================ */
-
-void SystemClock_Config(void) {
-    /* TODO: Configure STM32H747 clock tree
-     *
-     * Target: HSE 25 MHz -> PLL1 -> SYSCLK 480 MHz (Cortex-M7)
-     *         PLL2 -> Ethernet RMII (50 MHz reference)
-     *         PLL3 -> Peripherals as needed
-     *
-     * The STM32H747 has a complex clock tree with multiple PLLs and
-     * domain-specific clock dividers. Use STM32CubeMX to generate
-     * the proper configuration for the 25 MHz HSE crystal.
-     */
-}
-
-void MX_GPIO_Init(void) {
-    /* TODO: Configure GPIO pins for STM32H747
-     *
-     * Required pin assignments:
-     * - Dual Ethernet RMII (14 pins total for 2x KSZ8081RNACA PHYs)
-     * - RS-485 sensor bus UART + direction control
-     * - Modbus RTU isolated RS-485 (ADM2582EBRWZ)
-     * - PROFIBUS RS-485 (SN65HVD1176DR)
-     * - Interbus RS-485 (ADM2582EBRWZ)
-     * - SPI for ADS1274 ADC and PGA280 amplifiers
-     * - I2C for OLED display
-     * - SDMMC for microSD
-     * - ESP32-S3 UART interface
-     * - Safety digital input optocouplers (12 pins: 2 per channel, 6 channels)
-     * - Safety relay driver output (DRV110APWR)
-     * - TMUX1101 analog mode select GPIOs (8 pins: 2 per channel)
-     * - IEPE current source enable GPIOs (4 pins)
-     * - Status LEDs
-     * - Menu buttons (4x)
-     * - Reset/Boot buttons (2x)
-     */
-}
-
-void MX_USART2_UART_Init(void) {
-    /* USART2 configuration for RS-485 communication */
-    /* TODO: Implement for STM32H747 */
-}
-
-void MX_ETH_Init(void) {
-    /* Dual Ethernet configuration for STM32H747
-     * Port A (Machine Network): RMII via KSZ8081RNACA PHY
-     * Port B (IT Network): RMII via KSZ8081RNACA PHY
-     * TODO: Implement dual MAC initialization
-     */
-}
-
-void MX_RTC_Init(void) {
-    /* Real-time clock configuration */
-    /* TODO: Implement for STM32H747 with 32.768 kHz LSE */
-}
-
-void MX_TIM2_Init(void) {
-    /* Timer configuration for periodic tasks */
-    /* TODO: Implement for STM32H747 */
-}
-
-void Error_Handler(void) {
-    /* User can add his own implementation to report the HAL error return state */
-    __disable_irq();
-    while (1) {
+void bsp_delay_ms(uint32_t ms)
+{
+    uint32_t start = system_clock_get_tick();
+    while ((system_clock_get_tick() - start) < ms) {
+        /* Busy wait */
     }
 }
 
-#ifdef  USE_FULL_ASSERT
-void assert_failed(uint8_t *file, uint32_t line) {
-    /* User can add his own implementation to report the file name and line number */
+/**
+ * @brief bsp_get_tick_ms -- system tick in milliseconds
+ */
+uint32_t bsp_get_tick_ms(void)
+{
+    return system_clock_get_tick();
 }
-#endif /* USE_FULL_ASSERT */

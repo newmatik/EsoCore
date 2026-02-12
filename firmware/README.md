@@ -73,11 +73,11 @@ EsoCore supports three complementary data acquisition methods:
 make all
 
 # Build specific components
-make edge                    # Edge device
+make edge                   # Edge device
 make vibration              # Vibration sensor
 make acoustic               # Acoustic sensor
 make current                # Current sensor
-make air_quality           # Air quality sensor
+make air_quality            # Air quality sensor
 
 # Flash devices
 make flash_edge
@@ -88,7 +88,7 @@ make flash_vibration
 
 ```text
 firmware/
-├── common/                 # Shared components
+├── common/                # Shared components
 │   ├── communication/     # WiFi, HTTP, RS-485, Modbus
 │   ├── storage/           # Sensor interface, microSD
 │   ├── safety/            # EN ISO 13849 safety I/O (dual-channel inputs + relay outputs)
@@ -100,7 +100,7 @@ firmware/
 │   └── sensors/           # Sensor module firmware
 ├── build/                 # Generated build artifacts
 ├── release/               # Release packages
-└── Makefile              # Build system
+└── Makefile               # Build system
 ```
 
 ## RS-485 Sensor Bus Modules
@@ -122,10 +122,10 @@ External sensor modules connect via the RS-485 multi-drop bus. Each module has i
 
 In addition to the sensor bus, the Edge device has direct on-board inputs:
 
-| Input Type       | Channels | Specification                                 | Use Cases                                     |
-| ---------------- | -------- | --------------------------------------------- | --------------------------------------------- |
-| **Analog (IEPE/DC)** | 4    | 24-bit ADC, 50 kSPS, PGA, 15 kHz AAF, TMUX1101 | IEPE accelerometers, 0-10V, 4-20mA sensors  |
-| **Safety Digital** | 6      | Dual-channel optocoupled, 24V, EN ISO 13849 Cat. 3 | E-stops, safety edges, light curtains, machine states |
+| Input Type           | Channels | Specification                                      | Use Cases                                             |
+| -------------------- | -------- | -------------------------------------------------- | ----------------------------------------------------- |
+| **Analog (IEPE/DC)** | 4        | 24-bit ADC, 50 kSPS, PGA, 15 kHz AAF, TMUX1101     | IEPE accelerometers, 0-10V, 4-20mA sensors            |
+| **Safety Digital**   | 6        | Dual-channel optocoupled, 24V, EN ISO 13849 Cat. 3 | E-stops, safety edges, light curtains, machine states |
 
 ## Configuration
 

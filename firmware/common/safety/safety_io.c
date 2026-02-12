@@ -17,6 +17,25 @@
 #include <string.h>
 #include <stdio.h>
 
+/* v1.5.0.0: Include HAL and driver headers for actual hardware access */
+#include "../../stm32/stm32h7/hal/hal_gpio.h"
+#include "../../stm32/stm32h7/bsp/pin_mapping_v150.h"
+#include "../../stm32/stm32h7/bsp/system_clock.h"
+#include "../../stm32/stm32h7/drivers/drv_ssr.h"
+
+/* v1.5.0.0 pin mapping tables for dual-channel safety inputs */
+static const uint16_t safety_input_pins_a[SAFETY_INPUT_CHANNELS] = {
+    SAFETY_IN_CH0_A, SAFETY_IN_CH1_A, SAFETY_IN_CH2_A,
+    SAFETY_IN_CH3_A, SAFETY_IN_CH4_A, SAFETY_IN_CH5_A,
+};
+static const uint16_t safety_input_pins_b[SAFETY_INPUT_CHANNELS] = {
+    SAFETY_IN_CH0_B, SAFETY_IN_CH1_B, SAFETY_IN_CH2_B,
+    SAFETY_IN_CH3_B, SAFETY_IN_CH4_B, SAFETY_IN_CH5_B,
+};
+
+/* SSR handle for the AQY212EHAZ solid-state relay output */
+static ssr_handle_t ssr_output;
+
 /* ============================================================================
  * Private Data Structures
  * ============================================================================ */
@@ -47,16 +66,17 @@ static uint32_t last_test_pulse = 0;
  * @return true if hardware initialization successful, false otherwise
  */
 static bool safety_hw_init(void) {
-    /* TODO: Implement hardware-specific safety I/O initialization */
-    /* This would typically involve:
-     * - Configuring 12 GPIO pins for dual-channel safety inputs (2 per channel)
-     * - Setting up optocoupler circuits for cross-monitoring
-     * - Configuring relay driver GPIO (DRV110APWR)
-     * - Setting up relay feedback monitoring
-     * - Configuring SSR output GPIO (AQY212EHAZ)
-     * - Configuring watchdog timer
-     * - Setting up test pulse generation
-     */
+    /* v1.5.0.0: Initialize all 12 safety input GPIOs (already configured in hal_init.c) */
+    /* The GPIO pins are configured as inputs with pull-ups during BSP init.
+     * Optocouplers pull the GPIO LOW when the field signal (24V) is present. */
+
+    /* Initialize safety relay output (G7SA-2A2B-DC24 via DRV110APWR) */
+    /* GPIO already configured in hal_init.c, just ensure it's OFF */
+    hal_gpio_reset(SAFETY_RELAY_CTRL);
+
+    /* Initialize SSR output (AQY212EHAZ) */
+    drv_ssr_init(&ssr_output, SSR_CTRL);
+
     return true;
 }
 
@@ -68,13 +88,17 @@ static bool safety_hw_init(void) {
  * @return true if input is active, false otherwise
  */
 static bool safety_hw_read_input(uint8_t channel, bool read_channel_b) {
-    /* TODO: Implement hardware input reading */
-    /* This would typically involve:
-     * - Reading GPIO pin state for the specified optocoupler
-     *   (Channel A or Channel B of the dual-channel pair)
-     * - Debouncing input signal
-     */
-    return false;
+    if (channel >= SAFETY_INPUT_CHANNELS) return false;
+
+    /* Read the appropriate optocoupler GPIO for this dual-channel input.
+     * Optocoupler output is ACTIVE LOW: GPIO reads LOW when 24V field signal
+     * is present (optocoupler is conducting). */
+    uint16_t pin = read_channel_b ? safety_input_pins_b[channel]
+                                  : safety_input_pins_a[channel];
+    bool gpio_state = hal_gpio_read(pin);
+
+    /* Invert: LOW = active (signal present), HIGH = inactive */
+    return !gpio_state;
 }
 
 /**
@@ -85,14 +109,20 @@ static bool safety_hw_read_input(uint8_t channel, bool read_channel_b) {
  * @return true if write successful, false otherwise
  */
 static bool safety_hw_write_output(uint8_t channel, bool state) {
-    /* TODO: Implement hardware output writing */
-    /* This would typically involve:
-     * - Controlling relay driver (DRV110APWR for safety relay)
-     * - Safety relay energization
-     * - Feedback monitoring
-     * - Short-circuit detection
-     */
-    return true;
+    if (channel == SAFETY_OUTPUT_RELAY) {
+        /* Safety relay (G7SA-2A2B-DC24) via DRV110APWR driver */
+        hal_gpio_write(SAFETY_RELAY_CTRL, state);
+        return true;
+    } else if (channel == SAFETY_OUTPUT_SSR) {
+        /* Solid-state relay (AQY212EHAZ) */
+        if (state) {
+            drv_ssr_on(&ssr_output);
+        } else {
+            drv_ssr_off(&ssr_output);
+        }
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -102,8 +132,28 @@ static bool safety_hw_write_output(uint8_t channel, bool state) {
  * @return true if feedback indicates correct state, false otherwise
  */
 static bool safety_hw_read_output_feedback(uint8_t channel) {
-    /* TODO: Implement output feedback reading */
-    return true;
+    if (channel == SAFETY_OUTPUT_RELAY) {
+        /* Read relay feedback contacts:
+         * NO contacts should be closed (HIGH) when relay is energized
+         * NC contacts should be open (LOW) when relay is energized */
+        bool no1 = hal_gpio_read(SAFETY_RELAY_FB_NO1);
+        bool no2 = hal_gpio_read(SAFETY_RELAY_FB_NO2);
+        bool nc1 = hal_gpio_read(SAFETY_RELAY_FB_NC1);
+        bool nc2 = hal_gpio_read(SAFETY_RELAY_FB_NC2);
+
+        bool relay_on = safety_outputs[channel].energized;
+        if (relay_on) {
+            /* Expect NO=HIGH, NC=LOW */
+            return (no1 && no2 && !nc1 && !nc2);
+        } else {
+            /* Expect NO=LOW, NC=HIGH */
+            return (!no1 && !no2 && nc1 && nc2);
+        }
+    } else if (channel == SAFETY_OUTPUT_SSR) {
+        /* AQY212EHAZ has no feedback pin; assume correct */
+        return true;
+    }
+    return false;
 }
 
 /**
@@ -122,11 +172,10 @@ static bool safety_hw_feed_watchdog(void) {
  * @return true if emergency stop initiated, false otherwise
  */
 static bool safety_hw_emergency_stop(void) {
-    /* TODO: Implement emergency stop */
-    /* This would typically involve:
-     * - De-energizing all safety outputs
-     * - Activating emergency stop circuit
-     */
+    /* De-energize safety relay */
+    hal_gpio_reset(SAFETY_RELAY_CTRL);
+    /* De-energize SSR */
+    drv_ssr_off(&ssr_output);
     return true;
 }
 
@@ -171,7 +220,7 @@ static void safety_update_input_status(uint8_t channel) {
     bool current_state = channel_a && channel_b;
 
     /* Update timing */
-    uint32_t current_time = 0; /* TODO: Get current time */
+    uint32_t current_time = system_clock_get_tick();
 
     if (current_state != input->active) {
         if (current_state) {
@@ -207,7 +256,7 @@ static void safety_update_output_status(uint8_t channel) {
     output->fault = output->feedback_mismatch || output->short_circuit;
 
     /* Update timing */
-    uint32_t current_time = 0; /* TODO: Get current time */
+    uint32_t current_time = system_clock_get_tick();
 
     if (output->energized) {
         output->energize_time = current_time;
@@ -253,7 +302,7 @@ static void safety_check_system_faults(void) {
     }
 
     /* Check watchdog */
-    uint32_t current_time = 0; /* TODO: Get current time */
+    uint32_t current_time = system_clock_get_tick();
     if (current_time - last_watchdog_feed > safety_config.watchdog_timeout_ms) {
         safety_status.fault_code = SAFETY_FAULT_WATCHDOG;
     }
@@ -266,7 +315,7 @@ static void safety_check_system_faults(void) {
  * safety outputs (feedback verification).
  */
 static void safety_perform_test_pulse(void) {
-    uint32_t current_time = 0; /* TODO: Get current time */
+    uint32_t current_time = system_clock_get_tick();
 
     if (current_time - last_test_pulse >= SAFETY_TEST_PULSE_INTERVAL) {
         /* Test safety inputs (dual-channel cross-monitoring) */
@@ -316,8 +365,8 @@ bool safety_io_init(const safety_system_config_t *config) {
     memset(safety_outputs, 0, sizeof(safety_outputs));
 
     /* Initialize timing */
-    last_watchdog_feed = 0; /* TODO: Get current time */
-    last_test_pulse = 0;
+    last_watchdog_feed = system_clock_get_tick();
+    last_test_pulse = system_clock_get_tick();
 
     safety_initialized = true;
     return true;
