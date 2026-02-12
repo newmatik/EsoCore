@@ -33,7 +33,7 @@ jobs:
           version: 9
 
       - name: Cache pnpm store
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-portal-${{ hashFiles('portal/pnpm-lock.yaml') }}
