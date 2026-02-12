@@ -1,13 +1,28 @@
+import { mkdirSync, writeFileSync, existsSync } from 'node:fs'
+import { resolve } from 'node:path'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2024-11-01',
+  compatibilityDate: '2025-01-01',
   devtools: { enabled: true },
 
+  // Workaround for Nuxt 4.2.x missing client.precomputed.mjs (nuxt/nuxt#33579)
+  hooks: {
+    'vite:serverCreated'() {
+      const dir = resolve('.nuxt', 'dist', 'server')
+      const file = resolve(dir, 'client.precomputed.mjs')
+      if (!existsSync(file)) {
+        mkdirSync(dir, { recursive: true })
+        writeFileSync(file, 'export default {}')
+      }
+    },
+  },
+
   // Modules
-  modules: ['@nuxt/ui', '@pinia/nuxt', '@nuxtjs/tailwindcss', '@nuxtjs/color-mode'],
+  modules: ['@nuxt/ui', '@pinia/nuxt'],
 
   // CSS
-  css: ['@@/assets/css/main.css'],
+  css: ['~/assets/css/main.css'],
 
   // Environment variables
   runtimeConfig: {
@@ -23,21 +38,9 @@ export default defineNuxtConfig({
     },
   },
 
-  // Color mode
+  // Color mode (handled by @nuxt/ui)
   colorMode: {
     preference: 'dark',
-    fallback: 'dark',
-    hid: 'nuxt-color-mode-script',
-    globalName: '__NUXT_COLOR_MODE__',
-    componentName: 'ColorScheme',
-    classPrefix: '',
-    classSuffix: '',
-    storageKey: 'nuxt-color-mode',
-  },
-
-  // UI Configuration
-  ui: {
-    global: true,
   },
 
   // Build configuration

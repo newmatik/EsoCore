@@ -1,12 +1,11 @@
 <template>
-  <button
-    class="rounded-md p-1.5 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+  <UButton
+    variant="ghost"
+    color="neutral"
     :aria-label="`Switch to ${nextLabel} mode`"
+    :icon="isDark ? 'i-heroicons-moon-20-solid' : 'i-heroicons-sun-20-solid'"
     @click="toggle"
-  >
-    <span v-if="isDark" class="i-heroicons-moon-20-solid w-5 h-5" aria-hidden="true" />
-    <span v-else class="i-heroicons-sun-20-solid w-5 h-5" aria-hidden="true" />
-  </button>
+  />
 </template>
 
 <script setup lang="ts">

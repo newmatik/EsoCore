@@ -20,31 +20,28 @@
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
-    "@nuxt/ui": "^2.17.0",
-    "@pinia/nuxt": "^0.5.4",
-    "nuxt": "3.18.1",
-    "vue": "^3.4.38",
-    "vue-router": "^4.4.3",
-    "@nuxtjs/tailwindcss": "^6.12.1",
-    "@nuxtjs/color-mode": "^3.4.2",
-    "pinia": "^2.2.2",
+    "@nuxt/ui": "^4.0.0",
+    "@pinia/nuxt": "^0.9.0",
+    "@vueuse/core": "^12.0.0",
     "axios": "^1.7.9",
     "chart.js": "^4.4.7",
-    "vue-chartjs": "^5.3.1",
-    "socket.io-client": "^4.8.1",
     "jwt-decode": "^4.0.0",
-    "@vueuse/core": "^10.11.1"
+    "nuxt": "~4.2.2",
+    "pinia": "^2.3.0",
+    "socket.io-client": "^4.8.1",
+    "tailwindcss": "^4.0.0",
+    "vue": "^3.5.0",
+    "vue-chartjs": "^5.3.1",
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
-    "@nuxt/devtools": "^1.5.2",
-    "@nuxt/eslint-config": "^0.5.7",
+    "@iconify-json/lucide": "^1.2.90",
+    "@nuxt/eslint-config": "^0.7.0",
     "@types/node": "^22.9.0",
-    "typescript": "^5.6.3",
-    "vue-tsc": "^2.0.29",
+    "eslint": "^9.0.0",
+    "eslint-plugin-vue": "^9.29.0",
     "prettier": "^3.3.3",
-    "eslint": "^8.57.1",
-    "@typescript-eslint/parser": "^6.21.0",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "eslint-plugin-vue": "^9.29.0"
+    "typescript": "^5.7.0",
+    "vue-tsc": "^2.2.0"
   }
 }

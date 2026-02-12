@@ -1,21 +1,16 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="min-h-screen bg-(--ui-bg)">
     <!-- Header -->
-    <div class="bg-white dark:bg-gray-800 shadow">
+    <div class="bg-(--ui-bg-elevated) shadow">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-            <p class="text-gray-500 dark:text-gray-400">Monitor your IoT devices and systems</p>
+            <h1 class="text-2xl font-bold text-(--ui-text-highlighted)">Dashboard</h1>
+            <p class="text-(--ui-text-muted)">Monitor your IoT devices and systems</p>
           </div>
-          <div class="flex items-center space-x-4">
-            <UButton icon="i-heroicons-arrow-path" :loading="refreshing" @click="refreshData">
-              Refresh
-            </UButton>
-            <UButton icon="i-heroicons-cog-6-tooth" variant="outline" to="/settings">
-              Settings
-            </UButton>
-          </div>
+          <UButton leading-icon="i-heroicons-arrow-path" :loading="refreshing" @click="refreshData">
+            Refresh
+          </UButton>
         </div>
       </div>
     </div>
@@ -24,260 +19,283 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Stats Cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="dashboard-card">
+        <UCard v-for="stat in statsCards" :key="stat.label">
           <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <div
-                class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center"
-              >
-                <svg
-                  class="w-5 h-5 text-blue-600 dark:text-blue-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-              </div>
+            <div
+              class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+              :class="stat.iconBg"
+            >
+              <UIcon :name="stat.icon" class="w-5 h-5" :class="stat.iconColor" />
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Devices</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white">
-                {{ stats.totalDevices }}
-              </p>
+              <p class="text-sm font-medium text-(--ui-text-muted)">{{ stat.label }}</p>
+              <p class="text-2xl font-semibold text-(--ui-text-highlighted)">{{ stat.value }}</p>
             </div>
           </div>
-        </div>
-
-        <div class="dashboard-card">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <div
-                class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center"
-              >
-                <svg
-                  class="w-5 h-5 text-green-600 dark:text-green-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-            </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Online Devices</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white">
-                {{ stats.onlineDevices }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="dashboard-card">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <div
-                class="w-8 h-8 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center"
-              >
-                <svg
-                  class="w-5 h-5 text-yellow-600 dark:text-yellow-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-                  />
-                </svg>
-              </div>
-            </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Active Alerts</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white">
-                {{ stats.activeAlerts }}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="dashboard-card">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <div
-                class="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center"
-              >
-                <svg
-                  class="w-5 h-5 text-purple-600 dark:text-purple-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                  />
-                </svg>
-              </div>
-            </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Assets Monitored</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white">
-                {{ stats.totalAssets }}
-              </p>
-            </div>
-          </div>
-        </div>
+        </UCard>
       </div>
 
       <!-- Charts and Recent Activity -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Device Status Chart -->
-        <div class="dashboard-card">
-          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
-            Device Status Overview
-          </h3>
-          <div class="chart-container">
-            <canvas ref="deviceStatusChart" />
+        <UCard>
+          <template #header>
+            <h3 class="text-lg font-medium text-(--ui-text-highlighted)">
+              Device Status Overview
+            </h3>
+          </template>
+          <div class="flex items-center justify-center" style="height: 260px;">
+            <Doughnut v-if="chartReady" :data="chartData" :options="chartOptions" />
+            <p v-else class="text-(--ui-text-muted)">Loading chart...</p>
           </div>
-        </div>
+        </UCard>
 
         <!-- Recent Alerts -->
-        <div class="dashboard-card">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Recent Alerts</h3>
-            <UButton variant="link" to="/alerts" class="text-sm"> View all </UButton>
-          </div>
+        <UCard>
+          <template #header>
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-medium text-(--ui-text-highlighted)">Recent Alerts</h3>
+              <UButton variant="link" to="/alerts" size="sm">
+                View all
+              </UButton>
+            </div>
+          </template>
           <div class="space-y-3">
             <div
-              v-for="alert in recentAlerts"
-              :key="alert.id"
-              class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
+              v-for="event in recentEvents"
+              :key="event.id"
+              class="flex items-center justify-between p-3 bg-(--ui-bg-accented) rounded-lg"
             >
-              <div class="flex items-center space-x-3">
+              <div class="flex items-center gap-3 min-w-0">
                 <div
-                  class="w-2 h-2 rounded-full"
-                  :class="{
-                    'bg-green-500': alert.severity === 'low',
-                    'bg-yellow-500': alert.severity === 'medium',
-                    'bg-orange-500': alert.severity === 'high',
-                    'bg-red-500': alert.severity === 'critical',
-                  }"
+                  class="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                  :class="severityDotClass(event.severity)"
                 />
-                <div>
-                  <p class="text-sm font-medium text-gray-900 dark:text-white">
-                    {{ alert.description }}
+                <div class="min-w-0">
+                  <p class="text-sm font-medium text-(--ui-text-highlighted) truncate">
+                    {{ event.description }}
                   </p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">
-                    {{ formatDate(alert.created_at) }}
+                  <p class="text-xs text-(--ui-text-muted)">
+                    {{ event.event_type }} &middot; {{ formatTimeAgo(event.created_at) }}
                   </p>
                 </div>
               </div>
-              <UButton size="xs" variant="outline" @click="acknowledgeAlert(alert.id)">
-                Acknowledge
+              <UButton
+                v-if="event.status === 'active'"
+                size="xs"
+                variant="outline"
+                class="ml-2 flex-shrink-0"
+                @click="acknowledgeEvent(event.id)"
+              >
+                Ack
               </UButton>
+              <UBadge v-else :color="statusBadgeColor(event.status)" variant="subtle" size="sm" class="ml-2 flex-shrink-0">
+                {{ event.status }}
+              </UBadge>
             </div>
-            <div v-if="recentAlerts.length === 0" class="text-center py-8">
-              <p class="text-gray-500 dark:text-gray-400">No recent alerts</p>
+            <div v-if="recentEvents.length === 0" class="text-center py-8">
+              <p class="text-(--ui-text-muted)">No recent alerts</p>
             </div>
           </div>
-        </div>
+        </UCard>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { Doughnut } from 'vue-chartjs'
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
+import { useApi } from '../composables/useApi'
 
-// Page meta
-import auth from '~/middleware/auth'
+ChartJS.register(ArcElement, Tooltip, Legend)
 
 definePageMeta({
   layout: 'authenticated',
-  middleware: [auth],
+  middleware: ['auth'],
 })
 
-// Reactive data
+interface DashboardSummary {
+  total_devices: number
+  online_devices: number
+  offline_devices: number
+  maintenance_devices: number
+  active_alerts: number
+  total_assets: number
+  total_sites: number
+  device_status_breakdown: Record<string, number>
+  alert_severity_breakdown: Record<string, number>
+}
+
+interface SystemEvent {
+  id: string
+  device: string
+  event_type: string
+  severity: string
+  description: string
+  status: string
+  created_at: string
+}
+
+interface PaginatedResponse<T> {
+  count: number
+  results: T[]
+}
+
+const api = useApi()
 const refreshing = ref(false)
-const deviceStatusChart = ref<HTMLCanvasElement>()
 
-// Mock data - replace with real API calls
-const stats = ref({
-  totalDevices: 0,
-  onlineDevices: 0,
-  activeAlerts: 0,
-  totalAssets: 0,
+const summary = ref<DashboardSummary>({
+  total_devices: 0,
+  online_devices: 0,
+  offline_devices: 0,
+  maintenance_devices: 0,
+  active_alerts: 0,
+  total_assets: 0,
+  total_sites: 0,
+  device_status_breakdown: {},
+  alert_severity_breakdown: {},
 })
 
-const recentAlerts = ref([
+const recentEvents = ref<SystemEvent[]>([])
+const chartReady = ref(false)
+
+const statsCards = computed(() => [
   {
-    id: 1,
-    description: 'Device offline: Sensor-001',
-    severity: 'high',
-    created_at: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
+    icon: 'i-heroicons-cpu-chip',
+    iconBg: 'bg-blue-100 dark:bg-blue-900/40',
+    iconColor: 'text-blue-600 dark:text-blue-400',
+    label: 'Total Devices',
+    value: summary.value.total_devices,
   },
   {
-    id: 2,
-    description: 'High vibration detected on CNC-001',
-    severity: 'medium',
-    created_at: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
+    icon: 'i-heroicons-signal',
+    iconBg: 'bg-green-100 dark:bg-green-900/40',
+    iconColor: 'text-green-600 dark:text-green-400',
+    label: 'Online',
+    value: summary.value.online_devices,
+  },
+  {
+    icon: 'i-heroicons-bell-alert',
+    iconBg: 'bg-yellow-100 dark:bg-yellow-900/40',
+    iconColor: 'text-yellow-600 dark:text-yellow-400',
+    label: 'Active Alerts',
+    value: summary.value.active_alerts,
+  },
+  {
+    icon: 'i-heroicons-wrench-screwdriver',
+    iconBg: 'bg-purple-100 dark:bg-purple-900/40',
+    iconColor: 'text-purple-600 dark:text-purple-400',
+    label: 'Assets',
+    value: summary.value.total_assets,
   },
 ])
 
-// Methods
-const refreshData = async () => {
+const chartData = computed(() => {
+  const breakdown = summary.value.device_status_breakdown
+  return {
+    labels: ['Active', 'Inactive', 'Maintenance', 'Offline'],
+    datasets: [
+      {
+        data: [
+          breakdown.active || 0,
+          breakdown.inactive || 0,
+          breakdown.maintenance || 0,
+          breakdown.offline || 0,
+        ],
+        backgroundColor: ['#10b981', '#6b7280', '#f59e0b', '#ef4444'],
+        borderColor: ['#059669', '#4b5563', '#d97706', '#dc2626'],
+        borderWidth: 2,
+      },
+    ],
+  }
+})
+
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'bottom' as const,
+      labels: {
+        color: '#9ca3af',
+        padding: 16,
+        usePointStyle: true,
+      },
+    },
+  },
+}
+
+function severityDotClass(severity: string) {
+  const map: Record<string, string> = {
+    low: 'bg-green-500',
+    medium: 'bg-yellow-500',
+    high: 'bg-orange-500',
+    critical: 'bg-red-500',
+  }
+  return map[severity] || 'bg-gray-400'
+}
+
+function statusBadgeColor(status: string): string {
+  const map: Record<string, string> = {
+    acknowledged: 'info',
+    resolved: 'success',
+    suppressed: 'neutral',
+  }
+  return map[status] || 'neutral'
+}
+
+function formatTimeAgo(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime()
+  const minutes = Math.floor(diff / 60000)
+  if (minutes < 1) return 'just now'
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}h ago`
+  const days = Math.floor(hours / 24)
+  return `${days}d ago`
+}
+
+async function fetchDashboardData() {
+  try {
+    const [summaryData, eventsData] = await Promise.all([
+      api.get<DashboardSummary>('/dashboard/summary/'),
+      api.get<PaginatedResponse<SystemEvent>>('/events/events/', {
+        ordering: '-created_at',
+        page_size: 8,
+      }),
+    ])
+    summary.value = summaryData
+    recentEvents.value = eventsData.results || []
+    chartReady.value = true
+  }
+  catch (error) {
+    console.error('Failed to fetch dashboard data:', error)
+  }
+}
+
+async function refreshData() {
   refreshing.value = true
   try {
-    // TODO: Implement data refresh from API
-    await new Promise(resolve => setTimeout(resolve, 1000))
-  } finally {
+    await fetchDashboardData()
+  }
+  finally {
     refreshing.value = false
   }
 }
 
-const acknowledgeAlert = async (alertId: number) => {
-  // TODO: Implement alert acknowledgment
-  console.log('Acknowledging alert:', alertId)
+async function acknowledgeEvent(eventId: string) {
+  try {
+    await api.post(`/events/events/${eventId}/acknowledge/`)
+    const event = recentEvents.value.find(e => e.id === eventId)
+    if (event) event.status = 'acknowledged'
+  }
+  catch (error) {
+    console.error('Failed to acknowledge event:', error)
+  }
 }
 
-const formatDate = (date: Date) => {
-  return new Intl.RelativeTimeFormat('en', { numeric: 'auto' }).format(
-    Math.round((date.getTime() - Date.now()) / (1000 * 60)),
-    'minute'
-  )
-}
-
-// Initialize chart
 onMounted(() => {
-  if (deviceStatusChart.value) {
-    // TODO: Initialize Chart.js for device status visualization
-  }
-})
-
-// Fetch initial data
-onMounted(async () => {
-  // TODO: Fetch dashboard data from API
-  stats.value = {
-    totalDevices: 24,
-    onlineDevices: 22,
-    activeAlerts: 3,
-    totalAssets: 18,
-  }
+  fetchDashboardData()
 })
 </script>
