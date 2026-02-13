@@ -1,6 +1,7 @@
 import uuid
 
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from django.test import TestCase
 from django.utils import timezone
 from rest_framework import status
@@ -10,7 +11,6 @@ from rest_framework.test import APIClient
 from devices.models import Device, Site
 
 from .models import TelemetryPacket, TelemetryPoint, TelemetryWindow
-
 
 # ---------------------------------------------------------------------------
 # Model tests
@@ -44,7 +44,7 @@ class TelemetryPacketModelTests(TestCase):
         TelemetryPacket.objects.create(
             device=self.device, upload_id=upload_id, checksum="abc"
         )
-        with self.assertRaises(Exception):
+        with self.assertRaises(IntegrityError):
             TelemetryPacket.objects.create(
                 device=self.device, upload_id=upload_id, checksum="def"
             )

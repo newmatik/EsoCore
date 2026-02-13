@@ -1,3 +1,5 @@
+import contextlib
+
 from django.contrib.auth import authenticate
 from drf_spectacular.utils import OpenApiResponse, extend_schema, inline_serializer
 from rest_framework import serializers, status
@@ -89,17 +91,19 @@ def login_view(request):
 
 @extend_schema(
     request=None,
-    responses={200: inline_serializer(name="LogoutResponse", fields={"detail": serializers.CharField()})},
+    responses={
+        200: inline_serializer(
+            name="LogoutResponse", fields={"detail": serializers.CharField()}
+        )
+    },
     summary="Logout",
 )
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
     """Delete the current user's auth token."""
-    try:
+    with contextlib.suppress(Token.DoesNotExist):
         request.user.auth_token.delete()
-    except Token.DoesNotExist:
-        pass
     return Response({"detail": "Logged out."}, status=status.HTTP_200_OK)
 
 

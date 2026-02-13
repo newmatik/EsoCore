@@ -20,8 +20,12 @@ from events.models import SystemEvent
             "active_alerts": serializers.IntegerField(),
             "total_assets": serializers.IntegerField(),
             "total_sites": serializers.IntegerField(),
-            "device_status_breakdown": serializers.DictField(child=serializers.IntegerField()),
-            "alert_severity_breakdown": serializers.DictField(child=serializers.IntegerField()),
+            "device_status_breakdown": serializers.DictField(
+                child=serializers.IntegerField()
+            ),
+            "alert_severity_breakdown": serializers.DictField(
+                child=serializers.IntegerField()
+            ),
         },
     ),
     summary="Dashboard summary statistics",

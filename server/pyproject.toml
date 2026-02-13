@@ -61,15 +61,19 @@ select = [
 ]
 
 ignore = [
-    "E501", # Line too long, let black handle this
-    "B008", # Do not perform function calls in argument defaults
-    "C901", # Too complex
+    "E501",   # Line too long, let black handle this
+    "B008",   # Do not perform function calls in argument defaults
+    "C901",   # Too complex
+    "PT009",  # unittest-style assertions are idiomatic in Django TestCase
+    "PT027",  # unittest-style assertRaises is idiomatic in Django TestCase
+    "RUF012", # Mutable class defaults are standard in Django models/serializers
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
 "**/migrations/*.py" = ["E501", "N805"]
 "**/tests/*.py" = ["S101"]
+"scripts/*.py" = ["T201"]
 
 [tool.black]
 line-length = 88

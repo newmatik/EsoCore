@@ -256,8 +256,10 @@ const telemetryPoints = ref<TelemetryPoint[]>([])
 const deviceEvents = ref<DeviceEvent[]>([])
 const errorMsg = ref('')
 
-function statusColor(status: string): string {
-  const map: Record<string, string> = {
+type BadgeColor = 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'error' | 'neutral'
+
+function statusColor(status: string): BadgeColor {
+  const map: Record<string, BadgeColor> = {
     active: 'success',
     inactive: 'neutral',
     maintenance: 'warning',
@@ -276,8 +278,8 @@ function severityDot(severity: string) {
   return map[severity] || 'bg-gray-400'
 }
 
-function eventStatusColor(status: string): string {
-  const map: Record<string, string> = {
+function eventStatusColor(status: string): BadgeColor {
+  const map: Record<string, BadgeColor> = {
     active: 'error',
     acknowledged: 'info',
     resolved: 'success',

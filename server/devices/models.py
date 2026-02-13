@@ -48,6 +48,9 @@ class Device(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return f"{self.serial_number} ({self.model})"
+
     def set_api_secret(self, raw_secret: str) -> None:
         """Hash and store the API secret."""
         self.api_secret = hashlib.sha256(raw_secret.encode()).hexdigest()
@@ -56,9 +59,6 @@ class Device(models.Model):
         """Verify a raw secret against the stored hash (constant-time)."""
         candidate = hashlib.sha256(raw_secret.encode()).hexdigest()
         return hmac.compare_digest(candidate, self.api_secret)
-
-    def __str__(self):
-        return f"{self.serial_number} ({self.model})"
 
 
 class DeviceConfiguration(models.Model):

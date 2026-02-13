@@ -6,8 +6,7 @@ from rest_framework.test import APIClient
 
 from devices.models import Device, Site
 
-from .models import AlertRule, EventLog, NotificationQueue, SystemEvent
-
+from .models import AlertRule, SystemEvent
 
 # ---------------------------------------------------------------------------
 # Model tests
@@ -121,17 +120,13 @@ class SystemEventViewSetTests(TestCase):
         self.assertEqual(len(response.data["results"]), 1)
 
     def test_acknowledge_action(self):
-        response = self.client.post(
-            f"/api/events/events/{self.event.id}/acknowledge/"
-        )
+        response = self.client.post(f"/api/events/events/{self.event.id}/acknowledge/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.event.refresh_from_db()
         self.assertEqual(self.event.status, "acknowledged")
 
     def test_resolve_action(self):
-        response = self.client.post(
-            f"/api/events/events/{self.event.id}/resolve/"
-        )
+        response = self.client.post(f"/api/events/events/{self.event.id}/resolve/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.event.refresh_from_db()
         self.assertEqual(self.event.status, "resolved")

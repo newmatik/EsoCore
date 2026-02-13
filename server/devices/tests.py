@@ -1,14 +1,14 @@
 import uuid
 
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
 from .models import Device, DeviceConfiguration, FirmwareBundle, Site
-from .serializers import DeviceSerializer, FirmwareBundleSerializer, SiteSerializer
-
+from .serializers import DeviceSerializer, SiteSerializer
 
 # ---------------------------------------------------------------------------
 # Model tests
@@ -28,7 +28,7 @@ class SiteModelTests(TestCase):
 
     def test_unique_together(self):
         Site.objects.create(name="Factory A", customer=self.user)
-        with self.assertRaises(Exception):
+        with self.assertRaises(IntegrityError):
             Site.objects.create(name="Factory A", customer=self.user)
 
 
@@ -57,7 +57,7 @@ class DeviceModelTests(TestCase):
             api_secret="secret-001",
             site=self.site,
         )
-        with self.assertRaises(Exception):
+        with self.assertRaises(IntegrityError):
             Device.objects.create(
                 serial_number="SN-001",
                 model="Edge v2",

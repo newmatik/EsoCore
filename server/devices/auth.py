@@ -22,8 +22,8 @@ class APIKeyAuthentication(authentication.BaseAuthentication):
 
             # Return user and key (DRF expects tuple of (user, auth))
             return (key_obj, api_key)
-        except APIKey.DoesNotExist:
-            raise exceptions.AuthenticationFailed("Invalid API key")
+        except APIKey.DoesNotExist as err:
+            raise exceptions.AuthenticationFailed("Invalid API key") from err
 
     def get_api_key(self, request):
         """Extract API key from request headers"""
