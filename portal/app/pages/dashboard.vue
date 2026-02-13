@@ -251,8 +251,10 @@ function severityDotClass(severity: string) {
   return map[severity] || 'bg-gray-400'
 }
 
-function statusBadgeColor(status: string): string {
-  const map: Record<string, string> = {
+type BadgeColor = 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'error' | 'neutral'
+
+function statusBadgeColor(status: string): BadgeColor {
+  const map: Record<string, BadgeColor> = {
     acknowledged: 'info',
     resolved: 'success',
     suppressed: 'neutral',

@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from django.test import TestCase
 from django.utils import timezone
 from rest_framework import status
@@ -11,7 +12,6 @@ from devices.models import Site
 
 from .models import Asset, AssetCycle
 from .serializers import AssetSerializer
-
 
 # ---------------------------------------------------------------------------
 # Model tests
@@ -42,7 +42,7 @@ class AssetModelTests(TestCase):
             make="Kuka",
             model="KR 10",
         )
-        with self.assertRaises(Exception):
+        with self.assertRaises(IntegrityError):
             Asset.objects.create(
                 asset_id="DOOR-001",
                 site=self.site,
@@ -106,7 +106,9 @@ class AssetSerializerTests(TestCase):
         # Use annotated queryset (as the viewset does) for the count field
         from django.db.models import Count
 
-        asset = Asset.objects.annotate(cycle_count=Count("cycles")).get(pk=self.asset.pk)
+        asset = Asset.objects.annotate(cycle_count=Count("cycles")).get(
+            pk=self.asset.pk
+        )
         serializer = AssetSerializer(asset)
         self.assertEqual(serializer.data["cycle_count"], 1)
 

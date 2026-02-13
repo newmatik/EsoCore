@@ -6,4 +6,4 @@ class DevicesConfig(AppConfig):
     name = "devices"
 
     def ready(self):
-        import devices.openapi  # noqa: F401 – register OpenAPI auth extension
+        import devices.openapi  # noqa: F401 - register OpenAPI auth extension

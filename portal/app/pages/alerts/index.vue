@@ -213,8 +213,10 @@ const filteredEvents = computed(() => {
   return result
 })
 
-function severityColor(severity: string): string {
-  const map: Record<string, string> = {
+type BadgeColor = 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'error' | 'neutral'
+
+function severityColor(severity: string): BadgeColor {
+  const map: Record<string, BadgeColor> = {
     low: 'success',
     medium: 'warning',
     high: 'warning',
@@ -223,8 +225,8 @@ function severityColor(severity: string): string {
   return map[severity] || 'neutral'
 }
 
-function eventStatusColor(status: string): string {
-  const map: Record<string, string> = {
+function eventStatusColor(status: string): BadgeColor {
+  const map: Record<string, BadgeColor> = {
     active: 'error',
     acknowledged: 'info',
     resolved: 'success',

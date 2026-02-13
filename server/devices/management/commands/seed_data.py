@@ -72,9 +72,7 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS("Successfully seeded database with sample data!")
         )
-        self.stdout.write(
-            self.style.SUCCESS("  Login: admin@esocore.local / admin")
-        )
+        self.stdout.write(self.style.SUCCESS("  Login: admin@esocore.local / admin"))
 
     def _clear_data(self):
         """Clear all seeded data."""
@@ -464,9 +462,7 @@ class Command(BaseCommand):
             FirmwareBundle.objects.get_or_create(
                 version=b["version"],
                 defaults={
-                    "hash": hashlib.sha256(
-                        b["version"].encode()
-                    ).hexdigest(),
+                    "hash": hashlib.sha256(b["version"].encode()).hexdigest(),
                     "channel": b["channel"],
                     "rollout_policy": b["rollout_policy"],
                     "supported_models": b["supported_models"],
@@ -485,9 +481,9 @@ class Command(BaseCommand):
                     device=device,
                     upload_id=upload_id,
                     defaults={
-                        "checksum": hashlib.sha256(
-                            str(upload_id).encode()
-                        ).hexdigest()[:64],
+                        "checksum": hashlib.sha256(str(upload_id).encode()).hexdigest()[
+                            :64
+                        ],
                         "status": "processed",
                         "record_count": random.randint(50, 200),
                         "processed_at": now - timedelta(hours=i * 6),
@@ -527,7 +523,9 @@ class Command(BaseCommand):
                             unit=unit,
                             meta={
                                 "sensor_id": f"{metric_name.split('_')[0]}_01",
-                                "sample_rate": 1000 if "vibration" in metric_name else 1,
+                                "sample_rate": (
+                                    1000 if "vibration" in metric_name else 1
+                                ),
                             },
                         )
                     )
@@ -823,10 +821,16 @@ class Command(BaseCommand):
                 "site": sites[0],
                 "layout": {"columns": 2, "rows": 3},
                 "widgets": [
-                    {"type": "stats_cards", "position": {"row": 0, "col": 0, "span": 2}},
+                    {
+                        "type": "stats_cards",
+                        "position": {"row": 0, "col": 0, "span": 2},
+                    },
                     {"type": "device_status_chart", "position": {"row": 1, "col": 0}},
                     {"type": "recent_alerts", "position": {"row": 1, "col": 1}},
-                    {"type": "telemetry_chart", "position": {"row": 2, "col": 0, "span": 2}},
+                    {
+                        "type": "telemetry_chart",
+                        "position": {"row": 2, "col": 0, "span": 2},
+                    },
                 ],
                 "is_default": True,
             },

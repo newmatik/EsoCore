@@ -4,10 +4,9 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
-from devices.models import Device, Site
+from devices.models import Site
 
 from .models import Dashboard, UserDeviceRole, UserProfile
-
 
 # ---------------------------------------------------------------------------
 # Model tests
@@ -72,9 +71,7 @@ class UserProfileViewSetTests(TestCase):
         self.user = User.objects.create_user(username="testuser", password="pass1234")
         self.token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token.key}")
-        self.profile = UserProfile.objects.create(
-            user=self.user, company="Newmatik"
-        )
+        self.profile = UserProfile.objects.create(user=self.user, company="Newmatik")
 
     def test_list_own_profile(self):
         response = self.client.get("/api/users/profiles/")
@@ -157,13 +154,9 @@ class DashboardViewSetTests(TestCase):
         self.assertEqual(dashboard.user, self.user)
 
     def test_list_own_dashboards(self):
-        Dashboard.objects.create(
-            name="Dash 1", user=self.user, layout={}, widgets=[]
-        )
+        Dashboard.objects.create(name="Dash 1", user=self.user, layout={}, widgets=[])
         other = User.objects.create_user(username="other", password="pass1234")
-        Dashboard.objects.create(
-            name="Other Dash", user=other, layout={}, widgets=[]
-        )
+        Dashboard.objects.create(name="Other Dash", user=other, layout={}, widgets=[])
         response = self.client.get("/api/users/dashboards/")
         results = response.data["results"]
         self.assertEqual(len(results), 1)
@@ -252,7 +245,10 @@ class AuthViewTests(TestCase):
 
     def test_me_unauthenticated(self):
         response = self.client.get("/api/auth/me/")
-        self.assertIn(response.status_code, (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN))
+        self.assertIn(
+            response.status_code,
+            (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN),
+        )
 
     def test_logout(self):
         token = Token.objects.create(user=self.user)

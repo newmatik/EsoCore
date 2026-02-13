@@ -192,8 +192,10 @@ function assetTypeLabel(type: string) {
   return typeLabels[type] || type
 }
 
-function typeColor(type: string): string {
-  const map: Record<string, string> = {
+type BadgeColor = 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'error' | 'neutral'
+
+function typeColor(type: string): BadgeColor {
+  const map: Record<string, BadgeColor> = {
     cnc: 'info',
     robot: 'secondary',
     conveyor: 'info',

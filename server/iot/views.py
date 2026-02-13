@@ -69,16 +69,18 @@ def auth_handshake(request):
 
 
 @extend_schema(
-    request=serializers.ListSerializer(child=inline_serializer(
-        name="TelemetryItem",
-        fields={
-            "timestamp": serializers.CharField(),
-            "metric": serializers.CharField(),
-            "value": serializers.FloatField(),
-            "unit": serializers.CharField(required=False),
-            "meta": serializers.DictField(required=False),
-        },
-    )),
+    request=serializers.ListSerializer(
+        child=inline_serializer(
+            name="TelemetryItem",
+            fields={
+                "timestamp": serializers.CharField(),
+                "metric": serializers.CharField(),
+                "value": serializers.FloatField(),
+                "unit": serializers.CharField(required=False),
+                "meta": serializers.DictField(required=False),
+            },
+        )
+    ),
     responses={
         200: inline_serializer(
             name="TelemetryBatchResponse",
@@ -158,10 +160,7 @@ def telemetry_batch(request):
             try:
                 # Parse timestamp (expect ISO-8601 string)
                 ts = item.get("timestamp")
-                if isinstance(ts, str):
-                    ts_parsed = parse_datetime(ts)
-                else:
-                    ts_parsed = ts
+                ts_parsed = parse_datetime(ts) if isinstance(ts, str) else ts
                 if ts_parsed is None:
                     ts_parsed = timezone.now()
                 TelemetryPoint.objects.create(
@@ -283,9 +282,7 @@ def ota_check(request):
                 "release_notes": firmware.release_notes,
             }
         )
-    return Response(
-        {"available": False, "current_version": device.firmware_version}
-    )
+    return Response({"available": False, "current_version": device.firmware_version})
 
 
 @extend_schema(

@@ -9,6 +9,10 @@
 import type { FetchOptions } from 'ofetch'
 import { useAuthStore } from '../stores/auth'
 
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS'
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type RequestBody = Record<string, any> | BodyInit | null | undefined
+
 export function useApi() {
   const config = useRuntimeConfig()
   const baseURL = config.public.apiBaseUrl as string
@@ -35,6 +39,7 @@ export function useApi() {
       return await $fetch<T>(path, {
         baseURL,
         ...options,
+        method: options.method as HttpMethod,
         headers,
       })
     } catch (error: unknown) {
@@ -51,15 +56,15 @@ export function useApi() {
     return request<T>(path, { method: 'GET', query })
   }
 
-  function post<T = unknown>(path: string, body?: unknown) {
+  function post<T = unknown>(path: string, body?: RequestBody) {
     return request<T>(path, { method: 'POST', body })
   }
 
-  function put<T = unknown>(path: string, body?: unknown) {
+  function put<T = unknown>(path: string, body?: RequestBody) {
     return request<T>(path, { method: 'PUT', body })
   }
 
-  function patch<T = unknown>(path: string, body?: unknown) {
+  function patch<T = unknown>(path: string, body?: RequestBody) {
     return request<T>(path, { method: 'PATCH', body })
   }
 

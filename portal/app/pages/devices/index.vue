@@ -189,8 +189,10 @@ const filteredDevices = computed(() => {
   return result
 })
 
-function statusColor(status: string): string {
-  const map: Record<string, string> = {
+type BadgeColor = 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'error' | 'neutral'
+
+function statusColor(status: string): BadgeColor {
+  const map: Record<string, BadgeColor> = {
     active: 'success',
     inactive: 'neutral',
     maintenance: 'warning',
