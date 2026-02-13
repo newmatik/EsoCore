@@ -3,8 +3,11 @@
     <header class="bg-(--ui-bg-elevated) border-b border-(--ui-border)">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
         <!-- Brand -->
-        <NuxtLink to="/dashboard" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
-          <img src="/icon.svg" alt="Portal Icon" class="h-6 w-6">
+        <NuxtLink
+          to="/dashboard"
+          class="flex items-center gap-2 hover:opacity-80 transition-opacity"
+        >
+          <img src="/icon.svg" alt="Portal Icon" class="h-6 w-6" />
           <span class="text-lg font-semibold text-(--ui-text-highlighted)">
             {{ portalTitle }}
           </span>
@@ -17,9 +20,11 @@
             :key="item.to"
             :to="item.to"
             class="px-3 py-1.5 text-sm rounded-md transition-colors"
-            :class="isActive(item.to)
-              ? 'bg-(--ui-bg-accented) text-(--ui-text-highlighted) font-medium'
-              : 'text-(--ui-text-muted) hover:bg-(--ui-bg-accented) hover:text-(--ui-text)'"
+            :class="
+              isActive(item.to)
+                ? 'bg-(--ui-bg-accented) text-(--ui-text-highlighted) font-medium'
+                : 'text-(--ui-text-muted) hover:bg-(--ui-bg-accented) hover:text-(--ui-text)'
+            "
           >
             {{ item.label }}
           </NuxtLink>
@@ -34,17 +39,16 @@
           <div class="relative ml-1" ref="menuRef">
             <button
               @click="showMenu = !showMenu"
-              class="flex items-center gap-2 px-2 py-1.5 rounded-md text-sm
-                     text-(--ui-text-muted) hover:bg-(--ui-bg-accented) transition-colors"
+              class="flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-(--ui-text-muted) hover:bg-(--ui-bg-accented) transition-colors"
             >
               <span
-                class="w-7 h-7 rounded-full bg-(--ui-color-primary-100) dark:bg-(--ui-color-primary-950)
-                       text-(--ui-color-primary-600) flex items-center justify-center
-                       text-xs font-semibold"
+                class="w-7 h-7 rounded-full bg-(--ui-color-primary-100) dark:bg-(--ui-color-primary-950) text-(--ui-color-primary-600) flex items-center justify-center text-xs font-semibold"
               >
                 {{ authStore.initials || '?' }}
               </span>
-              <span class="hidden sm:inline text-(--ui-text)">{{ authStore.displayName || 'User' }}</span>
+              <span class="hidden sm:inline text-(--ui-text)">{{
+                authStore.displayName || 'User'
+              }}</span>
               <UIcon name="i-heroicons-chevron-down" class="w-4 h-4" />
             </button>
 
@@ -59,8 +63,7 @@
             >
               <div
                 v-if="showMenu"
-                class="absolute right-0 mt-2 w-48 bg-(--ui-bg-elevated) rounded-lg shadow-lg
-                       border border-(--ui-border) py-1 z-50"
+                class="absolute right-0 mt-2 w-48 bg-(--ui-bg-elevated) rounded-lg shadow-lg border border-(--ui-border) py-1 z-50"
               >
                 <div class="px-4 py-2 border-b border-(--ui-border)">
                   <p class="text-sm font-medium text-(--ui-text-highlighted)">
@@ -72,8 +75,7 @@
                 </div>
                 <button
                   @click="handleLogout"
-                  class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400
-                         hover:bg-(--ui-bg-accented) transition-colors"
+                  class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-(--ui-bg-accented) transition-colors"
                 >
                   Sign out
                 </button>
@@ -126,6 +128,10 @@ function handleClickOutside(event: MouseEvent) {
   }
 }
 
-onMounted(() => { document.addEventListener('click', handleClickOutside) })
-onUnmounted(() => { document.removeEventListener('click', handleClickOutside) })
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>

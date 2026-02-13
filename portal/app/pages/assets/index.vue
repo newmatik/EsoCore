@@ -37,7 +37,10 @@
 
       <!-- Loading -->
       <div v-if="loading && assets.length === 0" class="text-center py-16">
-        <UIcon name="i-heroicons-arrow-path" class="w-6 h-6 animate-spin text-(--ui-text-muted) mx-auto" />
+        <UIcon
+          name="i-heroicons-arrow-path"
+          class="w-6 h-6 animate-spin text-(--ui-text-muted) mx-auto"
+        />
         <p class="mt-3 text-(--ui-text-muted)">Loading assets...</p>
       </div>
 
@@ -47,7 +50,9 @@
           <UCard v-for="asset in filteredAssets" :key="asset.id">
             <div class="flex items-start justify-between mb-3">
               <div>
-                <h3 class="text-sm font-semibold text-(--ui-text-highlighted)">{{ asset.asset_id }}</h3>
+                <h3 class="text-sm font-semibold text-(--ui-text-highlighted)">
+                  {{ asset.asset_id }}
+                </h3>
                 <p class="text-xs text-(--ui-text-muted)">{{ asset.make }} {{ asset.model }}</p>
               </div>
               <UBadge :color="typeColor(asset.asset_type)" variant="subtle" size="sm">
@@ -66,7 +71,9 @@
               </div>
               <div v-if="asset.serial_number" class="flex justify-between">
                 <dt class="text-(--ui-text-muted)">Serial</dt>
-                <dd class="font-mono text-xs text-(--ui-text-highlighted)">{{ asset.serial_number }}</dd>
+                <dd class="font-mono text-xs text-(--ui-text-highlighted)">
+                  {{ asset.serial_number }}
+                </dd>
               </div>
               <div class="flex justify-between">
                 <dt class="text-(--ui-text-muted)">Cycles</dt>
@@ -75,7 +82,10 @@
             </dl>
 
             <!-- Specifications -->
-            <div v-if="asset.specifications && Object.keys(asset.specifications).length > 0" class="mt-3 pt-3 border-t border-(--ui-border)">
+            <div
+              v-if="asset.specifications && Object.keys(asset.specifications).length > 0"
+              class="mt-3 pt-3 border-t border-(--ui-border)"
+            >
               <p class="text-xs font-medium text-(--ui-text-muted) mb-1.5">Specifications</p>
               <div class="flex flex-wrap gap-1.5">
                 <UBadge
@@ -92,8 +102,16 @@
 
             <!-- Status -->
             <div class="mt-3 flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full" :class="asset.is_active ? 'bg-green-500' : 'bg-gray-400'" />
-              <span class="text-xs" :class="asset.is_active ? 'text-green-600 dark:text-green-400' : 'text-(--ui-text-muted)'">
+              <span
+                class="w-1.5 h-1.5 rounded-full"
+                :class="asset.is_active ? 'bg-green-500' : 'bg-gray-400'"
+              />
+              <span
+                class="text-xs"
+                :class="
+                  asset.is_active ? 'text-green-600 dark:text-green-400' : 'text-(--ui-text-muted)'
+                "
+              >
                 {{ asset.is_active ? 'Active' : 'Inactive' }}
               </span>
             </div>
@@ -161,16 +179,27 @@ const filteredAssets = computed(() => {
 })
 
 const typeLabels: Record<string, string> = {
-  cnc: 'CNC Machine', robot: 'Robot', conveyor: 'Conveyor',
-  pump: 'Pump', motor: 'Motor', door: 'Door', other: 'Other',
+  cnc: 'CNC Machine',
+  robot: 'Robot',
+  conveyor: 'Conveyor',
+  pump: 'Pump',
+  motor: 'Motor',
+  door: 'Door',
+  other: 'Other',
 }
 
-function assetTypeLabel(type: string) { return typeLabels[type] || type }
+function assetTypeLabel(type: string) {
+  return typeLabels[type] || type
+}
 
 function typeColor(type: string): string {
   const map: Record<string, string> = {
-    cnc: 'info', robot: 'secondary', conveyor: 'info',
-    pump: 'success', motor: 'warning', door: 'neutral',
+    cnc: 'info',
+    robot: 'secondary',
+    conveyor: 'info',
+    pump: 'success',
+    motor: 'warning',
+    door: 'neutral',
   }
   return map[type] || 'neutral'
 }
@@ -185,13 +214,11 @@ async function fetchAssets() {
   try {
     const data = await api.get<PaginatedResponse<AssetItem>>('/assets/assets/')
     assets.value = data.results || []
-  }
-  catch (error: unknown) {
+  } catch (error: unknown) {
     const err = error as { message?: string; data?: { detail?: string } }
     errorMsg.value = err?.data?.detail || err?.message || 'Unknown error'
     console.error('Failed to fetch assets:', error)
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }

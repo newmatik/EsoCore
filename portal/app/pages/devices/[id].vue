@@ -13,7 +13,13 @@
               {{ device?.model }} &middot; {{ device?.site_name }}
             </p>
           </div>
-          <UBadge v-if="device" :color="statusColor(device.status)" variant="subtle" size="lg" class="ml-auto">
+          <UBadge
+            v-if="device"
+            :color="statusColor(device.status)"
+            variant="subtle"
+            size="lg"
+            class="ml-auto"
+          >
             {{ device.status }}
           </UBadge>
         </div>
@@ -42,7 +48,9 @@
             </div>
             <div class="flex justify-between">
               <dt class="text-(--ui-text-muted)">Last Seen</dt>
-              <dd class="text-(--ui-text-highlighted)">{{ device.last_seen ? formatTimeAgo(device.last_seen) : 'Never' }}</dd>
+              <dd class="text-(--ui-text-highlighted)">
+                {{ device.last_seen ? formatTimeAgo(device.last_seen) : 'Never' }}
+              </dd>
             </div>
           </dl>
         </UCard>
@@ -52,7 +60,11 @@
             <h3 class="text-sm font-medium text-(--ui-text-muted)">Sampling Rates</h3>
           </template>
           <dl v-if="device.configuration" class="space-y-2 text-sm">
-            <div v-for="(rate, key) in device.configuration.sampling_rates" :key="key" class="flex justify-between">
+            <div
+              v-for="(rate, key) in device.configuration.sampling_rates"
+              :key="key"
+              class="flex justify-between"
+            >
               <dt class="text-(--ui-text-muted)">{{ key }}</dt>
               <dd class="font-mono text-(--ui-text-highlighted)">{{ rate }} Hz</dd>
             </div>
@@ -65,7 +77,11 @@
             <h3 class="text-sm font-medium text-(--ui-text-muted)">Thresholds</h3>
           </template>
           <dl v-if="device.configuration?.thresholds" class="space-y-2 text-sm">
-            <div v-for="(val, key) in device.configuration.thresholds" :key="key" class="flex justify-between">
+            <div
+              v-for="(val, key) in device.configuration.thresholds"
+              :key="key"
+              class="flex justify-between"
+            >
               <dt class="text-(--ui-text-muted)">{{ formatThresholdKey(String(key)) }}</dt>
               <dd class="font-mono text-(--ui-text-highlighted)">{{ val }}</dd>
             </div>
@@ -83,21 +99,45 @@
           <table class="min-w-full divide-y divide-(--ui-border)">
             <thead>
               <tr>
-                <th class="px-4 py-2 text-left text-xs font-medium text-(--ui-text-muted) uppercase">Metric</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-(--ui-text-muted) uppercase">Value</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-(--ui-text-muted) uppercase">Unit</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-(--ui-text-muted) uppercase">Timestamp</th>
+                <th
+                  class="px-4 py-2 text-left text-xs font-medium text-(--ui-text-muted) uppercase"
+                >
+                  Metric
+                </th>
+                <th
+                  class="px-4 py-2 text-left text-xs font-medium text-(--ui-text-muted) uppercase"
+                >
+                  Value
+                </th>
+                <th
+                  class="px-4 py-2 text-left text-xs font-medium text-(--ui-text-muted) uppercase"
+                >
+                  Unit
+                </th>
+                <th
+                  class="px-4 py-2 text-left text-xs font-medium text-(--ui-text-muted) uppercase"
+                >
+                  Timestamp
+                </th>
               </tr>
             </thead>
             <tbody class="divide-y divide-(--ui-border)">
               <tr v-for="point in telemetryPoints" :key="point.id">
-                <td class="px-4 py-2 text-sm font-medium text-(--ui-text-highlighted)">{{ point.metric }}</td>
-                <td class="px-4 py-2 text-sm font-mono text-(--ui-text-highlighted)">{{ point.value }}</td>
+                <td class="px-4 py-2 text-sm font-medium text-(--ui-text-highlighted)">
+                  {{ point.metric }}
+                </td>
+                <td class="px-4 py-2 text-sm font-mono text-(--ui-text-highlighted)">
+                  {{ point.value }}
+                </td>
                 <td class="px-4 py-2 text-sm text-(--ui-text-muted)">{{ point.unit }}</td>
-                <td class="px-4 py-2 text-sm text-(--ui-text-muted)">{{ formatDateTime(point.timestamp) }}</td>
+                <td class="px-4 py-2 text-sm text-(--ui-text-muted)">
+                  {{ formatDateTime(point.timestamp) }}
+                </td>
               </tr>
               <tr v-if="telemetryPoints.length === 0">
-                <td colspan="4" class="px-4 py-8 text-center text-(--ui-text-muted)">No telemetry data available.</td>
+                <td colspan="4" class="px-4 py-8 text-center text-(--ui-text-muted)">
+                  No telemetry data available.
+                </td>
               </tr>
             </tbody>
           </table>
@@ -116,10 +156,17 @@
             class="flex items-center justify-between p-3 bg-(--ui-bg-accented) rounded-lg"
           >
             <div class="flex items-center gap-3">
-              <div class="w-2.5 h-2.5 rounded-full flex-shrink-0" :class="severityDot(event.severity)" />
+              <div
+                class="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                :class="severityDot(event.severity)"
+              />
               <div>
-                <p class="text-sm font-medium text-(--ui-text-highlighted)">{{ event.description }}</p>
-                <p class="text-xs text-(--ui-text-muted)">{{ event.event_type }} &middot; {{ formatTimeAgo(event.created_at) }}</p>
+                <p class="text-sm font-medium text-(--ui-text-highlighted)">
+                  {{ event.description }}
+                </p>
+                <p class="text-xs text-(--ui-text-muted)">
+                  {{ event.event_type }} &middot; {{ formatTimeAgo(event.created_at) }}
+                </p>
               </div>
             </div>
             <UBadge :color="eventStatusColor(event.status)" variant="subtle" size="sm">
@@ -210,17 +257,32 @@ const deviceEvents = ref<DeviceEvent[]>([])
 const errorMsg = ref('')
 
 function statusColor(status: string): string {
-  const map: Record<string, string> = { active: 'success', inactive: 'neutral', maintenance: 'warning', offline: 'error' }
+  const map: Record<string, string> = {
+    active: 'success',
+    inactive: 'neutral',
+    maintenance: 'warning',
+    offline: 'error',
+  }
   return map[status] || 'neutral'
 }
 
 function severityDot(severity: string) {
-  const map: Record<string, string> = { low: 'bg-green-500', medium: 'bg-yellow-500', high: 'bg-orange-500', critical: 'bg-red-500' }
+  const map: Record<string, string> = {
+    low: 'bg-green-500',
+    medium: 'bg-yellow-500',
+    high: 'bg-orange-500',
+    critical: 'bg-red-500',
+  }
   return map[severity] || 'bg-gray-400'
 }
 
 function eventStatusColor(status: string): string {
-  const map: Record<string, string> = { active: 'error', acknowledged: 'info', resolved: 'success', suppressed: 'neutral' }
+  const map: Record<string, string> = {
+    active: 'error',
+    acknowledged: 'info',
+    resolved: 'success',
+    suppressed: 'neutral',
+  }
   return map[status] || 'neutral'
 }
 
@@ -236,7 +298,11 @@ function formatTimeAgo(dateStr: string) {
 
 function formatDateTime(dateStr: string) {
   return new Date(dateStr).toLocaleString('en-US', {
-    month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
   })
 }
 
@@ -249,20 +315,29 @@ async function fetchDeviceData() {
   try {
     const [deviceData, telemetryData, eventsData] = await Promise.all([
       api.get<DeviceDetail>(`/devices/devices/${deviceId}/`),
-      api.get<PaginatedResponse<TelemetryPoint>>('/telemetry/points/', { device: deviceId, ordering: '-timestamp', page_size: 20 }),
-      api.get<PaginatedResponse<DeviceEvent>>('/events/events/', { device: deviceId, ordering: '-created_at', page_size: 10 }),
+      api.get<PaginatedResponse<TelemetryPoint>>('/telemetry/points/', {
+        device: deviceId,
+        ordering: '-timestamp',
+        page_size: 20,
+      }),
+      api.get<PaginatedResponse<DeviceEvent>>('/events/events/', {
+        device: deviceId,
+        ordering: '-created_at',
+        page_size: 10,
+      }),
     ])
     device.value = deviceData
     telemetryPoints.value = telemetryData.results || []
     deviceEvents.value = eventsData.results || []
     useSeoMeta({ title: `${deviceData.serial_number} - EsoCore Portal` })
-  }
-  catch (error: unknown) {
+  } catch (error: unknown) {
     const err = error as { data?: { detail?: string }; message?: string }
     errorMsg.value = err?.data?.detail || err?.message || 'Failed to load device data'
     console.error('Failed to fetch device:', error)
   }
 }
 
-onMounted(() => { fetchDeviceData() })
+onMounted(() => {
+  fetchDeviceData()
+})
 </script>

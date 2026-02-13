@@ -51,11 +51,9 @@
         <!-- Device Status Chart -->
         <UCard>
           <template #header>
-            <h3 class="text-lg font-medium text-(--ui-text-highlighted)">
-              Device Status Overview
-            </h3>
+            <h3 class="text-lg font-medium text-(--ui-text-highlighted)">Device Status Overview</h3>
           </template>
-          <div class="flex items-center justify-center" style="height: 260px;">
+          <div class="flex items-center justify-center" style="height: 260px">
             <Doughnut v-if="chartReady" :data="chartData" :options="chartOptions" />
             <p v-else class="text-(--ui-text-muted)">Loading chart...</p>
           </div>
@@ -66,9 +64,7 @@
           <template #header>
             <div class="flex items-center justify-between">
               <h3 class="text-lg font-medium text-(--ui-text-highlighted)">Recent Alerts</h3>
-              <UButton variant="link" to="/alerts" size="sm">
-                View all
-              </UButton>
+              <UButton variant="link" to="/alerts" size="sm"> View all </UButton>
             </div>
           </template>
           <div class="space-y-3">
@@ -100,7 +96,13 @@
               >
                 Ack
               </UButton>
-              <UBadge v-else :color="statusBadgeColor(event.status)" variant="subtle" size="sm" class="ml-2 flex-shrink-0">
+              <UBadge
+                v-else
+                :color="statusBadgeColor(event.status)"
+                variant="subtle"
+                size="sm"
+                class="ml-2 flex-shrink-0"
+              >
                 {{ event.status }}
               </UBadge>
             </div>
@@ -282,8 +284,7 @@ async function fetchDashboardData() {
     summary.value = summaryData
     recentEvents.value = eventsData.results || []
     chartReady.value = true
-  }
-  catch (error: unknown) {
+  } catch (error: unknown) {
     const err = error as { data?: { detail?: string }; message?: string }
     errorMsg.value = err?.data?.detail || err?.message || 'Failed to load dashboard data'
     console.error('Failed to fetch dashboard data:', error)
@@ -294,8 +295,7 @@ async function refreshData() {
   refreshing.value = true
   try {
     await fetchDashboardData()
-  }
-  finally {
+  } finally {
     refreshing.value = false
   }
 }
@@ -305,8 +305,7 @@ async function acknowledgeEvent(eventId: string) {
     await api.post(`/events/events/${eventId}/acknowledge/`)
     const event = recentEvents.value.find(e => e.id === eventId)
     if (event) event.status = 'acknowledged'
-  }
-  catch (error: unknown) {
+  } catch (error: unknown) {
     const err = error as { data?: { detail?: string }; message?: string }
     toast.add({
       title: 'Failed to acknowledge event',

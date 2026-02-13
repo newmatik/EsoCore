@@ -11,9 +11,7 @@
             {{ portalTitle }}
           </p>
           <div class="mt-8">
-            <UButton to="/dashboard" size="xl">
-              Go to Dashboard
-            </UButton>
+            <UButton to="/dashboard" size="xl"> Go to Dashboard </UButton>
           </div>
         </div>
       </div>
@@ -82,21 +80,24 @@ const features = [
     iconBg: 'bg-blue-100 dark:bg-blue-900/40',
     iconColor: 'text-blue-600 dark:text-blue-400',
     title: 'Real-time Monitoring',
-    description: 'Monitor device status, telemetry data, and system health in real-time with live dashboards and alerts.',
+    description:
+      'Monitor device status, telemetry data, and system health in real-time with live dashboards and alerts.',
   },
   {
     icon: 'i-heroicons-cog-6-tooth',
     iconBg: 'bg-green-100 dark:bg-green-900/40',
     iconColor: 'text-green-600 dark:text-green-400',
     title: 'Device Management',
-    description: 'Easily provision, configure, and manage your IoT devices with centralized device management tools.',
+    description:
+      'Easily provision, configure, and manage your IoT devices with centralized device management tools.',
   },
   {
     icon: 'i-heroicons-bell-alert',
     iconBg: 'bg-yellow-100 dark:bg-yellow-900/40',
     iconColor: 'text-yellow-600 dark:text-yellow-400',
     title: 'Alert System',
-    description: 'Get notified of issues before they become problems with intelligent alerting and notification systems.',
+    description:
+      'Get notified of issues before they become problems with intelligent alerting and notification systems.',
   },
 ]
 </script>

@@ -3,13 +3,11 @@
     <div class="w-full max-w-sm">
       <!-- Logo / Branding -->
       <div class="text-center mb-8">
-        <img src="/icon.svg" alt="EsoCore" class="h-12 w-12 mx-auto mb-4">
+        <img src="/icon.svg" alt="EsoCore" class="h-12 w-12 mx-auto mb-4" />
         <h1 class="text-2xl font-bold text-(--ui-text-highlighted)">
           {{ portalTitle }}
         </h1>
-        <p class="mt-2 text-(--ui-text-muted)">
-          Sign in to your account
-        </p>
+        <p class="mt-2 text-(--ui-text-muted)">Sign in to your account</p>
       </div>
 
       <!-- Login Form -->
@@ -58,14 +56,7 @@
           </div>
 
           <!-- Submit -->
-          <UButton
-            type="submit"
-            :loading="loading"
-            block
-            size="lg"
-          >
-            Sign in
-          </UButton>
+          <UButton type="submit" :loading="loading" block size="lg"> Sign in </UButton>
         </form>
       </UCard>
 
@@ -109,12 +100,10 @@ async function handleLogin() {
   try {
     await authStore.login(email.value, password.value)
     await navigateTo('/dashboard')
-  }
-  catch (error: unknown) {
+  } catch (error: unknown) {
     const fetchError = error as { data?: { detail?: string } }
     errorMessage.value = fetchError?.data?.detail || 'Login failed. Please check your credentials.'
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }

@@ -18,8 +18,18 @@
     <!-- Filters -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
       <div class="flex flex-wrap gap-3">
-        <USelect v-model="severityFilter" :items="severityOptions" placeholder="All severities" class="w-40" />
-        <USelect v-model="statusFilter" :items="statusOptions" placeholder="All statuses" class="w-44" />
+        <USelect
+          v-model="severityFilter"
+          :items="severityOptions"
+          placeholder="All severities"
+          class="w-40"
+        />
+        <USelect
+          v-model="statusFilter"
+          :items="statusOptions"
+          placeholder="All statuses"
+          class="w-44"
+        />
       </div>
     </div>
 
@@ -38,7 +48,10 @@
 
       <!-- Loading -->
       <div v-if="loading && events.length === 0" class="text-center py-16">
-        <UIcon name="i-heroicons-arrow-path" class="w-6 h-6 animate-spin text-(--ui-text-muted) mx-auto" />
+        <UIcon
+          name="i-heroicons-arrow-path"
+          class="w-6 h-6 animate-spin text-(--ui-text-muted) mx-auto"
+        />
         <p class="mt-3 text-(--ui-text-muted)">Loading alerts...</p>
       </div>
 
@@ -48,11 +61,31 @@
           <table class="min-w-full divide-y divide-(--ui-border)">
             <thead>
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider">Severity</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider">Event</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider">Device</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider">Status</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider">Time</th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider"
+                >
+                  Severity
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider"
+                >
+                  Event
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider"
+                >
+                  Device
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider"
+                >
+                  Status
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider"
+                >
+                  Time
+                </th>
                 <th class="px-6 py-3" />
               </tr>
             </thead>
@@ -71,15 +104,21 @@
                   <p class="text-sm font-medium text-(--ui-text-highlighted)">
                     {{ event.event_type.replace(/_/g, ' ') }}
                   </p>
-                  <p class="text-xs text-(--ui-text-muted) max-w-md truncate">{{ event.description }}</p>
+                  <p class="text-xs text-(--ui-text-muted) max-w-md truncate">
+                    {{ event.description }}
+                  </p>
                 </td>
-                <td class="px-6 py-4 text-sm font-mono text-(--ui-text)">{{ event.device_serial }}</td>
+                <td class="px-6 py-4 text-sm font-mono text-(--ui-text)">
+                  {{ event.device_serial }}
+                </td>
                 <td class="px-6 py-4">
                   <UBadge :color="eventStatusColor(event.status)" variant="subtle" size="sm">
                     {{ event.status }}
                   </UBadge>
                 </td>
-                <td class="px-6 py-4 text-sm text-(--ui-text-muted)">{{ formatTimeAgo(event.created_at) }}</td>
+                <td class="px-6 py-4 text-sm text-(--ui-text-muted)">
+                  {{ formatTimeAgo(event.created_at) }}
+                </td>
                 <td class="px-6 py-4 text-right">
                   <div class="flex items-center gap-2 justify-end">
                     <UButton
@@ -103,7 +142,9 @@
                 </td>
               </tr>
               <tr v-if="filteredEvents.length === 0 && !loading">
-                <td colspan="6" class="px-6 py-12 text-center text-(--ui-text-muted)">No events found.</td>
+                <td colspan="6" class="px-6 py-12 text-center text-(--ui-text-muted)">
+                  No events found.
+                </td>
               </tr>
             </tbody>
           </table>
@@ -165,18 +206,30 @@ const statusOptions = [
 
 const filteredEvents = computed(() => {
   let result = events.value
-  if (severityFilter.value && severityFilter.value !== 'all') result = result.filter(e => e.severity === severityFilter.value)
-  if (statusFilter.value && statusFilter.value !== 'all') result = result.filter(e => e.status === statusFilter.value)
+  if (severityFilter.value && severityFilter.value !== 'all')
+    result = result.filter(e => e.severity === severityFilter.value)
+  if (statusFilter.value && statusFilter.value !== 'all')
+    result = result.filter(e => e.status === statusFilter.value)
   return result
 })
 
 function severityColor(severity: string): string {
-  const map: Record<string, string> = { low: 'success', medium: 'warning', high: 'warning', critical: 'error' }
+  const map: Record<string, string> = {
+    low: 'success',
+    medium: 'warning',
+    high: 'warning',
+    critical: 'error',
+  }
   return map[severity] || 'neutral'
 }
 
 function eventStatusColor(status: string): string {
-  const map: Record<string, string> = { active: 'error', acknowledged: 'info', resolved: 'success', suppressed: 'neutral' }
+  const map: Record<string, string> = {
+    active: 'error',
+    acknowledged: 'info',
+    resolved: 'success',
+    suppressed: 'neutral',
+  }
   return map[status] || 'neutral'
 }
 
@@ -194,15 +247,15 @@ async function fetchEvents() {
   loading.value = true
   errorMsg.value = ''
   try {
-    const data = await api.get<PaginatedResponse<SystemEvent>>('/events/events/', { ordering: '-created_at' })
+    const data = await api.get<PaginatedResponse<SystemEvent>>('/events/events/', {
+      ordering: '-created_at',
+    })
     events.value = data.results || []
-  }
-  catch (error: unknown) {
+  } catch (error: unknown) {
     const err = error as { message?: string; data?: { detail?: string } }
     errorMsg.value = err?.data?.detail || err?.message || 'Unknown error'
     console.error('Failed to fetch events:', error)
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }
@@ -212,8 +265,7 @@ async function acknowledgeEvent(eventId: string) {
     await api.post(`/events/events/${eventId}/acknowledge/`)
     const event = events.value.find(e => e.id === eventId)
     if (event) event.status = 'acknowledged'
-  }
-  catch (error: unknown) {
+  } catch (error: unknown) {
     const err = error as { data?: { detail?: string }; message?: string }
     toast.add({
       title: 'Failed to acknowledge event',
@@ -228,8 +280,7 @@ async function resolveEvent(eventId: string) {
     await api.post(`/events/events/${eventId}/resolve/`)
     const event = events.value.find(e => e.id === eventId)
     if (event) event.status = 'resolved'
-  }
-  catch (error: unknown) {
+  } catch (error: unknown) {
     const err = error as { data?: { detail?: string }; message?: string }
     toast.add({
       title: 'Failed to resolve event',
