@@ -18,7 +18,12 @@
     <!-- Filters -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
       <div class="flex flex-wrap gap-3">
-        <USelect v-model="statusFilter" :items="statusOptions" placeholder="All statuses" class="w-40" />
+        <USelect
+          v-model="statusFilter"
+          :items="statusOptions"
+          placeholder="All statuses"
+          class="w-40"
+        />
         <USelect v-model="siteFilter" :items="siteOptions" placeholder="All sites" class="w-48" />
       </div>
     </div>
@@ -38,7 +43,10 @@
 
       <!-- Loading -->
       <div v-if="loading && devices.length === 0" class="text-center py-16">
-        <UIcon name="i-heroicons-arrow-path" class="w-6 h-6 animate-spin text-(--ui-text-muted) mx-auto" />
+        <UIcon
+          name="i-heroicons-arrow-path"
+          class="w-6 h-6 animate-spin text-(--ui-text-muted) mx-auto"
+        />
         <p class="mt-3 text-(--ui-text-muted)">Loading devices...</p>
       </div>
 
@@ -48,11 +56,31 @@
           <table class="min-w-full divide-y divide-(--ui-border)">
             <thead>
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider">Device</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider">Site</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider">Status</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider">Firmware</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider">Last Seen</th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider"
+                >
+                  Device
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider"
+                >
+                  Site
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider"
+                >
+                  Status
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider"
+                >
+                  Firmware
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-(--ui-text-muted) uppercase tracking-wider"
+                >
+                  Last Seen
+                </th>
                 <th class="px-6 py-3" />
               </tr>
             </thead>
@@ -63,7 +91,9 @@
                 class="hover:bg-(--ui-bg-accented) transition-colors"
               >
                 <td class="px-6 py-4">
-                  <p class="text-sm font-medium text-(--ui-text-highlighted)">{{ device.serial_number }}</p>
+                  <p class="text-sm font-medium text-(--ui-text-highlighted)">
+                    {{ device.serial_number }}
+                  </p>
                   <p class="text-xs text-(--ui-text-muted)">{{ device.model }}</p>
                 </td>
                 <td class="px-6 py-4 text-sm text-(--ui-text)">{{ device.site_name }}</td>
@@ -72,7 +102,9 @@
                     {{ device.status }}
                   </UBadge>
                 </td>
-                <td class="px-6 py-4 text-sm font-mono text-(--ui-text)">v{{ device.firmware_version }}</td>
+                <td class="px-6 py-4 text-sm font-mono text-(--ui-text)">
+                  v{{ device.firmware_version }}
+                </td>
                 <td class="px-6 py-4 text-sm text-(--ui-text-muted)">
                   {{ device.last_seen ? formatTimeAgo(device.last_seen) : 'Never' }}
                 </td>
@@ -81,7 +113,9 @@
                 </td>
               </tr>
               <tr v-if="filteredDevices.length === 0 && !loading">
-                <td colspan="6" class="px-6 py-12 text-center text-(--ui-text-muted)">No devices found.</td>
+                <td colspan="6" class="px-6 py-12 text-center text-(--ui-text-muted)">
+                  No devices found.
+                </td>
               </tr>
             </tbody>
           </table>
@@ -186,13 +220,11 @@ async function fetchDevices() {
     ])
     devices.value = devicesData.results || []
     sites.value = sitesData.results || []
-  }
-  catch (error: unknown) {
+  } catch (error: unknown) {
     const err = error as { message?: string; statusCode?: number; data?: { detail?: string } }
     errorMsg.value = err?.data?.detail || err?.message || 'Unknown error'
     console.error('Failed to fetch devices:', error)
-  }
-  finally {
+  } finally {
     loading.value = false
   }
 }

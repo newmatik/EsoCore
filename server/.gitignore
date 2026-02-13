@@ -24,7 +24,6 @@ venv/
 
 # Poetry
 .poetry/
-poetry.lock
 
 # IDE/OS
 .DS_Store

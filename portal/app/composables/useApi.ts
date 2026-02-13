@@ -13,14 +13,11 @@ export function useApi() {
   const config = useRuntimeConfig()
   const baseURL = config.public.apiBaseUrl as string
 
-  async function request<T = unknown>(
-    path: string,
-    options: FetchOptions = {},
-  ): Promise<T> {
+  async function request<T = unknown>(path: string, options: FetchOptions = {}): Promise<T> {
     const authStore = useAuthStore()
 
     const headers: Record<string, string> = {
-      ...(options.headers as Record<string, string> || {}),
+      ...((options.headers as Record<string, string>) || {}),
     }
 
     if (authStore.token) {
@@ -40,8 +37,7 @@ export function useApi() {
         ...options,
         headers,
       })
-    }
-    catch (error: unknown) {
+    } catch (error: unknown) {
       const fetchError = error as { statusCode?: number; status?: number; data?: unknown }
       if (fetchError.statusCode === 401 || fetchError.status === 401) {
         authStore.clearAuth()
