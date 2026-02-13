@@ -43,14 +43,11 @@ export const useAuthStore = defineStore('auth', {
       const config = useRuntimeConfig()
       const baseURL = config.public.apiBaseUrl as string
 
-      const data = await $fetch<{ token: string; user: UserInfo }>(
-        '/auth/login/',
-        {
-          baseURL,
-          method: 'POST',
-          body: { email, password },
-        },
-      )
+      const data = await $fetch<{ token: string; user: UserInfo }>('/auth/login/', {
+        baseURL,
+        method: 'POST',
+        body: { email, password },
+      })
 
       this.token = data.token
       this.user = data.user
@@ -68,11 +65,9 @@ export const useAuthStore = defineStore('auth', {
             headers: { Authorization: `Token ${this.token}` },
           })
         }
-      }
-      catch {
+      } catch {
         // Ignore errors during logout
-      }
-      finally {
+      } finally {
         this.clearAuth()
       }
     },
@@ -86,8 +81,7 @@ export const useAuthStore = defineStore('auth', {
           baseURL,
           headers: { Authorization: `Token ${this.token}` },
         })
-      }
-      catch {
+      } catch {
         this.clearAuth()
       }
     },
