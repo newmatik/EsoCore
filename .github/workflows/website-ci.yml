@@ -1,9 +1,11 @@
 name: Website CI
 
-# The website had no pull_request CI at all: portal-ci and server-ci are path-filtered to
-# their own directories, and pages.yml (which publishes the website) only runs on push to
-# main. So website/** changes reached main completely unchecked. pages.yml is included in
-# the paths below so a change to the publish workflow is validated by a real build first.
+# The website had no pull_request CI at all, so website/** changes reached main unchecked.
+#
+# The pull_request trigger is deliberately NOT path-filtered. A workflow skipped by a path
+# filter never reports its check run, so a required status check would sit pending forever
+# on any PR that doesn't touch website/. Push keeps its filter — required checks only apply
+# to PRs. pages.yml is in the push paths so a change to the publish workflow still rebuilds.
 on:
   push:
     branches: [main]
@@ -13,10 +15,6 @@ on:
       - ".github/workflows/pages.yml"
   pull_request:
     branches: [main]
-    paths:
-      - "website/**"
-      - ".github/workflows/website-ci.yml"
-      - ".github/workflows/pages.yml"
 
 defaults:
   run:
@@ -24,6 +22,7 @@ defaults:
 
 jobs:
   build-and-lint:
+    name: Website
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
