@@ -50,6 +50,11 @@
       "esbuild",
       "unrs-resolver",
       "vue-demi"
-    ]
+    ],
+    "overrides": {
+      "ws": ">=8.21.0",
+      "esbuild": ">=0.28.1",
+      "socket.io-parser": ">=4.2.6"
+    }
   }
 }
