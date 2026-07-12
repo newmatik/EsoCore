@@ -18,16 +18,16 @@ detection of contamination or degradation helps prevent costly equipment damage 
 
 ## Key Specifications
 
-| Parameter              | Value                         |
-|------------------------|-------------------------------|
-| Viscosity range        | 1 - 1000 cSt                  |
-| Viscosity accuracy     | +/-3% of reading               |
-| Water detection        | 0 - 100% saturation            |
-| Temperature range      | -20 to +120 C                  |
-| Turbidity              | ISO 4406 cleanliness classes   |
-| Dielectric constant    | 1.0 - 5.0                     |
-| Interface              | RS-485 (Modbus RTU)            |
-| Supply voltage         | 5 V (from Edge backplane)      |
+| Parameter           | Value                        |
+| ------------------- | ---------------------------- |
+| Viscosity range     | 1 - 1000 cSt                 |
+| Viscosity accuracy  | +/-3% of reading             |
+| Water detection     | 0 - 100% saturation          |
+| Temperature range   | -20 to +120 C                |
+| Turbidity           | ISO 4406 cleanliness classes |
+| Dielectric constant | 1.0 - 5.0                    |
+| Interface           | RS-485 (Modbus RTU)          |
+| Supply voltage      | 5 V (from Edge backplane)    |
 
 ## Applications
 

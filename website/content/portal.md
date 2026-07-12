@@ -8,18 +8,18 @@ tools, and alerting interfaces.
 
 ## Technology Stack
 
-| Component | Technology | Version |
-| --- | --- | --- |
-| **Framework** | Nuxt 4 | 4.2 |
-| **UI Library** | Nuxt UI (Tailwind CSS 4) | 4.0 |
-| **State Management** | Pinia | 2.3 |
-| **Charts** | Chart.js + vue-chartjs | 4.4 / 5.3 |
-| **HTTP Client** | ofetch ($fetch) + Axios | -- |
-| **Real-time** | socket.io-client (planned) | 4.8 |
-| **Auth** | Token auth (Pinia store) | -- |
-| **Utilities** | VueUse | 12.0 |
-| **Node.js** | 22+ | -- |
-| **Package Manager** | pnpm | 9+ |
+| Component            | Technology                 | Version   |
+| -------------------- | -------------------------- | --------- |
+| **Framework**        | Nuxt 4                     | 4.2       |
+| **UI Library**       | Nuxt UI (Tailwind CSS 4)   | 4.0       |
+| **State Management** | Pinia                      | 2.3       |
+| **Charts**           | Chart.js + vue-chartjs     | 4.4 / 5.3 |
+| **HTTP Client**      | ofetch ($fetch) + Axios    | --        |
+| **Real-time**        | socket.io-client (planned) | 4.8       |
+| **Auth**             | Token auth (Pinia store)   | --        |
+| **Utilities**        | VueUse                     | 12.0      |
+| **Node.js**          | 22+                        | --        |
+| **Package Manager**  | pnpm                       | 9+        |
 
 ---
 
@@ -122,15 +122,15 @@ The portal will be available at `http://localhost:3000`.
 
 ### Environment Variables
 
-| Variable | Default | Description |
-| --- | --- | --- |
-| `NUXT_PUBLIC_API_BASE_URL` | `http://localhost:8000/api` | Backend API base URL |
-| `NUXT_PUBLIC_WS_BASE_URL` | `ws://localhost:8000/ws` | WebSocket URL for real-time updates |
-| `NUXT_PUBLIC_AUTH_REDIRECT_URL` | `/dashboard` | Redirect after login |
-| `NUXT_PUBLIC_APP_NAME` | `EsoCore` | Application display name |
-| `NUXT_PUBLIC_BRAND` | `Newmatik` | Brand name |
-| `NUXT_PUBLIC_PRODUCT` | `EsoCore` | Product name |
-| `NUXT_PUBLIC_DISPLAY_BRAND` | `true` | Show/hide brand name in UI |
+| Variable                        | Default                     | Description                         |
+| ------------------------------- | --------------------------- | ----------------------------------- |
+| `NUXT_PUBLIC_API_BASE_URL`      | `http://localhost:8000/api` | Backend API base URL                |
+| `NUXT_PUBLIC_WS_BASE_URL`       | `ws://localhost:8000/ws`    | WebSocket URL for real-time updates |
+| `NUXT_PUBLIC_AUTH_REDIRECT_URL` | `/dashboard`                | Redirect after login                |
+| `NUXT_PUBLIC_APP_NAME`          | `EsoCore`                   | Application display name            |
+| `NUXT_PUBLIC_BRAND`             | `Newmatik`                  | Brand name                          |
+| `NUXT_PUBLIC_PRODUCT`           | `EsoCore`                   | Product name                        |
+| `NUXT_PUBLIC_DISPLAY_BRAND`     | `true`                      | Show/hide brand name in UI          |
 
 ### Available Scripts
 
@@ -160,10 +160,10 @@ deployment behind a reverse proxy (Nginx, Caddy, etc.).
 
 The portal communicates with the Backend Server via REST APIs. In development, both services run locally:
 
-| Service | URL | Purpose |
-| --- | --- | --- |
-| Backend Server | `http://localhost:8000` | Django REST API |
-| Portal | `http://localhost:3000` | Nuxt.js frontend |
+| Service        | URL                     | Purpose          |
+| -------------- | ----------------------- | ---------------- |
+| Backend Server | `http://localhost:8000` | Django REST API  |
+| Portal         | `http://localhost:3000` | Nuxt.js frontend |
 
 CORS is configured on the backend to allow requests from the portal origin. In production, both services are
 typically served behind the same reverse proxy or domain to simplify CORS handling.

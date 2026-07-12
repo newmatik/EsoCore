@@ -18,17 +18,17 @@ for sensor type, sampling rate, and alarm thresholds.
 
 ## Key Specifications
 
-| Parameter              | Value                         |
-|------------------------|-------------------------------|
-| NTC channels           | 4 (range: -40 to +125 C)     |
-| PT100 channels         | 2 (range: -200 to +850 C)    |
-| Type-K channels        | 2 (range: -200 to +1250 C)   |
-| IR channel             | 1 (range: -40 to +380 C)     |
-| ADC resolution         | 16-bit                        |
-| Accuracy (PT100)       | +/-0.1 C                      |
-| Accuracy (Type-K)      | +/-1.5 C                      |
-| Interface              | RS-485 (Modbus RTU)           |
-| Supply voltage         | 5 V (from Edge backplane)     |
+| Parameter         | Value                      |
+| ----------------- | -------------------------- |
+| NTC channels      | 4 (range: -40 to +125 C)   |
+| PT100 channels    | 2 (range: -200 to +850 C)  |
+| Type-K channels   | 2 (range: -200 to +1250 C) |
+| IR channel        | 1 (range: -40 to +380 C)   |
+| ADC resolution    | 16-bit                     |
+| Accuracy (PT100)  | +/-0.1 C                   |
+| Accuracy (Type-K) | +/-1.5 C                   |
+| Interface         | RS-485 (Modbus RTU)        |
+| Supply voltage    | 5 V (from Edge backplane)  |
 
 ## Applications
 

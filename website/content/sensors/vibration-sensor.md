@@ -21,16 +21,16 @@ needed for condition-based maintenance strategies.
 
 ## Key Specifications
 
-| Parameter              | Value                       |
-|------------------------|-----------------------------|
-| Axes                   | 3 (X, Y, Z)                |
-| Measurement range      | +/-16 g (selectable)        |
-| Frequency range        | 1 Hz - 3 kHz               |
-| FFT resolution         | Up to 2048 bins             |
-| Noise density          | < 80 ug/sqrt(Hz)           |
-| Output data rate       | 1 kHz / 3 kHz selectable    |
-| Interface              | RS-485 (Modbus RTU)         |
-| Supply voltage         | 5 V (from Edge backplane)   |
+| Parameter         | Value                     |
+| ----------------- | ------------------------- |
+| Axes              | 3 (X, Y, Z)               |
+| Measurement range | +/-16 g (selectable)      |
+| Frequency range   | 1 Hz - 3 kHz              |
+| FFT resolution    | Up to 2048 bins           |
+| Noise density     | < 80 ug/sqrt(Hz)          |
+| Output data rate  | 1 kHz / 3 kHz selectable  |
+| Interface         | RS-485 (Modbus RTU)       |
+| Supply voltage    | 5 V (from Edge backplane) |
 
 ## Applications
 

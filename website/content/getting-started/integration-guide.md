@@ -181,40 +181,40 @@ if events["results"]:
 **JavaScript/Node.js Integration:**
 
 ```javascript
-const axios = require("axios");
+const axios = require('axios')
 
 class EsoCoreClient {
   constructor(baseUrl, token) {
-    this.baseUrl = baseUrl;
+    this.baseUrl = baseUrl
     this.headers = {
       Authorization: `Token ${token}`,
-      "Content-Type": "application/json",
-    };
+      'Content-Type': 'application/json',
+    }
   }
 
   async getDevices() {
     const response = await axios.get(`${this.baseUrl}/devices/devices/`, {
       headers: this.headers,
-    });
-    return response.data;
+    })
+    return response.data
   }
 
   async getTelemetryPoints(params = {}) {
     const response = await axios.get(`${this.baseUrl}/telemetry/points/`, {
       headers: this.headers,
       params,
-    });
-    return response.data;
+    })
+    return response.data
   }
 }
 
 // Usage
-const client = new EsoCoreClient("https://your-server/api", "your-auth-token");
+const client = new EsoCoreClient('https://your-server/api', 'your-auth-token')
 
 client
   .getDevices()
-  .then((data) => console.log(data.results))
-  .catch((error) => console.error(error));
+  .then(data => console.log(data.results))
+  .catch(error => console.error(error))
 ```
 
 ---

@@ -18,11 +18,7 @@ const canonicalUrl = computed(() => `${siteUrl}${canonicalPath.value}`)
 useHead({
   titleTemplate: title =>
     title ? `${title} – EsoCore` : 'EsoCore – Edge-native intelligence and observability',
-  link: [
-    { rel: 'canonical', href: canonicalUrl },
-  ],
-  meta: [
-    { property: 'og:url', content: canonicalUrl },
-  ],
+  link: [{ rel: 'canonical', href: canonicalUrl }],
+  meta: [{ property: 'og:url', content: canonicalUrl }],
 })
 </script>

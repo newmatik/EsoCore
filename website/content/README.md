@@ -175,8 +175,8 @@ Detailed Specifications: See [Hardware: Edge](/docs/esocore-edge) for complete c
   proximity/position sensors (automation, cycle counting), motor current sensing for torque/load monitoring.
 - **Thermal**: Targeted temperature monitoring with NTC thermistors, RTD sensors, thermocouples, and IR sensors for bearings, gearboxes, and extreme
   environments.
-Detailed Specifications: See [Hardware: Sensors](/docs/esocore-sensors) for complete component specifications, compliance standards, and reference
-designs.
+  Detailed Specifications: See [Hardware: Sensors](/docs/esocore-sensors) for complete component specifications, compliance standards, and reference
+  designs.
 
 ---
 

@@ -504,7 +504,6 @@ Scale to additional machines based on pilot results:
 - [Predictive Maintenance Guide](/docs/solutions/predictive-maintenance)
 - [Equipment Downtime Prevention](/docs/solutions/equipment-downtime-prevention)
 
-
 ### Technical Documentation
 
 - [Hardware Specifications](/docs/esocore-edge)

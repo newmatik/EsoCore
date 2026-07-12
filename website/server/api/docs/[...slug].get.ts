@@ -1,9 +1,9 @@
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async event => {
   const param = getRouterParam(event, 'slug')
-  const slug = Array.isArray(param) ? param.join('/') : (param || 'README')
+  const slug = Array.isArray(param) ? param.join('/') : param || 'README'
 
   try {
     const contentPath = join(process.cwd(), 'content', `${slug}.md`)
@@ -16,5 +16,3 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
-
-

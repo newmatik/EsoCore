@@ -533,7 +533,6 @@ Track results and scale based on proven value:
 - [Predictive Maintenance Implementation](/docs/solutions/predictive-maintenance)
 - [Factory Monitoring Strategies](/docs/solutions/factory-monitoring)
 
-
 ### Technical Resources
 
 - [Hardware Specifications](/docs/esocore-edge)

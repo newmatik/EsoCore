@@ -17,16 +17,16 @@ near-infrared.
 
 ## Key Specifications
 
-| Parameter              | Value                         |
-|------------------------|-------------------------------|
-| Lux range              | 0.01 - 120,000 lux           |
-| UV-A range             | 280 - 400 nm                  |
-| Spectral channels      | 10 (415 - 940 nm)            |
-| Color output           | RGB + clear + IR              |
-| IR temperature range   | -40 to +380 C (optional)     |
-| Dynamic range          | 1:1,000,000                   |
-| Interface              | RS-485 (Modbus RTU)           |
-| Supply voltage         | 5 V (from Edge backplane)     |
+| Parameter            | Value                     |
+| -------------------- | ------------------------- |
+| Lux range            | 0.01 - 120,000 lux        |
+| UV-A range           | 280 - 400 nm              |
+| Spectral channels    | 10 (415 - 940 nm)         |
+| Color output         | RGB + clear + IR          |
+| IR temperature range | -40 to +380 C (optional)  |
+| Dynamic range        | 1:1,000,000               |
+| Interface            | RS-485 (Modbus RTU)       |
+| Supply voltage       | 5 V (from Edge backplane) |
 
 ## Applications
 

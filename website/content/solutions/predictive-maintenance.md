@@ -424,7 +424,6 @@ Track results and expand monitoring based on proven ROI:
 - [Equipment Downtime Prevention Strategies](/docs/solutions/equipment-downtime-prevention)
 - [Factory-Wide Monitoring Guide](/docs/solutions/factory-monitoring)
 
-
 ---
 
 Transform your maintenance strategy from reactive to predictive with EsoCore. Start with a pilot program on your most critical equipment and

@@ -19,16 +19,16 @@ On-board processing computes rate-of-change and statistical metrics for early an
 
 ## Key Specifications
 
-| Parameter              | Value                         |
-|------------------------|-------------------------------|
-| Pressure ranges        | 0-1 / 0-10 / 0-100 bar       |
-| Accuracy               | +/-0.25% FS                   |
-| Overpress rating       | 2x full scale                 |
-| Response time          | < 1 ms                        |
-| Sampling rate          | Up to 1 kSPS                  |
-| Media compatibility    | Stainless steel diaphragm     |
-| Interface              | RS-485 (Modbus RTU)           |
-| Supply voltage         | 5 V (from Edge backplane)     |
+| Parameter           | Value                     |
+| ------------------- | ------------------------- |
+| Pressure ranges     | 0-1 / 0-10 / 0-100 bar    |
+| Accuracy            | +/-0.25% FS               |
+| Overpress rating    | 2x full scale             |
+| Response time       | < 1 ms                    |
+| Sampling rate       | Up to 1 kSPS              |
+| Media compatibility | Stainless steel diaphragm |
+| Interface           | RS-485 (Modbus RTU)       |
+| Supply voltage      | 5 V (from Edge backplane) |
 
 ## Applications
 

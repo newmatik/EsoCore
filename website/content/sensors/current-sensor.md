@@ -18,16 +18,16 @@ distortion, and individual harmonic magnitudes without requiring external analys
 
 ## Key Specifications
 
-| Parameter              | Value                         |
-|------------------------|-------------------------------|
-| Default range          | +/-30 A AC/DC                 |
-| Accuracy               | +/-1% of reading              |
-| Isolation voltage      | 2.5 kV RMS                    |
-| Bandwidth              | DC - 1 kHz                    |
-| Harmonic analysis      | Up to 15th harmonic           |
-| Sampling rate          | 10 kSPS                       |
-| Interface              | RS-485 (Modbus RTU)           |
-| Supply voltage         | 5 V (from Edge backplane)     |
+| Parameter         | Value                     |
+| ----------------- | ------------------------- |
+| Default range     | +/-30 A AC/DC             |
+| Accuracy          | +/-1% of reading          |
+| Isolation voltage | 2.5 kV RMS                |
+| Bandwidth         | DC - 1 kHz                |
+| Harmonic analysis | Up to 15th harmonic       |
+| Sampling rate     | 10 kSPS                   |
+| Interface         | RS-485 (Modbus RTU)       |
+| Supply voltage    | 5 V (from Edge backplane) |
 
 ## Applications
 
