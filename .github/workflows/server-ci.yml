@@ -8,9 +8,6 @@ on:
       - ".github/workflows/server-ci.yml"
   pull_request:
     branches: [main]
-    paths:
-      - "server/**"
-      - ".github/workflows/server-ci.yml"
 
 defaults:
   run:
@@ -18,6 +15,7 @@ defaults:
 
 jobs:
   lint:
+    name: Server lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -48,6 +46,7 @@ jobs:
         run: poetry run isort --check-only .
 
   test:
+    name: Server test
     runs-on: ubuntu-latest
     env:
       SECRET_KEY: test-secret-key-for-ci
