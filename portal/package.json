@@ -20,13 +20,13 @@
     "typecheck": "nuxt typecheck"
   },
   "dependencies": {
-    "@nuxt/ui": "^4.0.0",
+    "@nuxt/ui": "^4.8.0",
     "@pinia/nuxt": "^0.11.3",
     "@vueuse/core": "^14.2.1",
     "axios": "^1.13.5",
     "chart.js": "^4.5.1",
     "jwt-decode": "^4.0.0",
-    "nuxt": "~4.3.1",
+    "nuxt": "~4.4.7",
     "pinia": "^3.0.4",
     "socket.io-client": "^4.8.3",
     "tailwindcss": "^4.0.0",
