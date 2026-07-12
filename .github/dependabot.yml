@@ -1,3 +1,6 @@
+# Grouped Dependabot: one batched PR per ecosystem per week, not one per package.
+# Without the `groups` blocks below, four ecosystems at a limit of 5 each produced 14 open
+# PRs at once.
 version: 2
 updates:
   # Python (Poetry) - server
@@ -5,37 +8,91 @@ updates:
     directory: "/server"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Berlin"
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
       - "server"
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      pip:
+        applies-to: version-updates
+        patterns: ["*"]
+      pip-security:
+        applies-to: security-updates
+        patterns: ["*"]
 
   # Node.js (pnpm) - portal
   - package-ecosystem: "npm"
     directory: "/portal"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Berlin"
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
       - "portal"
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      portal:
+        applies-to: version-updates
+        patterns: ["*"]
+      portal-security:
+        applies-to: security-updates
+        patterns: ["*"]
+    ignore:
+      # TypeScript 7 is the Go-native rewrite and ships without a stable programmatic API.
+      # typescript-eslint caps its peer range at <6.1.0, and Volar/vue-tsc cannot type-check
+      # Vue templates against it. Neither is fixable here. Revisit when TS 7.1 lands.
+      - dependency-name: "typescript"
+        versions: [">=7"]
 
   # Node.js (pnpm) - website
   - package-ecosystem: "npm"
     directory: "/website"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Berlin"
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
       - "website"
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      website:
+        applies-to: version-updates
+        patterns: ["*"]
+      website-security:
+        applies-to: security-updates
+        patterns: ["*"]
+    ignore:
+      # See the portal entry above — same upstream blocker.
+      - dependency-name: "typescript"
+        versions: [">=7"]
 
   # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Berlin"
     open-pull-requests-limit: 5
     labels:
       - "dependencies"
       - "ci"
+    commit-message:
+      prefix: "ci"
+    groups:
+      github-actions:
+        patterns: ["*"]

@@ -38,7 +38,10 @@
               </template>
               <template v-else>
                 <details class="nav-group" :open="isGroupExpanded(doc, currentSlug)">
-                  <summary class="nav-group-header" :class="{ active: isGroupExpanded(doc, currentSlug) }">
+                  <summary
+                    class="nav-group-header"
+                    :class="{ active: isGroupExpanded(doc, currentSlug) }"
+                  >
                     <span class="icon" aria-hidden="true" v-html="doc.icon" />
                     <span class="label">{{ doc.title }}</span>
                   </summary>
@@ -80,7 +83,7 @@
 
 <script setup>
 import { marked } from 'marked'
-import { docsConfig, getGroupHeaderLink, isGroupExpanded } from '~/utils/docs-config'
+import { docsConfig, isGroupExpanded } from '~/utils/docs-config'
 
 const route = useRoute()
 const slug = computed(() => {

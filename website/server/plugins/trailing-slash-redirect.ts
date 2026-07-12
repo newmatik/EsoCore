@@ -1,7 +1,7 @@
 // CRITICAL: This plugin handles trailing slash redirects for the documentation site.
 // It ensures that URLs with trailing slashes redirect to clean URLs without trailing slashes,
 // maintaining SEO consistency and preventing duplicate content issues.
-// 
+//
 // IMPORTANT: This plugin is DISABLED during development and static generation to prevent
 // redirect loops. It only runs in production environments where GitHub Pages _redirects
 // file might not be sufficient.
@@ -10,11 +10,10 @@
 // - nuxt.config.ts route generation
 // - _redirects file for GitHub Pages
 // - Static site generation requirements
-export default defineNitroPlugin((nitroApp) => {
+export default defineNitroPlugin(_nitroApp => {
   // DISABLED: This plugin is currently disabled to prevent redirect loops
   // The _redirects file handles trailing slash normalization for static hosting
   // Uncomment only if needed for specific hosting environments that don't support _redirects
-  
   /*
   nitroApp.hooks.hook('request', (event) => {
     const url = event.node.req.url || ''
