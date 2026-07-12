@@ -263,7 +263,6 @@ server/
 ├── manage.py
 ├── pyproject.toml
 ├── poetry.lock (generated)
-├── requirements.txt (optional export)
 └── README.md
 ```
 
