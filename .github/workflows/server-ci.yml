@@ -21,6 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Install Poetry
         run: pipx install poetry
@@ -53,6 +55,8 @@ jobs:
       ALLOWED_HOSTS: localhost,127.0.0.1
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - name: Install Poetry
         run: pipx install poetry

@@ -15,7 +15,7 @@ export default defineNitroPlugin(_nitroApp => {
   // The _redirects file handles trailing slash normalization for static hosting
   // Uncomment only if needed for specific hosting environments that don't support _redirects
   /*
-  nitroApp.hooks.hook('request', (event) => {
+  _nitroApp.hooks.hook('request', (event) => {
     const url = event.node.req.url || ''
 
     // Skip if it's a static asset, API request, or Nuxt internal routes

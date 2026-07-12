@@ -78,6 +78,13 @@ updates:
       # See the portal entry above — same upstream blocker.
       - dependency-name: "typescript"
         versions: [">=7"]
+      # This app pins nuxt "~4.2.2", and Nuxt 4.2 declares vue-router "^4.6.3". Forcing
+      # vue-router 5 here does NOT fail the build — it silently installs a SECOND copy
+      # (Nuxt and unplugin-vue-router keep resolving 4.x while the app gets 5.x), which
+      # means two router singletons at runtime. Lift this only together with a Nuxt bump
+      # to a release that supports vue-router 5 (4.4+).
+      - dependency-name: "vue-router"
+        versions: [">=5"]
 
   # GitHub Actions
   - package-ecosystem: "github-actions"
