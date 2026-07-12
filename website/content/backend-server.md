@@ -44,7 +44,6 @@ server/
 ├── templates/admin/           # Custom admin templates
 ├── manage.py
 ├── pyproject.toml             # Poetry configuration and dependencies
-└── requirements.txt           # Exported pip requirements
 ```
 
 ### Django Apps
