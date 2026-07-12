@@ -29,6 +29,7 @@ Both modes share the same high-performance signal chain (PGA, AAF, 24-bit ADC) a
 ```
 
 Mode selection per channel (2 GPIOs):
+
 - **IEPE Mode**: current source ON (Si2301CDS), analog switch routes through AC coupling cap
 - **DC Mode**: current source OFF, analog switch routes through direct bypass to buffer
 
@@ -71,6 +72,7 @@ Design: Precision current source (per channel)
 ```
 
 Implementation: Precision Current Source IC
+
 - IC: REF200AU (TI) -- dual 100 uA sources, scaled with external resistor
 - Configuration: 40x multiplier to produce 4 mA output
 - Enable: P-channel MOSFET switch (Si2301CDS) per channel, controlled via GPIO
@@ -107,6 +109,7 @@ Mode Switch (TMUX1101, one per channel):
 ```
 
 TMUX1101 Analog Switch Specification:
+
 - Part: TMUX1101DCR (TI), 4 units (one per channel)
 - Type: SPDT (single-pole double-throw)
 - On-resistance: 1 ohm typical
@@ -118,12 +121,12 @@ TMUX1101 Analog Switch Specification:
 - Package: SOT-23-6
 
 DC Mode Use Cases:
+
 - **4-20 mA transmitters**: Add a 250 ohm shunt resistor at the connector to convert to 1-5 V (within PGA input range)
 - **0-10 V voltage sensors**: Direct connection, PGA at gain 1x
 - **Thermocouples**: With external cold-junction compensation module
 - **Potentiometric sensors**: Direct voltage divider output
 - **Any DC or low-frequency analog signal** within the +/-10 V PGA input range
-
 
 ### 4. Programmable Gain Amplifier (PGA)
 
@@ -137,6 +140,7 @@ DC Mode Use Cases:
 ```
 
 PGA Specification:
+
 - IC: PGA280AIDR (TI), 4 units (one per channel)
 - Gain settings: 1, 2, 5, 10, 20 (binary control via SPI/GPIO)
 - Control: SPI or GPIO from STM32H747
@@ -158,6 +162,7 @@ Gain Selection Strategy:
 ```
 
 Firmware auto-calibration:
+
 1. Apply known test signal (or idle baseline)
 2. Measure ADC output at each gain
 3. Select optimal gain for 70% ADC full-scale
@@ -168,6 +173,7 @@ Firmware auto-calibration:
 Purpose: Prevent aliasing from >25 kHz noise
 
 Design: 4-pole Butterworth active filter
+
 - Topology: Sallen-Key (two cascaded 2-pole sections per channel)
 - Cutoff: 15 kHz (-3 dB)
 - Rolloff: 80 dB/decade (24 dB/octave)
@@ -175,12 +181,14 @@ Design: 4-pole Butterworth active filter
 - Group delay: <50 us at 10 kHz
 
 Why 15 kHz cutoff?
+
 - Sensor bandwidth: 0.5 Hz -- 10 kHz
 - Nyquist: need >20 kHz sampling
 - AAF at 15 kHz: passes full 10 kHz signal
 - Attenuates >25 kHz noise before ADC
 
 Implementation:
+
 - Op-amp: OPA4188AIDR (TI, quad, shared across buffer and AAF stages; 2 units total for 4 channels)
 - Passive components: 1% metal film resistors (ERA-3AEB), C0G/NP0 capacitors (GRM15)
 - Stages: two 2-pole Sallen-Key sections cascaded per channel
@@ -201,6 +209,7 @@ Implementation:
 ```
 
 Selected IC: ADS1274IPAPR (Texas Instruments)
+
 - Architecture: 4-channel simultaneous delta-sigma
 - Resolution: 24-bit
 - Sample Rate: up to 128 kSPS per channel (operated at 50 kSPS)
@@ -215,6 +224,7 @@ Selected IC: ADS1274IPAPR (Texas Instruments)
   - Industrial temp range (-40 C to +105 C)
 
 Connection to STM32H747:
+
 - SPI3 or SPI4 (up to 50 MHz)
 - DMA for zero-copy transfers
 - Double buffering: Fill one buffer while processing other

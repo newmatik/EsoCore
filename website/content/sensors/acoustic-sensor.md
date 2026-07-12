@@ -19,16 +19,16 @@ sensor board.
 
 ## Key Specifications
 
-| Parameter              | Value                         |
-|------------------------|-------------------------------|
-| Audible range          | 20 Hz - 20 kHz                |
-| Ultrasonic range       | 20 kHz - 100 kHz              |
-| MEMS SNR               | > 65 dB(A)                   |
-| ADC resolution         | 24-bit                        |
-| FFT window             | Up to 1024 bins               |
-| Pattern memory         | 8 stored fingerprints         |
-| Interface              | RS-485 (Modbus RTU)           |
-| Supply voltage         | 5 V (from Edge backplane)     |
+| Parameter        | Value                     |
+| ---------------- | ------------------------- |
+| Audible range    | 20 Hz - 20 kHz            |
+| Ultrasonic range | 20 kHz - 100 kHz          |
+| MEMS SNR         | > 65 dB(A)                |
+| ADC resolution   | 24-bit                    |
+| FFT window       | Up to 1024 bins           |
+| Pattern memory   | 8 stored fingerprints     |
+| Interface        | RS-485 (Modbus RTU)       |
+| Supply voltage   | 5 V (from Edge backplane) |
 
 ## Applications
 

@@ -75,34 +75,34 @@ STM32H747XI Microcontroller
 ## Advantages
 
 - True Network Isolation
-   - Physical separation = no VLAN hopping attacks
-   - Machine network cannot reach internet (security)
-   - IT network cannot disrupt real-time traffic (reliability)
+  - Physical separation = no VLAN hopping attacks
+  - Machine network cannot reach internet (security)
+  - IT network cannot disrupt real-time traffic (reliability)
 
 - Independent Configuration
-   - Machine network: Static IP, no DHCP dependency
-   - IT network: DHCP, dynamic, can change without affecting machine
-   - Failure isolation: Cloud down? Machine keeps running
+  - Machine network: Static IP, no DHCP dependency
+  - IT network: DHCP, dynamic, can change without affecting machine
+  - Failure isolation: Cloud down? Machine keeps running
 
 - Clear Security Boundary
-   - Airgap between OT (Operational Technology) and IT
-   - Compliance: Some industries require physical separation
-   - Defense in depth: Compromised cloud doesn't touch PLC
+  - Airgap between OT (Operational Technology) and IT
+  - Compliance: Some industries require physical separation
+  - Defense in depth: Compromised cloud doesn't touch PLC
 
 - Easier Troubleshooting
-   - "Port A has link" vs "Port B has link"
-   - Technician can see two separate LEDs
-   - Wireshark on one port doesn't show other port's traffic
+  - "Port A has link" vs "Port B has link"
+  - Technician can see two separate LEDs
+  - Wireshark on one port doesn't show other port's traffic
 
 - Future-Proofing
-   - Can add switch functionality (bridge/route between ports)
-   - Can support redundant PROFINET (MRP - Media Redundancy Protocol)
-   - Higher bandwidth ceiling (2× 100 Mbps vs 1× 100 Mbps)
+  - Can add switch functionality (bridge/route between ports)
+  - Can support redundant PROFINET (MRP - Media Redundancy Protocol)
+  - Higher bandwidth ceiling (2× 100 Mbps vs 1× 100 Mbps)
 
 - Customer-Specific Context
-   - Large OEM plants often have physically separate networks
-   - Machine network might be on different physical infrastructure
-   - Simplifies integration: "Plug Port A here, Port B there"
+  - Large OEM plants often have physically separate networks
+  - Machine network might be on different physical infrastructure
+  - Simplifies integration: "Plug Port A here, Port B there"
 
 ## PCB Layout Guidelines
 

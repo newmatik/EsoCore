@@ -20,17 +20,17 @@ automated ventilation control and regulatory compliance reporting.
 
 ## Key Specifications
 
-| Parameter              | Value                         |
-|------------------------|-------------------------------|
-| Temperature range      | -10 to +60 C                  |
-| Temperature accuracy   | +/-0.3 C                      |
-| Humidity range         | 0 - 100% RH                   |
-| CO2 range (NDIR)       | 400 - 5000 ppm                |
-| CO2 accuracy           | +/-50 ppm + 3% of reading     |
-| PM2.5 range            | 0 - 500 ug/m3                 |
-| VOC output             | TVOC index (1 - 500)          |
-| Interface              | RS-485 (Modbus RTU)           |
-| Supply voltage         | 5 V (from Edge backplane)     |
+| Parameter            | Value                     |
+| -------------------- | ------------------------- |
+| Temperature range    | -10 to +60 C              |
+| Temperature accuracy | +/-0.3 C                  |
+| Humidity range       | 0 - 100% RH               |
+| CO2 range (NDIR)     | 400 - 5000 ppm            |
+| CO2 accuracy         | +/-50 ppm + 3% of reading |
+| PM2.5 range          | 0 - 500 ug/m3             |
+| VOC output           | TVOC index (1 - 500)      |
+| Interface            | RS-485 (Modbus RTU)       |
+| Supply voltage       | 5 V (from Edge backplane) |
 
 ## Applications
 

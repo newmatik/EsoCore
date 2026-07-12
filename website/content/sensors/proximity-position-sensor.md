@@ -20,17 +20,17 @@ separate sensor modules.
 
 ## Key Specifications
 
-| Parameter              | Value                         |
-|------------------------|-------------------------------|
-| Inductive range        | 0 - 12 mm (2 channels)        |
-| Capacitive input       | 1 channel, configurable       |
-| Encoder resolution     | 1000 PPR (4000 counts/rev)    |
-| Encoder max speed      | 6000 RPM                      |
-| Laser range            | 50 mm - 2000 mm               |
-| Laser accuracy         | +/-3 mm                       |
-| Reed/digital inputs    | 2 channels                    |
-| Interface              | RS-485 (Modbus RTU)           |
-| Supply voltage         | 5 V (from Edge backplane)     |
+| Parameter           | Value                      |
+| ------------------- | -------------------------- |
+| Inductive range     | 0 - 12 mm (2 channels)     |
+| Capacitive input    | 1 channel, configurable    |
+| Encoder resolution  | 1000 PPR (4000 counts/rev) |
+| Encoder max speed   | 6000 RPM                   |
+| Laser range         | 50 mm - 2000 mm            |
+| Laser accuracy      | +/-3 mm                    |
+| Reed/digital inputs | 2 channels                 |
+| Interface           | RS-485 (Modbus RTU)        |
+| Supply voltage      | 5 V (from Edge backplane)  |
 
 ## Applications
 

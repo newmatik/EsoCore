@@ -15,10 +15,10 @@ The firmware follows a bare-metal cooperative (superloop) architecture with a sh
 target-specific code for each device type. The HAL layer uses CMSIS device headers for register definitions with
 thin, custom wrappers -- no dependency on ST's HAL library.
 
-| Target | MCU | Core | Clock | Purpose |
-| --- | --- | --- | --- | --- |
-| **Edge** | STM32H747IIT6 | Cortex-M7 (+ M4) | 480 MHz | Central hub: dual Ethernet, analog acquisition, fieldbus, TinyML |
-| **Sensors** | STM32G031xx | Cortex-M0+ | 64 MHz | Individual sensor modules connected via RS-485 bus |
+| Target      | MCU           | Core             | Clock   | Purpose                                                          |
+| ----------- | ------------- | ---------------- | ------- | ---------------------------------------------------------------- |
+| **Edge**    | STM32H747IIT6 | Cortex-M7 (+ M4) | 480 MHz | Central hub: dual Ethernet, analog acquisition, fieldbus, TinyML |
+| **Sensors** | STM32G031xx   | Cortex-M0+       | 64 MHz  | Individual sensor modules connected via RS-485 bus               |
 
 The Edge device runs on the Cortex-M7 core of the dual-core STM32H747 at 480 MHz (PLL1 from 25 MHz HSE). It
 manages:
@@ -96,28 +96,28 @@ libraries -- every peripheral is configured via direct register writes for trans
 
 **HAL modules** (`stm32h7/hal/`):
 
-| Module | Description |
-| --- | --- |
-| `hal_gpio` | Pin configuration, atomic read/write/toggle, alternate function setup |
-| `hal_spi` | Blocking and DMA transfers; double-buffer mode for continuous ADC capture |
-| `hal_uart` | Blocking/interrupt TX/RX, RS-485 DE/RE control, RX callback |
-| `hal_i2c` | Master read/write with register addressing, 100/400 kHz timing |
-| `hal_eth` | Dual Ethernet MAC init, DMA descriptors, MDIO PHY management, frame TX/RX |
-| `hal_dma` | Stream config with DMAMUX routing, circular and double-buffer modes |
-| `hal_timer` | Periodic interrupt timers, microsecond delay via TIM2 |
-| `hal_adc` | Internal ADC3 for power rail monitoring and die temperature readback |
-| `hal_init` | Centralized GPIO initialization for all board pins from pin mapping |
+| Module      | Description                                                               |
+| ----------- | ------------------------------------------------------------------------- |
+| `hal_gpio`  | Pin configuration, atomic read/write/toggle, alternate function setup     |
+| `hal_spi`   | Blocking and DMA transfers; double-buffer mode for continuous ADC capture |
+| `hal_uart`  | Blocking/interrupt TX/RX, RS-485 DE/RE control, RX callback               |
+| `hal_i2c`   | Master read/write with register addressing, 100/400 kHz timing            |
+| `hal_eth`   | Dual Ethernet MAC init, DMA descriptors, MDIO PHY management, frame TX/RX |
+| `hal_dma`   | Stream config with DMAMUX routing, circular and double-buffer modes       |
+| `hal_timer` | Periodic interrupt timers, microsecond delay via TIM2                     |
+| `hal_adc`   | Internal ADC3 for power rail monitoring and die temperature readback      |
+| `hal_init`  | Centralized GPIO initialization for all board pins from pin mapping       |
 
 **Hardware drivers** (`stm32h7/drivers/`):
 
-| Driver | IC | Description |
-| --- | --- | --- |
-| `drv_ksz8081` | KSZ8081RNACA | 10/100 Ethernet PHY (x2) -- auto-negotiation, link status |
-| `drv_ads1274` | ADS1274 | 24-bit 4-channel simultaneous ADC -- SPI + DMA continuous capture |
-| `drv_pga280` | PGA280 | Programmable gain amplifier -- SPI register interface |
-| `drv_tmux1101` | TMUX1101 | SPDT analog switch -- IEPE/DC mode selection per channel |
-| `drv_iepe` | REF200AU gate | IEPE 4 mA current source enable/disable per channel |
-| `drv_ssr` | AQY212EHAZ | Solid-state relay output control |
+| Driver         | IC            | Description                                                       |
+| -------------- | ------------- | ----------------------------------------------------------------- |
+| `drv_ksz8081`  | KSZ8081RNACA  | 10/100 Ethernet PHY (x2) -- auto-negotiation, link status         |
+| `drv_ads1274`  | ADS1274       | 24-bit 4-channel simultaneous ADC -- SPI + DMA continuous capture |
+| `drv_pga280`   | PGA280        | Programmable gain amplifier -- SPI register interface             |
+| `drv_tmux1101` | TMUX1101      | SPDT analog switch -- IEPE/DC mode selection per channel          |
+| `drv_iepe`     | REF200AU gate | IEPE 4 mA current source enable/disable per channel               |
+| `drv_ssr`      | AQY212EHAZ    | Solid-state relay output control                                  |
 
 **BSP** (`stm32h7/bsp/`):
 
@@ -145,14 +145,14 @@ Individual sensor types each have a dedicated source file under `stm32/sensors/`
 
 ### Required Tools
 
-| Tool | Version | Purpose |
-| --- | --- | --- |
-| `arm-none-eabi-gcc` | 10+ | Cross-compiler for ARM Cortex-M targets |
-| `arm-none-eabi-objcopy` | (bundled) | Binary format conversion (ELF to HEX/BIN) |
-| `arm-none-eabi-size` | (bundled) | Memory usage reporting |
-| GNU Make | 4.0+ | Build system |
-| OpenOCD or STM32CubeProgrammer | latest | Flashing and debugging |
-| ST-LINK V2/V3 | -- | Debug probe hardware (SWD interface) |
+| Tool                           | Version   | Purpose                                   |
+| ------------------------------ | --------- | ----------------------------------------- |
+| `arm-none-eabi-gcc`            | 10+       | Cross-compiler for ARM Cortex-M targets   |
+| `arm-none-eabi-objcopy`        | (bundled) | Binary format conversion (ELF to HEX/BIN) |
+| `arm-none-eabi-size`           | (bundled) | Memory usage reporting                    |
+| GNU Make                       | 4.0+      | Build system                              |
+| OpenOCD or STM32CubeProgrammer | latest    | Flashing and debugging                    |
+| ST-LINK V2/V3                  | --        | Debug probe hardware (SWD interface)      |
 
 ### Installing the Toolchain
 
@@ -226,10 +226,10 @@ make help                # Show all available targets and options
 
 ### Build Options
 
-| Option | Default | Description |
-| --- | --- | --- |
-| `DEBUG=1` | `0` | Enable debug build (`-O0`, debug symbols, `DEBUG` macro defined) |
-| `OPTIMIZATION` | `-O2` | Compiler optimization level |
+| Option         | Default | Description                                                      |
+| -------------- | ------- | ---------------------------------------------------------------- |
+| `DEBUG=1`      | `0`     | Enable debug build (`-O0`, debug symbols, `DEBUG` macro defined) |
+| `OPTIMIZATION` | `-O2`   | Compiler optimization level                                      |
 
 Example debug build:
 

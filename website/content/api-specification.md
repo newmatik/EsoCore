@@ -132,18 +132,18 @@ System Event → Event Parser → Severity Classification → Workflow Trigger �
 
 ### Workflow Examples
 
-| Event Type                 | Trigger Condition     | Automated Actions                                      |
-| -------------------------- | --------------------- | ------------------------------------------------------ |
-| `connectivity_lost`        | Duration > 5 minutes  | Email to maintenance team, escalate if > 30 min        |
-| `power_outage`             | Severity = critical   | Immediate SMS + email, create maintenance ticket       |
-| `safe_shutdown_initiated`  | Any occurrence        | Critical alert + incident creation, prepare site visit |
-| `supercap_low`             | Voltage < 80% rated   | Maintenance alert, check backup power system           |
-| `safety_input_triggered`   | Any safety activation  | Immediate alert, log safety event, verify relay state  |
-| `safety_cross_monitor_fault` | Any occurrence       | Critical alert, force safe state, create incident      |
-| `server_unreachable`       | Retry count > 5       | Notify IT team, check server status                    |
-| `sensor_fault`             | Any sensor failure    | Schedule maintenance, disable affected alerts          |
-| `tamper_detected`          | Security event        | Instant security team alert, log incident              |
-| `sd_error`                 | Storage failure       | Emergency notification, prepare replacement            |
+| Event Type                   | Trigger Condition     | Automated Actions                                      |
+| ---------------------------- | --------------------- | ------------------------------------------------------ |
+| `connectivity_lost`          | Duration > 5 minutes  | Email to maintenance team, escalate if > 30 min        |
+| `power_outage`               | Severity = critical   | Immediate SMS + email, create maintenance ticket       |
+| `safe_shutdown_initiated`    | Any occurrence        | Critical alert + incident creation, prepare site visit |
+| `supercap_low`               | Voltage < 80% rated   | Maintenance alert, check backup power system           |
+| `safety_input_triggered`     | Any safety activation | Immediate alert, log safety event, verify relay state  |
+| `safety_cross_monitor_fault` | Any occurrence        | Critical alert, force safe state, create incident      |
+| `server_unreachable`         | Retry count > 5       | Notify IT team, check server status                    |
+| `sensor_fault`               | Any sensor failure    | Schedule maintenance, disable affected alerts          |
+| `tamper_detected`            | Security event        | Instant security team alert, log incident              |
+| `sd_error`                   | Storage failure       | Emergency notification, prepare replacement            |
 
 ### Django Workflow Integration
 

@@ -4,9 +4,7 @@
     <main class="container error-content">
       <h1>{{ error?.statusCode || 404 }}</h1>
       <p class="error-message">{{ error?.statusMessage || 'Page not found' }}</p>
-      <p class="error-help">
-        The page you are looking for does not exist or may have been moved.
-      </p>
+      <p class="error-help">The page you are looking for does not exist or may have been moved.</p>
       <div class="error-actions">
         <NuxtLink to="/" class="btn">Go to Homepage</NuxtLink>
         <NuxtLink to="/docs" class="btn secondary">Browse Documentation</NuxtLink>

@@ -147,10 +147,10 @@ The portal communicates with the Django backend through a well-defined REST API:
 
 ```typescript
 // Example API integration
-const { data: devices } = await $api("/devices/");
-const { data: telemetry } = await $api("/telemetry/", {
+const { data: devices } = await $api('/devices/')
+const { data: telemetry } = await $api('/telemetry/', {
   params: { device_id, start_date, end_date },
-});
+})
 ```
 
 ### Real-time Updates
@@ -159,11 +159,11 @@ WebSocket connections enable real-time data streaming:
 
 ```typescript
 // Real-time device status updates
-const { connect, subscribe } = useWebSocket();
-connect();
-subscribe("devices", (data) => {
+const { connect, subscribe } = useWebSocket()
+connect()
+subscribe('devices', data => {
   // Update UI with live data
-});
+})
 ```
 
 ### Authentication Flow

@@ -1,20 +1,26 @@
-name: Portal CI
+name: Website CI
 
+# The website had no pull_request CI at all: portal-ci and server-ci are path-filtered to
+# their own directories, and pages.yml (which publishes the website) only runs on push to
+# main. So website/** changes reached main completely unchecked. pages.yml is included in
+# the paths below so a change to the publish workflow is validated by a real build first.
 on:
   push:
     branches: [main]
     paths:
-      - "portal/**"
-      - ".github/workflows/portal-ci.yml"
+      - "website/**"
+      - ".github/workflows/website-ci.yml"
+      - ".github/workflows/pages.yml"
   pull_request:
     branches: [main]
     paths:
-      - "portal/**"
-      - ".github/workflows/portal-ci.yml"
+      - "website/**"
+      - ".github/workflows/website-ci.yml"
+      - ".github/workflows/pages.yml"
 
 defaults:
   run:
-    working-directory: portal
+    working-directory: website
 
 jobs:
   build-and-lint:
@@ -38,9 +44,9 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-portal-${{ hashFiles('portal/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-pnpm-website-${{ hashFiles('website/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-portal-
+            ${{ runner.os }}-pnpm-website-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

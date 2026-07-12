@@ -32,13 +32,16 @@ function generateDocRoutes() {
       '/',
       '/docs', // Main docs page (README)
       '/imprint',
-      ...docRoutes
+      ...docRoutes,
     ]
-    
+
     // Remove development-timeline if present
     return routes.filter(r => !r.includes('development-timeline'))
-  } catch (error: any) {
-    console.warn('Could not auto-generate doc routes:', error.message)
+  } catch (error) {
+    console.warn(
+      'Could not auto-generate doc routes:',
+      error instanceof Error ? error.message : error
+    )
     // Fallback to manual routes if auto-generation fails
     return [
       '/',
@@ -57,7 +60,7 @@ function generateDocRoutes() {
       '/docs/fieldbus',
       '/docs/bom',
       '/docs/license',
-      '/imprint'
+      '/imprint',
     ]
   }
 }
@@ -71,41 +74,41 @@ export default defineNuxtConfig({
 
   // CRITICAL: Build hooks to create GitHub Pages compatible file structure
   hooks: {
-    'nitro:build:public-assets': async (nitro) => {
+    'nitro:build:public-assets': async nitro => {
       // This hook creates HTML files for clean URLs to prevent GitHub Pages
       // from redirecting /docs/page to /docs/page/
       const fs = await import('fs')
       const path = await import('path')
-      
+
       const publicDir = nitro.options.output.publicDir
       const docsDir = path.join(publicDir, 'docs')
-      
+
       if (!fs.existsSync(docsDir)) return
-      
+
       // Find all directories with index.html and create clean URL HTML files
       const processDirectory = (dirPath: string, relativePath = '') => {
         const entries = fs.readdirSync(dirPath, { withFileTypes: true })
-        
+
         for (const entry of entries) {
           if (entry.isDirectory() && !entry.name.startsWith('_') && !entry.name.startsWith('.')) {
             const fullPath = path.join(dirPath, entry.name)
             const indexPath = path.join(fullPath, 'index.html')
-            
+
             // If directory has index.html, create clean URL HTML file
             if (fs.existsSync(indexPath)) {
               const cleanUrlPath = path.join(dirPath, `${entry.name}.html`)
-              
+
               // Copy index.html as clean URL file
               fs.copyFileSync(indexPath, cleanUrlPath)
               console.log(`✓ Created clean URL file: ${relativePath}/${entry.name}.html`)
             }
-            
+
             // Recursively process subdirectories
             processDirectory(fullPath, path.join(relativePath, entry.name))
           }
         }
       }
-      
+
       processDirectory(docsDir, 'docs')
 
       // Generate sitemap.xml from all prerendered routes
@@ -119,9 +122,8 @@ export default defineNuxtConfig({
       const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapEntries.join('\n')}\n</urlset>\n`
       fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), sitemap)
       console.log(`✓ Generated sitemap.xml with ${routes.length} URLs`)
-    }
+    },
   },
-
 
   // Static site generation for GitHub Pages
   // CRITICAL: This configuration ensures proper static file generation

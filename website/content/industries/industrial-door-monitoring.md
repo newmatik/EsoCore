@@ -494,7 +494,6 @@ Expand based on pilot success:
 - [Predictive Maintenance Guide](/docs/solutions/predictive-maintenance)
 - [Equipment Downtime Prevention](/docs/solutions/equipment-downtime-prevention)
 
-
 ### Technical Documentation
 
 - [Hardware Specifications](/docs/esocore-edge)

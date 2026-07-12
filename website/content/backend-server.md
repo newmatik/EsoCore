@@ -8,17 +8,17 @@ events and alerts, and exposes REST APIs consumed by the Portal frontend.
 
 ## Technology Stack
 
-| Component | Technology | Version |
-| --- | --- | --- |
-| **Framework** | Django | 5.2 |
-| **REST API** | Django REST Framework | 3.16 |
-| **Database** | PostgreSQL (production) / SQLite (development) | -- |
-| **API Documentation** | drf-spectacular (OpenAPI 3.0 / Swagger / ReDoc) | 0.28 |
-| **Authentication** | API keys (devices), session auth (users) | -- |
-| **Admin Interface** | django-unfold | 0.65 |
-| **Package Manager** | Poetry | 2.0+ |
-| **Python** | 3.11+ | -- |
-| **Linting** | ruff, black, isort | -- |
+| Component             | Technology                                      | Version |
+| --------------------- | ----------------------------------------------- | ------- |
+| **Framework**         | Django                                          | 5.2     |
+| **REST API**          | Django REST Framework                           | 3.16    |
+| **Database**          | PostgreSQL (production) / SQLite (development)  | --      |
+| **API Documentation** | drf-spectacular (OpenAPI 3.0 / Swagger / ReDoc) | 0.28    |
+| **Authentication**    | API keys (devices), session auth (users)        | --      |
+| **Admin Interface**   | django-unfold                                   | 0.65    |
+| **Package Manager**   | Poetry                                          | 2.0+    |
+| **Python**            | 3.11+                                           | --      |
+| **Linting**           | ruff, black, isort                              | --      |
 
 ---
 
@@ -49,14 +49,14 @@ server/
 
 ### Django Apps
 
-| App | Purpose |
-| --- | --- |
-| **devices** | Device registry: provisioning, configuration, firmware tracking, fleet management |
-| **assets** | Equipment and asset models that devices are attached to |
-| **telemetry** | Time-series data storage for sensor readings; batch ingestion endpoint |
-| **events** | Structured event logging (connectivity, power, safety, security); alert generation |
-| **users** | User accounts, roles, and permissions |
-| **iot** | Device-facing API endpoints using API key authentication |
+| App           | Purpose                                                                            |
+| ------------- | ---------------------------------------------------------------------------------- |
+| **devices**   | Device registry: provisioning, configuration, firmware tracking, fleet management  |
+| **assets**    | Equipment and asset models that devices are attached to                            |
+| **telemetry** | Time-series data storage for sensor readings; batch ingestion endpoint             |
+| **events**    | Structured event logging (connectivity, power, safety, security); alert generation |
+| **users**     | User accounts, roles, and permissions                                              |
+| **iot**       | Device-facing API endpoints using API key authentication                           |
 
 ---
 
@@ -67,39 +67,39 @@ server/
 Devices authenticate using `X-Auth-Key` and `X-Device-Id` headers. These endpoints are designed for machine-to-machine
 communication from Edge devices.
 
-| Endpoint | Method | Purpose |
-| --- | --- | --- |
-| `/api/iot/v1/auth/handshake` | POST | Device authentication and session setup |
-| `/api/iot/v1/telemetry/batch` | POST | Batch upload of sensor telemetry data |
-| `/api/iot/v1/config` | GET | Retrieve device configuration |
-| `/api/iot/v1/ota/check` | GET | Check for firmware updates |
-| `/api/iot/v1/ota/report` | POST | Report OTA update result |
+| Endpoint                      | Method | Purpose                                 |
+| ----------------------------- | ------ | --------------------------------------- |
+| `/api/iot/v1/auth/handshake`  | POST   | Device authentication and session setup |
+| `/api/iot/v1/telemetry/batch` | POST   | Batch upload of sensor telemetry data   |
+| `/api/iot/v1/config`          | GET    | Retrieve device configuration           |
+| `/api/iot/v1/ota/check`       | GET    | Check for firmware updates              |
+| `/api/iot/v1/ota/report`      | POST   | Report OTA update result                |
 
 ### Management API (Session Authentication)
 
 These endpoints are consumed by the Portal frontend and require user session authentication.
 
-| Endpoint | Purpose |
-| --- | --- |
-| `/api/devices/` | Device CRUD, listing, filtering |
-| `/api/assets/` | Asset/equipment management |
-| `/api/telemetry/` | Query historical telemetry data |
-| `/api/events/` | Browse and filter system events |
-| `/api/users/` | User management |
-| `/api/auth/login/` | User login |
-| `/api/auth/logout/` | User logout |
-| `/api/auth/me/` | Current user profile |
+| Endpoint                  | Purpose                         |
+| ------------------------- | ------------------------------- |
+| `/api/devices/`           | Device CRUD, listing, filtering |
+| `/api/assets/`            | Asset/equipment management      |
+| `/api/telemetry/`         | Query historical telemetry data |
+| `/api/events/`            | Browse and filter system events |
+| `/api/users/`             | User management                 |
+| `/api/auth/login/`        | User login                      |
+| `/api/auth/logout/`       | User logout                     |
+| `/api/auth/me/`           | Current user profile            |
 | `/api/dashboard/summary/` | Aggregated dashboard statistics |
 
 ### API Documentation
 
 The server auto-generates interactive API documentation:
 
-| URL | Format |
-| --- | --- |
-| `/api/docs/` | Swagger UI (interactive) |
+| URL            | Format                             |
+| -------------- | ---------------------------------- |
+| `/api/docs/`   | Swagger UI (interactive)           |
 | `/api/schema/` | Raw OpenAPI 3.0 schema (JSON/YAML) |
-| `/api/redoc/` | ReDoc (alternative viewer) |
+| `/api/redoc/`  | ReDoc (alternative viewer)         |
 
 ---
 
@@ -150,13 +150,13 @@ The server will be available at `http://localhost:8000`. The admin panel is at `
 Key environment variables (set in shell or deployment config). Note: `.env` files are **not** auto-loaded
 by the Django settings; set these as real environment variables or add `python-dotenv` loading if needed:
 
-| Variable | Default | Description |
-| --- | --- | --- |
-| `SECRET_KEY` | (generated) | Django secret key |
-| `DEBUG` | `True` | Enable debug mode |
-| `DATABASE_URL` | `sqlite:///db.sqlite3` | Database connection string |
-| `ALLOWED_HOSTS` | `localhost,127.0.0.1` | Comma-separated allowed hostnames |
-| `CORS_ALLOWED_ORIGINS` | `http://localhost:3000` | Portal origin for CORS |
+| Variable               | Default                 | Description                       |
+| ---------------------- | ----------------------- | --------------------------------- |
+| `SECRET_KEY`           | (generated)             | Django secret key                 |
+| `DEBUG`                | `True`                  | Enable debug mode                 |
+| `DATABASE_URL`         | `sqlite:///db.sqlite3`  | Database connection string        |
+| `ALLOWED_HOSTS`        | `localhost,127.0.0.1`   | Comma-separated allowed hostnames |
+| `CORS_ALLOWED_ORIGINS` | `http://localhost:3000` | Portal origin for CORS            |
 
 ### Running Tests
 

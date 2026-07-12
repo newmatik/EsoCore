@@ -27,7 +27,11 @@
           </div>
         </div>
         <div class="hero-art" aria-hidden="true">
-          <img ref="heroImage" src="/pcb.png" alt="EsoCore Edge industrial IoT circuit board for predictive maintenance" />
+          <img
+            ref="heroImage"
+            src="/pcb.png"
+            alt="EsoCore Edge industrial IoT circuit board for predictive maintenance"
+          />
         </div>
       </div>
     </section>
@@ -74,22 +78,27 @@
       <div class="container">
         <h2>What is EsoCore?</h2>
         <p>
-          EsoCore is an open-source <strong>industrial IoT platform</strong> designed for comprehensive equipment monitoring and
-          <strong>predictive maintenance</strong> in manufacturing environments. This advanced <strong>condition monitoring system</strong>
-          combines edge computing with machine learning to deliver real-time insights into machine health, preventing costly downtime and
-          optimizing maintenance schedules.
+          EsoCore is an open-source <strong>industrial IoT platform</strong> designed for
+          comprehensive equipment monitoring and <strong>predictive maintenance</strong> in
+          manufacturing environments. This advanced <strong>condition monitoring system</strong>
+          combines edge computing with machine learning to deliver real-time insights into machine
+          health, preventing costly downtime and optimizing maintenance schedules.
         </p>
         <p>
-          As a complete <strong>industrial equipment monitoring</strong> solution, EsoCore provides everything needed for modern factory
-          automation: modular sensor modules for vibration analysis, temperature monitoring, acoustic sensing, and more. The platform
-          processes data at the edge using TinyML algorithms, enabling ultra-low latency anomaly detection without relying on cloud
-          connectivity. This makes it ideal for mission-critical manufacturing applications where reliability and responsiveness are paramount.
+          As a complete <strong>industrial equipment monitoring</strong> solution, EsoCore provides
+          everything needed for modern factory automation: modular sensor modules for vibration
+          analysis, temperature monitoring, acoustic sensing, and more. The platform processes data
+          at the edge using TinyML algorithms, enabling ultra-low latency anomaly detection without
+          relying on cloud connectivity. This makes it ideal for mission-critical manufacturing
+          applications where reliability and responsiveness are paramount.
         </p>
         <p>
-          Unlike proprietary industrial IoT solutions, EsoCore is fully open source under the Apache 2.0 License, giving you complete control
-          over your monitoring infrastructure. You can deploy it on-premises, customize it for your specific needs, and integrate it with
-          existing factory systems including Modbus, PROFIBUS, and PROFINET networks. Whether you are monitoring CNC machines, industrial
-          doors, injection molding equipment, or conveyor systems, EsoCore provides the flexibility and reliability your operations demand.
+          Unlike proprietary industrial IoT solutions, EsoCore is fully open source under the Apache
+          2.0 License, giving you complete control over your monitoring infrastructure. You can
+          deploy it on-premises, customize it for your specific needs, and integrate it with
+          existing factory systems including Modbus, PROFIBUS, and PROFINET networks. Whether you
+          are monitoring CNC machines, industrial doors, injection molding equipment, or conveyor
+          systems, EsoCore provides the flexibility and reliability your operations demand.
         </p>
       </div>
     </section>
@@ -98,43 +107,55 @@
       <div class="container">
         <h2>Who Uses EsoCore?</h2>
         <p>
-          EsoCore serves manufacturing facilities and industrial operations that require reliable, real-time equipment monitoring and
-          predictive maintenance capabilities. Our <strong>industrial IoT platform</strong> is deployed across diverse applications:
+          EsoCore serves manufacturing facilities and industrial operations that require reliable,
+          real-time equipment monitoring and predictive maintenance capabilities. Our
+          <strong>industrial IoT platform</strong> is deployed across diverse applications:
         </p>
         <div class="use-cases">
           <div class="use-case">
             <h3>CNC Machine Monitoring</h3>
             <p>
-              Monitor machining centers, lathes, and milling machines with comprehensive vibration analysis, spindle temperature monitoring,
-              and power consumption tracking. Detect bearing wear, tool degradation, and mechanical anomalies before they cause costly
+              Monitor machining centers, lathes, and milling machines with comprehensive vibration
+              analysis, spindle temperature monitoring, and power consumption tracking. Detect
+              bearing wear, tool degradation, and mechanical anomalies before they cause costly
               downtime or quality issues.
             </p>
-            <NuxtLink to="/docs/industries/cnc-machine-monitoring" class="use-case-link">Learn more →</NuxtLink>
+            <NuxtLink to="/docs/industries/cnc-machine-monitoring" class="use-case-link"
+              >Learn more →</NuxtLink
+            >
           </div>
           <div class="use-case">
             <h3>Industrial Door Systems</h3>
             <p>
-              Track cycle counts, spring health, motor current, and operational state for sectional doors, high-speed roll-up doors, and
-              automated gate systems. Optimize maintenance intervals and prevent unexpected failures with data-driven condition
-              monitoring.
+              Track cycle counts, spring health, motor current, and operational state for sectional
+              doors, high-speed roll-up doors, and automated gate systems. Optimize maintenance
+              intervals and prevent unexpected failures with data-driven condition monitoring.
             </p>
-            <NuxtLink to="/docs/industries/industrial-door-monitoring" class="use-case-link">Learn more →</NuxtLink>
+            <NuxtLink to="/docs/industries/industrial-door-monitoring" class="use-case-link"
+              >Learn more →</NuxtLink
+            >
           </div>
           <div class="use-case">
             <h3>Manufacturing Equipment</h3>
             <p>
-              Monitor injection molding machines, packaging lines, conveyor systems, and process equipment with customizable sensor
-              configurations. Track operational parameters, detect anomalies, and optimize production efficiency across your entire facility.
+              Monitor injection molding machines, packaging lines, conveyor systems, and process
+              equipment with customizable sensor configurations. Track operational parameters,
+              detect anomalies, and optimize production efficiency across your entire facility.
             </p>
-            <NuxtLink to="/docs/industries/injection-molding-monitoring" class="use-case-link">Learn more →</NuxtLink>
+            <NuxtLink to="/docs/industries/injection-molding-monitoring" class="use-case-link"
+              >Learn more →</NuxtLink
+            >
           </div>
           <div class="use-case">
             <h3>Support Infrastructure</h3>
             <p>
-              Maintain critical support equipment including industrial pumps, compressors, motors, and HVAC systems with continuous condition
-              monitoring. Predict failures before they occur and extend equipment lifespan through data-driven maintenance strategies.
+              Maintain critical support equipment including industrial pumps, compressors, motors,
+              and HVAC systems with continuous condition monitoring. Predict failures before they
+              occur and extend equipment lifespan through data-driven maintenance strategies.
             </p>
-            <NuxtLink to="/docs/industries/pump-compressor-monitoring" class="use-case-link">Learn more →</NuxtLink>
+            <NuxtLink to="/docs/industries/pump-compressor-monitoring" class="use-case-link"
+              >Learn more →</NuxtLink
+            >
           </div>
         </div>
       </div>
@@ -144,56 +165,63 @@
       <div class="container">
         <h2>Why Choose EsoCore for Industrial Equipment Monitoring?</h2>
         <p>
-          EsoCore differentiates itself from proprietary industrial IoT platforms through its unique combination of open-source flexibility,
-          edge intelligence, and comprehensive safety integration. Here is what makes our <strong>predictive maintenance system</strong>
+          EsoCore differentiates itself from proprietary industrial IoT platforms through its unique
+          combination of open-source flexibility, edge intelligence, and comprehensive safety
+          integration. Here is what makes our <strong>predictive maintenance system</strong>
           the preferred choice for forward-thinking manufacturers:
         </p>
         <div class="benefits-grid">
           <div class="benefit">
             <h3>Edge-First Architecture</h3>
             <p>
-              Process sensor data directly on industrial-grade edge devices using TinyML models. Achieve sub-second anomaly detection without
-              cloud dependency, ensuring your critical equipment monitoring continues even during network outages. Reduce bandwidth costs by
+              Process sensor data directly on industrial-grade edge devices using TinyML models.
+              Achieve sub-second anomaly detection without cloud dependency, ensuring your critical
+              equipment monitoring continues even during network outages. Reduce bandwidth costs by
               90% through intelligent data filtering and prioritization.
             </p>
           </div>
           <div class="benefit">
             <h3>Open Source Freedom</h3>
             <p>
-              No vendor lock-in, no hidden costs, no proprietary restrictions. The entire platform—hardware designs, firmware, and cloud
-              components—is available under the Apache 2.0 License. Customize it for your specific needs, deploy it anywhere, and maintain
-              complete control over your industrial data.
+              No vendor lock-in, no hidden costs, no proprietary restrictions. The entire
+              platform—hardware designs, firmware, and cloud components—is available under the
+              Apache 2.0 License. Customize it for your specific needs, deploy it anywhere, and
+              maintain complete control over your industrial data.
             </p>
           </div>
           <div class="benefit">
             <h3>Modular Sensor System</h3>
             <p>
-              Add new sensor types without redesigning your infrastructure. Our RS-485 sensor bus supports hot-plug sensor modules for
-              vibration, acoustics, temperature, pressure, oil quality, and more. Scale from single-machine monitoring to facility-wide
-              deployments with ease.
+              Add new sensor types without redesigning your infrastructure. Our RS-485 sensor bus
+              supports hot-plug sensor modules for vibration, acoustics, temperature, pressure, oil
+              quality, and more. Scale from single-machine monitoring to facility-wide deployments
+              with ease.
             </p>
           </div>
           <div class="benefit">
             <h3>Safety Compliance Built-In</h3>
             <p>
-              6 dual-channel safety digital inputs with cross-monitoring (EN ISO 13849 Cat. 3) for e-stops, light curtains, and safety edges.
-              Built-in safety relay (dual-channel, 2NO+2NC) and SSR output for interlocking. Combined with 4 dual-mode analog inputs, EsoCore
-              provides comprehensive safety-rated I/O for industrial monitoring and interlocking applications.
+              6 dual-channel safety digital inputs with cross-monitoring (EN ISO 13849 Cat. 3) for
+              e-stops, light curtains, and safety edges. Built-in safety relay (dual-channel,
+              2NO+2NC) and SSR output for interlocking. Combined with 4 dual-mode analog inputs,
+              EsoCore provides comprehensive safety-rated I/O for industrial monitoring and
+              interlocking applications.
             </p>
           </div>
           <div class="benefit">
             <h3>Industrial Fieldbus Integration</h3>
             <p>
-              Connect seamlessly to existing factory automation systems via Modbus RTU/TCP, PROFIBUS DP, and PROFINET protocols. EsoCore
-              speaks the language of industrial control systems, enabling smooth integration without disrupting production workflows.
+              Connect seamlessly to existing factory automation systems via Modbus RTU/TCP, PROFIBUS
+              DP, and PROFINET protocols. EsoCore speaks the language of industrial control systems,
+              enabling smooth integration without disrupting production workflows.
             </p>
           </div>
           <div class="benefit">
             <h3>Proven Technology Stack</h3>
             <p>
-              Built on industrial-proven components: STM32 microcontrollers, Django REST Framework backend, and modern web technologies.
-              Comprehensive documentation, reference designs, and professional support ensure successful deployments from pilot to
-              production scale.
+              Built on industrial-proven components: STM32 microcontrollers, Django REST Framework
+              backend, and modern web technologies. Comprehensive documentation, reference designs,
+              and professional support ensure successful deployments from pilot to production scale.
             </p>
           </div>
         </div>
@@ -202,30 +230,52 @@
             <h4>Get Started</h4>
             <ul>
               <li><NuxtLink to="/docs/getting-started/quick-start">Quick Start Guide</NuxtLink></li>
-              <li><NuxtLink to="/docs/getting-started/installation-guide">Installation Guide</NuxtLink></li>
-              <li><NuxtLink to="/docs/getting-started/integration-guide">Integration Guide</NuxtLink></li>
+              <li>
+                <NuxtLink to="/docs/getting-started/installation-guide"
+                  >Installation Guide</NuxtLink
+                >
+              </li>
+              <li>
+                <NuxtLink to="/docs/getting-started/integration-guide">Integration Guide</NuxtLink>
+              </li>
             </ul>
           </div>
           <div class="resource-card">
             <h4>Solutions</h4>
             <ul>
-              <li><NuxtLink to="/docs/solutions/predictive-maintenance">Predictive Maintenance</NuxtLink></li>
-              <li><NuxtLink to="/docs/solutions/equipment-downtime-prevention">Downtime Prevention</NuxtLink></li>
+              <li>
+                <NuxtLink to="/docs/solutions/predictive-maintenance"
+                  >Predictive Maintenance</NuxtLink
+                >
+              </li>
+              <li>
+                <NuxtLink to="/docs/solutions/equipment-downtime-prevention"
+                  >Downtime Prevention</NuxtLink
+                >
+              </li>
             </ul>
           </div>
           <div class="resource-card">
             <h4>Compare & Choose</h4>
             <ul>
-              <li><NuxtLink to="/docs/comparisons/open-source-vs-proprietary">Open Source vs Proprietary</NuxtLink></li>
-              <li><NuxtLink to="/docs/comparisons/edge-ai-vs-cloud-monitoring">Edge AI vs Cloud</NuxtLink></li>
+              <li>
+                <NuxtLink to="/docs/comparisons/open-source-vs-proprietary"
+                  >Open Source vs Proprietary</NuxtLink
+                >
+              </li>
+              <li>
+                <NuxtLink to="/docs/comparisons/edge-ai-vs-cloud-monitoring"
+                  >Edge AI vs Cloud</NuxtLink
+                >
+              </li>
             </ul>
           </div>
         </div>
         <div class="cta-section">
           <h3>Ready to Transform Your Equipment Monitoring?</h3>
           <p>
-            Explore our comprehensive documentation to learn how EsoCore can reduce downtime, optimize maintenance, and provide complete
-            visibility into your industrial operations.
+            Explore our comprehensive documentation to learn how EsoCore can reduce downtime,
+            optimize maintenance, and provide complete visibility into your industrial operations.
           </p>
           <div class="cta">
             <NuxtLink to="/docs" class="btn">Explore Documentation</NuxtLink>
