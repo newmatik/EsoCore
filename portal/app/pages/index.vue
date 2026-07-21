@@ -69,7 +69,15 @@ definePageMeta({
 useSeoMeta({
   title: 'EsoCore Portal',
   description: 'Monitor and manage your IoT devices with a powerful monitoring platform.',
-  keywords: 'IoT, monitoring, devices, sensors, telemetry, alerts',
+})
+
+useHead({
+  meta: [
+    {
+      name: 'keywords',
+      content: 'IoT, monitoring, devices, sensors, telemetry, alerts',
+    },
+  ],
 })
 
 const { fullName, portalTitle } = useBranding()
