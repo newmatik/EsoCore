@@ -22,11 +22,11 @@
   "dependencies": {
     "@nuxt/ui": "^4.10.0",
     "@pinia/nuxt": "^1.0.1",
-    "@vueuse/core": "^14.3.0",
-    "axios": "^1.13.5",
+    "@vueuse/core": "^14.4.0",
+    "axios": "^1.19.0",
     "chart.js": "^4.5.1",
     "jwt-decode": "^4.0.0",
-    "nuxt": "~4.5.0",
+    "nuxt": "~4.5.1",
     "pinia": "^4.0.2",
     "socket.io-client": "^4.8.3",
     "tailwindcss": "^4.3.3",
@@ -35,14 +35,14 @@
     "vue-router": "^5.2.0"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.118",
+    "@iconify-json/lucide": "^1.2.120",
     "@nuxt/eslint-config": "^1.15.1",
-    "@types/node": "^26.1.1",
-    "eslint": "^10.7.0",
-    "eslint-plugin-vue": "^10.9.2",
-    "prettier": "^3.9.5",
+    "@types/node": "^26.1.2",
+    "eslint": "^10.8.0",
+    "eslint-plugin-vue": "^10.10.0",
+    "prettier": "^3.9.6",
     "typescript": "^6.0.3",
-    "vue-tsc": "^3.3.7"
+    "vue-tsc": "^3.3.8"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
