@@ -26,7 +26,7 @@
     "axios": "^1.13.5",
     "chart.js": "^4.5.1",
     "jwt-decode": "^4.0.0",
-    "nuxt": "~4.5.0",
+    "nuxt": "~4.5.1",
     "pinia": "^4.0.2",
     "socket.io-client": "^4.8.3",
     "tailwindcss": "^4.3.3",
