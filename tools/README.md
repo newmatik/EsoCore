@@ -12,8 +12,8 @@ A comprehensive tool for cleaning up and standardizing STEP files in the hardwar
 
 - Fix FILE_NAME attributes to match actual filenames
 - Remove duplicate ISO-10303-21 lines
-- Normalize formatting and spacing for consistency
-- Standardize header format across all files
+- Normalize formatting and spacing for consistency (quoted strings are left unchanged)
+- Set FILE_NAME to the actual filename (schema, timestamp and authors are kept)
 - Support for both individual files and directories
 
 ### Usage

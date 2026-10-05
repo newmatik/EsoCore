@@ -1,9 +1,20 @@
 ;(function () {
+  // All CSV values are rendered with textContent, never as HTML: the BOM files
+  // are data, and a stray `<` in a note or MPN must not become markup.
+  function el(tag, text, className) {
+    const node = document.createElement(tag)
+    if (text !== undefined) node.textContent = String(text)
+    if (className) node.className = className
+    return node
+  }
+
   async function renderBOM(mountId, csvPath) {
     const mount = document.getElementById(mountId)
     if (!mount) return
     try {
       const res = await fetch(csvPath + '?_=' + Date.now())
+      // An error page (404, 500, ...) must not be parsed and rendered as BOM rows.
+      if (!res.ok) throw new Error('BOM request failed: HTTP ' + res.status)
       const csv = await res.text()
       const rows = csv
         .trim()
@@ -66,9 +77,14 @@
       search.placeholder = 'Filter… (Category, Item, MPN, Supplier, Notes, Package)'
       const cat = document.createElement('select')
       const categories = Array.from(new Set(data.map(d => d.Category))).sort()
-      cat.innerHTML =
-        '<option value="">All categories</option>' +
-        categories.map(c => `<option>${c}</option>`).join('')
+      const allOption = el('option', 'All categories')
+      allOption.value = ''
+      cat.appendChild(allOption)
+      categories.forEach(c => {
+        const option = el('option', c)
+        option.value = c
+        cat.appendChild(option)
+      })
       controls.appendChild(search)
       controls.appendChild(cat)
 
@@ -101,7 +117,7 @@
       const summary = document.createElement('div')
       summary.className = 'bom-summary'
 
-      mount.innerHTML = ''
+      mount.replaceChildren()
       mount.appendChild(controls)
       wrap.appendChild(table)
       wrap.appendChild(summary)
@@ -140,7 +156,7 @@
       function render() {
         const filtered = sortList(applyFilters(data))
         // body
-        tbody.innerHTML = ''
+        tbody.replaceChildren()
         filtered.forEach(d => {
           const tr = document.createElement('tr')
           const cells = [
@@ -154,7 +170,7 @@
             d.Package,
             '$' + d.Ext.toFixed(2),
           ]
-          tr.innerHTML = cells.map(c => '<td>' + c + '</td>').join('')
+          cells.forEach(c => tr.appendChild(el('td', c)))
           tbody.appendChild(tr)
         })
         // totals in separate summary panel
@@ -164,17 +180,21 @@
           groupTotals[d.Category] = (groupTotals[d.Category] || 0) + ext
           return s + ext
         }, 0)
-        tfoot.innerHTML = ''
-        const list = Object.entries(groupTotals)
+        tfoot.replaceChildren()
+        const totalBox = el('div', undefined, 'total')
+        totalBox.appendChild(el('div', 'Total (filtered)'))
+        totalBox.appendChild(el('div', '$' + total.toFixed(2), 'value'))
+        const split = el('details', undefined, 'split')
+        split.appendChild(el('summary', 'Category breakdown'))
+        Object.entries(groupTotals)
           .sort((a, b) => b[1] - a[1])
-          .map(
-            ([k, v]) => `<div class="row"><span>${k}</span><strong>$${v.toFixed(2)}</strong></div>`
-          )
-          .join('')
-        summary.innerHTML = `
-          <div class="total"><div>Total (filtered)</div><div class="value">$${total.toFixed(2)}</div></div>
-          <details class="split"><summary>Category breakdown</summary>${list}</details>
-        `
+          .forEach(([k, v]) => {
+            const row = el('div', undefined, 'row')
+            row.appendChild(el('span', k))
+            row.appendChild(el('strong', '$' + v.toFixed(2)))
+            split.appendChild(row)
+          })
+        summary.replaceChildren(totalBox, split)
         // Notify listeners so the page can aggregate totals
         try {
           window.dispatchEvent(

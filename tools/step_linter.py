@@ -8,8 +8,8 @@ A comprehensive tool for cleaning up and standardizing STEP files.
 Features:
 - Fix FILE_NAME attributes to match actual filenames
 - Remove duplicate ISO-10303-21 lines
-- Normalize formatting and spacing for consistency
-- Standardize header format
+- Normalize formatting and spacing for consistency (quoted strings are left unchanged)
+- Set FILE_NAME to the actual filename (schema, timestamp and authors are kept)
 - Support for configurable target directories
 
 Usage:
@@ -30,6 +30,11 @@ import os
 import re
 import sys
 from pathlib import Path
+
+# A STEP (ISO 10303-21) string literal: single-quoted, '' escapes a quote.
+STEP_STRING = re.compile(r"'(?:[^']|'')*'")
+# Placeholder for a protected string literal; \x00 never occurs in a STEP file.
+_PLACEHOLDER = re.compile(r"\x00(\d+)\x00")
 
 
 class StepLinter:
@@ -85,15 +90,28 @@ class StepLinter:
             return sorted(step_files)
 
     def fix_duplicate_iso_lines(self, content):
-        """Remove duplicate ISO-10303-21 lines"""
+        """Collapse a leading run of duplicate ISO-10303-21 lines to one"""
         lines = content.split('\n')
-        if len(lines) >= 2 and lines[0].strip() == "ISO-10303-21;" and lines[1].strip() == "ISO-10303-21;":
-            lines = lines[1:]
-            return '\n'.join(lines), True
+        run = 0
+        while run < len(lines) and lines[run].strip() == "ISO-10303-21;":
+            run += 1
+        if run >= 2:
+            return '\n'.join(lines[run - 1:]), True
         return content, False
 
     def normalize_formatting(self, content):
-        """Normalize STEP file formatting to use consistent spacing"""
+        """Normalize STEP file formatting to use consistent spacing.
+
+        Quoted string literals (names, descriptions, ...) are data and are left
+        byte-for-byte unchanged; only the surrounding syntax is respaced.
+        """
+        literals = []
+
+        def protect(match):
+            literals.append(match.group(0))
+            return f"\x00{len(literals) - 1}\x00"
+
+        content = STEP_STRING.sub(protect, content)
         lines = content.split('\n')
         normalized_lines = []
 
@@ -132,24 +150,34 @@ class StepLinter:
 
             normalized_lines.append(line)
 
-        return '\n'.join(normalized_lines)
+        normalized = '\n'.join(normalized_lines)
+        return _PLACEHOLDER.sub(lambda m: literals[int(m.group(1))], normalized)
 
     def fix_header(self, content, filename):
-        """Fix the header section with correct FILE_NAME and formatting"""
-        # Standard header format (without ISO line - that's handled separately)
-        standard_header = f"""HEADER;
-FILE_DESCRIPTION(('3D model data'),'2;1');
-FILE_NAME('{filename}','2024-01-01T00:00:00',(''),(''),'EsoCore Library','Unspecified','');
-FILE_SCHEMA(('AUTOMOTIVE_DESIGN'));
-ENDSEC;"""
+        """Set the FILE_NAME name to the actual filename.
 
-        # Find and replace header section
+        Only the first FILE_NAME argument is rewritten. FILE_DESCRIPTION,
+        FILE_SCHEMA (AP203/AP214/AP242), the timestamp, authors and the
+        originating system are kept as exported by the CAD tool.
+        """
         header_match = re.search(r'HEADER;(.*?)ENDSEC;', content, re.DOTALL | re.IGNORECASE)
-        if header_match:
-            new_content = re.sub(r'HEADER;(.*?)ENDSEC;', standard_header, content, flags=re.DOTALL | re.IGNORECASE)
-            return new_content, True
+        if not header_match:
+            return content, False
 
-        return content, False
+        quoted_name = "'" + filename.replace("'", "''") + "'"
+        header = header_match.group(0)
+        file_name = re.search(r"FILE_NAME\s*\(\s*(" + STEP_STRING.pattern + r")", header, re.IGNORECASE)
+        if file_name:
+            if file_name.group(1) == quoted_name:
+                return content, False
+            new_header = header[:file_name.start(1)] + quoted_name + header[file_name.end(1):]
+        else:
+            # FILE_NAME is mandatory in Part 21; add a minimal one.
+            end = header.upper().rindex('ENDSEC;')
+            new_header = header[:end] + f"FILE_NAME({quoted_name},'',(''),(''),'','','');\n" + header[end:]
+
+        new_content = content[:header_match.start()] + new_header + content[header_match.end():]
+        return new_content, True
 
     def process_file(self, file_path):
         """Process a single STEP file"""
