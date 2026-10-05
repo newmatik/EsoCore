@@ -102,7 +102,7 @@ portal/
 
 ### Prerequisites
 
-- Node.js 22 or later
+- Node.js 22.19+ (or 24.11+)
 - pnpm 10 or later
 - The Backend Server running at `http://localhost:8000` (see [Backend Server](/docs/backend-server))
 

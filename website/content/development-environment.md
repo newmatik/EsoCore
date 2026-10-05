@@ -82,7 +82,7 @@ rationale and minimum setup.
   with real-time dashboards, accelerating time-to-market.
 - **Local dev requirements**:
   - Django: Python 3.11+, PostgreSQL (production) or SQLite (development)
-  - Nuxt.js: Node.js 22+, pnpm 9+
+  - Nuxt.js: Node.js 22.19+ (or 24.11+), pnpm 9+
   - Development tools: Poetry for Python, VS Code/Cursor
 - **Coding standards**:
   - Python: ruff + black; JS/TS: eslint + prettier
@@ -118,7 +118,7 @@ rationale and minimum setup.
   - west, CMake/Ninja, OpenOCD or J-Link, Python 3.11; optional Docker
 - **Cloud engineer**:
   - Backend: Python 3.11+, Poetry, PostgreSQL or SQLite; VS Code/Cursor
-  - Frontend: Node.js 22+, pnpm 9+, Nuxt 4; VS Code/Cursor
+  - Frontend: Node.js 22.19+ (or 24.11+), pnpm 9+, Nuxt 4; VS Code/Cursor
 
 ## Rationale Summary
 

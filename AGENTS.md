@@ -9,8 +9,8 @@ EsoCore is a full-stack industrial IoT platform. The three software services are
 | Service | Directory | Port | Tech | Required |
 |---------|-----------|------|------|----------|
 | Django REST API | `server/` | 8000 | Python 3.11+, Django 5.2, Poetry | Yes |
-| Portal (Nuxt.js) | `portal/` | 3000 | Node 22+, Nuxt 4, pnpm | Yes |
-| Website (Nuxt.js) | `website/` | 3001 | Node 22+, Nuxt 4, pnpm | No |
+| Portal (Nuxt.js) | `portal/` | 3000 | Node 22.19+ (or 24.11+), Nuxt 4, pnpm | Yes |
+| Website (Nuxt.js) | `website/` | 3001 | Node 22.19+ (or 24.11+), Nuxt 4, pnpm | No |
 
 See each project's README for standard setup/run/lint/test commands.
 
