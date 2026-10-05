@@ -5,8 +5,8 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  ws: '>=8.21.0'
-  esbuild: '>=0.28.1'
+  ws: ^8.21.0
+  esbuild: ^0.28.1
   socket.io-parser: ^4.2.7
   '@fastify/busboy': ^3.2.1
   '@nuxt/devtools': ^3.3.1
@@ -1588,7 +1588,7 @@ packages:
     peerDependencies:
       '@unhead/cli': ^3.4.2
       '@vitejs/devtools-kit': ^0.4.1
-      esbuild: '>=0.28.1'
+      esbuild: ^0.28.1
       lightningcss: '>=1.20.0'
       oxc-parser: '>=0.98.0'
       rolldown: '>=1.0.0'
@@ -4567,7 +4567,7 @@ packages:
       '@rsbuild/core': '*'
       '@rspack/core': '*'
       bun-types-no-globals: '*'
-      esbuild: '>=0.28.1'
+      esbuild: ^0.28.1
       rolldown: '*'
       rollup: '*'
       unloader: '*'
@@ -4768,7 +4768,7 @@ packages:
     peerDependencies:
       '@types/node': ^20.19.0 || >=22.12.0
       '@vitejs/devtools': ^0.7.1
-      esbuild: '>=0.28.1'
+      esbuild: ^0.28.1
       jiti: '>=1.21.0'
       less: ^4.0.0
       sass: ^1.70.0

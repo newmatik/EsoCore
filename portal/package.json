@@ -52,8 +52,8 @@
       "vue-demi"
     ],
     "overrides": {
-      "ws": ">=8.21.0",
-      "esbuild": ">=0.28.1",
+      "ws": "^8.21.0",
+      "esbuild": "^0.28.1",
       "socket.io-parser": "^4.2.7",
       "@fastify/busboy": "^3.2.1",
       "@nuxt/devtools": "^3.3.1",
