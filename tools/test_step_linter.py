@@ -46,6 +46,31 @@ class StepLinterTest(unittest.TestCase):
             "#1 = PRODUCT('part,revision','it''s,Name', #2, $) ;",
         )
 
+    def test_apostrophe_in_comment_does_not_shift_quote_pairing(self):
+        line = "/* Bob's export */ #1=PRODUCT('a,b','c',#2);"
+        self.assertEqual(
+            self.linter.normalize_formatting(line),
+            "/* Bob's export */ #1 = PRODUCT('a,b','c', #2) ;",
+        )
+
+    def test_missing_file_name_is_inserted_before_file_schema(self):
+        start = AP242_FILE.index("FILE_NAME(")
+        end = AP242_FILE.index("\n", start) + 1
+        content = AP242_FILE[:start] + AP242_FILE[end:]
+        fixed, changed = self.linter.fix_header(content, "new_name.step")
+        self.assertTrue(changed)
+        self.assertLess(fixed.index("FILE_DESCRIPTION("), fixed.index("FILE_NAME('new_name.step'"))
+        self.assertLess(fixed.index("FILE_NAME('new_name.step'"), fixed.index("FILE_SCHEMA("))
+
+    def test_missing_file_name_ignores_file_schema_inside_comment(self):
+        content = (
+            "HEADER;\n/* Bob's FILE_SCHEMA( note */\nFILE_DESCRIPTION((''),'2;1');\n"
+            "FILE_SCHEMA(('AP214'));\nENDSEC;\n"
+        )
+        fixed, _ = self.linter.fix_header(content, "x.step")
+        self.assertIn("/* Bob's FILE_SCHEMA( note */\nFILE_DESCRIPTION", fixed)
+        self.assertIn("FILE_NAME('x.step','',(''),(''),'','','');\nFILE_SCHEMA(('AP214'))", fixed)
+
     def test_header_keeps_schema_timestamp_and_authors(self):
         fixed, changed = self.linter.fix_header(AP242_FILE, "new_name.step")
         self.assertTrue(changed)

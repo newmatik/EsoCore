@@ -33,6 +33,9 @@ from pathlib import Path
 
 # A STEP (ISO 10303-21) string literal: single-quoted, '' escapes a quote.
 STEP_STRING = re.compile(r"'(?:[^']|'')*'")
+# A string literal or a /* ... */ comment. Matching both in one left-to-right
+# scan keeps an apostrophe inside a comment from shifting the quote pairing.
+STEP_OPAQUE = re.compile(r"/\*.*?\*/|" + STEP_STRING.pattern, re.DOTALL)
 # Placeholder for a protected string literal; \x00 never occurs in a STEP file.
 _PLACEHOLDER = re.compile(r"\x00(\d+)\x00")
 
@@ -102,8 +105,8 @@ class StepLinter:
     def normalize_formatting(self, content):
         """Normalize STEP file formatting to use consistent spacing.
 
-        Quoted string literals (names, descriptions, ...) are data and are left
-        byte-for-byte unchanged; only the surrounding syntax is respaced.
+        Quoted string literals (names, descriptions, ...) and /* */ comments are
+        left byte-for-byte unchanged; only the surrounding syntax is respaced.
         """
         literals = []
 
@@ -111,7 +114,7 @@ class StepLinter:
             literals.append(match.group(0))
             return f"\x00{len(literals) - 1}\x00"
 
-        content = STEP_STRING.sub(protect, content)
+        content = STEP_OPAQUE.sub(protect, content)
         lines = content.split('\n')
         normalized_lines = []
 
@@ -166,21 +169,28 @@ class StepLinter:
 
         quoted_name = "'" + filename.replace("'", "''") + "'"
         header = header_match.group(0)
-        # The FILE_NAME entity, not the same text quoted inside e.g. FILE_DESCRIPTION.
-        quoted = [m.span() for m in STEP_STRING.finditer(header)]
-        file_name = next(
-            (m for m in re.finditer(r"FILE_NAME\s*\(\s*(" + STEP_STRING.pattern + r")", header, re.IGNORECASE)
-             if not any(start <= m.start() < end for start, end in quoted)),
-            None,
-        )
+        # Entities, not the same text quoted inside e.g. FILE_DESCRIPTION or a comment.
+        opaque = [m.span() for m in STEP_OPAQUE.finditer(header)]
+
+        def entity(pattern):
+            return next(
+                (m for m in re.finditer(pattern, header, re.IGNORECASE)
+                 if not any(start <= m.start() < end for start, end in opaque)),
+                None,
+            )
+
+        file_name = entity(r"FILE_NAME\s*\(\s*(" + STEP_STRING.pattern + r")")
         if file_name:
             if file_name.group(1) == quoted_name:
                 return content, False
             new_header = header[:file_name.start(1)] + quoted_name + header[file_name.end(1):]
         else:
-            # FILE_NAME is mandatory in Part 21; add a minimal one.
-            end = header.upper().rindex('ENDSEC;')
-            new_header = header[:end] + f"FILE_NAME({quoted_name},'',(''),(''),'','','');\n" + header[end:]
+            # FILE_NAME is mandatory in Part 21; add a minimal one. Part 21 orders
+            # the header FILE_DESCRIPTION, FILE_NAME, FILE_SCHEMA, so it goes
+            # before FILE_SCHEMA (or before ENDSEC; if there is none).
+            schema = entity(r"FILE_SCHEMA\s*\(")
+            at = schema.start() if schema else header.upper().rindex('ENDSEC;')
+            new_header = header[:at] + f"FILE_NAME({quoted_name},'',(''),(''),'','','');\n" + header[at:]
 
         new_content = content[:header_match.start()] + new_header + content[header_match.end():]
         return new_content, True
