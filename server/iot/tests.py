@@ -1,3 +1,4 @@
+import hashlib
 import json
 import unittest
 import uuid
@@ -128,6 +129,38 @@ class TelemetryBatchTests(TestCase):
             **self._headers(),
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_content_sha256_match_is_accepted(self):
+        body = json.dumps(
+            [{"timestamp": "2026-02-12T10:00:00Z", "metric": "t", "value": 1}]
+        )
+        response = self.client.post(
+            "/api/iot/v1/telemetry/batch",
+            data=body,
+            content_type="application/json",
+            **self._headers(
+                HTTP_CONTENT_SHA256=hashlib.sha256(body.encode()).hexdigest()
+            ),
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["accepted"], 1)
+
+    def test_content_sha256_mismatch_is_rejected(self):
+        body = json.dumps(
+            [{"timestamp": "2026-02-12T10:00:00Z", "metric": "t", "value": 1}]
+        )
+        response = self.client.post(
+            "/api/iot/v1/telemetry/batch",
+            data=body,
+            content_type="application/json",
+            **self._headers(
+                HTTP_CONTENT_SHA256=hashlib.sha256(b"tampered").hexdigest()
+            ),
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["error"], "Content-SHA256 mismatch")
+        self.assertEqual(TelemetryPacket.objects.count(), 0)
+        self.assertEqual(TelemetryPoint.objects.count(), 0)
 
 
 class GetConfigTests(TestCase):

@@ -32,7 +32,7 @@ esocore/
 ## Prerequisites
 
 - **Python 3.11+** and [Poetry](https://python-poetry.org/) for the server
-- **Node 22+** and [pnpm 9+](https://pnpm.io/) for the portal and website
+- **Node 22.19+ (or 24.11+)** and [pnpm 9+](https://pnpm.io/) for the portal and website
 - **ARM GCC** (`arm-none-eabi-gcc`) and **GNU Make** for the firmware
 
 ## Getting Started

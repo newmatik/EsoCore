@@ -1,18 +1,26 @@
 import { readFile } from 'fs/promises'
-import { join } from 'path'
+import { resolve } from 'path'
+import { resolveDocPath } from '../../utils/docPath'
+
+function notFound() {
+  return createError({
+    statusCode: 404,
+    statusMessage: 'Document not found',
+  })
+}
 
 export default defineEventHandler(async event => {
   const param = getRouterParam(event, 'slug')
   const slug = Array.isArray(param) ? param.join('/') : param || 'README'
 
+  const contentPath = resolveDocPath(resolve(process.cwd(), 'content'), slug)
+  if (!contentPath) {
+    throw notFound()
+  }
+
   try {
-    const contentPath = join(process.cwd(), 'content', `${slug}.md`)
-    const content = await readFile(contentPath, 'utf-8')
-    return content
+    return await readFile(contentPath, 'utf-8')
   } catch {
-    throw createError({
-      statusCode: 404,
-      statusMessage: 'Document not found',
-    })
+    throw notFound()
   }
 })

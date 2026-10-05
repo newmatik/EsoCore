@@ -98,8 +98,6 @@ class StepLinter:
         normalized_lines = []
 
         for line in lines:
-            original_line = line
-
             # Skip empty lines and comments
             if not line.strip() or line.strip().startswith('//'):
                 normalized_lines.append(line)

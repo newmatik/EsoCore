@@ -4,7 +4,7 @@
   "private": true,
   "description": "EsoCore Website",
   "engines": {
-    "node": ">=22.0.0",
+    "node": "^22.19.0 || ^24.11.0 || >=26.0.0",
     "pnpm": ">=9.0.0"
   },
   "scripts": {
@@ -17,7 +17,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "nuxt typecheck"
+    "typecheck": "nuxt typecheck",
+    "test": "node --experimental-strip-types --test tests/*.test.mjs"
   },
   "dependencies": {
     "marked": "^18.0.9",
@@ -39,6 +40,15 @@
       "@parcel/watcher",
       "esbuild",
       "unrs-resolver"
-    ]
+    ],
+    "overrides": {
+      "@fastify/busboy": "^3.2.1",
+      "brace-expansion@^2": "^2.1.7",
+      "brace-expansion@>=4 <6": "^5.0.12",
+      "devalue": "^5.9.3",
+      "qs": "^6.16.0",
+      "svgo@^4": "^4.1.0",
+      "undici@^8": "^8.10.2"
+    }
   }
 }
