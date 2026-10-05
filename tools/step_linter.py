@@ -166,7 +166,13 @@ class StepLinter:
 
         quoted_name = "'" + filename.replace("'", "''") + "'"
         header = header_match.group(0)
-        file_name = re.search(r"FILE_NAME\s*\(\s*(" + STEP_STRING.pattern + r")", header, re.IGNORECASE)
+        # The FILE_NAME entity, not the same text quoted inside e.g. FILE_DESCRIPTION.
+        quoted = [m.span() for m in STEP_STRING.finditer(header)]
+        file_name = next(
+            (m for m in re.finditer(r"FILE_NAME\s*\(\s*(" + STEP_STRING.pattern + r")", header, re.IGNORECASE)
+             if not any(start <= m.start() < end for start, end in quoted)),
+            None,
+        )
         if file_name:
             if file_name.group(1) == quoted_name:
                 return content, False

@@ -60,6 +60,12 @@ class StepLinterTest(unittest.TestCase):
         # Only the FILE_NAME name changed.
         self.assertEqual(fixed.replace("new_name.step", "old_name.step"), AP242_FILE)
 
+    def test_file_name_quoted_in_description_is_not_rewritten(self):
+        content = AP242_FILE.replace("('KiCad model')", "('see FILE_NAME(''example.step'')')")
+        fixed, _ = self.linter.fix_header(content, "new_name.step")
+        self.assertIn("('see FILE_NAME(''example.step'')')", fixed)
+        self.assertIn("FILE_NAME('new_name.step','2023-05-17T10:11:12'", fixed)
+
     def test_header_with_matching_name_is_unchanged(self):
         self.assertEqual(self.linter.fix_header(AP242_FILE, "old_name.step"), (AP242_FILE, False))
 
