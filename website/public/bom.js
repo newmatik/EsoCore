@@ -28,7 +28,7 @@
           result.push(current.trim())
           return result
         })
-      const [header, ...raw] = rows
+      const raw = rows.slice(1) // first row is the CSV header; columns are mapped by `keys` below
 
       const keys = [
         { key: 'Category', label: 'Category' },

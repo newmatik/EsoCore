@@ -270,73 +270,24 @@ export const docsConfig = [
 // CRITICAL: These functions determine which navigation groups are expanded
 // and what links are generated. They must work consistently across all
 // documentation pages to prevent navigation inconsistencies.
+// Groups whose pages are not all listed as children: any slug under one of these
+// prefixes also opens the group.
+const GROUP_PATH_PREFIXES = {
+  sensors: ['sensors/'],
+  business: ['solutions/', 'industries/', 'comparisons/'],
+  bom: ['bom/'],
+  'getting-started': ['getting-started/'],
+}
+
 export function isGroupExpanded(group, currentSlug) {
   if (!group.children) return false
 
-  // Use stable key-based matching for groups
-  if (group.key === 'edge-hardware') {
-    return (
-      currentSlug === 'esocore-edge' ||
-      currentSlug === 'ethernet' ||
-      currentSlug === 'edge-analog-inputs' ||
-      currentSlug === 'fieldbus'
-    )
+  // The current page is the group's own page or one of its listed children.
+  if (currentSlug === group.slug || group.children.some(child => child.slug === currentSlug)) {
+    return true
   }
 
-  if (group.key === 'sensors') {
-    return currentSlug === 'esocore-sensors' || currentSlug.startsWith('sensors/')
-  }
-
-  if (group.key === 'firmware') {
-    return (
-      currentSlug === 'firmware-overview' ||
-      currentSlug === 'edge-intelligence' ||
-      currentSlug === 'data-format-specification'
-    )
-  }
-
-  if (group.key === 'cloud-platform') {
-    return (
-      currentSlug === 'backend-server' ||
-      currentSlug === 'portal' ||
-      currentSlug === 'api-specification' ||
-      currentSlug === 'cloud-infrastructure'
-    )
-  }
-
-  if (group.key === 'development') {
-    return currentSlug === 'development-environment' || currentSlug === 'testing-procedures'
-  }
-
-  if (group.key === 'business') {
-    return (
-      currentSlug === 'business-model-and-partnerships' ||
-      currentSlug === 'competitor-analysis' ||
-      currentSlug.startsWith('solutions/') ||
-      currentSlug.startsWith('industries/') ||
-      currentSlug.startsWith('comparisons/')
-    )
-  }
-
-  if (group.key === 'bom') {
-    return currentSlug === 'bom' || currentSlug.startsWith('bom/')
-  }
-
-  if (group.key === 'getting-started') {
-    return currentSlug.startsWith('getting-started/')
-  }
-
-  // Fallback to slug-based matching
-  if (group.slug) {
-    return currentSlug === group.slug || currentSlug.startsWith(group.slug + '/')
-  }
-
-  return false
-}
-
-export function getGroupHeaderLink(group) {
-  if (group.slug) {
-    return `/docs/${group.slug}`
-  }
-  return '/docs'
+  // Unlisted pages under the group's path prefixes (or "<group slug>/" by default).
+  const prefixes = GROUP_PATH_PREFIXES[group.key] ?? (group.slug ? [`${group.slug}/`] : [])
+  return prefixes.some(prefix => currentSlug.startsWith(prefix))
 }
