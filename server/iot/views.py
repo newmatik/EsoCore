@@ -3,6 +3,7 @@ import logging
 import uuid
 from datetime import datetime
 
+from django.http.request import RawPostDataException
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from drf_spectacular.utils import OpenApiResponse, extend_schema, inline_serializer
@@ -140,8 +141,14 @@ def telemetry_batch(request):
                         {"error": "Content-SHA256 mismatch"},
                         status=status.HTTP_400_BAD_REQUEST,
                     )
-            except Exception:
-                pass
+            except RawPostDataException:
+                # The raw body is unavailable once the request stream has been consumed
+                # without caching. The payload was already parsed and authenticated, so the
+                # optional integrity check is skipped rather than rejecting the upload.
+                logger.warning(
+                    "Content-SHA256 not verified for device %s: request body unavailable",
+                    device.id,
+                )
 
         # Create telemetry packet record
         packet = TelemetryPacket.objects.create(

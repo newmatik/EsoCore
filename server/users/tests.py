@@ -241,7 +241,7 @@ class AuthViewTests(TestCase):
         response = self.client.get("/api/auth/me/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["username"], "testuser")
-        self.assertTrue("is_staff" in response.data)
+        self.assertIn("is_staff", response.data)
 
     def test_me_unauthenticated(self):
         response = self.client.get("/api/auth/me/")
