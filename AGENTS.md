@@ -1,6 +1,27 @@
 # AGENTS.md
 
-## Cursor Cloud specific instructions
+Instructions for AI coding agents (Claude Code reads this file through `CLAUDE.md`; Codex reads it directly).
+
+## Project conventions
+
+### BOM management
+
+- After editing any `bom.csv` file in `hardware/` (edge, cables, or sensors), run `python3 tools/sync_bom_data.py` so the
+  website's public BOM data (`website/public/bom/*.csv`) stays in sync with the source BOM files.
+- `hardware/edge/bom.csv` → `website/public/bom/bom-main.csv`
+- `hardware/cables/bom.csv` → `website/public/bom/bom-cables.csv`
+- `hardware/sensors/<name>/bom.csv` → `website/public/bom/bom-<slug>.csv`
+
+### Markdown
+
+- Maximum line length is 150 characters. When editing Markdown, fix line-length issues while preserving all content.
+- Use 2-space indentation for bullet continuation lines.
+
+### README files
+
+- Never use emojis. Keep content professional and clear, with plain-text section headers (no decorative characters).
+
+## Development environment
 
 ### Overview
 
