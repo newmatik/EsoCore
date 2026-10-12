@@ -1,0 +1,16 @@
+# pnpm settings. They live here, not in package.json's "pnpm" field, because
+# pnpm 11 (which Dependabot uses) ignores that field and would drop the overrides
+# from the lockfile, breaking CI's pnpm 10 frozen install.
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  unrs-resolver: true
+
+overrides:
+  '@fastify/busboy': '^3.2.1'
+  'brace-expansion@^2': '^2.1.7'
+  'brace-expansion@>=4 <6': '^5.0.12'
+  devalue: '^5.9.3'
+  qs: '^6.16.0'
+  'svgo@^4': '^4.1.0'
+  'undici@^8': '^8.10.2'

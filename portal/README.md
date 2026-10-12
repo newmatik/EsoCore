@@ -142,6 +142,7 @@ portal/
 ├── nuxt.config.ts                    # Nuxt configuration
 ├── package.json                      # Dependencies and scripts
 ├── pnpm-lock.yaml                    # Lockfile
+├── pnpm-workspace.yaml               # pnpm settings (overrides, allowed build scripts)
 └── tsconfig.json                     # TypeScript configuration
 ```
 
@@ -201,7 +202,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 # Use pnpm via Corepack (bundled with Node 22)
 RUN corepack enable
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 COPY . .
 RUN pnpm run build
