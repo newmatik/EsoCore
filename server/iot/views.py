@@ -1,11 +1,12 @@
 import hashlib
 import logging
+import math
 import uuid
 from datetime import datetime
 
+from django.db import DatabaseError, IntegrityError, transaction
 from django.http.request import RawPostDataException
 from django.utils import timezone
-from django.utils.dateparse import parse_datetime
 from drf_spectacular.utils import OpenApiResponse, extend_schema, inline_serializer
 from rest_framework import serializers, status
 from rest_framework.decorators import api_view, permission_classes
@@ -69,19 +70,25 @@ def auth_handshake(request):
     return Response({"nonce": nonce, "server_time": server_time, "version": "1.0.0"})
 
 
+class TelemetryItemSerializer(serializers.Serializer):
+    """Validate device readings before opening a database write transaction."""
+
+    timestamp = serializers.DateTimeField()
+    metric = serializers.CharField(max_length=255)
+    value = serializers.FloatField()
+    unit = serializers.CharField(
+        max_length=50, required=False, allow_blank=True, default=""
+    )
+    meta = serializers.DictField(required=False, default=dict)
+
+    def validate_value(self, value):
+        if not math.isfinite(value):
+            raise serializers.ValidationError("Value must be finite")
+        return value
+
+
 @extend_schema(
-    request=serializers.ListSerializer(
-        child=inline_serializer(
-            name="TelemetryItem",
-            fields={
-                "timestamp": serializers.CharField(),
-                "metric": serializers.CharField(),
-                "value": serializers.FloatField(),
-                "unit": serializers.CharField(required=False),
-                "meta": serializers.DictField(required=False),
-            },
-        )
-    ),
+    request=TelemetryItemSerializer(many=True),
     responses={
         200: inline_serializer(
             name="TelemetryBatchResponse",
@@ -104,102 +111,95 @@ def telemetry_batch(request):
     if err_response:
         return err_response
 
+    idempotency_key = request.META.get("HTTP_IDEMPOTENCY_KEY")
+    content_sha256 = request.META.get("HTTP_CONTENT_SHA256")
+    if not idempotency_key:
+        return Response(
+            {"error": "Missing required Idempotency-Key header"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
     try:
-        idempotency_key = request.META.get("HTTP_IDEMPOTENCY_KEY")
-        content_sha256 = request.META.get("HTTP_CONTENT_SHA256")
-
-        if not idempotency_key:
-            return Response(
-                {"error": "Missing required Idempotency-Key header"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # Check for duplicate upload
-        if TelemetryPacket.objects.filter(
-            device=device, upload_id=idempotency_key
-        ).exists():
-            return Response(
-                {"accepted": 0, "duplicates": 1, "rejected": 0},
-                status=status.HTTP_409_CONFLICT,
-            )
-
-        # Process batch data
-        batch_data = request.data
-        if not isinstance(batch_data, list):
-            return Response(
-                {"error": "Batch data must be a list"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # Optional: verify content hash if provided
-        if content_sha256:
-            try:
-                raw_body = request.body or b""
-                calculated = hashlib.sha256(raw_body).hexdigest()
-                if calculated != content_sha256:
-                    return Response(
-                        {"error": "Content-SHA256 mismatch"},
-                        status=status.HTTP_400_BAD_REQUEST,
-                    )
-            except RawPostDataException:
-                # The raw body is unavailable once the request stream has been consumed
-                # without caching. The payload was already parsed and authenticated, so the
-                # optional integrity check is skipped rather than rejecting the upload.
-                logger.warning(
-                    "Content-SHA256 not verified for device %s: request body unavailable",
-                    device.id,
-                )
-
-        # Create telemetry packet record
-        packet = TelemetryPacket.objects.create(
-            device=device,
-            upload_id=idempotency_key,
-            checksum=content_sha256 or "",
-            record_count=len(batch_data),
-            status="processing",
+        idempotency_key = uuid.UUID(idempotency_key)
+    except (ValueError, AttributeError):
+        return Response(
+            {"error": "Idempotency-Key must be a UUID"},
+            status=status.HTTP_400_BAD_REQUEST,
         )
 
-        # Process individual telemetry points
-        accepted = 0
-        rejected = 0
+    # Capture/verify bytes before DRF consumes the JSON stream. A supplied
+    # integrity check must never silently become optional because parsing ran.
+    if content_sha256:
+        try:
+            raw_body = request.body
+        except RawPostDataException:
+            return Response(
+                {"error": "Content-SHA256 cannot be verified"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if hashlib.sha256(raw_body).hexdigest() != content_sha256:
+            return Response(
+                {"error": "Content-SHA256 mismatch"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        for item in batch_data:
-            try:
-                # Parse timestamp (expect ISO-8601 string)
-                ts = item.get("timestamp")
-                ts_parsed = parse_datetime(ts) if isinstance(ts, str) else ts
-                if ts_parsed is None:
-                    ts_parsed = timezone.now()
-                TelemetryPoint.objects.create(
-                    device=device,
-                    timestamp=ts_parsed,
-                    metric=item.get("metric"),
-                    value=item.get("value"),
-                    unit=item.get("unit", ""),
-                    meta=item.get("meta", {}),
-                )
-                accepted += 1
-            except Exception:
-                rejected += 1
+    # Keep parser errors under DRF's normal 400 handling, not the storage 500.
+    batch_data = request.data
+    if not isinstance(batch_data, list):
+        return Response(
+            {"error": "Batch data must be a list"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    readings = []
+    rejected = 0
+    for item in batch_data:
+        serializer = TelemetryItemSerializer(data=item)
+        if serializer.is_valid():
+            readings.append(serializer.validated_data)
+        else:
+            rejected += 1
 
-        # Update packet status
-        packet.status = "processed"
-        packet.record_count = accepted
-        packet.processed_at = timezone.now()
-        packet.save()
-
-        # Update device last_seen
-        device.last_seen = timezone.now()
-        device.save()
-
-        return Response({"accepted": accepted, "duplicates": 0, "rejected": rejected})
-
+    duplicate = {"accepted": 0, "duplicates": 1, "rejected": 0}
+    try:
+        with transaction.atomic():
+            if TelemetryPacket.objects.filter(
+                device=device, upload_id=idempotency_key
+            ).exists():
+                return Response(duplicate, status=status.HTTP_409_CONFLICT)
+            packet = TelemetryPacket.objects.create(
+                device=device,
+                upload_id=idempotency_key,
+                checksum=content_sha256 or "",
+                record_count=len(readings),
+                status="processing",
+            )
+            for reading in readings:
+                TelemetryPoint.objects.create(device=device, **reading)
+            packet.status = "processed"
+            packet.processed_at = timezone.now()
+            packet.save(update_fields=["status", "processed_at"])
+            device.last_seen = timezone.now()
+            device.save(update_fields=["last_seen"])
+        return Response(
+            {"accepted": len(readings), "duplicates": 0, "rejected": rejected}
+        )
+    except IntegrityError:
+        # The unique device/upload constraint arbitrates concurrent arrivals.
+        # Query only after atomic rollback so a duplicate is not mistaken for
+        # an unavailable/broken transaction or an unrelated integrity failure.
+        try:
+            if TelemetryPacket.objects.filter(
+                device=device, upload_id=idempotency_key, status="processed"
+            ).exists():
+                return Response(duplicate, status=status.HTTP_409_CONFLICT)
+        except DatabaseError:
+            logger.exception("Duplicate recovery lookup failed in telemetry_batch")
+        logger.exception("Integrity error in telemetry_batch")
     except Exception:
         logger.exception("Unexpected error in telemetry_batch")
-        return Response(
-            {"error": "Internal server error"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+    return Response(
+        {"error": "Internal server error"},
+        status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    )
 
 
 @extend_schema(

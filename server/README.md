@@ -112,6 +112,29 @@ curl -H "X-Device-Id: <uuid>" \
      http://localhost:8000/api/iot/v1/telemetry/batch
 ```
 
+### Telemetry upload integrity
+
+`POST /api/iot/v1/telemetry/batch` requires a client-generated UUID in
+`Idempotency-Key`. Retain the same UUID when retrying a failed upload. Successful
+replays return the existing duplicate response (`409`), rather than inserting
+more points.
+
+Each reading requires an ISO-8601 timestamp, a nonempty metric (up to 255
+characters), and a finite numeric value. Optional units are limited to 50
+characters; metadata is an object. Invalid readings contribute to `rejected`
+and are never assigned an invented server timestamp. Valid readings contribute
+to `accepted`.
+
+The packet receipt, valid readings and device last-seen update commit in one
+transaction. A storage failure returns `500` and leaves the upload retryable
+under its original key. A supplied `Content-SHA256` must match the raw request
+bytes before JSON parsing; an unavailable checksum body is rejected explicitly.
+Malformed JSON or upload IDs return `400`.
+
+This controls new uploads. Historical incomplete receipts or partial data from
+the older write path require a separate review; the API does not erase or
+reconstruct them automatically.
+
 ### Session Authentication (Users)
 
 Users authenticate via Django's session framework for web interface access.
@@ -184,6 +207,21 @@ DATABASES = {
 ```bash
 poetry run python manage.py test
 ```
+
+### PostgreSQL protocol tests
+
+CI also runs the full server suite against a disposable PostgreSQL 17 service,
+using `esocore_api.test_settings_postgres`. This executes concurrent upload and
+row-lock tests that SQLite cannot establish. The default local backend remains
+SQLite. For an isolated local PostgreSQL fixture, provide the `TEST_POSTGRES_*`
+connection variables and run:
+
+```bash
+poetry run python manage.py test --settings=esocore_api.test_settings_postgres
+```
+
+Use a disposable test database and test credentials; this module is not a
+production deployment configuration.
 
 ### Code Quality Tools
 
