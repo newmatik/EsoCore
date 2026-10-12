@@ -73,3 +73,45 @@ jobs:
 
       - name: Run tests
         run: poetry run python manage.py test --verbosity=2
+
+  test-postgres:
+    name: Server test (PostgreSQL)
+    runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: test-secret-key-for-ci
+      DEBUG: "True"
+      ALLOWED_HOSTS: localhost,127.0.0.1
+      DJANGO_SETTINGS_MODULE: esocore_api.test_settings_postgres
+      TEST_POSTGRES_HOST: 127.0.0.1
+      TEST_POSTGRES_DB: esocore_telemetry_fixture
+      TEST_POSTGRES_USER: postgres
+      TEST_POSTGRES_PASSWORD: local-test-only
+      TEST_POSTGRES_PORT: "5432"
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: esocore_telemetry_fixture
+          POSTGRES_PASSWORD: local-test-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d esocore_telemetry_fixture"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Install Poetry
+        run: pipx install poetry
+        working-directory: .
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: "poetry"
+          cache-dependency-path: server/poetry.lock
+      - name: Install dependencies
+        run: poetry install --no-interaction
+      - name: Run PostgreSQL-backed tests
+        run: poetry run python manage.py test --verbosity=2
