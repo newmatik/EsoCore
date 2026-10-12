@@ -7,6 +7,10 @@ allowBuilds:
   unrs-resolver: true
   vue-demi: true
 
+# Do not override simple-git to ^4: @nuxt/devtools 3.x does `import Git from 'simple-git'`,
+# and v4 dropped the default export, so `nuxt dev` fails to load devtools. The open
+# simple-git alerts are dev-only (devtools runs it with fixed args against rootDir) and
+# go away with @nuxt/devtools 4, which no longer depends on simple-git.
 overrides:
   ws: '^8.21.0'
   esbuild: '^0.28.1'

@@ -6,6 +6,10 @@ allowBuilds:
   esbuild: true
   unrs-resolver: true
 
+# Do not override simple-git to ^4: @nuxt/devtools 3.x does `import Git from 'simple-git'`,
+# and v4 dropped the default export, so `nuxt dev` fails to load devtools. The open
+# simple-git alerts are dev-only (devtools runs it with fixed args against rootDir) and
+# go away with @nuxt/devtools 4, which no longer depends on simple-git.
 overrides:
   '@fastify/busboy': '^3.2.1'
   'brace-expansion@^2': '^2.1.7'
