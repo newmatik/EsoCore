@@ -2,7 +2,11 @@
 
 import os
 
-from .settings import *  # noqa: F403
+from . import settings as base_settings
+
+globals().update(
+    {name: value for name, value in vars(base_settings).items() if name.isupper()}
+)
 
 DATABASES = {
     "default": {

@@ -208,6 +208,21 @@ DATABASES = {
 poetry run python manage.py test
 ```
 
+### PostgreSQL protocol tests
+
+CI also runs the full server suite against a disposable PostgreSQL 17 service,
+using `esocore_api.test_settings_postgres`. This executes concurrent upload and
+row-lock tests that SQLite cannot establish. The default local backend remains
+SQLite. For an isolated local PostgreSQL fixture, provide the `TEST_POSTGRES_*`
+connection variables and run:
+
+```bash
+poetry run python manage.py test --settings=esocore_api.test_settings_postgres
+```
+
+Use a disposable test database and test credentials; this module is not a
+production deployment configuration.
+
 ### Code Quality Tools
 
 This project uses modern Python code quality tools:
@@ -299,18 +314,3 @@ server/
 ## License
 
 Copyright © 2026 Newmatik. All rights reserved. Licensed under the Apache License, Version 2.0. See `website/content/license.md` for details.
-
-### PostgreSQL protocol tests
-
-CI also runs the full server suite against a disposable PostgreSQL 17 service,
-using `esocore_api.test_settings_postgres`. This executes concurrent upload and
-row-lock tests that SQLite cannot establish. The default local backend remains
-SQLite. For an isolated local PostgreSQL fixture, provide the `TEST_POSTGRES_*`
-connection variables and run:
-
-```bash
-poetry run python manage.py test --settings=esocore_api.test_settings_postgres
-```
-
-Use a disposable test database and test credentials; this module is not a
-production deployment configuration.
