@@ -45,11 +45,17 @@ See each project's README for standard setup/run/lint/test commands.
 - **Portal .env**: Copy `portal/.env.example` to `portal/.env`. The portal connects to the API at
   `http://localhost:8000/api` by default.
 - **Server superuser**: Create with
-  `DJANGO_SUPERUSER_USERNAME=admin DJANGO_SUPERUSER_EMAIL=admin@esocore.local DJANGO_SUPERUSER_PASSWORD=admin123 poetry run python manage.py createsuperuser --noinput`
-- **pnpm build scripts warning**: pnpm 10+ blocks native dependency build scripts by default. The portal and website
-  show warnings about ignored build scripts for `@parcel/watcher`, `esbuild`, `unrs-resolver`, and `vue-demi`.
-  The portal works correctly despite these warnings. The website has a pre-existing issue where pages are not
-  discovered (shows Nuxt welcome page instead of actual content).
+
+  ```bash
+  DJANGO_SUPERUSER_USERNAME=admin DJANGO_SUPERUSER_EMAIL=admin@esocore.local DJANGO_SUPERUSER_PASSWORD=admin123 \
+    poetry run python manage.py createsuperuser --noinput
+  ```
+
+- **pnpm settings live in `pnpm-workspace.yaml`**: `portal/` and `website/` each keep `overrides` and the `allowBuilds`
+  build-script allowlist in their own `pnpm-workspace.yaml`, not in the `pnpm` field of `package.json`. pnpm 11 (which
+  Dependabot uses) ignores that field and drops the overrides from the lockfile, so CI's pnpm 10 `--frozen-lockfile`
+  install fails. Add new overrides or build approvals to `pnpm-workspace.yaml`, and use `allowBuilds`, not
+  `onlyBuiltDependencies`.
 - **Portal login**: Use `admin` / `admin123` (or the superuser credentials you created) to log into the portal.
 - **WebSocket port conflict**: When running both portal and website dev servers simultaneously, the website will show
   a WebSocket port 24678 conflict error. This is cosmetic and doesn't affect the website's server-side rendering.
@@ -69,8 +75,18 @@ cd website && pnpm run dev -- --host 0.0.0.0 --port 3001
 
 ### Lint and test commands
 
-- **Server lint**: `cd server && poetry run ruff check . && poetry run black --check . && poetry run isort --check-only .`
-- **Server tests**: `cd server && poetry run python manage.py test`
-- **Portal lint**: `cd portal && pnpm run lint`
-- **Website lint**: `cd website && pnpm run lint`
-- **Root markdown lint**: `pnpm run lint:md` (from repository root)
+These are the CI gates in `.github/workflows/`. Each `*-ci.yml` workflow runs on every pull request to `main`; run the
+gates of the part you changed before pushing.
+
+- **Server** (`server-ci.yml`): `cd server && poetry run ruff check . && poetry run black --check . &&
+  poetry run isort --check-only .`, then `poetry run python manage.py test`. CI repeats the tests against PostgreSQL 17
+  with `DJANGO_SETTINGS_MODULE=esocore_api.test_settings_postgres`.
+- **Portal** (`portal-ci.yml`): `cd portal && pnpm install --frozen-lockfile && pnpm lint && pnpm format:check &&
+  pnpm typecheck && pnpm build`. The portal has no test script.
+- **Website** (`website-ci.yml`): `cd website && pnpm install --frozen-lockfile && pnpm lint && pnpm format:check &&
+  pnpm typecheck && pnpm test && pnpm build`.
+- **Tools** (`tools-ci.yml`): `python3 -m unittest discover -s tools -v` from the repository root.
+- **Root markdown lint** (not in CI): `pnpm install --lockfile=false && pnpm run lint:md` from the repository root,
+  which has no lockfile.
+
+`pages.yml` deploys the website to GitHub Pages on every push to `main`.
