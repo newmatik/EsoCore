@@ -158,6 +158,13 @@ BRAND_NAME=Newmatik
 PRODUCT_NAME=EsoCore
 ```
 
+`ALLOWED_HOSTS` and `CORS_ALLOWED_ORIGINS` are comma-separated lists; whitespace around entries and empty entries
+are ignored. `CORS_ALLOWED_ORIGINS` takes full origins (scheme, host and optional port, no trailing slash). Setting
+it replaces the defaults, which only cover local development (the portal on `:3080` plus `localhost`, `127.0.0.1`
+and `0.0.0.0` on ports 3001, 3002 and 8000; see `DEFAULT_CORS_ALLOWED_ORIGINS` in `esocore_api/settings.py`). A
+deployment that serves the portal from its own domain must set it, for example
+`CORS_ALLOWED_ORIGINS=https://portal.example.com`.
+
 ### Branding (Admin Title)
 
 Admin branding is configured in `esocore_api/branding.py`.
