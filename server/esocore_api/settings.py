@@ -36,11 +36,16 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "False").lower() in ("true", "1", "yes")
 
-ALLOWED_HOSTS = [
-    h.strip()
-    for h in os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
-    if h.strip()
-]
+
+def env_list(name, default):
+    """Read a comma-separated list from the environment, dropping empty entries."""
+    raw = os.environ.get(name)
+    if raw is None:
+        return list(default)
+    return [item.strip() for item in raw.split(",") if item.strip()]
+
+
+ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", ["localhost", "127.0.0.1"])
 
 # Authentication backends (allow login by username or email)
 AUTHENTICATION_BACKENDS = [
@@ -243,8 +248,9 @@ SPECTACULAR_SETTINGS = {
     "COMPONENT_SPLIT_REQUEST": True,
 }
 
-# CORS configuration
-CORS_ALLOWED_ORIGINS = [
+# CORS configuration. Override with a comma-separated CORS_ALLOWED_ORIGINS
+# environment variable; the defaults cover local development only.
+DEFAULT_CORS_ALLOWED_ORIGINS = [
     "http://localhost:3080",
     "http://127.0.0.1:3080",
     "http://localhost:3001",
@@ -257,6 +263,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://127.0.0.1:8000",
 ]
+CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS", DEFAULT_CORS_ALLOWED_ORIGINS)
 
 CORS_ALLOW_CREDENTIALS = True
 

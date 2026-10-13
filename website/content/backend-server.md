@@ -149,13 +149,18 @@ The server will be available at `http://localhost:8000`. The admin panel is at `
 Key environment variables (set in shell or deployment config). Note: `.env` files are **not** auto-loaded
 by the Django settings; set these as real environment variables or add `python-dotenv` loading if needed:
 
-| Variable               | Default                 | Description                       |
-| ---------------------- | ----------------------- | --------------------------------- |
-| `SECRET_KEY`           | (generated)             | Django secret key                 |
-| `DEBUG`                | `True`                  | Enable debug mode                 |
-| `DATABASE_URL`         | `sqlite:///db.sqlite3`  | Database connection string        |
-| `ALLOWED_HOSTS`        | `localhost,127.0.0.1`   | Comma-separated allowed hostnames |
-| `CORS_ALLOWED_ORIGINS` | `http://localhost:3080` | Portal origin for CORS            |
+| Variable               | Default                | Description                       |
+| ---------------------- | ---------------------- | --------------------------------- |
+| `SECRET_KEY`           | (generated)            | Django secret key                 |
+| `DEBUG`                | `True`                 | Enable debug mode                 |
+| `DATABASE_URL`         | `sqlite:///db.sqlite3` | Database connection string        |
+| `ALLOWED_HOSTS`        | `localhost,127.0.0.1`  | Comma-separated allowed hostnames |
+| `CORS_ALLOWED_ORIGINS` | Local dev origins      | Comma-separated CORS origins      |
+
+`CORS_ALLOWED_ORIGINS` takes full origins (scheme, host and optional port), for example
+`https://portal.example.com,https://admin.example.com`. Setting it replaces the defaults, which only cover local
+development (`http://localhost:3080`, `http://127.0.0.1:3080` and a few other local ports). Set it whenever the
+portal runs on its own domain, or the browser blocks its API requests.
 
 ### Running Tests
 
