@@ -118,7 +118,7 @@ pnpm install
 pnpm dev
 ```
 
-The portal will be available at `http://localhost:3000`.
+The portal will be available at `http://localhost:3080`.
 
 ### Environment Variables
 
@@ -163,7 +163,7 @@ The portal communicates with the Backend Server via REST APIs. In development, b
 | Service        | URL                     | Purpose          |
 | -------------- | ----------------------- | ---------------- |
 | Backend Server | `http://localhost:8000` | Django REST API  |
-| Portal         | `http://localhost:3000` | Nuxt.js frontend |
+| Portal         | `http://localhost:3080` | Nuxt.js frontend |
 
 CORS is configured on the backend to allow requests from the portal origin. In production, both services are
 typically served behind the same reverse proxy or domain to simplify CORS handling.

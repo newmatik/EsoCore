@@ -48,7 +48,7 @@ Modern Vue.js frontend application for the EsoCore IoT monitoring system, built 
    pnpm run dev
    ```
 
-The application will be available at `http://localhost:3000`
+The application will be available at `http://localhost:3080`
 
 ### Production Build
 

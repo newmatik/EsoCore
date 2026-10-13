@@ -69,6 +69,9 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
   devtools: { enabled: true },
 
+  // Local port map: newmatik/agent-skills workspace/AGENTS.md, "Local ports" (portal is 3080).
+  devServer: { port: 3081 },
+
   // Explicitly keep root-level directory structure (Nuxt 4 defaults to app/)
   srcDir: '.',
 
