@@ -153,7 +153,7 @@ in `settings.py` are sufficient (SQLite, DEBUG=True).
 DEBUG=True
 SECRET_KEY=your-secret-key-here
 ALLOWED_HOSTS=localhost,127.0.0.1
-CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+CORS_ALLOWED_ORIGINS=http://localhost:3080,http://127.0.0.1:3080
 BRAND_NAME=Newmatik
 PRODUCT_NAME=EsoCore
 ```

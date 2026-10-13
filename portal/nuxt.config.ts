@@ -61,9 +61,9 @@ export default defineNuxtConfig({
     },
   },
 
-  // Development server
+  // Development server. Local port map: newmatik/agent-skills workspace/AGENTS.md, "Local ports".
   devServer: {
-    port: 3000,
+    port: 3080,
     host: '0.0.0.0',
   },
 

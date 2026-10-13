@@ -155,7 +155,7 @@ by the Django settings; set these as real environment variables or add `python-d
 | `DEBUG`                | `True`                  | Enable debug mode                 |
 | `DATABASE_URL`         | `sqlite:///db.sqlite3`  | Database connection string        |
 | `ALLOWED_HOSTS`        | `localhost,127.0.0.1`   | Comma-separated allowed hostnames |
-| `CORS_ALLOWED_ORIGINS` | `http://localhost:3000` | Portal origin for CORS            |
+| `CORS_ALLOWED_ORIGINS` | `http://localhost:3080` | Portal origin for CORS            |
 
 ### Running Tests
 

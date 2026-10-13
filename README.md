@@ -59,7 +59,7 @@ pnpm install
 pnpm run dev
 ```
 
-The portal runs at `http://localhost:3000`.
+The portal runs at `http://localhost:3080`.
 
 See `portal/README.md` for configuration and branding details.
 
@@ -70,6 +70,8 @@ cd website
 pnpm install
 pnpm run dev
 ```
+
+The website runs at `http://localhost:3081`.
 
 To generate the static site for production:
 
