@@ -27,7 +27,7 @@ esocore/
 
 | Layer    | Technology                                                  |
 | -------- | ----------------------------------------------------------- |
-| Backend  | Python 3.11+, Django 5, Django REST Framework, Poetry       |
+| Backend  | Python 3.11–3.13, Django 5, Django REST Framework, Poetry   |
 | Portal   | TypeScript, Nuxt 4 (Vue 3), Nuxt UI, Tailwind CSS 4, Pinia  |
 | Website  | TypeScript, Nuxt 4 (Vue 3), static generation, GitHub Pages |
 | Firmware | C (C11), STM32H7 / STM32G0, ARM GCC, GNU Make               |
@@ -99,8 +99,9 @@ Requires the ARM GCC toolchain. See `firmware/README.md` for architecture and pr
 
 ### Checks
 
-Each part has its own CI workflow in `.github/workflows/` that runs on pull requests to `main`. The commands for server, portal, website and tools are
-listed in [AGENTS.md](AGENTS.md#lint-and-test-commands); run the ones for the part you changed before pushing.
+The server, portal, website and tools each have a CI workflow in `.github/workflows/` that runs on pull requests to `main` (`firmware/` and
+`hardware/` have none). The commands for these parts are listed in [AGENTS.md](AGENTS.md#lint-and-test-commands); run the ones for the part you
+changed before pushing.
 
 ## Hardware
 
