@@ -2,9 +2,13 @@
 
 [![Sponsor](https://img.shields.io/badge/Sponsor-Newmatik-blue?style=for-the-badge&logo=github-sponsors)](https://www.newmatik.com)
 
-EsoCore (Edge Sensor Observation, Control, Operations, Reliability Engine) is an open-source industrial IoT platform
-for monitoring factory machinery and equipment. It spans the full stack from PCB hardware and embedded firmware to a
-Django REST API backend and a Nuxt.js user portal.
+EsoCore (Edge Sensor Observation, Control, Operations, Reliability Engine) is an open-source industrial IoT platform for monitoring factory machinery
+and equipment. It spans the full stack from PCB hardware and embedded firmware to a Django REST API backend and a Nuxt.js user portal.
+
+Status: in development. Newmatik builds it for monitoring machines on factory floors. The documentation website is live at
+[www.esocore.com](https://www.esocore.com) (GitHub Pages); the API and the portal have no production deployment yet and run locally only.
+
+Coding agents: [AGENTS.md](AGENTS.md) has the conventions, local caveats and CI gates.
 
 ## Repository Structure
 
@@ -21,18 +25,18 @@ esocore/
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Backend | Python 3.11+, Django 5, Django REST Framework, Poetry |
-| Portal | TypeScript, Nuxt 4 (Vue 3), Nuxt UI, Tailwind CSS 4, Pinia |
-| Website | TypeScript, Nuxt 4 (Vue 3), static generation, GitHub Pages |
-| Firmware | C (C11), STM32H7 / STM32G0, ARM GCC, GNU Make |
-| Hardware | Altium Designer, 4-layer FR4 PCBs |
+| Layer    | Technology                                                  |
+| -------- | ----------------------------------------------------------- |
+| Backend  | Python 3.11–3.13, Django 5, Django REST Framework, Poetry   |
+| Portal   | TypeScript, Nuxt 4 (Vue 3), Nuxt UI, Tailwind CSS 4, Pinia  |
+| Website  | TypeScript, Nuxt 4 (Vue 3), static generation, GitHub Pages |
+| Firmware | C (C11), STM32H7 / STM32G0, ARM GCC, GNU Make               |
+| Hardware | Altium Designer, 4-layer FR4 PCBs                           |
 
 ## Prerequisites
 
-- **Python 3.11+** and [Poetry](https://python-poetry.org/) for the server
-- **Node 22.19+ (or 24.11+)** and [pnpm 9+](https://pnpm.io/) for the portal and website
+- **Python 3.11 to 3.13** and [Poetry](https://python-poetry.org/) for the server (CI uses 3.11)
+- **Node 22.19+ (or 24.11+)** and [pnpm](https://pnpm.io/) 10 (as in CI) for the portal and website
 - **ARM GCC** (`arm-none-eabi-gcc`) and **GNU Make** for the firmware
 
 ## Getting Started
@@ -93,6 +97,12 @@ make help         # List all available targets
 
 Requires the ARM GCC toolchain. See `firmware/README.md` for architecture and protocol details.
 
+### Checks
+
+The server, portal, website and tools each have a CI workflow in `.github/workflows/` that runs on pull requests to `main` (`firmware/` and
+`hardware/` have none). The commands for these parts are listed in [AGENTS.md](AGENTS.md#lint-and-test-commands); run the ones for the part you
+changed before pushing.
+
 ## Hardware
 
 PCB designs, schematics, and BOMs are organized under `hardware/`:
@@ -102,13 +112,13 @@ PCB designs, schematics, and BOMs are organized under `hardware/`:
   - vibration, acoustic, current, air quality, light, oil quality, pressure, temperature spot, proximity position
 - `hardware/cables/` -- Cable assemblies
 
-CAD files are in each device's `altium/` folder (open the `.PcbDoc` projects with Altium Designer).
-See `hardware/README.md` and individual sensor READMEs for specifications.
+CAD files are in each device's `altium/` folder (open the `.PcbDoc` projects with Altium Designer). See `hardware/README.md` and individual sensor
+READMEs for specifications.
 
 ### BOM Management
 
-Canonical BOM CSVs live in each device folder under `hardware/`. The website reads CSVs from
-`website/public/bom/` for public rendering. After editing any BOM in `hardware/`, run:
+Canonical BOM CSVs live in each device folder under `hardware/`. The website reads CSVs from `website/public/bom/` for public rendering. After editing
+any BOM in `hardware/`, run:
 
 ```bash
 python3 tools/sync_bom_data.py
@@ -131,9 +141,8 @@ The Edge device supports industrial fieldbus protocols:
 
 ## Open Source
 
-Source code: [github.com/newmatik/esocore](https://github.com/newmatik/esocore)
+Source code: [github.com/newmatik/EsoCore](https://github.com/newmatik/EsoCore)
 
 ## Legal
 
-Copyright 2026 Newmatik. All rights reserved.
-Licensed under the Apache License, Version 2.0. See `website/content/license.md` for details.
+Copyright 2026 Newmatik. All rights reserved. Licensed under the Apache License, Version 2.0. See `website/content/license.md` for details.
