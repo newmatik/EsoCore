@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import AlertRule, EventLog, NotificationQueue, SystemEvent
+from .models import AlertRule, NotificationQueue, SystemEvent
 
 
 class SystemEventSerializer(serializers.ModelSerializer):
@@ -87,26 +87,3 @@ class NotificationQueueSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
-
-
-class EventLogSerializer(serializers.ModelSerializer):
-    event_description = serializers.CharField(
-        source="event.description", read_only=True
-    )
-    user_name = serializers.CharField(
-        source="user.username", read_only=True, allow_null=True
-    )
-
-    class Meta:
-        model = EventLog
-        fields = [
-            "id",
-            "event",
-            "event_description",
-            "action",
-            "details",
-            "user",
-            "user_name",
-            "timestamp",
-        ]
-        read_only_fields = ["id", "timestamp"]
