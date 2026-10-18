@@ -58,7 +58,6 @@ pnpm preview
 ```text
 website/
 ├── components/         # Vue components (header, footer, etc.)
-├── composables/        # Vue composables (useDocs, etc.)
 ├── content/            # Markdown documentation files
 ├── layouts/            # Nuxt.js layouts
 ├── pages/              # Nuxt.js pages and routing
