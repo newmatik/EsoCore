@@ -26,8 +26,8 @@ django-crispy-forms = ">=2.4,<3.0"
 
 
 [tool.poetry.group.dev.dependencies]
-ruff = "0.16.10"
-black = "26.10.0"
+ruff = "0.17.1"
+black = "26.10.1"
 isort = "9.0.2"
 
 # Scripts are defined in package.json style format for easier execution
