@@ -1,0 +1,98 @@
+name: Dependabot auto-merge
+
+# Patch and minor dependency updates are low risk and fully gated by CI, yet
+# they used to sit for days waiting on a person. This job turns on GitHub
+# auto-merge (squash) for a Dependabot PR when every update in it is a semver
+# patch or minor, so it lands as soon as the required checks pass. Majors,
+# minor bumps of 0.x packages (breaking under semver) and anything
+# dependabot/fetch-metadata can't classify wait for a person: see the
+# dependabot-review skill in newmatik/agent-skills. If Dependabot later pushes
+# a version of the PR that no longer qualifies, auto-merge is turned off again.
+#
+# Same file in every Newmatik repo that uses it. Change it in all of them.
+#
+# Needs "Allow auto-merge" in the repo settings and a ruleset with required
+# status checks on the default branch. Without required checks, `--auto`
+# merges at once, before CI.
+#
+# The merge is made with GITHUB_TOKEN, so it does not start push-triggered
+# workflows on the default branch (GitHub blocks that to avoid recursive runs).
+# Deploys driven by Actions on push ship the bump with the next merge; deploys
+# driven by a GitHub App (Cloudflare Workers Builds) still run.
+
+on: pull_request
+
+# Dependabot-triggered workflows get a read-only GITHUB_TOKEN unless the
+# permissions are declared explicitly.
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: dependabot-automerge-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  automerge:
+    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 5
+    # Only PRs that Dependabot opened, from a branch in this repo, and only
+    # when Dependabot itself pushed (opened, rebased, recreated). A person
+    # pushing a fix to the branch doesn't re-run the decision. The PR author
+    # is immutable; github.actor alone can be spoofed (it is whoever caused
+    # the latest event), so both are checked.
+    if: >-
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.actor == 'dependabot[bot]' &&
+      github.repository == github.event.pull_request.head.repo.full_name
+    steps:
+      - name: Read Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+
+      - name: Decide
+        id: decide
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          UPDATES: ${{ steps.metadata.outputs.updated-dependencies-json }}
+        with:
+          script: |
+            // Merge only if every update is a patch, or a minor of a package
+            // already at 1.0 or later. A missing update type (git SHAs,
+            // versions that aren't semver) never qualifies.
+            const updates = JSON.parse(process.env.UPDATES || '[]');
+            const qualifies = (u) =>
+              u.updateType === 'version-update:semver-patch' ||
+              (u.updateType === 'version-update:semver-minor' &&
+                !/^v?0\./.test(u.prevVersion ?? '0.'));
+            const merge = updates.length > 0 && updates.every(qualifies);
+            core.setOutput('merge', String(merge));
+            await core.summary
+              .addHeading(`Dependabot auto-merge: ${merge ? 'enabled' : 'left for review'}`, 3)
+              .addTable([
+                ['Dependency', 'From', 'To', 'Update'].map((data) => ({ data, header: true })),
+                ...updates.map((u) => [
+                  u.dependencyName,
+                  u.prevVersion ?? '?',
+                  u.newVersion ?? '?',
+                  u.updateType ?? 'unknown',
+                ]),
+              ])
+              .write();
+
+      - name: Enable auto-merge (squash) once required checks pass
+        if: steps.decide.outputs.merge == 'true'
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Turn auto-merge off for updates that need review
+        if: steps.decide.outputs.merge != 'true'
+        run: |
+          if [ "$(gh pr view "$PR_URL" --json autoMergeRequest --jq '.autoMergeRequest != null')" = true ]; then
+            gh pr merge --disable-auto "$PR_URL"
+          fi
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
