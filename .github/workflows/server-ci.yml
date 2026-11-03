@@ -20,23 +20,21 @@ defaults:
 jobs:
   lint:
     name: Server lint
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
-      - name: Install Poetry
-        run: pipx install poetry
-        working-directory: .
-
       - name: Setup Python
         uses: actions/setup-python@v7
         with:
           python-version: "3.11"
-          cache: "poetry"
-          cache-dependency-path: server/poetry.lock
+
+      # pipx is not installed on the Beast runners. Same Poetry as poetry.lock.
+      - name: Install Poetry
+        run: python -m pip install poetry==2.5.1
 
       - name: Install dependencies
         run: poetry install --no-interaction
@@ -52,7 +50,7 @@ jobs:
 
   test:
     name: Server test
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 15
     env:
       SECRET_KEY: test-secret-key-for-ci
@@ -63,16 +61,14 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Install Poetry
-        run: pipx install poetry
-        working-directory: .
-
       - name: Setup Python
         uses: actions/setup-python@v7
         with:
           python-version: "3.11"
-          cache: "poetry"
-          cache-dependency-path: server/poetry.lock
+
+      # pipx is not installed on the Beast runners. Same Poetry as poetry.lock.
+      - name: Install Poetry
+        run: python -m pip install poetry==2.5.1
 
       - name: Install dependencies
         run: poetry install --no-interaction
@@ -82,7 +78,7 @@ jobs:
 
   test-postgres:
     name: Server test (PostgreSQL)
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 15
     env:
       SECRET_KEY: test-secret-key-for-ci
@@ -109,15 +105,12 @@ jobs:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-      - name: Install Poetry
-        run: pipx install poetry
-        working-directory: .
       - name: Setup Python
         uses: actions/setup-python@v7
         with:
           python-version: "3.11"
-          cache: "poetry"
-          cache-dependency-path: server/poetry.lock
+      - name: Install Poetry
+        run: python -m pip install poetry==2.5.1
       - name: Install dependencies
         run: poetry install --no-interaction
       - name: Run PostgreSQL-backed tests

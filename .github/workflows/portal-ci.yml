@@ -20,7 +20,7 @@ defaults:
 jobs:
   build-and-lint:
     name: Portal
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7

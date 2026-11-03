@@ -21,7 +21,7 @@ concurrency:
 jobs:
   test:
     name: Tools test
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
