@@ -1,0 +1,9 @@
+# HSTS and X-Content-Type-Options come from the esocore.com zone settings (Cloudflare).
+/*
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Content-Security-Policy: base-uri 'self'; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+/_nuxt/*
+  Cache-Control: public, max-age=31536000, immutable

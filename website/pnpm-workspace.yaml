@@ -5,6 +5,7 @@ allowBuilds:
   '@parcel/watcher': true
   esbuild: true
   unrs-resolver: true
+  workerd: true
 
 # Do not override simple-git to ^4: @nuxt/devtools 3.x does `import Git from 'simple-git'`,
 # and v4 dropped the default export, so `nuxt dev` fails to load devtools. The open

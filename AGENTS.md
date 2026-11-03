@@ -92,4 +92,9 @@ gates of the part you changed before pushing.
 - **Root markdown lint** (not in CI): `pnpm install --lockfile=false && pnpm run lint:md` from the repository root,
   which has no lockfile.
 
-`pages.yml` deploys the website to GitHub Pages on every push to `main`.
+`deploy-website.yml` deploys the website to the Cloudflare Worker `esocore-website` (static assets, Newmatik account
+`24c549e9c3005de7a3c295ead2c4bb87`) on every push to `main` that touches `website/`, and hourly when the last successful
+deploy shipped an older commit than `main` (Dependabot auto-merge pushes with `GITHUB_TOKEN`, which starts no workflow).
+It uses the repo secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` and attaches `www.esocore.com` and
+`esocore.com` as Workers custom domains; the Worker redirects the apex to www. Security and cache headers are in
+`website/public/_headers`. Do not deploy by hand.

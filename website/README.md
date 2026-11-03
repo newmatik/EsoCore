@@ -2,7 +2,8 @@
 
 This is the official website for EsoCore - an open-source industrial IoT platform for comprehensive monitoring of factory machinery and equipment.
 
-The website is built with [Nuxt.js](https://nuxt.com) and deployed as a static site to GitHub Pages at [www.esocore.com](https://www.esocore.com).
+The website is built with [Nuxt.js](https://nuxt.com) and deployed as static assets on a Cloudflare Worker at
+[www.esocore.com](https://www.esocore.com).
 
 ## Features
 
@@ -93,12 +94,19 @@ This copies CSV files from `hardware/` to `website/public/bom/` for use in the d
 
 ## Deployment
 
-The website is automatically deployed to GitHub Pages via GitHub Actions when changes are pushed to the `main` branch. The workflow:
+`.github/workflows/deploy-website.yml` deploys the site when changes to `website/` reach `main`, and an hourly check
+deploys `main` when an automatic (Dependabot) merge did not start the workflow. The workflow:
 
-1. Sets up Node.js and pnpm
-2. Installs dependencies
-3. Generates the static site
-4. Deploys to GitHub Pages
+1. Installs dependencies and generates the static site (`pnpm generate` writes `.output/public`)
+2. Runs `wrangler deploy` for the Worker `esocore-website` (`wrangler.jsonc`, Newmatik Cloudflare account)
+3. Attaches `www.esocore.com` and `esocore.com` as Workers custom domains (`.github/scripts/attach-custom-domains.mjs`;
+   idempotent, the first run moved them off GitHub Pages)
+4. Checks that the site, its headers and the apex redirect answer
+
+`worker/index.js` redirects `esocore.com` to `https://www.esocore.com` and hands every other request to the static
+assets. `public/_headers` sets `Referrer-Policy`, `X-Frame-Options`, the CSP `frame-ancestors` and long caching for
+`/_nuxt/*`; HSTS and `X-Content-Type-Options` come from the zone settings. Preview the production build locally with
+`pnpm generate && pnpm exec wrangler dev`.
 
 ## Contributing
 

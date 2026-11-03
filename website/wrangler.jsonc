@@ -1,0 +1,24 @@
+// www.esocore.com on Cloudflare Workers static assets (Newmatik account only).
+// Build first: `pnpm generate` writes .output/public.
+//
+// No `routes` here on purpose. www.esocore.com and esocore.com are attached as Workers
+// custom domains by .github/workflows/deploy-website.yml after `wrangler deploy`, through
+// the API with override_existing_dns_record, which replaces the old GitHub Pages DNS records
+// on the first deploy. Wrangler's own custom_domain routes fail in CI while those records
+// exist, and a deploy without routes leaves attached custom domains alone.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "esocore-website",
+  "account_id": "24c549e9c3005de7a3c295ead2c4bb87",
+  "compatibility_date": "2026-11-01",
+  "main": "worker/index.js",
+  "workers_dev": false,
+  "assets": {
+    "directory": ".output/public",
+    "binding": "ASSETS",
+    "run_worker_first": true,
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash",
+  },
+  "observability": { "enabled": true },
+}

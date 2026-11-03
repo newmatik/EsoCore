@@ -77,10 +77,11 @@ export default defineNuxtConfig({
   // Explicitly keep root-level directory structure (Nuxt 4 defaults to app/)
   srcDir: '.',
 
-  // CRITICAL: Build hooks to create GitHub Pages compatible file structure
+  // CRITICAL: Build hooks to create a clean-URL file structure (docs/page.html next to docs/page/index.html)
   hooks: {
     'nitro:build:public-assets': async nitro => {
-      // This hook creates HTML files for clean URLs to prevent GitHub Pages
+      // This hook creates HTML files for clean URLs to prevent the static host (Cloudflare Workers
+      // static assets, formerly GitHub Pages)
       // from redirecting /docs/page to /docs/page/
       const fs = await import('fs')
       const path = await import('path')
@@ -139,9 +140,9 @@ export default defineNuxtConfig({
     },
   },
 
-  // Static site generation for GitHub Pages
+  // Static site generation for Cloudflare Workers static assets (wrangler.jsonc)
   // CRITICAL: This configuration ensures proper static file generation
-  // for GitHub Pages hosting with clean URL support
+  // for static hosting with clean URL support
   nitro: {
     prerender: {
       routes: [...generateDocRoutes(), '/api/docs-search.json'],
@@ -157,7 +158,8 @@ export default defineNuxtConfig({
     ],
     static: true,
     // Enable proper SPA routing for static sites
-    compressPublicAssets: true,
+    // Cloudflare compresses responses itself; pre-compressed .br/.gz copies would only be uploaded as extra files.
+    compressPublicAssets: false,
     // CRITICAL: Configure routing to handle both clean URLs and trailing slash variants
     routeRules: {
       // Generate static files for clean URLs (without trailing slash)
