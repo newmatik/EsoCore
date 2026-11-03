@@ -2,7 +2,7 @@
   <main class="container" style="padding-top: 84px" lang="de">
     <article class="doc-content">
       <h1>Datenschutz</h1>
-      <p>
+      <p lang="en">
         <em>English version: <NuxtLink to="/privacy" hreflang="en">Privacy</NuxtLink></em>
       </p>
 
@@ -213,7 +213,6 @@
 <script setup>
 useHead({
   title: 'Datenschutz',
-  htmlAttrs: { lang: 'de' },
   link: [{ rel: 'alternate', hreflang: 'en', href: 'https://www.esocore.com/privacy' }],
   meta: [
     {

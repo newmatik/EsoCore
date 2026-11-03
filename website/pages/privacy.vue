@@ -2,7 +2,7 @@
   <main class="container" style="padding-top: 84px">
     <article class="doc-content">
       <h1>Privacy</h1>
-      <p>
+      <p lang="de">
         <em
           >Deutsche Fassung:
           <NuxtLink to="/datenschutz" hreflang="de">Datenschutzerklärung</NuxtLink></em
