@@ -86,21 +86,10 @@
           seven days at the latest.
         </p>
 
-        <h3>Network error reports</h3>
-        <p>
-          Cloudflare's responses ask your browser to report network errors (Network Error Logging).
-          Your browser keeps this instruction for up to seven days. Only if a page fails to load
-          does the browser send a short report to Cloudflare (a.nel.cloudflare.com) with the address
-          concerned, the type of error, the time and the IP addresses involved. Successful page
-          loads are not reported. Cloudflare uses the reports to detect and fix faults in its
-          network. The legal basis is Art. 6 (1) (f) GDPR (reliable delivery of the website).
-        </p>
-
         <h3>Cookies and information on your device</h3>
         <p>
           This website does not store cookies or any other information on your device and does not
-          read information from it, apart from the error-report instruction described above, which
-          is needed to deliver the website reliably (§ 25 (2) no. 2 TDDDG). The search on the
+          read information from it (§ 25 TDDDG), so it asks for no consent. The search on the
           documentation pages loads its index from www.esocore.com and runs in your browser; your
           search terms are not sent to us or anyone else.
         </p>
@@ -145,7 +134,8 @@
           Framework; transfers to it rest on the European Commission's adequacy decision of 10 July
           2023 (Art. 45 GDPR). Where data reaches a country without an adequacy decision, or a
           provider that is not certified, the transfer rests on the EU standard contractual clauses
-          (Art. 46 (2) (c) GDPR) in the provider's data processing agreement.
+          (Art. 46 (2) (c) GDPR) in the provider's data processing agreement. You can request a copy
+          of these safeguards at service@newmatik.com.
         </p>
       </section>
 

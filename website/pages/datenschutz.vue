@@ -87,25 +87,12 @@
           automatisch gelöscht.
         </p>
 
-        <h3>Fehlerberichte des Netzwerks</h3>
-        <p>
-          Die Antworten von Cloudflare bitten Ihren Browser, Netzwerkfehler zu melden (Network Error
-          Logging). Ihr Browser speichert diese Anweisung bis zu sieben Tage. Nur wenn eine Seite
-          nicht geladen werden kann, sendet er einen kurzen Bericht an Cloudflare
-          (a.nel.cloudflare.com) mit der betroffenen Adresse, der Fehlerart, der Uhrzeit und den
-          beteiligten IP-Adressen. Erfolgreiche Seitenaufrufe werden nicht gemeldet. Cloudflare
-          nutzt die Berichte, um Störungen im eigenen Netzwerk zu erkennen und zu beheben.
-          Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (zuverlässige Auslieferung der Website).
-        </p>
-
         <h3>Cookies und Informationen auf Ihrem Endgerät</h3>
         <p>
           Diese Website speichert keine Cookies oder sonstigen Informationen auf Ihrem Endgerät und
-          liest keine Informationen daraus aus, abgesehen von der oben beschriebenen Anweisung für
-          Fehlerberichte, die für die zuverlässige Auslieferung der Website erforderlich ist (§ 25
-          Abs. 2 Nr. 2 TDDDG). Die Suche in der Dokumentation lädt ihren Index von www.esocore.com
-          und läuft in Ihrem Browser; Ihre Suchbegriffe werden weder an uns noch an andere
-          übertragen.
+          liest keine Informationen daraus aus (§ 25 TDDDG); eine Einwilligung ist daher nicht
+          erforderlich. Die Suche in der Dokumentation lädt ihren Index von www.esocore.com und
+          läuft in Ihrem Browser; Ihre Suchbegriffe werden weder an uns noch an andere übertragen.
         </p>
 
         <h3>Links zu anderen Websites</h3>
@@ -151,7 +138,8 @@
           auf den Angemessenheitsbeschluss der Europäischen Kommission vom 10. Juli 2023 (Art. 45
           DSGVO). Gelangen Daten in ein Land ohne Angemessenheitsbeschluss oder zu einem nicht
           zertifizierten Anbieter, stützt sich die Übermittlung auf die EU-Standardvertragsklauseln
-          (Art. 46 Abs. 2 lit. c DSGVO) im Auftragsverarbeitungsvertrag des Anbieters.
+          (Art. 46 Abs. 2 lit. c DSGVO) im Auftragsverarbeitungsvertrag des Anbieters. Eine Kopie
+          dieser Garantien erhalten Sie auf Anfrage über service@newmatik.com.
         </p>
       </section>
 
