@@ -20,7 +20,7 @@ defaults:
 jobs:
   lint:
     name: Server lint
-    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || vars.LINUX_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
@@ -50,7 +50,7 @@ jobs:
 
   test:
     name: Server test
-    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || vars.LINUX_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 15
     env:
       SECRET_KEY: test-secret-key-for-ci
@@ -78,7 +78,7 @@ jobs:
 
   test-postgres:
     name: Server test (PostgreSQL)
-    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || vars.LINUX_RUNNER || 'ubuntu-latest' }}
     timeout-minutes: 15
     env:
       SECRET_KEY: test-secret-key-for-ci
