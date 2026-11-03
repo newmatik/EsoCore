@@ -227,6 +227,40 @@ class AuthViewTests(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    def test_login_inactive_user_is_rejected(self):
+        self.user.is_active = False
+        self.user.save(update_fields=["is_active"])
+        for identifier in ({"username": "testuser"}, {"email": "test@example.com"}):
+            response = self.client.post(
+                "/api/auth/login/",
+                {**identifier, "password": "pass1234"},
+                format="json",
+            )
+            self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+            self.assertNotIn("token", response.data)
+        self.assertFalse(Token.objects.filter(user=self.user).exists())
+
+    def test_login_with_email_shared_by_two_users_is_rejected(self):
+        # Email is not unique on the User model: an ambiguous email must not
+        # log in either account (and must not raise a 500).
+        User.objects.create_user(
+            username="other", email="test@example.com", password="pass1234"
+        )
+        response = self.client.post(
+            "/api/auth/login/",
+            {"email": "test@example.com", "password": "pass1234"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_login_with_email_and_wrong_password(self):
+        response = self.client.post(
+            "/api/auth/login/",
+            {"email": "test@example.com", "password": "wrong"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
     def test_login_missing_password(self):
         response = self.client.post(
             "/api/auth/login/",

@@ -10,5 +10,8 @@ class APIKeyAuthenticationExtension(OpenApiAuthenticationExtension):
             "type": "apiKey",
             "in": "header",
             "name": "X-API-Key",
-            "description": "Device API key passed via X-API-Key header or Authorization: Api-Key <key>",
+            "description": (
+                "Device API key (X-Auth-Key, X-API-Key or Authorization: Api-Key <key>),"
+                " sent together with the device's X-Device-Id header"
+            ),
         }

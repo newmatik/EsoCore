@@ -5,8 +5,9 @@ from django.db import IntegrityError
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APIRequestFactory
 
+from .auth import APIKeyAuthentication, DevicePrincipal
 from .models import Device, DeviceConfiguration, FirmwareBundle, Site
 from .serializers import DeviceSerializer, SiteSerializer
 
@@ -280,3 +281,99 @@ class FirmwareBundleViewSetTests(TestCase):
         response = self.client.get(f"/api/devices/firmware/{self.fw.pk}/devices/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
+
+
+# ---------------------------------------------------------------------------
+# Device API key authentication (devices.auth)
+# ---------------------------------------------------------------------------
+
+
+class DeviceAPIKeyAuthenticationTests(TestCase):
+    """Regression: a valid key used to raise AttributeError (500) because the
+    authenticator read `is_active` from rest_framework_api_key's APIKey model
+    and returned that key object as request.user."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.owner = User.objects.create_user(username="owner", password="pass1234")
+        self.site = Site.objects.create(name="Site 1", customer=self.owner)
+        self.device = Device.objects.create(
+            serial_number="SN-001",
+            model="Edge v1",
+            api_key="device-key-001",
+            api_secret="secret-001",
+            site=self.site,
+        )
+        self.factory = APIRequestFactory()
+
+    def _authenticate(self, **headers):
+        return APIKeyAuthentication().authenticate(
+            self.factory.get("/api/devices/devices/", **headers)
+        )
+
+    def test_device_credentials_authenticate_as_the_device(self):
+        for key_header in (
+            {"HTTP_X_AUTH_KEY": "device-key-001"},
+            {"HTTP_X_API_KEY": "device-key-001"},
+            {"HTTP_AUTHORIZATION": "Api-Key device-key-001"},
+        ):
+            user, auth = self._authenticate(
+                HTTP_X_DEVICE_ID=str(self.device.id), **key_header
+            )
+            self.assertIsInstance(user, DevicePrincipal)
+            self.assertEqual(user.device, self.device)
+            self.assertEqual(auth, self.device)
+
+    def test_device_principal_has_no_user_rights(self):
+        user, _ = self._authenticate(
+            HTTP_X_DEVICE_ID=str(self.device.id), HTTP_X_API_KEY="device-key-001"
+        )
+        self.assertFalse(user.is_authenticated)
+        self.assertFalse(user.is_staff)
+        self.assertFalse(user.has_perm("devices.change_device"))
+
+    def test_valid_device_key_on_user_api_is_not_a_server_error(self):
+        headers = {
+            "HTTP_X_DEVICE_ID": str(self.device.id),
+            "HTTP_X_API_KEY": "device-key-001",
+        }
+        response = self.client.get("/api/devices/devices/", **headers)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # A device sees none of its owner's data and cannot write.
+        self.assertEqual(response.data["count"], 0)
+        response = self.client.post(
+            "/api/devices/sites/", {"name": "Injected"}, format="json", **headers
+        )
+        self.assertIn(
+            response.status_code,
+            (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN),
+        )
+        self.assertFalse(Site.objects.filter(name="Injected").exists())
+
+    def test_wrong_key_or_malformed_device_id_is_rejected(self):
+        for headers in (
+            {"HTTP_X_DEVICE_ID": str(self.device.id), "HTTP_X_API_KEY": "wrong"},
+            {"HTTP_X_DEVICE_ID": str(uuid.uuid4()), "HTTP_X_API_KEY": "device-key-001"},
+            {"HTTP_X_DEVICE_ID": "not-a-uuid", "HTTP_X_API_KEY": "device-key-001"},
+        ):
+            response = self.client.get("/api/devices/devices/", **headers)
+            # DRF answers 403 rather than 401 because SessionAuthentication,
+            # listed first, sends no WWW-Authenticate challenge.
+            self.assertIn(
+                response.status_code,
+                (status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN),
+            )
+            self.assertEqual(
+                response.data["detail"], "Device not found or invalid API key"
+            )
+
+    def test_key_without_device_id_falls_back_to_other_authentication(self):
+        self.assertIsNone(self._authenticate(HTTP_X_API_KEY="device-key-001"))
+        token = Token.objects.create(user=self.owner)
+        response = self.client.get(
+            "/api/devices/devices/",
+            HTTP_AUTHORIZATION=f"Token {token.key}",
+            HTTP_X_API_KEY="stray-key",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 1)
