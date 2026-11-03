@@ -2,6 +2,7 @@
   <main class="container" style="padding-top: 84px">
     <article class="doc-content">
       <h1>Imprint</h1>
+      <p>Information pursuant to § 5 Digitale-Dienste-Gesetz (DDG).</p>
 
       <section>
         <h2>Company Information</h2>
@@ -16,8 +17,9 @@
       <section>
         <h2>Contact</h2>
         <div class="contact-info">
-          <strong>Phone:</strong> +49 6752 16998-0<br />
-          <strong>Email:</strong> service@newmatik.com<br />
+          <strong>Phone:</strong> <a href="tel:+49675216998-0">+49 6752 16998-0</a><br />
+          <strong>Email:</strong> <a href="mailto:service@newmatik.com">service@newmatik.com</a
+          ><br />
           <strong>Website:</strong> <a href="https://www.newmatik.com">www.newmatik.com</a>
         </div>
       </section>
@@ -53,6 +55,15 @@
           55619 Hennweiler<br />
           Germany
         </div>
+      </section>
+
+      <section>
+        <h2>Privacy</h2>
+        <p>
+          How this website processes personal data is described in the
+          <NuxtLink to="/privacy">privacy notice</NuxtLink> (German:
+          <NuxtLink to="/datenschutz" hreflang="de">Datenschutzerklärung</NuxtLink>).
+        </p>
       </section>
     </article>
   </main>

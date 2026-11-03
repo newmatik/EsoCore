@@ -10,6 +10,8 @@
         <NuxtLink to="/imprint">Imprint</NuxtLink>
         &nbsp;•&nbsp;
         <NuxtLink to="/privacy">Privacy</NuxtLink>
+        &nbsp;•&nbsp;
+        <NuxtLink to="/datenschutz" hreflang="de" lang="de">Datenschutz</NuxtLink>
       </div>
     </div>
   </footer>

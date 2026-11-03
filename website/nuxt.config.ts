@@ -33,6 +33,7 @@ function generateDocRoutes() {
       '/docs', // Main docs page (README)
       '/imprint',
       '/privacy',
+      '/datenschutz',
       ...docRoutes,
     ]
 
@@ -63,6 +64,7 @@ function generateDocRoutes() {
       '/docs/license',
       '/imprint',
       '/privacy',
+      '/datenschutz',
     ]
   }
 }
@@ -117,8 +119,8 @@ export default defineNuxtConfig({
 
       processDirectory(docsDir, 'docs')
 
-      // Same for top-level pages: /docs, /imprint and /privacy answered 301 -> /docs/ etc.
-      for (const page of ['docs', 'imprint', 'privacy']) {
+      // Same for top-level pages: /docs, /imprint, /privacy and /datenschutz answered 301 -> /docs/ etc.
+      for (const page of ['docs', 'imprint', 'privacy', 'datenschutz']) {
         const indexPath = path.join(publicDir, page, 'index.html')
         if (fs.existsSync(indexPath)) {
           fs.copyFileSync(indexPath, path.join(publicDir, `${page}.html`))
