@@ -137,7 +137,6 @@ portal/
 │   └── stores/
 │       └── auth.ts                   # Auth state (token, user, login/logout)
 ├── public/                           # Static assets (icons, robots.txt)
-├── app.config.ts                     # App-level configuration
 ├── eslint.config.js                  # ESLint configuration
 ├── nuxt.config.ts                    # Nuxt configuration
 ├── package.json                      # Dependencies and scripts

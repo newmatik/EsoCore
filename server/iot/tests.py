@@ -130,7 +130,7 @@ class TelemetryBatchTests(TestCase):
     def test_last_seen_failure_does_not_leave_a_committed_receipt(self):
         payload = [{"timestamp": "2026-02-12T10:00:00Z", "metric": "t", "value": 1}]
         with patch(
-            "iot.views.Device.save", side_effect=DatabaseError("synthetic outage")
+            "devices.models.Device.save", side_effect=DatabaseError("synthetic outage")
         ):
             response = self.client.post(
                 "/api/iot/v1/telemetry/batch",
@@ -375,6 +375,25 @@ class GetConfigTests(TestCase):
             HTTP_X_AUTH_KEY="wrong",
         )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_compat_api_key_header_is_accepted(self):
+        # X-API-Key is the documented compatibility header; the global
+        # authenticator used to reject it before the view ran.
+        response = self.client.get(
+            "/api/iot/v1/config",
+            HTTP_X_DEVICE_ID=str(self.device.id),
+            HTTP_X_API_KEY=self.device.api_key,
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_malformed_device_id_is_unauthorized_not_a_server_error(self):
+        response = self.client.get(
+            "/api/iot/v1/config",
+            HTTP_X_DEVICE_ID="not-a-uuid",
+            HTTP_X_AUTH_KEY=self.device.api_key,
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.data["error"], "Device not found or invalid API key")
 
 
 class OTACheckTests(TestCase):
