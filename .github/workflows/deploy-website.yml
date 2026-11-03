@@ -14,7 +14,6 @@ on:
     paths:
       - "website/**"
       - ".github/workflows/deploy-website.yml"
-      - ".github/scripts/attach-custom-domains.mjs"
   schedule:
     - cron: '53 * * * *'
   workflow_dispatch:
@@ -138,16 +137,6 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      # Idempotent. The first run moves both hostnames from GitHub Pages to the Worker:
-      # override_existing_dns_record replaces the Pages A/CNAME records with the Worker's.
-      # Later runs find the domains attached to this Worker and change nothing.
-      - name: Attach custom domains
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          ZONE_ID: 680b95c936e6500b88f5912be9046f28
-          SERVICE: esocore-website
-        run: node ../.github/scripts/attach-custom-domains.mjs www.esocore.com esocore.com
       - name: Smoke test
         run: |
           set -euo pipefail
