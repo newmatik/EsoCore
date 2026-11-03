@@ -92,4 +92,4 @@ gates of the part you changed before pushing.
 - **Root markdown lint** (not in CI): `pnpm install --lockfile=false && pnpm run lint:md` from the repository root,
   which has no lockfile.
 
-`pages.yml` deploys the website to GitHub Pages on every push to `main`.
+`pages.yml` deploys the website to GitHub Pages on every push to `main`, and hourly when the last successful deploy shipped an older commit than `main` (Dependabot auto-merge pushes with `GITHUB_TOKEN`, which starts no workflow).
