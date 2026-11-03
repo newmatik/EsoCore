@@ -5,14 +5,14 @@ name: Website CI
 # The pull_request trigger is deliberately NOT path-filtered. A workflow skipped by a path
 # filter never reports its check run, so a required status check would sit pending forever
 # on any PR that doesn't touch website/. Push keeps its filter — required checks only apply
-# to PRs. pages.yml is in the push paths so a change to the publish workflow still rebuilds.
+# to PRs. deploy-website.yml is in the push paths so a change to the publish workflow still rebuilds.
 on:
   push:
     branches: [main]
     paths:
       - "website/**"
       - ".github/workflows/website-ci.yml"
-      - ".github/workflows/pages.yml"
+      - ".github/workflows/deploy-website.yml"
   pull_request:
     branches: [main]
 
@@ -66,3 +66,8 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      # Validates wrangler.jsonc and the Worker without credentials. The deploy itself uses
+      # `pnpm generate` (deploy-website.yml); this checks the config and worker/index.js.
+      - name: Generate and Worker dry run
+        run: pnpm generate && pnpm exec wrangler deploy --dry-run --outdir .wrangler/dry-run

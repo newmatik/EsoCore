@@ -46,7 +46,7 @@
       <section>
         <h2>Responsible for Content</h2>
         <div class="contact-info">
-          <strong>According to § 55 Abs. 2 RStV:</strong><br />
+          <strong>According to § 18 (2) Medienstaatsvertrag (MStV):</strong><br />
           Dominik Ottenbreit<br />
           Newmatik GmbH<br />
           Am Markt 1<br />

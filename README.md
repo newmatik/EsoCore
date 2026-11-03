@@ -6,7 +6,7 @@ EsoCore (Edge Sensor Observation, Control, Operations, Reliability Engine) is an
 and equipment. It spans the full stack from PCB hardware and embedded firmware to a Django REST API backend and a Nuxt.js user portal.
 
 Status: in development. Newmatik builds it for monitoring machines on factory floors. The documentation website is live at
-[www.esocore.com](https://www.esocore.com) (GitHub Pages); the API and the portal have no production deployment yet and run locally only.
+[www.esocore.com](https://www.esocore.com) (Cloudflare Workers); the API and the portal have no production deployment yet and run locally only.
 
 Coding agents: [AGENTS.md](AGENTS.md) has the conventions, local caveats and CI gates.
 
@@ -16,7 +16,7 @@ Coding agents: [AGENTS.md](AGENTS.md) has the conventions, local caveats and CI 
 esocore/
   server/       Django REST API backend
   portal/       Nuxt.js user portal (dashboard, devices, alerts)
-  website/      Public documentation site (static Nuxt.js, GitHub Pages)
+  website/      Public documentation site (static Nuxt.js, Cloudflare Workers)
   firmware/     Embedded C firmware for Edge (STM32H7) and sensors (STM32G0)
   hardware/     PCB designs (Altium), BOMs, Gerber, STEP, schematics
   tools/        Utility scripts (BOM sync, STEP linter)
@@ -29,7 +29,7 @@ esocore/
 | -------- | ----------------------------------------------------------- |
 | Backend  | Python 3.11–3.13, Django 5, Django REST Framework, Poetry   |
 | Portal   | TypeScript, Nuxt 4 (Vue 3), Nuxt UI, Tailwind CSS 4, Pinia  |
-| Website  | TypeScript, Nuxt 4 (Vue 3), static generation, GitHub Pages |
+| Website  | TypeScript, Nuxt 4 (Vue 3), static generation, Cloudflare   |
 | Firmware | C (C11), STM32H7 / STM32G0, ARM GCC, GNU Make               |
 | Hardware | Altium Designer, 4-layer FR4 PCBs                           |
 

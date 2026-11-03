@@ -1,0 +1,161 @@
+name: Deploy website
+
+# Builds website/ (nuxt generate) and deploys it to the `esocore-website` Worker (Cloudflare
+# Workers static assets) on www.esocore.com, with esocore.com redirecting to www. Replaces the
+# GitHub Pages workflow (pages.yml): Pages cannot send security or cache headers, the Worker
+# does (website/public/_headers).
+#
+# A push made with GITHUB_TOKEN (Dependabot auto-merge) starts no workflow; the hourly schedule
+# deploys such a commit (job `behind`). A manual run with `catch_up` does the same check; a plain
+# manual run deploys the selected ref's website.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "website/**"
+      - ".github/workflows/deploy-website.yml"
+  schedule:
+    - cron: '53 * * * *'
+  workflow_dispatch:
+    inputs:
+      catch_up:
+        description: Deploy only if the site is behind main, as the schedule does (off main, a dry run)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# Never cancel a running deploy: the scheduled check would otherwise cancel a push deploy in flight.
+concurrency:
+  group: deploy-website-production
+  cancel-in-progress: false
+
+jobs:
+  # Hourly catch-up. Dependabot auto-merge merges with GITHUB_TOKEN, and GitHub starts no workflow
+  # for a push made with that token, so such a merge was only deployed with the next human merge. On
+  # the schedule (or a manual run with catch_up) this job finds the commit the last successful deploy
+  # of this workflow shipped and lets the deploy run only when main is ahead of it. It skips while
+  # another run of this workflow is active, and after a failed deploy of the same commit, so a
+  # broken commit is not redeployed every hour. Off main it only reports (a dry run).
+  # Same block in every Newmatik deploy workflow that uses it: change it in all of them.
+  behind:
+    name: Production behind main?
+    if: github.event_name == 'schedule' || inputs.catch_up == true
+    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 5
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      deploy: ${{ steps.check.outputs.deploy }}
+    steps:
+      - name: Compare main with the deployed commit
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          REF: ${{ github.ref }}
+          RUN_ID: ${{ github.run_id }}
+          DEPLOY_WORKFLOW: deploy-website.yml
+          CI_WORKFLOW: ''
+          GATE_JOB: Production behind main?
+        run: |
+          set -euo pipefail
+          api() { gh api -H 'X-GitHub-Api-Version: 2022-11-28' "$@"; }
+          runs="repos/$REPO/actions/workflows/$DEPLOY_WORKFLOW/runs"
+          # Jobs of a run that did the deploying: every job but this one.
+          deploy_jobs() { api "repos/$REPO/actions/runs/$1/jobs" --jq ".jobs[] | select(.name != \"$GATE_JOB\") | .conclusion"; }
+          decide() { echo "$2"; echo "deploy=$1" >> "$GITHUB_OUTPUT"; exit 0; }
+
+          head=$(api "repos/$REPO/commits/main" --jq .sha)
+          deployed=''
+          while read -r id sha; do
+            [ -n "$id" ] || continue
+            if deploy_jobs "$id" | grep -qx success; then deployed=$sha; break; fi
+          done < <(api "$runs?branch=main&status=success&per_page=50" --jq '.workflow_runs[] | "\(.id) \(.head_sha)"')
+          echo "main: $head; last deployed: ${deployed:-none found in the last 50 successful runs}"
+
+          [ "$deployed" != "$head" ] || decide false 'Production runs main. Nothing to do.'
+          active=$(api "$runs?per_page=30" --jq "[.workflow_runs[] | select(.status != \"completed\" and .id != $RUN_ID)] | length")
+          [ "$active" = 0 ] || decide false "Another run of $DEPLOY_WORKFLOW is active; it or the next check deploys main."
+          while read -r id; do
+            [ -n "$id" ] || continue
+            if deploy_jobs "$id" | grep -qx failure; then
+              echo "::warning::A deploy of $head already failed (run $id). Not retrying on the schedule; fix main or run the workflow by hand."
+              decide false 'Skipped after a failed deploy of this commit.'
+            fi
+          done < <(api "$runs?head_sha=$head&status=completed&per_page=20" --jq '.workflow_runs[].id')
+
+          if [ -n "$CI_WORKFLOW" ]; then
+            ci="repos/$REPO/actions/workflows/$CI_WORKFLOW/runs?head_sha=$head&per_page=20"
+            passed=$(api "$ci" --jq '[.workflow_runs[] | select(.conclusion == "success")] | length')
+            if [ "$passed" = 0 ]; then
+              pending=$(api "$ci" --jq '[.workflow_runs[] | select(.status != "completed")] | length')
+              [ "$pending" = 0 ] || decide false "CI is running on $head; the next check deploys it."
+              failed=$(api "$ci" --jq '[.workflow_runs[] | select(.conclusion == "failure")] | length')
+              [ "$failed" = 0 ] || { echo "::warning::CI failed on $head; not deploying."; decide false 'CI failed on main.'; }
+              if [ "$REF" = refs/heads/main ]; then
+                gh workflow run "$CI_WORKFLOW" --repo "$REPO" --ref main
+                decide false "Started $CI_WORKFLOW on $head (no run yet); the next check deploys it once CI passes."
+              fi
+              decide false "Dry run on $REF: would start $CI_WORKFLOW on main ($head has no CI run yet)."
+            fi
+          fi
+
+          [ "$REF" = refs/heads/main ] || decide false "Dry run on $REF: production is behind main and would be deployed."
+          decide true "Production is behind main: deploying $head."
+
+
+  deploy:
+    name: Deploy www.esocore.com
+    needs: behind
+    # Push and manual runs skip `behind`; the schedule deploys only what it found missing.
+    if: ${{ !cancelled() && (needs.behind.result == 'skipped' || needs.behind.outputs.deploy == 'true') }}
+    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    environment:
+      name: production
+      url: https://www.esocore.com
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm generate
+      - name: Deploy to Cloudflare Workers
+        run: pnpm exec wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      # Idempotent. The first run moves both hostnames from GitHub Pages to the Worker:
+      # override_existing_dns_record replaces the Pages A/CNAME records with the Worker's.
+      # Later runs find the domains attached to this Worker and change nothing.
+      - name: Attach custom domains
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          ZONE_ID: 680b95c936e6500b88f5912be9046f28
+          SERVICE: esocore-website
+        run: node ../.github/scripts/attach-custom-domains.mjs www.esocore.com esocore.com
+      - name: Smoke test
+        run: |
+          set -euo pipefail
+          for i in 1 2 3 4 5 6; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' https://www.esocore.com/docs) && [ "$code" = 200 ] && break
+            sleep 10
+          done
+          [ "$code" = 200 ] || { echo "::error::https://www.esocore.com/docs answered $code"; exit 1; }
+          curl -sI https://www.esocore.com/ | grep -i '^referrer-policy:' || { echo "::error::Worker headers missing"; exit 1; }
+          apex=$(curl -s -o /dev/null -w '%{http_code} %{redirect_url}' https://esocore.com/docs)
+          echo "esocore.com/docs -> $apex"
+          case "$apex" in 301\ https://www.esocore.com/docs) ;; *) echo "::error::apex redirect: $apex"; exit 1;; esac

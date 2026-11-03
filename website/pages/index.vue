@@ -29,7 +29,12 @@
         <div class="hero-art" aria-hidden="true">
           <img
             ref="heroImage"
-            src="/pcb.png"
+            src="/pcb-1000.webp"
+            srcset="/pcb-1000.webp 1000w, /pcb-2000.webp 2000w"
+            sizes="(max-width: 960px) clamp(600px, 120vw, 1200px), clamp(600px, 80vw, 1000px)"
+            width="3000"
+            height="720"
+            fetchpriority="high"
             alt="EsoCore Edge industrial IoT circuit board for predictive maintenance"
           />
         </div>

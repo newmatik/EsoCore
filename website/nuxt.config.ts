@@ -32,6 +32,7 @@ function generateDocRoutes() {
       '/',
       '/docs', // Main docs page (README)
       '/imprint',
+      '/privacy',
       ...docRoutes,
     ]
 
@@ -61,6 +62,7 @@ function generateDocRoutes() {
       '/docs/bom',
       '/docs/license',
       '/imprint',
+      '/privacy',
     ]
   }
 }
@@ -75,10 +77,11 @@ export default defineNuxtConfig({
   // Explicitly keep root-level directory structure (Nuxt 4 defaults to app/)
   srcDir: '.',
 
-  // CRITICAL: Build hooks to create GitHub Pages compatible file structure
+  // CRITICAL: Build hooks to create a clean-URL file structure (docs/page.html next to docs/page/index.html)
   hooks: {
     'nitro:build:public-assets': async nitro => {
-      // This hook creates HTML files for clean URLs to prevent GitHub Pages
+      // This hook creates HTML files for clean URLs to prevent the static host (Cloudflare Workers
+      // static assets, formerly GitHub Pages)
       // from redirecting /docs/page to /docs/page/
       const fs = await import('fs')
       const path = await import('path')
@@ -114,6 +117,15 @@ export default defineNuxtConfig({
 
       processDirectory(docsDir, 'docs')
 
+      // Same for top-level pages: /docs, /imprint and /privacy answered 301 -> /docs/ etc.
+      for (const page of ['docs', 'imprint', 'privacy']) {
+        const indexPath = path.join(publicDir, page, 'index.html')
+        if (fs.existsSync(indexPath)) {
+          fs.copyFileSync(indexPath, path.join(publicDir, `${page}.html`))
+          console.log(`✓ Created clean URL file: ${page}.html`)
+        }
+      }
+
       // Generate sitemap.xml from all prerendered routes
       const routes = generateDocRoutes()
       const today = new Date().toISOString().split('T')[0]
@@ -128,12 +140,12 @@ export default defineNuxtConfig({
     },
   },
 
-  // Static site generation for GitHub Pages
+  // Static site generation for Cloudflare Workers static assets (wrangler.jsonc)
   // CRITICAL: This configuration ensures proper static file generation
-  // for GitHub Pages hosting with clean URL support
+  // for static hosting with clean URL support
   nitro: {
     prerender: {
-      routes: generateDocRoutes(),
+      routes: [...generateDocRoutes(), '/api/docs-search.json'],
       // Ensure trailing slash handling works correctly
       crawlLinks: true,
     },
@@ -146,7 +158,8 @@ export default defineNuxtConfig({
     ],
     static: true,
     // Enable proper SPA routing for static sites
-    compressPublicAssets: true,
+    // Cloudflare compresses responses itself; pre-compressed .br/.gz copies would only be uploaded as extra files.
+    compressPublicAssets: false,
     // CRITICAL: Configure routing to handle both clean URLs and trailing slash variants
     routeRules: {
       // Generate static files for clean URLs (without trailing slash)
@@ -177,18 +190,15 @@ export default defineNuxtConfig({
         },
         { property: 'og:type', content: 'website' },
         { property: 'og:site_name', content: 'EsoCore' },
-        { property: 'og:image', content: `${SITE_URL}/og-image.png` },
+        { property: 'og:image', content: `${SITE_URL}/og-image.jpg` },
+        { property: 'og:image:width', content: '1200' },
+        { property: 'og:image:height', content: '630' },
+        { property: 'og:image:alt', content: 'EsoCore: Open Source Industrial IoT Platform' },
         { name: 'twitter:card', content: 'summary_large_image' },
-        { name: 'twitter:image', content: `${SITE_URL}/og-image.png` },
+        { name: 'twitter:image', content: `${SITE_URL}/og-image.jpg` },
       ],
       link: [
         { rel: 'icon', href: '/icon.svg', type: 'image/svg+xml' },
-        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-        { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        {
-          rel: 'stylesheet',
-          href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap',
-        },
         { rel: 'stylesheet', href: '/theme.css' },
       ],
     },
