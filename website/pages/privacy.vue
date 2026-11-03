@@ -3,71 +3,197 @@
     <article class="doc-content">
       <h1>Privacy</h1>
       <p>
-        This is the privacy notice (Datenschutzerklärung) for www.esocore.com. It covers this
-        website only. The EsoCore portal and the Newmatik company site at newmatik.com are separate
-        services with their own notices.
+        <em
+          >Deutsche Fassung:
+          <NuxtLink to="/datenschutz" hreflang="de">Datenschutzerklärung</NuxtLink></em
+        >
       </p>
 
       <section>
-        <h2>Who is responsible</h2>
+        <h2>Data privacy declaration</h2>
         <p>
-          Newmatik GmbH, Am Markt 1, 55619 Hennweiler, Germany, represented by its managing
-          directors Dominik Ottenbreit and Björn Ottenbreit. Privacy questions go to
-          <a href="mailto:service@newmatik.com">service@newmatik.com</a> or +49 6752 16998-0.
+          This notice explains how personal data is processed when you visit www.esocore.com (Art.
+          13 GDPR). It covers this website only. The Newmatik company site newmatik.com and the
+          EsoCore portal have their own notices.
+        </p>
+        <p>The data controller in accordance with the GDPR and other data protection laws is:</p>
+        <p class="contact-info">
+          Newmatik GmbH<br />
+          represented by the managing directors Dominik Ottenbreit and Björn Ottenbreit<br />
+          Am Markt 1<br />
+          55619 Hennweiler<br />
+          Germany<br />
+          Phone: <a href="tel:+49675216998-0">+49 6752 16998-0</a><br />
+          Email: <a href="mailto:service@newmatik.com">service@newmatik.com</a>
+        </p>
+        <p>Further company details are in the <NuxtLink to="/imprint">imprint</NuxtLink>.</p>
+      </section>
+
+      <section>
+        <h2>The short version</h2>
+        <ul>
+          <li>
+            This website sets no cookies, stores nothing in your browser's local storage and uses no
+            analytics, tracking or advertising.
+          </li>
+          <li>
+            Every file of the site comes from www.esocore.com. We load no fonts, scripts, videos,
+            maps or social media plugins from other servers.
+          </li>
+          <li>The site has no contact form, no login and no newsletter.</li>
+          <li>
+            We process personal data only to deliver the pages to you (hosting at Cloudflare) and to
+            answer you if you write to us by email.
+          </li>
+          <li>We do not sell personal data and do not use it for advertising.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>What information we collect and why</h2>
+
+        <h3>Information from website browsers</h3>
+        <p>
+          The website runs on Cloudflare Workers, a service of Cloudflare, Inc., 101 Townsend
+          Street, San Francisco, CA 94107, USA. Every page you open is a request to Cloudflare's
+          network, which necessarily processes:
+        </p>
+        <ul>
+          <li>your IP address,</li>
+          <li>date and time of the request,</li>
+          <li>the address requested, the HTTP method and the response status,</li>
+          <li>
+            the request headers your browser sends, such as browser type and version (user agent),
+            preferred language and the referring page,
+          </li>
+          <li>
+            the approximate location Cloudflare derives from the IP address (for example country and
+            city) and technical connection data.
+          </li>
+        </ul>
+        <p>
+          <strong>Why:</strong> to deliver the website to you, to protect it against attacks and
+          misuse, and to find and fix errors. We do not use this data to identify you, build
+          profiles or measure reach, and we do not combine it with other data.
+        </p>
+        <p>
+          <strong>Legal basis:</strong> Art. 6 (1) (f) GDPR. Our legitimate interest is a website
+          that can be delivered securely and reliably.
+        </p>
+        <p>
+          <strong>Retention:</strong> Cloudflare keeps a log of the requests to this website
+          (Workers Logs) that contains the data listed above. It is deleted automatically after
+          seven days at the latest.
+        </p>
+
+        <h3>Network error reports</h3>
+        <p>
+          Cloudflare's responses ask your browser to report network errors (Network Error Logging).
+          Your browser keeps this instruction for up to seven days. Only if a page fails to load
+          does the browser send a short report to Cloudflare (a.nel.cloudflare.com) with the address
+          concerned, the type of error, the time and the IP addresses involved. Successful page
+          loads are not reported. Cloudflare uses the reports to detect and fix faults in its
+          network. The legal basis is Art. 6 (1) (f) GDPR (reliable delivery of the website).
+        </p>
+
+        <h3>Cookies and information on your device</h3>
+        <p>
+          This website does not store cookies or any other information on your device and does not
+          read information from it, apart from the error-report instruction described above, which
+          is needed to deliver the website reliably (§ 25 (2) no. 2 TDDDG). The search on the
+          documentation pages loads its index from www.esocore.com and runs in your browser; your
+          search terms are not sent to us or anyone else.
+        </p>
+
+        <h3>Links to other websites</h3>
+        <p>
+          Links to GitHub, newmatik.com and other sites are plain links. Nothing is sent to those
+          sites until you follow a link; after that, their own privacy notices apply.
+        </p>
+
+        <h3>Contacting us by email</h3>
+        <p>
+          If you write to one of the email addresses on this website, we process your email address,
+          your name if you give it, the content of your message and the technical data of the email,
+          in order to answer you.
+        </p>
+        <p>
+          <strong>Legal basis:</strong> Art. 6 (1) (b) GDPR if your message concerns a contract with
+          us or steps before one; otherwise Art. 6 (1) (f) GDPR, our legitimate interest in
+          answering enquiries.
+        </p>
+        <p>
+          <strong>Service providers:</strong> our email is received and stored by Microsoft 365
+          (Microsoft Ireland Operations Limited, One Microsoft Place, South County Business Park,
+          Leopardstown, Dublin 18, Ireland). Messages to service@newmatik.com are handled in our
+          customer service system Help Scout (Help Scout PBC, Boston, USA).
+        </p>
+        <p>
+          <strong>Retention:</strong> we delete your message when your request is settled, unless
+          commercial or tax law requires us to keep it as business correspondence (§ 257 HGB, § 147
+          AO; generally six to ten years).
         </p>
       </section>
 
       <section>
-        <h2>Opening a page</h2>
+        <h2>Processors and transfers outside the EU</h2>
         <p>
-          The site is hosted on GitHub Pages (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San
-          Francisco, CA 94107, USA) and delivered through Cloudflare, Inc. (101 Townsend Street, San
-          Francisco, CA 94107, USA). Delivering a page creates a connection record: IP address, date
-          and time, the address you requested and the browser’s user agent. The providers process
-          that record to deliver the page and to keep the site available and secure. We do not
-          receive a visitor profile from it and do not use it for advertising or analytics.
-        </p>
-        <p>
-          The legal basis is our legitimate interest in running a site that loads and stays up (Art.
-          6 (1) (f) GDPR). You can object; if you do, we stop unless we can show compelling grounds
-          that override your interest.
-        </p>
-        <p>
-          Connection data can be processed in the United States. GitHub, Inc. and Cloudflare, Inc.
-          are certified under the EU-US Data Privacy Framework, so that transfer rests on the
-          European Commission’s adequacy decision.
-        </p>
-        <p>
-          This site sets no cookies and loads no analytics, advertising or fonts from other servers.
-          Links to GitHub only contact GitHub when you follow them.
+          Cloudflare, Microsoft and Help Scout process the data described above on our behalf under
+          data processing agreements (Art. 28 GDPR). Cloudflare delivers the website from its
+          worldwide network, so connection data can also be processed in the United States and other
+          countries outside the EU. Cloudflare, Inc. is certified under the EU-US Data Privacy
+          Framework; transfers to it rest on the European Commission's adequacy decision of 10 July
+          2023 (Art. 45 GDPR). Where data reaches a country without an adequacy decision, or a
+          provider that is not certified, the transfer rests on the EU standard contractual clauses
+          (Art. 46 (2) (c) GDPR) in the provider's data processing agreement.
         </p>
       </section>
 
       <section>
-        <h2>Email</h2>
+        <h2>Your rights under the GDPR</h2>
+        <p>You have the right to:</p>
+        <ul>
+          <li>access the personal data we process about you (Art. 15 GDPR),</li>
+          <li>have inaccurate data corrected (Art. 16 GDPR),</li>
+          <li>have your data erased (Art. 17 GDPR),</li>
+          <li>have processing restricted (Art. 18 GDPR),</li>
+          <li>receive your data in a portable format (Art. 20 GDPR),</li>
+          <li>object to processing (Art. 21 GDPR, see below),</li>
+          <li>lodge a complaint with a data protection supervisory authority (Art. 77 GDPR).</li>
+        </ul>
         <p>
-          If you write to us, we use your address and message to reply. The basis is Art. 6 (1) (b)
-          GDPR when the message concerns a contract we are discussing, and Art. 6 (1) (f) GDPR
-          otherwise. We keep the thread while that work is open, and longer only where commercial or
-          tax law requires us to keep business correspondence.
+          <strong>Right to object:</strong> where we process data on the basis of Art. 6 (1) (f)
+          GDPR, you can object at any time on grounds relating to your particular situation. We then
+          stop, unless we can demonstrate compelling legitimate grounds that override your
+          interests, rights and freedoms, or the processing serves legal claims.
         </p>
-      </section>
-
-      <section>
-        <h2>Your rights</h2>
         <p>
-          You can ask for access, correction, deletion, restriction or a copy of personal data we
-          hold about you, and you can object to processing based on legitimate interest. You can
-          also complain to the supervisory authority for our seat: Der Landesbeauftragte für den
-          Datenschutz und die Informationsfreiheit Rheinland-Pfalz, Hintere Bleiche 34, 55116 Mainz,
-          Germany,
+          To exercise your rights, email
+          <a href="mailto:service@newmatik.com">service@newmatik.com</a> or write to the address
+          above.
+        </p>
+        <p>
+          The supervisory authority for Newmatik GmbH is: Der Landesbeauftragte für den Datenschutz
+          und die Informationsfreiheit Rheinland-Pfalz, Hintere Bleiche 34, 55116 Mainz, Germany,
           <a href="https://www.datenschutz.rlp.de" target="_blank" rel="noopener noreferrer"
-            >datenschutz.rlp.de</a
-          >.
+            >www.datenschutz.rlp.de</a
+          >. You can also complain to the authority in the EU member state where you live or work.
         </p>
       </section>
 
-      <p><NuxtLink to="/imprint">Imprint</NuxtLink></p>
+      <section>
+        <h2>Further information</h2>
+        <p>
+          You do not have to provide any personal data. Without the connection data, however, the
+          website cannot be delivered to you. We do not use automated decision-making or profiling
+          (Art. 22 GDPR).
+        </p>
+        <p>
+          We update this notice when the website or the law changes. The current version is always
+          on this page.
+        </p>
+        <p>Last updated: 3 November 2026</p>
+      </section>
     </article>
   </main>
 </template>
@@ -75,10 +201,12 @@
 <script setup>
 useHead({
   title: 'Privacy',
+  link: [{ rel: 'alternate', hreflang: 'de', href: 'https://www.esocore.com/datenschutz' }],
   meta: [
     {
       name: 'description',
-      content: 'Privacy notice for www.esocore.com, provided by Newmatik GmbH.',
+      content:
+        'Privacy notice for www.esocore.com: Newmatik GmbH, Cloudflare hosting, no cookies, no tracking.',
     },
   ],
 })
