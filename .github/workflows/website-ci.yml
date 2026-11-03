@@ -16,6 +16,10 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 defaults:
   run:
     working-directory: website
@@ -24,28 +28,26 @@ jobs:
   build-and-lint:
     name: Website
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: "22"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
         with:
           version: 10
 
-      - name: Cache pnpm store
-        uses: actions/cache@v6
+      # pnpm must be on PATH before setup-node can cache its store. The former
+      # actions/cache step pointed at ~/.pnpm-store, which pnpm 10 never uses,
+      # so it never saved anything.
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-website-${{ hashFiles('website/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-website-
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: website/pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
