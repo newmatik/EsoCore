@@ -2,7 +2,7 @@
   <header class="header">
     <div class="container navbar">
       <NuxtLink to="/" class="brand">
-        <img src="/icon.svg" alt="EsoCore" width="28" height="28" />
+        <img src="/icon.svg" alt="" width="28" height="28" />
         <span>EsoCore</span>
       </NuxtLink>
       <nav class="nav" aria-label="Main Navigation">

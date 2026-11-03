@@ -8,6 +8,8 @@
         <a href="https://github.com/newmatik/EsoCore" target="_blank" rel="noopener">Open Source</a>
         &nbsp;•&nbsp;
         <NuxtLink to="/imprint">Imprint</NuxtLink>
+        &nbsp;•&nbsp;
+        <NuxtLink to="/privacy">Privacy</NuxtLink>
       </div>
     </div>
   </footer>

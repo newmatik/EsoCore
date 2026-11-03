@@ -134,30 +134,26 @@ const searchQuery = ref('')
 const searchResults = ref([])
 const searchIndex = ref([])
 
-// Build search index on mount
-onMounted(async () => {
-  await buildSearchIndex()
-})
+// The index (all docs, ~115 KB compressed) loads on the first search, not on page load.
+let searchIndexLoad = null
 
 async function buildSearchIndex() {
-  const items = []
-  const flatDocs = flattenDocs(docsConfig)
-  for (const doc of flatDocs) {
-    try {
-      const content = await $fetch(`/api/docs/${doc.slug || 'README'}`)
-      items.push({
-        slug: doc.slug,
-        title: doc.title,
-        text: content,
-      })
-    } catch (error) {
-      console.warn(`Failed to load content for ${doc.slug}:`, error)
-    }
+  // One prerendered file with every doc's text (server/api/docs-search.json.get.ts).
+  let texts = {}
+  try {
+    texts = await $fetch('/api/docs-search.json')
+  } catch (error) {
+    console.warn('Failed to load the docs search index:', error)
+    return
   }
-  searchIndex.value = items
+  searchIndex.value = flattenDocs(docsConfig)
+    .filter(doc => typeof texts[doc.slug || 'README'] === 'string')
+    .map(doc => ({ slug: doc.slug, title: doc.title, text: texts[doc.slug || 'README'] }))
 }
 
-function onSearch() {
+async function onSearch() {
+  if (!searchIndexLoad) searchIndexLoad = buildSearchIndex()
+  await searchIndexLoad
   const q = searchQuery.value.trim()
   if (!q) {
     searchResults.value = []

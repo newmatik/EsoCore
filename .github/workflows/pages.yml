@@ -2,6 +2,9 @@ name: Deploy GitHub Pages
 on:
   push:
     branches: [ main ]
+  # Dependabot auto-merges use GITHUB_TOKEN and do not trigger this workflow, so a
+  # dependency bump stays undeployed until the next human merge. Run it by hand then.
+  workflow_dispatch:
 permissions:
   contents: read
   pages: write
