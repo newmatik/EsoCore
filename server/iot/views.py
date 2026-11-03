@@ -9,11 +9,16 @@ from django.http.request import RawPostDataException
 from django.utils import timezone
 from drf_spectacular.utils import OpenApiResponse, extend_schema, inline_serializer
 from rest_framework import serializers, status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from devices.models import Device, FirmwareBundle
+from devices.auth import DeviceCredentialsError, device_from_request
+from devices.models import FirmwareBundle
 from events.models import SystemEvent
 from telemetry.models import TelemetryPacket, TelemetryPoint
 
@@ -26,23 +31,18 @@ def _authenticate_device(request):
 
     Returns (Device, None) on success or (None, Response) on failure.
     """
-    device_id = request.META.get("HTTP_X_DEVICE_ID")
-    api_key = request.META.get("HTTP_X_AUTH_KEY") or request.META.get("HTTP_X_API_KEY")
-
-    if not device_id or not api_key:
-        return None, Response(
-            {"error": "Missing required authentication headers"},
-            status=status.HTTP_401_UNAUTHORIZED,
-        )
-
     try:
-        device = Device.objects.get(id=device_id, api_key=api_key)
-    except Device.DoesNotExist:
+        device = device_from_request(request)
+    except DeviceCredentialsError:
         return None, Response(
             {"error": "Device not found or invalid API key"},
             status=status.HTTP_401_UNAUTHORIZED,
         )
-
+    if device is None:
+        return None, Response(
+            {"error": "Missing required authentication headers"},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
     return device, None
 
 
@@ -60,6 +60,7 @@ def _authenticate_device(request):
     tags=["iot"],
 )
 @api_view(["POST"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def auth_handshake(request):
     """Device authentication handshake endpoint"""
@@ -104,6 +105,7 @@ class TelemetryItemSerializer(serializers.Serializer):
     tags=["iot"],
 )
 @api_view(["POST"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def telemetry_batch(request):
     """Batch telemetry data ingestion"""
@@ -216,6 +218,7 @@ def telemetry_batch(request):
     tags=["iot"],
 )
 @api_view(["GET"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def get_config(request):
     """Get device configuration"""
@@ -259,6 +262,7 @@ def get_config(request):
     tags=["iot"],
 )
 @api_view(["GET"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def ota_check(request):
     """Check for OTA updates"""
@@ -309,6 +313,7 @@ def ota_check(request):
     tags=["iot"],
 )
 @api_view(["POST"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def ota_report(request):
     """Report OTA update status"""
