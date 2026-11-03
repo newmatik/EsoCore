@@ -1,11 +1,13 @@
 // www.esocore.com on Cloudflare Workers static assets (Newmatik account only).
 // Build first: `pnpm generate` writes .output/public.
 //
-// No `routes` here on purpose. www.esocore.com and esocore.com are attached as Workers
-// custom domains by .github/workflows/deploy-website.yml after `wrangler deploy`, through
-// the API with override_existing_dns_record, which replaces the old GitHub Pages DNS records
-// on the first deploy. Wrangler's own custom_domain routes fail in CI while those records
-// exist, and a deploy without routes leaves attached custom domains alone.
+// Routes, not custom domains. Cloudflare refuses to attach a Workers custom domain while the
+// hostname has DNS records (error 100117, with or without override_existing_dns_record), and
+// deleting the GitHub Pages records first would leave the site without DNS for a moment. A
+// route takes over on the existing proxied records at once: the Worker answers every request
+// for both hostnames and never fetches the origin, so the A/CNAME records that still name
+// GitHub Pages are only there to keep the hostnames proxied. Do not delete them while these
+// routes exist; to move to custom domains later, delete them and attach the domains together.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "esocore-website",
@@ -13,6 +15,10 @@
   "compatibility_date": "2026-11-01",
   "main": "worker/index.js",
   "workers_dev": false,
+  "routes": [
+    { "pattern": "www.esocore.com/*", "zone_name": "esocore.com" },
+    { "pattern": "esocore.com/*", "zone_name": "esocore.com" },
+  ],
   "assets": {
     "directory": ".output/public",
     "binding": "ASSETS",

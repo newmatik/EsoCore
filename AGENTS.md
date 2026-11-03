@@ -95,6 +95,7 @@ gates of the part you changed before pushing.
 `deploy-website.yml` deploys the website to the Cloudflare Worker `esocore-website` (static assets, Newmatik account
 `24c549e9c3005de7a3c295ead2c4bb87`) on every push to `main` that touches `website/`, and hourly when the last successful
 deploy shipped an older commit than `main` (Dependabot auto-merge pushes with `GITHUB_TOKEN`, which starts no workflow).
-It uses the repo secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` and attaches `www.esocore.com` and
-`esocore.com` as Workers custom domains; the Worker redirects the apex to www. Security and cache headers are in
+It uses the repo secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. `www.esocore.com/*` and `esocore.com/*`
+are Worker routes (`website/wrangler.jsonc`) on the zone's existing proxied DNS records, which still name GitHub Pages
+but are never contacted: keep them while the routes exist. The Worker redirects the apex to www. Security and cache headers are in
 `website/public/_headers`. Do not deploy by hand.

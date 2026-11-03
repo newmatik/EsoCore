@@ -98,10 +98,10 @@ This copies CSV files from `hardware/` to `website/public/bom/` for use in the d
 deploys `main` when an automatic (Dependabot) merge did not start the workflow. The workflow:
 
 1. Installs dependencies and generates the static site (`pnpm generate` writes `.output/public`)
-2. Runs `wrangler deploy` for the Worker `esocore-website` (`wrangler.jsonc`, Newmatik Cloudflare account)
-3. Attaches `www.esocore.com` and `esocore.com` as Workers custom domains (`.github/scripts/attach-custom-domains.mjs`;
-   idempotent, the first run moved them off GitHub Pages)
-4. Checks that the site, its headers and the apex redirect answer
+2. Runs `wrangler deploy` for the Worker `esocore-website` (`wrangler.jsonc`, Newmatik Cloudflare account), with the
+   routes `www.esocore.com/*` and `esocore.com/*`. The routes sit on the zone's existing proxied DNS records, which
+   still name GitHub Pages but are never contacted; Cloudflare refuses Workers custom domains while those records exist
+3. Checks that the site, its headers and the apex redirect answer
 
 `worker/index.js` redirects `esocore.com` to `https://www.esocore.com` and hands every other request to the static
 assets. `public/_headers` sets `Referrer-Policy`, `X-Frame-Options`, the CSP `frame-ancestors` and long caching for
