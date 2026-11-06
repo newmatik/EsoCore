@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from esocore_api.access import require_caller_asset, require_caller_device
+
 from .models import AlertRule, NotificationQueue, SystemEvent
 
 
@@ -28,6 +30,9 @@ class SystemEventSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
+
+    def validate_device(self, device):
+        return require_caller_device(self, device)
 
 
 class AlertRuleSerializer(serializers.ModelSerializer):
@@ -59,6 +64,12 @@ class AlertRuleSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
+
+    def validate_device(self, device):
+        return require_caller_device(self, device)
+
+    def validate_asset(self, asset):
+        return require_caller_asset(self, asset)
 
 
 class NotificationQueueSerializer(serializers.ModelSerializer):

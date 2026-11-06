@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from esocore_api.access import require_caller_device, require_caller_site
+
 from .models import Dashboard, UserDeviceRole, UserProfile
 
 
@@ -56,6 +58,12 @@ class UserDeviceRoleSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "granted_at"]
 
+    def validate_device(self, device):
+        return require_caller_device(self, device)
+
+    def validate_site(self, site):
+        return require_caller_site(self, site)
+
 
 class DashboardSerializer(serializers.ModelSerializer):
     class Meta:
@@ -72,3 +80,6 @@ class DashboardSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
+
+    def validate_site(self, site):
+        return require_caller_site(self, site)
