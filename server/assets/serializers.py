@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from esocore_api.access import require_caller_asset, require_caller_site
+
 from .models import Asset, AssetCycle
 
 
@@ -29,6 +31,9 @@ class AssetSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
+    def validate_site(self, site):
+        return require_caller_site(self, site)
+
 
 class AssetCycleSerializer(serializers.ModelSerializer):
     asset_name = serializers.CharField(source="asset.asset_id", read_only=True)
@@ -47,3 +52,6 @@ class AssetCycleSerializer(serializers.ModelSerializer):
             "created_at",
         ]
         read_only_fields = ["id", "created_at"]
+
+    def validate_asset(self, asset):
+        return require_caller_asset(self, asset)

@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from esocore_api.access import require_caller_site
+
 from .models import Device, DeviceConfiguration, FirmwareBundle, Site
 
 
@@ -47,6 +49,9 @@ class DeviceSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
+
+    def validate_site(self, site):
+        return require_caller_site(self, site)
 
 
 class FirmwareBundleSerializer(serializers.ModelSerializer):

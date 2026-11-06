@@ -70,10 +70,14 @@ class FirmwareBundleViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=["get"])
     def devices(self, request, pk=None):
-        """Get devices compatible with this firmware"""
+        """List compatible devices on sites the caller can access."""
         firmware = self.get_object()
-        devices = Device.objects.filter(
-            model__in=firmware.supported_models, firmware_version__lt=firmware.version
-        )
+        devices = Device.objects.none()
+        if request.user.is_authenticated:
+            devices = Device.objects.filter(
+                model__in=firmware.supported_models,
+                firmware_version__lt=firmware.version,
+                site__in=request.user.sites.all(),
+            )
         serializer = DeviceSerializer(devices, many=True)
         return Response(serializer.data)

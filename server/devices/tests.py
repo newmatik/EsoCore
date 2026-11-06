@@ -233,6 +233,18 @@ class DeviceViewSetTests(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_patch_rejects_another_users_site(self):
+        other = User.objects.create_user(username="other", password="pass1234")
+        other_site = Site.objects.create(name="Other Site", customer=other)
+        response = self.client.patch(
+            f"/api/devices/devices/{self.device.id}/",
+            {"site": other_site.pk},
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.device.refresh_from_db()
+        self.assertEqual(self.device.site_id, self.site.pk)
+
     def test_configuration_action(self):
         DeviceConfiguration.objects.create(
             device=self.device, sampling_rates={"vibration": 1000}
@@ -281,6 +293,44 @@ class FirmwareBundleViewSetTests(TestCase):
         response = self.client.get(f"/api/devices/firmware/{self.fw.pk}/devices/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
+
+    def test_devices_action_is_limited_to_caller_sites(self):
+        Device.objects.create(
+            serial_number="SN-001",
+            model="Edge v1",
+            firmware_version="1.4.0",
+            api_key="key-001",
+            api_secret="secret-001",
+            site=self.site,
+        )
+        other = User.objects.create_user(username="other", password="pass1234")
+        other_site = Site.objects.create(name="Other Site", customer=other)
+        Device.objects.create(
+            serial_number="SN-002",
+            model="Edge v1",
+            firmware_version="1.0.0",
+            api_key="key-002",
+            api_secret="secret-002",
+            site=other_site,
+        )
+        response = self.client.get(f"/api/devices/firmware/{self.fw.pk}/devices/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["serial_number"], "SN-001")
+
+    def test_devices_action_anonymous_is_empty(self):
+        Device.objects.create(
+            serial_number="SN-001",
+            model="Edge v1",
+            firmware_version="1.4.0",
+            api_key="key-001",
+            api_secret="secret-001",
+            site=self.site,
+        )
+        self.client.credentials()
+        response = self.client.get(f"/api/devices/firmware/{self.fw.pk}/devices/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, [])
 
 
 # ---------------------------------------------------------------------------

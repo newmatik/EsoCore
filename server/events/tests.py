@@ -119,6 +119,29 @@ class SystemEventViewSetTests(TestCase):
         response = self.client.get("/api/events/events/")
         self.assertEqual(len(response.data["results"]), 1)
 
+    def test_create_rejects_another_users_device(self):
+        other = User.objects.create_user(username="other", password="pass1234")
+        other_site = Site.objects.create(name="Other Site", customer=other)
+        other_device = Device.objects.create(
+            serial_number="SN-009",
+            model="Edge v1",
+            api_key="key-009",
+            api_secret="secret-009",
+            site=other_site,
+        )
+        before = SystemEvent.objects.count()
+        response = self.client.post(
+            "/api/events/events/",
+            {
+                "device": str(other_device.id),
+                "event_type": "vibration_high",
+                "description": "nope",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(SystemEvent.objects.count(), before)
+
     def test_acknowledge_action(self):
         response = self.client.post(f"/api/events/events/{self.event.id}/acknowledge/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -162,6 +185,30 @@ class AlertRuleViewSetTests(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(AlertRule.objects.count(), 1)
+
+    def test_create_rejects_another_users_device(self):
+        other = User.objects.create_user(username="other", password="pass1234")
+        other_site = Site.objects.create(name="Other Site", customer=other)
+        other_device = Device.objects.create(
+            serial_number="SN-009",
+            model="Edge v1",
+            api_key="key-009",
+            api_secret="secret-009",
+            site=other_site,
+        )
+        response = self.client.post(
+            "/api/events/rules/",
+            {
+                "name": "Temp Alert",
+                "device": str(other_device.id),
+                "event_type": "temperature_high",
+                "conditions": {"threshold": 80},
+                "severity": "high",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(AlertRule.objects.count(), 0)
 
     def test_list_alert_rules(self):
         AlertRule.objects.create(

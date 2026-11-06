@@ -172,6 +172,23 @@ class AssetViewSetTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Asset.objects.count(), 2)
 
+    def test_create_rejects_another_users_site(self):
+        other = User.objects.create_user(username="other", password="pass1234")
+        other_site = Site.objects.create(name="Other Site", customer=other)
+        response = self.client.post(
+            "/api/assets/assets/",
+            {
+                "asset_id": "MOTOR-009",
+                "site": other_site.pk,
+                "asset_type": "motor",
+                "make": "Siemens",
+                "model": "1LE1",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(Asset.objects.filter(asset_id="MOTOR-009").exists())
+
     def test_retrieve_asset(self):
         response = self.client.get(f"/api/assets/assets/{self.asset.id}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -213,3 +230,25 @@ class AssetCycleViewSetTests(TestCase):
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_create_rejects_another_users_asset(self):
+        other = User.objects.create_user(username="other", password="pass1234")
+        other_site = Site.objects.create(name="Other Site", customer=other)
+        other_asset = Asset.objects.create(
+            asset_id="DOOR-009",
+            site=other_site,
+            asset_type="door",
+            make="Kuka",
+            model="KR 10",
+        )
+        response = self.client.post(
+            "/api/assets/cycles/",
+            {
+                "asset": str(other_asset.id),
+                "cycle_type": "open/close",
+                "start_time": "2026-02-12T10:00:00Z",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(AssetCycle.objects.count(), 0)
