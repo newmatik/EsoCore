@@ -100,7 +100,8 @@ EDGE_SOURCES := \
 EDGE_STARTUP := stm32/$(EDGE_TARGET)/startup/startup_stm32h747xx.s
 EDGE_LINKER_SCRIPT := stm32/$(EDGE_TARGET)/linker/STM32H747IITx_FLASH_CM7.ld
 
-EDGE_OBJ_DIR := $(BUILD_DIR)/edge/obj
+# Debug and release objects are kept apart, so changing DEBUG never mixes the two.
+EDGE_OBJ_DIR := $(BUILD_DIR)/edge/obj/$(if $(filter 1,$(DEBUG)),debug,release)
 EDGE_OBJECTS := $(patsubst %.c,$(EDGE_OBJ_DIR)/%.o,$(COMMON_SOURCES) $(EDGE_SOURCES))
 EDGE_STARTUP_OBJECT := $(EDGE_OBJ_DIR)/$(EDGE_STARTUP:.s=.o)
 
