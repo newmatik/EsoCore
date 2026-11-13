@@ -197,7 +197,7 @@ static void send_sensor_data(void) {
             switch (device_type) {
                 case ESOCORE_DEVICE_TYPE_VIBRATION:
                     if (vibration_sensor_read_data(&vibration_data, 500)) {
-                        esocore_protocol_send_sensor_data((esocore_sensor_data_t *)&vibration_data, sizeof(vibration_data));
+                        esocore_protocol_send_sensor_data((esocore_sensor_data_payload_t *)&vibration_data, sizeof(vibration_data));
                         data_sent = true;
                         system_status.total_measurements++;
                     }
@@ -205,7 +205,7 @@ static void send_sensor_data(void) {
 
                 case ESOCORE_DEVICE_TYPE_CURRENT:
                     if (current_sensor_read_data(&current_data, 500)) {
-                        esocore_protocol_send_sensor_data((esocore_sensor_data_t *)&current_data, sizeof(current_data));
+                        esocore_protocol_send_sensor_data((esocore_sensor_data_payload_t *)&current_data, sizeof(current_data));
                         data_sent = true;
                         system_status.total_measurements++;
                     }

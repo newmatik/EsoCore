@@ -188,9 +188,9 @@ make --version
 The firmware uses a GNU Make build system defined in `firmware/Makefile`. All builds are invoked from the `firmware/`
 directory.
 
-The firmware is in development: the targets below do not build yet
-([issue 128](https://github.com/newmatik/EsoCore/issues/128)). `make test` builds and runs the host unit tests with the
-local C compiler.
+The firmware is in development: `make edge-objects` compiles every source file of the Edge firmware, but the targets
+below do not link yet ([issue 128](https://github.com/newmatik/EsoCore/issues/128)). `make test` builds and runs the
+host unit tests with the local C compiler.
 
 ### Build Targets
 

@@ -11,6 +11,7 @@
  */
 
 #include "oled_display.h"
+#include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -1002,7 +1003,6 @@ bool oled_scroll_text(const char *text, uint8_t y, uint8_t speed, oled_color_t c
 bool oled_display_loading_animation(uint8_t x, uint8_t y, uint8_t radius, oled_color_t color) { return false; }
 bool oled_fade_out(uint16_t duration_ms) { return false; }
 bool oled_fade_in(uint16_t duration_ms) { return false; }
-bool oled_menu_navigate_down(oled_menu_t *menu) { return false; }
 bool oled_menu_back(oled_menu_t *menu) { return false; }
 bool oled_display_network_screen(const char *wifi_ssid, uint8_t wifi_signal, const char *ip_address, const char *connection_status) { return false; }
 bool oled_display_error_screen(const char *error_title, const char *error_message, uint32_t error_code) { return false; }

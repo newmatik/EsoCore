@@ -92,7 +92,7 @@ typedef struct {
     char url[HTTP_MAX_URL_LENGTH];               /* Request URL */
     http_header_t headers[HTTP_MAX_HEADER_COUNT]; /* Request headers */
     uint8_t num_headers;                         /* Number of headers */
-    uint8_t *body;                               /* Request body */
+    const uint8_t *body;                         /* Request body (not modified) */
     uint16_t body_length;                        /* Request body length */
     char content_type[64];                       /* Content-Type header */
 } http_request_t;

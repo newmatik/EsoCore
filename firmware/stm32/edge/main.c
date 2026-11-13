@@ -341,17 +341,49 @@ static bool init_subsystems(void)
 
     /* --- Storage (microSD via SDMMC1) --- */
 #if ESOCORE_FEATURE_MICROSD
-    storage_system_init();
+    storage_config_t storage_cfg = {
+        .max_file_size_bytes       = STORAGE_FILE_ROTATION_SIZE,
+        .max_storage_usage_percent = 90,
+        .compression_level         = STORAGE_COMPRESSION_LEVEL,
+        .buffer_size_bytes         = STORAGE_BUFFER_SIZE,
+        .enable_compression        = true,
+        .enable_integrity_check    = true,
+        .enable_power_safe_writes  = true,
+        .enable_auto_cleanup       = true,
+        .cleanup_threshold_percent = 80,
+        .mount_point               = "/sd",
+    };
+    storage_system_init(&storage_cfg);
 #endif
 
     /* --- TinyML Engine --- */
 #if ESOCORE_FEATURE_TINYML
-    tinyml_engine_init();
+    tinyml_engine_config_t tinyml_cfg = {
+        .tensor_arena_size             = TINYML_TENSOR_ARENA_SIZE,
+        .max_models                    = TINYML_MAX_MODELS,
+        .inference_timeout_ms          = TINYML_INFERENCE_TIMEOUT_MS,
+        .enable_model_caching          = true,
+        .enable_performance_monitoring = true,
+        .enable_auto_calibration       = false,
+        .max_inference_frequency_hz    = 10,
+        .memory_limit_kb               = 256,
+    };
+    tinyml_engine_init(&tinyml_cfg);
 #endif
 
     /* --- OLED Display --- */
 #if ESOCORE_FEATURE_OLED_DISPLAY
-    oled_display_init();
+    oled_config_t oled_cfg = {
+        .i2c_address              = OLED_I2C_ADDRESS,
+        .contrast                 = OLED_DEFAULT_CONTRAST,
+        .rotation                 = OLED_ROTATION_0,
+        .enable_charge_pump       = true,
+        .invert_display           = false,
+        .enable_scroll            = false,
+        .update_rate_hz           = 10,
+        .screen_saver_timeout_sec = 300,
+    };
+    oled_display_init(&oled_cfg);
     oled_display_status_screen("EsoCore Edge", FW_VERSION_STRING, "Booting...", 0);
 #endif
 
