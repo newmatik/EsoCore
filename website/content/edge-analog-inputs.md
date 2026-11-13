@@ -14,7 +14,7 @@ Both modes share the same high-performance signal chain (PGA, AAF, 24-bit ADC) a
 
 ## Per-Channel Circuit Architecture (4 channels)
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────────────┐
 │ Dual-Mode Analog Input Channel (x4)                                      │
 ├──────────────────────────────────────────────────────────────────────────┤
@@ -37,7 +37,7 @@ Mode selection per channel (2 GPIOs):
 
 ### 1. Input Protection & Interface
 
-```
+```text
 Component: Input terminal (10-pin pluggable screw terminal, Degson 2EDGR-5.0-10P)
 │
 ├─── ESD Protection
@@ -57,7 +57,7 @@ Component: Input terminal (10-pin pluggable screw terminal, Degson 2EDGR-5.0-10P
 
 Design: Precision current source (per channel)
 
-```
+```text
 ┌─────────────────────────────────────┐
 │ Current Source Specification        │
 ├─────────────────────────────────────┤
@@ -83,7 +83,7 @@ Implementation: Precision Current Source IC
 The signal path after the current source stage splits into two routes selected by an analog switch.
 A TMUX1101 (TI) SPDT analog switch per channel selects between the IEPE path and the DC bypass path.
 
-```
+```text
 Mode Switch (TMUX1101, one per channel):
 │
 │    IEPE Path (switch position A):
@@ -130,7 +130,7 @@ DC Mode Use Cases:
 
 ### 4. Programmable Gain Amplifier (PGA)
 
-```
+```text
 ┌────────────────────────────────────────────────┐
 │ Why PGA? Different sensors, different gains:   │
 │ - Low-cost sensor: 100 mV/g                    │
@@ -150,7 +150,7 @@ PGA Specification:
 
 Gain Selection Strategy:
 
-```
+```text
 ┌────────────────┬──────────────┬────────────────┐
 │ Sensor Type    │ Sensitivity  │ PGA Gain       │
 ├────────────────┼──────────────┼────────────────┤
@@ -195,7 +195,7 @@ Implementation:
 
 ### 6. Analog-to-Digital Converter (ADC)
 
-```
+```text
 ┌─────────────────────────────────────────────────┐
 │ ADC Requirements for Vibration Monitoring       │
 ├─────────────────────────────────────────────────┤
@@ -234,7 +234,7 @@ Connection to STM32H747:
 
 ### IEPE Mode (vibration accelerometers)
 
-```
+```text
 ┌───────────────────────────────────────────────────────────────────┐
 │ IEPE Sensor → 24V/4mA → DC: 8-12V + AC: +/-5V peak                │
 │              Current              (vibration signal)              │
@@ -254,7 +254,7 @@ Connection to STM32H747:
 
 ### DC Mode (general analog sensors)
 
-```
+```text
 ┌───────────────────────────────────────────────────────────────────┐
 │ Analog Sensor → 0-10V / 1-5V (via shunt) / any DC signal          │
 │              Current                                              │
@@ -274,7 +274,7 @@ Connection to STM32H747:
 
 Noise Budget Analysis (IEPE Mode):
 
-```
+```text
 ┌─────────────────────┬──────────────┬────────────┐
 │ Source              │ Noise (µVrms)│ Equiv (µg) │
 ├─────────────────────┼──────────────┼────────────┤

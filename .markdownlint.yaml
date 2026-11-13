@@ -25,6 +25,11 @@ MD036: false
 # Allow bare URLs in technical documentation  
 MD034: false
 
-# Allow trailing punctuation in headings for specific cases
+# No trailing punctuation in headings, except a colon ("BOM:" style headings)
 MD026:
-  punctuation: ".,;:"  # Exclude colon to allow "BOM:" style headings
+  punctuation: ".,;"
+
+# The same sub-heading may repeat under different parents (the comparison pages
+# use "Edge AI" / "Cloud Processing" under every criterion), not among siblings
+MD024:
+  siblings_only: true

@@ -256,8 +256,8 @@ EsoCore enters competitive markets with clear differentiators: cross-domain capa
 Success depends on executing these advantages while building domain credibility through strategic partnerships.
 
 The industrial doors market offers significant opportunity with limited dedicated competition, while the CNC machine market requires precise
-positioning against established players. EsoCore's unique combination of comprehensive I/O, edge intelligence, and open architecture provides a viable path
-to market leadership in both verticals.
+positioning against established players. EsoCore's unique combination of comprehensive I/O, edge intelligence, and open architecture provides a
+viable path to market leadership in both verticals.
 
 Key success factors:
 

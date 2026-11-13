@@ -250,20 +250,20 @@ Configure EsoCore to send alerts directly to CMMS:
 
 2. **Payload Example:**
 
-```json
-{
-  "equipment_id": "{{device_id}}",
-  "alert_type": "{{alert_severity}}",
-  "description": "{{alert_message}}",
-  "priority": "{{priority_mapping}}",
-  "detected_at": "{{timestamp}}",
-  "sensor_data": {
-    "sensor": "{{sensor_name}}",
-    "value": "{{current_value}}",
-    "threshold": "{{threshold_value}}"
-  }
-}
-```
+   ```json
+   {
+     "equipment_id": "{{device_id}}",
+     "alert_type": "{{alert_severity}}",
+     "description": "{{alert_message}}",
+     "priority": "{{priority_mapping}}",
+     "detected_at": "{{timestamp}}",
+     "sensor_data": {
+       "sensor": "{{sensor_name}}",
+       "value": "{{current_value}}",
+       "threshold": "{{threshold_value}}"
+     }
+   }
+   ```
 
 3. **Test integration** with sample alert
 
@@ -315,7 +315,7 @@ If CMMS supports email-to-ticket:
 
 2. **Email Template:**
 
-```
+```text
 Subject: [EQUIPMENT:{{device_name}}][PRIORITY:{{severity}}] {{alert_type}}
 
 Equipment: {{device_name}}
@@ -404,7 +404,7 @@ Expose EsoCore data to SCADA via Modbus TCP:
 
 _Allen-Bradley / Rockwell:_
 
-```
+```text
 Controller: Modbus/TCP
 IP Address: 192.168.1.100
 Port: 502
@@ -415,7 +415,7 @@ Scan Rate: 1000ms
 
 _Siemens WinCC:_
 
-```
+```text
 Driver: ModbusTCP.chn
 IP: 192.168.1.100
 Port: 502

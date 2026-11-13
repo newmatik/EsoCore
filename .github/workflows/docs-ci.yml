@@ -1,0 +1,45 @@
+name: Docs CI
+
+# Lints every Markdown file in the repository with the root markdownlint config.
+# The root package has no lockfile, so the markdownlint-cli version is pinned here;
+# keep it in the range of the root package.json.
+# The pull_request trigger is not path-filtered (see website-ci.yml for why).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**/*.md"
+      - ".markdownlint.yaml"
+      - ".markdownlintignore"
+      - ".github/workflows/docs-ci.yml"
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  markdown:
+    name: Markdown lint
+    runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || vars.LINUX_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: portal/.nvmrc
+
+      - name: Lint Markdown
+        run: >-
+          npx --yes markdownlint-cli@0.39.0
+          --config .markdownlint.yaml
+          --ignore-path .markdownlintignore
+          "**/*.md" "**/*.markdown"
