@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { apiErrorMessage, formatTimeAgo, humanizeKey } from '../app/utils/format'
+import {
+  apiErrorMessage,
+  formatTimeAgo,
+  humanizeKey,
+  truncatedListNotice,
+} from '../app/utils/format'
 
 describe('formatTimeAgo', () => {
   const now = new Date('2026-03-10T12:00:00Z')
@@ -66,6 +71,19 @@ describe('apiErrorMessage', () => {
     expect(apiErrorMessage(null)).toBe('Unknown error')
     expect(apiErrorMessage(undefined, 'Failed to load device data')).toBe(
       'Failed to load device data'
+    )
+  })
+})
+
+describe('truncatedListNotice', () => {
+  it('is empty when the whole list is shown', () => {
+    expect(truncatedListNotice(12, 12, 'devices')).toBe('')
+    expect(truncatedListNotice(0, 0, 'devices')).toBe('')
+  })
+
+  it('says how many of the rows are shown', () => {
+    expect(truncatedListNotice(2000, 12345, 'alerts (newest first)')).toBe(
+      'Showing 2,000 of 12,345 alerts (newest first).'
     )
   })
 })

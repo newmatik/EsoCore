@@ -13,6 +13,19 @@ type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTION
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type RequestBody = Record<string, any> | BodyInit | null | undefined
 
+/** One page of a list endpoint. */
+export interface PaginatedResponse<T> {
+  count: number
+  next?: string | null
+  previous?: string | null
+  results: T[]
+}
+
+/** Largest page the API serves (`max_page_size` of the server's pagination). */
+const MAX_PAGE_SIZE = 500
+/** Most rows a list page loads; beyond this it says that it shows only a part. */
+export const LIST_LIMIT = 2000
+
 export function useApi() {
   const config = useRuntimeConfig()
   const baseURL = config.public.apiBaseUrl as string
@@ -72,5 +85,34 @@ export function useApi() {
     return request<T>(path, { method: 'DELETE' })
   }
 
-  return { request, get, post, put, patch, del }
+  /**
+   * Reads a paginated list completely by following its pages, up to `limit`
+   * rows. `total` is the number of rows the server has; it is larger than
+   * `items.length` when the limit cut the list short.
+   */
+  async function getAll<T = unknown>(
+    path: string,
+    query: Record<string, unknown> = {},
+    limit = LIST_LIMIT
+  ): Promise<{ items: T[]; total: number }> {
+    const items: T[] = []
+    let total = 0
+
+    for (let page = 1; items.length < limit; page++) {
+      const data = await get<PaginatedResponse<T>>(path, {
+        ...query,
+        page,
+        page_size: Math.min(MAX_PAGE_SIZE, limit),
+      })
+      const results = data.results || []
+      items.push(...results)
+      total = data.count ?? items.length
+      if (!data.next || results.length === 0) break
+    }
+
+    const shown = items.slice(0, limit)
+    return { items: shown, total: Math.max(total, shown.length) }
+  }
+
+  return { request, get, getAll, post, put, patch, del }
 }

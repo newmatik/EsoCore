@@ -101,6 +101,49 @@ class SystemEventViewSetTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["results"]), 1)
 
+    def _create_events(self, count):
+        SystemEvent.objects.bulk_create(
+            SystemEvent(
+                device=self.device,
+                event_type="vibration_high",
+                severity="low",
+                description=f"Event {index}",
+            )
+            for index in range(count)
+        )
+
+    def test_list_events_honours_page_size(self):
+        """The portal asks for its "recent events" with page_size."""
+        self._create_events(11)  # 12 with the one from setUp
+
+        response = self.client.get("/api/events/events/", {"page_size": 8})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["count"], 12)
+        self.assertEqual(len(response.data["results"]), 8)
+        self.assertIn("page=2", response.data["next"])
+        self.assertIn("page_size=8", response.data["next"])
+
+        response = self.client.get("/api/events/events/", {"page_size": 8, "page": 2})
+
+        self.assertEqual(len(response.data["results"]), 4)
+        self.assertIsNone(response.data["next"])
+
+    def test_list_events_default_and_maximum_page_size(self):
+        self._create_events(510)  # 511 with the one from setUp
+
+        response = self.client.get("/api/events/events/")
+        self.assertEqual(len(response.data["results"]), 100)
+
+        response = self.client.get("/api/events/events/", {"page_size": 100000})
+        self.assertEqual(len(response.data["results"]), 500)
+
+        # Zero and non-numeric values fall back to the default page size
+        response = self.client.get("/api/events/events/", {"page_size": 0})
+        self.assertEqual(len(response.data["results"]), 100)
+        response = self.client.get("/api/events/events/", {"page_size": "all"})
+        self.assertEqual(len(response.data["results"]), 100)
+
     def test_list_events_filters_by_user_sites(self):
         other_user = User.objects.create_user(username="other", password="pass1234")
         other_site = Site.objects.create(name="Other Site", customer=other_user)

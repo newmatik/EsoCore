@@ -24,3 +24,12 @@ export function apiErrorMessage(error: unknown, fallback = 'Unknown error'): str
   const err = error as { data?: { detail?: string }; message?: string } | null | undefined
   return err?.data?.detail || err?.message || fallback
 }
+
+/**
+ * Notice for a list that was cut short, for example "Showing 2,000 of 12,345
+ * alerts.", or an empty string when the list is complete.
+ */
+export function truncatedListNotice(shown: number, total: number, noun: string): string {
+  if (total <= shown) return ''
+  return `Showing ${shown.toLocaleString('en-US')} of ${total.toLocaleString('en-US')} ${noun}.`
+}

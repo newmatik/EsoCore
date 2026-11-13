@@ -35,6 +35,9 @@
         </div>
       </UCard>
 
+      <!-- Shown only when the list was cut short -->
+      <p v-if="listNotice" class="mb-4 text-sm text-(--ui-text-muted)">{{ listNotice }}</p>
+
       <!-- Loading -->
       <div v-if="loading && assets.length === 0" class="text-center py-16">
         <UIcon
@@ -151,15 +154,14 @@ interface AssetItem {
   cycle_count: number
 }
 
-interface PaginatedResponse<T> {
-  count: number
-  results: T[]
-}
-
 const api = useApi()
 const loading = ref(false)
 const errorMsg = ref('')
 const assets = ref<AssetItem[]>([])
+const totalAssets = ref(0)
+const listNotice = computed(() =>
+  truncatedListNotice(assets.value.length, totalAssets.value, 'assets')
+)
 const typeFilter = ref('all')
 
 const typeOptions = [
@@ -210,8 +212,9 @@ async function fetchAssets() {
   loading.value = true
   errorMsg.value = ''
   try {
-    const data = await api.get<PaginatedResponse<AssetItem>>('/assets/assets/')
-    assets.value = data.results || []
+    const data = await api.getAll<AssetItem>('/assets/assets/')
+    assets.value = data.items
+    totalAssets.value = data.total
   } catch (error: unknown) {
     errorMsg.value = apiErrorMessage(error)
     console.error('Failed to fetch assets:', error)
