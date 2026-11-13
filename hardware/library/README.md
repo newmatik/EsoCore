@@ -4,7 +4,7 @@ This folder holds the shared Altium Designer libraries for EsoCore hardware.
 
 ## Structure
 
-- footprints — Common footprint libraries (.PcbLib directories with footprint components).
+- altium — Altium integrated libraries (`.IntLib`), one per part.
 - 3d — 3D models referenced by footprints (.step/.stp, .wrl as needed).
 
 ## Guidelines
@@ -18,11 +18,11 @@ This folder holds the shared Altium Designer libraries for EsoCore hardware.
 ## Repository conventions
 
 - Library path: `hardware/library`
-- Subfolders: `hardware/library/footprints`, `hardware/library/3d`
+- Subfolders: `hardware/library/altium`, `hardware/library/3d`
 - Track empty folders via `.gitkeep` files.
 
 ## Altium Designer setup (per project)
 
 1. File → Open → From Version Control (or File → New → PCB Library) to manage libraries.
-2. Add library path to `hardware/library/footprints` (or to specific `.PcbLib` directories).
+2. Add library path to `hardware/library/altium` (or to specific `.IntLib` files).
 3. File → New → PCB Library → Design → Layer Stack Manager to configure 3D models path to `hardware/library/3d`.
