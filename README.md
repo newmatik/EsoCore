@@ -99,9 +99,9 @@ Requires the ARM GCC toolchain. See `firmware/README.md` for architecture and pr
 
 ### Checks
 
-The server, portal, website and tools each have a CI workflow in `.github/workflows/` that runs on pull requests to `main` (`firmware/` and
-`hardware/` have none). The commands for these parts are listed in [AGENTS.md](AGENTS.md#lint-and-test-commands); run the ones for the part you
-changed before pushing.
+The server, portal, website, tools and firmware each have a CI workflow in `.github/workflows/` that runs on pull requests to `main` (`hardware/` has
+none; the firmware workflow runs the host unit tests and does not build the target firmware). The commands for these parts are listed in
+[AGENTS.md](AGENTS.md#lint-and-test-commands); run the ones for the part you changed before pushing.
 
 ## Hardware
 
