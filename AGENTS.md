@@ -30,8 +30,8 @@ EsoCore is a full-stack industrial IoT platform. The three software services are
 | Service | Directory | Port | Tech | Required |
 |---------|-----------|------|------|----------|
 | Django REST API | `server/` | 8000 | Python 3.11+, Django 5.2, Poetry | Yes |
-| Portal (Nuxt.js) | `portal/` | 3080 | Node 24 (24.18.0 in `.nvmrc`, as in CI), Nuxt 4, pnpm | Yes |
-| Website (Nuxt.js) | `website/` | 3081 | Node 24 (24.18.0 in `.nvmrc`, as in CI), Nuxt 4, pnpm | No |
+| Portal (Nuxt.js) | `portal/` | 3080 | Node 24 (24.11 or newer; 24.22.3 in `.nvmrc`, as in CI), Nuxt 4, pnpm | Yes |
+| Website (Nuxt.js) | `website/` | 3081 | Node 24 (24.11 or newer; 24.22.3 in `.nvmrc`, as in CI), Nuxt 4, pnpm | No |
 
 Ports come from the workspace port map (newmatik/agent-skills `workspace/AGENTS.md`, "Local ports"), so EsoCore can run
 next to other Newmatik repos; `devServer.port` in each `nuxt.config.ts` sets them.
