@@ -144,6 +144,36 @@ describe('useApi', () => {
       expect(nuxt.$fetch.mock.calls[0]![1].query).toEqual({ page: 1, page_size: 10 })
     })
 
+    it('keeps a row once when an insert on the server shifts the pages', async () => {
+      // Newest first: a new row (id 601) arrives after page 1 was read, so
+      // page 2 starts with the row that ended page 1.
+      const page1 = Array.from({ length: 500 }, (_, index) => ({ id: 600 - index }))
+      const page2 = Array.from({ length: 101 }, (_, index) => ({ id: 101 - index }))
+      nuxt.$fetch
+        .mockResolvedValueOnce({ count: 600, next: 'next-page-url', results: page1 })
+        .mockResolvedValueOnce({ count: 601, next: null, results: page2 })
+
+      const { items, total } = await useApi().getAll<{ id: number }>('/events/events/')
+
+      expect(items).toHaveLength(600)
+      expect(new Set(items.map(item => item.id)).size).toBe(600)
+      expect(items[499]).toEqual({ id: 101 })
+      expect(items[500]).toEqual({ id: 100 })
+      expect(total).toBe(601)
+    })
+
+    it('keeps rows without an id as they come', async () => {
+      nuxt.$fetch.mockResolvedValue({
+        count: 2,
+        next: null,
+        results: [{ name: 'a' }, { name: 'a' }],
+      })
+
+      const { items } = await useApi().getAll('/devices/sites/')
+
+      expect(items).toEqual([{ name: 'a' }, { name: 'a' }])
+    })
+
     it('returns an empty list', async () => {
       servePages(0)
 

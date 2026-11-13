@@ -89,6 +89,10 @@ export function useApi() {
    * Reads a paginated list completely by following its pages, up to `limit`
    * rows. `total` is the number of rows the server has; it is larger than
    * `items.length` when the limit cut the list short.
+   *
+   * A row inserted on the server between two page requests shifts the later
+   * pages by one, so a row can come back twice. Rows are therefore kept once
+   * per `id`.
    */
   async function getAll<T = unknown>(
     path: string,
@@ -96,6 +100,7 @@ export function useApi() {
     limit = LIST_LIMIT
   ): Promise<{ items: T[]; total: number }> {
     const items: T[] = []
+    const seen = new Set<unknown>()
     let total = 0
 
     for (let page = 1; items.length < limit; page++) {
@@ -105,7 +110,16 @@ export function useApi() {
         page_size: Math.min(MAX_PAGE_SIZE, limit),
       })
       const results = data.results || []
-      items.push(...results)
+
+      for (const row of results) {
+        const id = (row as { id?: unknown } | null)?.id
+        if (id !== undefined && id !== null) {
+          if (seen.has(id)) continue
+          seen.add(id)
+        }
+        items.push(row)
+      }
+
       total = data.count ?? items.length
       if (!data.next || results.length === 0) break
     }
