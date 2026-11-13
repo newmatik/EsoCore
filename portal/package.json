@@ -17,7 +17,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "nuxt typecheck"
+    "typecheck": "nuxt typecheck",
+    "test": "vitest run"
   },
   "dependencies": {
     "@nuxt/ui": "^4.12.0",
@@ -38,6 +39,7 @@
     "eslint-plugin-vue": "^10.12.0",
     "prettier": "^3.9.10",
     "typescript": "^6.0.3",
+    "vitest": "^5.1.0",
     "vue-tsc": "^3.3.14"
   }
 }

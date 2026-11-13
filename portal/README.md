@@ -134,15 +134,19 @@ portal/
 │   ├── plugins/
 │   │   ├── auth.client.ts            # Auth token restoration on startup
 │   │   └── force-dark.client.ts      # Force dark mode on load
-│   └── stores/
-│       └── auth.ts                   # Auth state (token, user, login/logout)
+│   ├── stores/
+│   │   └── auth.ts                   # Auth state (token, user, login/logout)
+│   └── utils/
+│       └── format.ts                 # Shared display helpers (time ago, labels, API error text)
 ├── public/                           # Static assets (icons, robots.txt)
+├── tests/                            # Vitest unit tests; setup.ts stubs the Nuxt auto-imports
 ├── eslint.config.js                  # ESLint configuration
 ├── nuxt.config.ts                    # Nuxt configuration
 ├── package.json                      # Dependencies and scripts
 ├── pnpm-lock.yaml                    # Lockfile
 ├── pnpm-workspace.yaml               # pnpm settings (overrides, allowed build scripts)
-└── tsconfig.json                     # TypeScript configuration
+├── tsconfig.json                     # TypeScript configuration
+└── vitest.config.ts                  # Unit test configuration
 ```
 
 ## API Integration
@@ -190,6 +194,17 @@ pnpm run format:check
 # Type check
 pnpm run typecheck
 ```
+
+### Tests
+
+```bash
+pnpm test
+```
+
+Vitest runs the unit tests in `tests/` in plain Node, without starting Nuxt. They cover the API client, the auth
+store, the auth route guard, the branding composable and the display helpers in `app/utils/format.ts`.
+`tests/setup.ts` replaces the Nuxt auto-imports that this code uses (`$fetch`, `useRuntimeConfig`, `useCookie`,
+`navigateTo`). A test for code that uses another auto-import needs a stub there first.
 
 ## Deployment
 

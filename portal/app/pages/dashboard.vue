@@ -262,17 +262,6 @@ function statusBadgeColor(status: string): BadgeColor {
   return map[status] || 'neutral'
 }
 
-function formatTimeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime()
-  const minutes = Math.floor(diff / 60000)
-  if (minutes < 1) return 'just now'
-  if (minutes < 60) return `${minutes}m ago`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
-  const days = Math.floor(hours / 24)
-  return `${days}d ago`
-}
-
 async function fetchDashboardData() {
   errorMsg.value = ''
   try {
@@ -287,8 +276,7 @@ async function fetchDashboardData() {
     recentEvents.value = eventsData.results || []
     chartReady.value = true
   } catch (error: unknown) {
-    const err = error as { data?: { detail?: string }; message?: string }
-    errorMsg.value = err?.data?.detail || err?.message || 'Failed to load dashboard data'
+    errorMsg.value = apiErrorMessage(error, 'Failed to load dashboard data')
     console.error('Failed to fetch dashboard data:', error)
   }
 }
@@ -308,10 +296,9 @@ async function acknowledgeEvent(eventId: string) {
     const event = recentEvents.value.find(e => e.id === eventId)
     if (event) event.status = 'acknowledged'
   } catch (error: unknown) {
-    const err = error as { data?: { detail?: string }; message?: string }
     toast.add({
       title: 'Failed to acknowledge event',
-      description: err?.data?.detail || err?.message || 'Unknown error',
+      description: apiErrorMessage(error),
       color: 'error',
     })
   }

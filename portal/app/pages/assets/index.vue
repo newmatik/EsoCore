@@ -95,7 +95,7 @@
                   color="neutral"
                   size="sm"
                 >
-                  {{ formatSpecKey(String(key)) }}: {{ val }}
+                  {{ humanizeKey(String(key)) }}: {{ val }}
                 </UBadge>
               </div>
             </div>
@@ -206,10 +206,6 @@ function typeColor(type: string): BadgeColor {
   return map[type] || 'neutral'
 }
 
-function formatSpecKey(key: string) {
-  return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-}
-
 async function fetchAssets() {
   loading.value = true
   errorMsg.value = ''
@@ -217,8 +213,7 @@ async function fetchAssets() {
     const data = await api.get<PaginatedResponse<AssetItem>>('/assets/assets/')
     assets.value = data.results || []
   } catch (error: unknown) {
-    const err = error as { message?: string; data?: { detail?: string } }
-    errorMsg.value = err?.data?.detail || err?.message || 'Unknown error'
+    errorMsg.value = apiErrorMessage(error)
     console.error('Failed to fetch assets:', error)
   } finally {
     loading.value = false
