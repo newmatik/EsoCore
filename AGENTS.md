@@ -59,6 +59,9 @@ See each project's README for standard setup/run/lint/test commands.
   Dependabot uses) ignores that field and drops the overrides from the lockfile, so CI's pnpm 10 `--frozen-lockfile`
   install fails. Add new overrides or build approvals to `pnpm-workspace.yaml`, and use `allowBuilds`, not
   `onlyBuiltDependencies`.
+- **pnpm version**: `portal/`, `website/` and `server/` pin pnpm exactly in the `packageManager` field of their
+  `package.json`. CI reads it from there (`pnpm/action-setup` with `package_json_file`, no `version`); change the pin in
+  all three files together.
 - **Portal login**: Use `admin` / `admin123` (or the superuser credentials you created) to log into the portal.
 - **WebSocket port conflict**: When running both portal and website dev servers simultaneously, the website will show
   a WebSocket port 24678 conflict error. This is cosmetic and doesn't affect the website's server-side rendering.
