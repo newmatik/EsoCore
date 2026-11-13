@@ -36,7 +36,7 @@ esocore/
 ## Prerequisites
 
 - **Python 3.11 to 3.13** and [Poetry](https://python-poetry.org/) for the server (CI uses 3.11)
-- **Node 22.19+ (or 24.11+)** and [pnpm](https://pnpm.io/) 10 (as in CI) for the portal and website
+- **Node 24** (24.11 or newer; CI and the `.nvmrc` files use 24.22.3) and [pnpm](https://pnpm.io/) 10 (as in CI) for the portal and website
 - **ARM GCC** (`arm-none-eabi-gcc`) and **GNU Make** for the firmware
 
 ## Getting Started

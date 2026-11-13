@@ -25,7 +25,7 @@ Modern Vue.js frontend application for the EsoCore IoT monitoring system, built 
 
 ### Prerequisites
 
-- Node.js 22.19+ (or 24.11+)
+- Node.js 24 (24.11 or newer; CI and `.nvmrc` use 24.22.3)
 - pnpm 9+
 
 ### Installation
@@ -196,10 +196,10 @@ pnpm run typecheck
 ### Docker
 
 ```dockerfile
-FROM node:22-alpine
+FROM node:24-alpine
 WORKDIR /app
 ENV NODE_ENV=production
-# Use pnpm via Corepack (bundled with Node 22)
+# Use pnpm via Corepack (bundled with Node 24)
 RUN corepack enable
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile

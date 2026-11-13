@@ -38,7 +38,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: "22"
+          node-version-file: portal/.nvmrc
           cache: pnpm
           cache-dependency-path: portal/pnpm-lock.yaml
 
