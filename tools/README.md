@@ -1,6 +1,21 @@
 # Tools
 
-Utility scripts (e.g., sync, build, release)
+Utility scripts. Both are standard-library Python 3; run the unit tests from the repository root with `python3 -m unittest discover -s tools -v` (the
+Tools CI workflow runs the same command).
+
+## sync_bom_data.py
+
+Copies the BOM CSVs from `hardware/` to `website/public/bom/`, which the website renders. Run it from the repository root after editing any `bom.csv`:
+
+```bash
+python3 tools/sync_bom_data.py            # copy changed BOMs
+python3 tools/sync_bom_data.py --dry-run  # show what would be copied
+python3 tools/sync_bom_data.py --verbose  # print every action
+```
+
+- `hardware/edge/bom.csv` → `website/public/bom/bom-main.csv`
+- `hardware/cables/bom.csv` → `website/public/bom/bom-cables.csv`
+- `hardware/sensors/<name>/bom.csv` → `website/public/bom/bom-<slug>.csv` (for example `bom-vibration-sensor.csv`)
 
 ## step_linter.py
 

@@ -24,6 +24,7 @@ See READMEs in subfolders.
   - `temperature spot sensor/`
   - `proximity position sensor/`
 - `cables/`
+- `library/` (shared Altium libraries and 3D models)
 
 Notes:
 
