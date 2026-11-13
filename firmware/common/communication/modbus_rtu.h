@@ -388,9 +388,12 @@ void modbus_rtu_receive_byte(uint8_t byte, uint32_t now_us);
 /**
  * @brief Close the received frame after T3.5 of silence and answer it (slave mode)
  *
- * Call when the T3.5 timer expires, or periodically. Once T3.5 has passed
- * since the last character, the buffered frame is checked (length, T1.5
- * violation, CRC) and, if valid and addressed to this slave, processed with
+ * Call periodically, or from a timer started with each received character.
+ * The buffered frame is closed once nothing has been received for T3.5 plus
+ * one character time: a character that began inside T3.5 is only reported
+ * when it is complete, so this is the earliest moment at which T3.5 of
+ * silence is certain. The frame is then checked (length, T1.5 violation, CRC)
+ * and, if valid and addressed to this slave, processed with
  * modbus_process_frame(). A new frame that starts before the previous one was
  * taken here replaces it and counts as an overrun error.
  *

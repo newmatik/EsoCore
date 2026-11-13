@@ -1248,8 +1248,12 @@ bool modbus_rtu_poll(uint32_t now_us, uint8_t *response_buffer,
         return false;
     }
 
-    /* The frame ends only after T3.5 without a character */
-    if (!modbus_rx_in_frame || (uint32_t)(now_us - modbus_rx_last_byte_us) < modbus_t3_5_us) {
+    /* The frame ends only after T3.5 of silence. A character that started
+     * within T3.5 is reported only once it is complete, one character time
+     * later, so the frame is closed when nothing has arrived for T3.5 plus
+     * one character time. */
+    if (!modbus_rx_in_frame ||
+        (uint32_t)(now_us - modbus_rx_last_byte_us) < modbus_t3_5_us + modbus_char_us) {
         return false;
     }
 
