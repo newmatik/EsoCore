@@ -36,6 +36,11 @@ static bool modbus_data_map_owned = false;
 static bool modbus_rx_in_frame = false;     /* A frame is being received or awaits modbus_rtu_poll() */
 static bool modbus_rx_frame_bad = false;    /* The current frame must be discarded */
 static uint32_t modbus_rx_last_byte_us = 0; /* Time the last character was completely received */
+
+/* A complete frame that the receiver set aside because the next frame began
+ * before modbus_rtu_poll() took it. A length of 0 means there is none. */
+static uint8_t modbus_rx_pending_buffer[MODBUS_MAX_FRAME_SIZE];
+static uint16_t modbus_rx_pending_length = 0;
 static uint32_t modbus_char_us = 0;         /* Duration of one character on the line */
 static uint32_t modbus_t1_5_us = 0;         /* Maximum silence between two characters of a frame */
 static uint32_t modbus_t3_5_us = 0;         /* Minimum silence between two frames */
@@ -544,6 +549,41 @@ static void modbus_rx_reset(void) {
     modbus_rx_frame_bad = false;
 }
 
+/**
+ * @brief Discard everything the receiver holds
+ */
+static void modbus_rx_reset_all(void) {
+    modbus_rx_reset();
+    modbus_rx_pending_length = 0;
+}
+
+/**
+ * @brief Check a complete raw frame and answer it
+ *
+ * @return true if a response is ready to be transmitted
+ */
+static bool modbus_rx_answer(uint8_t *raw_frame, uint16_t frame_length, uint32_t now_us,
+                            uint8_t *response_buffer, uint16_t *response_length,
+                            uint16_t max_response_length) {
+    modbus_frame_t frame;
+
+    /* Shorter than address, function and CRC */
+    if (frame_length < 4) {
+        modbus_statistics.framing_errors++;
+        return false;
+    }
+
+    if (!modbus_parse_frame(raw_frame, frame_length, &frame)) {
+        modbus_statistics.crc_errors++;
+        return false;
+    }
+
+    frame.timestamp = now_us;
+
+    return modbus_process_frame(&frame, response_buffer, response_length, max_response_length) &&
+           *response_length > 0;
+}
+
 /** @brief Bits per character: start bit, data bits, parity bit if any, stop bits */
 static uint32_t modbus_bits_per_char(uint8_t data_bits, uint8_t stop_bits, char parity) {
     return 1u + data_bits + ((parity == 'N' || parity == 'n') ? 0u : 1u) + stop_bits;
@@ -621,7 +661,7 @@ bool modbus_rtu_init(const modbus_config_t *config) {
         modbus_data_map.num_input_registers = modbus_config.max_registers;
     }
 
-    modbus_rx_reset();
+    modbus_rx_reset_all();
 
     modbus_initialized = true;
     return true;
@@ -638,7 +678,7 @@ bool modbus_rtu_deinit(void) {
     /* Frees only what modbus_rtu_init() allocated; a data map handed in
      * through modbus_init_data_map() stays with its owner. */
     modbus_release_data_map();
-    modbus_rx_reset();
+    modbus_rx_reset_all();
 
     coil_callback = NULL;
     register_callback = NULL;
@@ -1206,12 +1246,17 @@ void modbus_rtu_receive_byte(uint8_t byte, uint32_t now_us) {
         uint32_t gap_us = (distance_us > modbus_char_us) ? (distance_us - modbus_char_us) : 0;
 
         if (gap_us >= modbus_t3_5_us) {
-            /* The previous frame had ended but modbus_rtu_poll() never took
-             * it: it is lost, and this character starts a new frame. */
-            if (!modbus_rx_frame_bad) {
+            /* The previous frame has ended and this character starts the next
+             * one. modbus_rtu_poll() could not have taken the previous frame
+             * yet if the gap was exactly T3.5, so it is set aside for the next
+             * poll. Only if a frame is already waiting there is it lost. */
+            if (modbus_rx_frame_bad) {
+                modbus_statistics.framing_errors++;
+            } else if (modbus_rx_pending_length > 0) {
                 modbus_statistics.overrun_errors++;
             } else {
-                modbus_statistics.framing_errors++;
+                memcpy(modbus_rx_pending_buffer, modbus_rx_buffer, modbus_rx_index);
+                modbus_rx_pending_length = modbus_rx_index;
             }
             modbus_rx_reset();
         } else if (gap_us > modbus_t1_5_us) {
@@ -1248,6 +1293,15 @@ bool modbus_rtu_poll(uint32_t now_us, uint8_t *response_buffer,
         return false;
     }
 
+    /* A frame that was set aside when the next one began comes first */
+    if (modbus_rx_pending_length > 0) {
+        uint16_t pending_length = modbus_rx_pending_length;
+
+        modbus_rx_pending_length = 0;
+        return modbus_rx_answer(modbus_rx_pending_buffer, pending_length, now_us,
+                                response_buffer, response_length, max_response_length);
+    }
+
     /* The frame ends only after T3.5 of silence. A character that started
      * within T3.5 is reported only once it is complete, one character time
      * later, so the frame is closed when nothing has arrived for T3.5 plus
@@ -1262,23 +1316,14 @@ bool modbus_rtu_poll(uint32_t now_us, uint8_t *response_buffer,
 
     modbus_rx_reset();
 
-    /* Too short, too long, or broken by a gap of more than T1.5 */
-    if (frame_bad || frame_length < 4) {
+    /* Too long, or broken by a gap of more than T1.5 */
+    if (frame_bad) {
         modbus_statistics.framing_errors++;
         return false;
     }
 
-    modbus_frame_t frame;
-
-    if (!modbus_parse_frame(modbus_rx_buffer, frame_length, &frame)) {
-        modbus_statistics.crc_errors++;
-        return false;
-    }
-
-    frame.timestamp = now_us;
-
-    return modbus_process_frame(&frame, response_buffer, response_length, max_response_length) &&
-           *response_length > 0;
+    return modbus_rx_answer(modbus_rx_buffer, frame_length, now_us,
+                            response_buffer, response_length, max_response_length);
 }
 
 /**
@@ -1383,7 +1428,7 @@ bool modbus_set_comm_params(uint32_t baud_rate, uint8_t data_bits,
     if (!modbus_apply_frame_timing(baud_rate, data_bits, stop_bits, parity)) {
         return false;
     }
-    modbus_rx_reset();
+    modbus_rx_reset_all();
 
     modbus_config.baud_rate = baud_rate;
     modbus_config.data_bits = data_bits;

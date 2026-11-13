@@ -394,8 +394,13 @@ void modbus_rtu_receive_byte(uint8_t byte, uint32_t now_us);
  * when it is complete, so this is the earliest moment at which T3.5 of
  * silence is certain. The frame is then checked (length, T1.5 violation, CRC)
  * and, if valid and addressed to this slave, processed with
- * modbus_process_frame(). A new frame that starts before the previous one was
- * taken here replaces it and counts as an overrun error.
+ * modbus_process_frame().
+ *
+ * Each call handles at most one frame. If the next frame begins before the
+ * previous one was taken here, the receiver sets the previous one aside and
+ * the next call answers it; a second frame that completes while one is still
+ * waiting is lost and counts as an overrun error. Call again until it returns
+ * false after a burst of frames.
  *
  * @param now_us Current time in microseconds
  * @param response_buffer Pointer to response buffer

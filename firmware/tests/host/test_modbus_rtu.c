@@ -797,25 +797,84 @@ static void test_receiver_bad_frames(void) {
     CHECK(stats.crc_errors == 0 && stats.framing_errors == 0 && stats.frames_received == 0);
 }
 
-static void test_receiver_back_to_back_frames(void) {
-    begin("receiver: a new frame after T3.5 replaces an unpolled one");
-    uint32_t now = 0;
-    const uint8_t write_register[] = {0x11, 0x06, 0x00, 0x01, 0x00, 0x03};
-    uint8_t first[8];
-    memcpy(first, write_register, 6);
-    uint16_t crc = modbus_calculate_crc(first, 6);
-    first[6] = (uint8_t)(crc & 0xFF);
-    first[7] = (uint8_t)(crc >> 8);
+/** Builds a Write Single Register frame for `address` with CRC. */
+static void write_register_frame(uint8_t *frame, uint8_t address, uint8_t reg, uint8_t value) {
+    frame[0] = address;
+    frame[1] = 0x06;
+    frame[2] = 0x00;
+    frame[3] = reg;
+    frame[4] = 0x00;
+    frame[5] = value;
+    uint16_t crc = modbus_calculate_crc(frame, 6);
+    frame[6] = (uint8_t)(crc & 0xFF);
+    frame[7] = (uint8_t)(crc >> 8);
+}
 
+static void test_receiver_back_to_back_frames(void) {
+    begin("receiver: a frame is kept when the next one begins after exactly T3.5");
+    uint32_t now = 0;
+    uint8_t broadcast_write[8];
+    write_register_frame(broadcast_write, MODBUS_BROADCAST_ADDRESS, 1, 3);
+
+    /* Poll as often as possible: the first character of the second frame is
+     * complete T3.5 + one character time after the first frame, which is also
+     * the earliest moment poll may close the first frame. Reception runs first. */
+    feed(broadcast_write, sizeof(broadcast_write), &now);
+    CHECK(!poll_at(now + FRAME_END_US - 1));
+    now += T3_5_US + CHAR_US;
+    feed(READ_REGISTER_0, sizeof(READ_REGISTER_0), &now);
+    CHECK(!poll_at(now)); /* takes the broadcast: executed, nothing to send */
+    CHECK(poll_at(now + FRAME_END_US));
+    EXPECT_RESPONSE(0x03, 0x02, 0x00, 0x00);
+    CHECK(statistics().overrun_errors == 0);
+    REQUEST(0x03, 0x00, 0x01, 0x00, 0x01); /* the broadcast write was executed */
+    EXPECT_RESPONSE(0x03, 0x02, 0x00, 0x03);
+
+    begin("receiver: two unpolled frames are answered in order");
+    now = 0;
+    uint8_t first[8];
+    write_register_frame(first, SLAVE_ADDRESS, 1, 3);
     feed(first, sizeof(first), &now);
-    now += T3_5_US + CHAR_US; /* T3.5 of silence: frame complete, but poll is late */
+    now += T3_5_US + CHAR_US;
     feed(READ_REGISTER_0, sizeof(READ_REGISTER_0), &now);
     CHECK(poll_at(now + FRAME_END_US));
-    EXPECT_RESPONSE(0x03, 0x02, 0x00, 0x00); /* the answer belongs to the second frame */
-    CHECK(statistics().overrun_errors == 1);
+    EXPECT_RESPONSE(0x06, 0x00, 0x01, 0x00, 0x03);
+    CHECK(poll_at(now + FRAME_END_US));
+    EXPECT_RESPONSE(0x03, 0x02, 0x00, 0x00);
+    CHECK(!poll_at(now + FRAME_END_US));
+    CHECK(statistics().overrun_errors == 0);
 
-    /* The lost write was not executed */
-    REQUEST(0x03, 0x00, 0x01, 0x00, 0x01);
+    begin("receiver: a third unpolled frame costs the second one");
+    now = 0;
+    uint8_t second[8];
+    uint8_t third[8];
+    write_register_frame(first, SLAVE_ADDRESS, 1, 0x11);
+    write_register_frame(second, SLAVE_ADDRESS, 2, 0x22);
+    write_register_frame(third, SLAVE_ADDRESS, 3, 0x33);
+    feed(first, sizeof(first), &now);
+    now += T3_5_US + CHAR_US;
+    feed(second, sizeof(second), &now);
+    now += T3_5_US + CHAR_US;
+    feed(third, sizeof(third), &now);
+    CHECK(poll_at(now + FRAME_END_US));
+    EXPECT_RESPONSE(0x06, 0x00, 0x01, 0x00, 0x11);
+    CHECK(poll_at(now + FRAME_END_US));
+    EXPECT_RESPONSE(0x06, 0x00, 0x03, 0x00, 0x33);
+    CHECK(!poll_at(now + 2 * FRAME_END_US));
+    CHECK(statistics().overrun_errors == 1);
+    REQUEST(0x03, 0x00, 0x01, 0x00, 0x03); /* the second write was lost */
+    EXPECT_RESPONSE(0x03, 0x06, 0x00, 0x11, 0x00, 0x00, 0x00, 0x33);
+
+    begin("receiver: a set-aside frame with a CRC error is counted");
+    now = 0;
+    write_register_frame(first, SLAVE_ADDRESS, 1, 3);
+    first[5] ^= 0x01;
+    feed(first, sizeof(first), &now);
+    now += T3_5_US + CHAR_US;
+    feed(READ_REGISTER_0, sizeof(READ_REGISTER_0), &now);
+    CHECK(!poll_at(now + FRAME_END_US));
+    CHECK(statistics().crc_errors == 1);
+    CHECK(poll_at(now + FRAME_END_US));
     EXPECT_RESPONSE(0x03, 0x02, 0x00, 0x00);
 }
 
