@@ -41,6 +41,9 @@
         </div>
       </UCard>
 
+      <!-- Shown only when the list was cut short -->
+      <p v-if="listNotice" class="mb-4 text-sm text-(--ui-text-muted)">{{ listNotice }}</p>
+
       <!-- Loading -->
       <div v-if="loading && devices.length === 0" class="text-center py-16">
         <UIcon
@@ -152,15 +155,14 @@ interface SiteItem {
   name: string
 }
 
-interface PaginatedResponse<T> {
-  count: number
-  results: T[]
-}
-
 const api = useApi()
 const loading = ref(false)
 const errorMsg = ref('')
 const devices = ref<DeviceItem[]>([])
+const totalDevices = ref(0)
+const listNotice = computed(() =>
+  truncatedListNotice(devices.value.length, totalDevices.value, 'devices')
+)
 const sites = ref<SiteItem[]>([])
 const statusFilter = ref('all')
 const siteFilter = ref('all')
@@ -206,11 +208,12 @@ async function fetchDevices() {
   errorMsg.value = ''
   try {
     const [devicesData, sitesData] = await Promise.all([
-      api.get<PaginatedResponse<DeviceItem>>('/devices/devices/'),
-      api.get<PaginatedResponse<SiteItem>>('/devices/sites/'),
+      api.getAll<DeviceItem>('/devices/devices/'),
+      api.getAll<SiteItem>('/devices/sites/'),
     ])
-    devices.value = devicesData.results || []
-    sites.value = sitesData.results || []
+    devices.value = devicesData.items
+    totalDevices.value = devicesData.total
+    sites.value = sitesData.items
   } catch (error: unknown) {
     errorMsg.value = apiErrorMessage(error)
     console.error('Failed to fetch devices:', error)

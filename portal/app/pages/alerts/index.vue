@@ -46,6 +46,9 @@
         </div>
       </UCard>
 
+      <!-- Shown only when the list was cut short -->
+      <p v-if="listNotice" class="mb-4 text-sm text-(--ui-text-muted)">{{ listNotice }}</p>
+
       <!-- Loading -->
       <div v-if="loading && events.length === 0" class="text-center py-16">
         <UIcon
@@ -175,16 +178,15 @@ interface SystemEvent {
   created_at: string
 }
 
-interface PaginatedResponse<T> {
-  count: number
-  results: T[]
-}
-
 const api = useApi()
 const toast = useToast()
 const loading = ref(false)
 const errorMsg = ref('')
 const events = ref<SystemEvent[]>([])
+const totalEvents = ref(0)
+const listNotice = computed(() =>
+  truncatedListNotice(events.value.length, totalEvents.value, 'alerts (newest first)')
+)
 const severityFilter = ref('all')
 const statusFilter = ref('all')
 
@@ -239,10 +241,9 @@ async function fetchEvents() {
   loading.value = true
   errorMsg.value = ''
   try {
-    const data = await api.get<PaginatedResponse<SystemEvent>>('/events/events/', {
-      ordering: '-created_at',
-    })
-    events.value = data.results || []
+    const data = await api.getAll<SystemEvent>('/events/events/', { ordering: '-created_at' })
+    events.value = data.items
+    totalEvents.value = data.total
   } catch (error: unknown) {
     errorMsg.value = apiErrorMessage(error)
     console.error('Failed to fetch events:', error)
