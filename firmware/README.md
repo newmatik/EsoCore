@@ -235,7 +235,8 @@ with the microsecond time at which it was completely received, and calls `modbus
 
 - A silence of more than T1.5 (1.5 character times) inside a frame discards the whole frame.
 - A silence of at least T3.5 (3.5 character times) ends the frame; it is then checked (length, CRC, address) and answered. `modbus_rtu_poll()`
-  closes the frame one character time after T3.5, when it is certain that no further character had begun.
+  closes the frame one character time after T3.5, when it is certain that no further character had begun. A frame that is complete when the next
+  one begins is kept for the next poll.
 - Up to 19200 Bd both times follow from the character format (9600 Bd 8E1: 1719 µs and 4011 µs); above 19200 Bd they are fixed at 750 µs and
   1750 µs. `modbus_rtu_get_frame_timing()` returns them.
 

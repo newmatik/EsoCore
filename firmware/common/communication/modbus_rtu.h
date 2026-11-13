@@ -396,11 +396,15 @@ void modbus_rtu_receive_byte(uint8_t byte, uint32_t now_us);
  * and, if valid and addressed to this slave, processed with
  * modbus_process_frame().
  *
- * Each call handles at most one frame. If the next frame begins before the
- * previous one was taken here, the receiver sets the previous one aside and
- * the next call answers it; a second frame that completes while one is still
- * waiting is lost and counts as an overrun error. Call again until it returns
- * false after a burst of frames.
+ * Each call returns at most one response. If the next frame begins before
+ * the previous one was taken here, the receiver sets the previous one aside
+ * and this function handles it first; a second frame that completes while one
+ * is still waiting is lost and counts as an overrun error. Call again until
+ * it returns false after a burst of frames.
+ *
+ * Measured times can be off by a microsecond or two (whole-microsecond
+ * timestamps, rounded character time); the receiver decides the T1.5 and T3.5
+ * limits in favour of accepting the frame by that margin.
  *
  * @param now_us Current time in microseconds
  * @param response_buffer Pointer to response buffer

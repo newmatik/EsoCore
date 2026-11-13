@@ -41,7 +41,12 @@ static uint32_t modbus_rx_last_byte_us = 0; /* Time the last character was compl
  * before modbus_rtu_poll() took it. A length of 0 means there is none. */
 static uint8_t modbus_rx_pending_buffer[MODBUS_MAX_FRAME_SIZE];
 static uint16_t modbus_rx_pending_length = 0;
-static uint32_t modbus_char_us = 0;         /* Duration of one character on the line */
+static uint32_t modbus_char_us = 0;         /* Duration of one character on the line, rounded down */
+
+/* Timestamps are whole microseconds and the character time is rounded, so a
+ * measured silence can be off by a microsecond or two. The receiver decides
+ * every timing limit in favour of accepting the frame by this margin. */
+#define MODBUS_TIMING_TOLERANCE_US 2u
 static uint32_t modbus_t1_5_us = 0;         /* Maximum silence between two characters of a frame */
 static uint32_t modbus_t3_5_us = 0;         /* Minimum silence between two frames */
 
@@ -603,9 +608,9 @@ static bool modbus_apply_frame_timing(uint32_t baud_rate, uint8_t data_bits, uin
         return false;
     }
 
-    /* One character time in microseconds, rounded up */
-    modbus_char_us = (uint32_t)((modbus_bits_per_char(data_bits, stop_bits, parity) * 1000000ull +
-                                 baud_rate - 1) / baud_rate);
+    /* One character time in microseconds, rounded down */
+    modbus_char_us = (uint32_t)((modbus_bits_per_char(data_bits, stop_bits, parity) * 1000000ull) /
+                                baud_rate);
     modbus_t1_5_us = t1_5_us;
     modbus_t3_5_us = t3_5_us;
     return true;
@@ -1245,7 +1250,7 @@ void modbus_rtu_receive_byte(uint8_t byte, uint32_t now_us) {
         uint32_t distance_us = now_us - modbus_rx_last_byte_us;
         uint32_t gap_us = (distance_us > modbus_char_us) ? (distance_us - modbus_char_us) : 0;
 
-        if (gap_us >= modbus_t3_5_us) {
+        if (gap_us + MODBUS_TIMING_TOLERANCE_US >= modbus_t3_5_us) {
             /* The previous frame has ended and this character starts the next
              * one. modbus_rtu_poll() could not have taken the previous frame
              * yet if the gap was exactly T3.5, so it is set aside for the next
@@ -1259,7 +1264,7 @@ void modbus_rtu_receive_byte(uint8_t byte, uint32_t now_us) {
                 modbus_rx_pending_length = modbus_rx_index;
             }
             modbus_rx_reset();
-        } else if (gap_us > modbus_t1_5_us) {
+        } else if (gap_us > modbus_t1_5_us + MODBUS_TIMING_TOLERANCE_US) {
             /* Silence of more than T1.5 inside a frame: the frame is
              * incomplete and is discarded as a whole. */
             modbus_rx_frame_bad = true;
@@ -1293,21 +1298,27 @@ bool modbus_rtu_poll(uint32_t now_us, uint8_t *response_buffer,
         return false;
     }
 
-    /* A frame that was set aside when the next one began comes first */
+    /* A frame that was set aside when the next one began comes first. If it
+     * needs no response (broadcast, another slave, bad CRC), go on to the
+     * frame behind it in the same call. */
     if (modbus_rx_pending_length > 0) {
         uint16_t pending_length = modbus_rx_pending_length;
 
         modbus_rx_pending_length = 0;
-        return modbus_rx_answer(modbus_rx_pending_buffer, pending_length, now_us,
-                                response_buffer, response_length, max_response_length);
+        if (modbus_rx_answer(modbus_rx_pending_buffer, pending_length, now_us,
+                             response_buffer, response_length, max_response_length)) {
+            return true;
+        }
+        *response_length = 0;
     }
 
     /* The frame ends only after T3.5 of silence. A character that started
      * within T3.5 is reported only once it is complete, one character time
      * later, so the frame is closed when nothing has arrived for T3.5 plus
-     * one character time. */
+     * one character time (plus the rounding margin). */
     if (!modbus_rx_in_frame ||
-        (uint32_t)(now_us - modbus_rx_last_byte_us) < modbus_t3_5_us + modbus_char_us) {
+        (uint32_t)(now_us - modbus_rx_last_byte_us) <
+            modbus_t3_5_us + modbus_char_us + MODBUS_TIMING_TOLERANCE_US) {
         return false;
     }
 
