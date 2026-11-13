@@ -188,6 +188,10 @@ make --version
 The firmware uses a GNU Make build system defined in `firmware/Makefile`. All builds are invoked from the `firmware/`
 directory.
 
+The firmware is in development: the targets below do not build yet
+([issue 128](https://github.com/newmatik/EsoCore/issues/128)). `make test` builds and runs the host unit tests with the
+local C compiler.
+
 ### Build Targets
 
 **Edge device:**

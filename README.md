@@ -95,7 +95,8 @@ make vibration    # Build a single sensor target
 make help         # List all available targets
 ```
 
-Requires the ARM GCC toolchain. See `firmware/README.md` for architecture and protocol details.
+Requires the ARM GCC toolchain. These targets do not build yet ([#128](https://github.com/newmatik/EsoCore/issues/128)); `make test` runs the
+host unit tests with the local C compiler. See `firmware/README.md` for architecture and protocol details.
 
 ### Checks
 

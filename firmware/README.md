@@ -95,9 +95,11 @@ make flash_air_quality
 make help
 ```
 
-> **Note:** The STM32G0 HAL, CMSIS, startup, and linker files (`stm32/stm32g0/`) are not yet included in
-> the repository. Sensor module builds will fail until this directory structure is added. See the Makefile
-> for the expected layout.
+> **Build status:** no firmware target builds yet. `make edge` stops at a source path that does not exist, several
+> modules in `common/` do not compile, and the STM32H7 startup file as well as the STM32G0 HAL, CMSIS, startup and
+> linker files (`stm32/stm32g0/`) are not in the repository. Issue
+> [#128](https://github.com/newmatik/EsoCore/issues/128) tracks this. What runs today is `make test`, the host unit
+> tests described below.
 
 ## Project Structure
 
