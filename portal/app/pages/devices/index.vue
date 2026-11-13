@@ -201,17 +201,6 @@ function statusColor(status: string): BadgeColor {
   return map[status] || 'neutral'
 }
 
-function formatTimeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime()
-  const minutes = Math.floor(diff / 60000)
-  if (minutes < 1) return 'just now'
-  if (minutes < 60) return `${minutes}m ago`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
-  const days = Math.floor(hours / 24)
-  return `${days}d ago`
-}
-
 async function fetchDevices() {
   loading.value = true
   errorMsg.value = ''
@@ -223,8 +212,7 @@ async function fetchDevices() {
     devices.value = devicesData.results || []
     sites.value = sitesData.results || []
   } catch (error: unknown) {
-    const err = error as { message?: string; statusCode?: number; data?: { detail?: string } }
-    errorMsg.value = err?.data?.detail || err?.message || 'Unknown error'
+    errorMsg.value = apiErrorMessage(error)
     console.error('Failed to fetch devices:', error)
   } finally {
     loading.value = false

@@ -82,7 +82,7 @@
               :key="key"
               class="flex justify-between"
             >
-              <dt class="text-(--ui-text-muted)">{{ formatThresholdKey(String(key)) }}</dt>
+              <dt class="text-(--ui-text-muted)">{{ humanizeKey(String(key)) }}</dt>
               <dd class="font-mono text-(--ui-text-highlighted)">{{ val }}</dd>
             </div>
           </dl>
@@ -288,16 +288,6 @@ function eventStatusColor(status: string): BadgeColor {
   return map[status] || 'neutral'
 }
 
-function formatTimeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime()
-  const minutes = Math.floor(diff / 60000)
-  if (minutes < 1) return 'just now'
-  if (minutes < 60) return `${minutes}m ago`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
-  return `${Math.floor(hours / 24)}d ago`
-}
-
 function formatDateTime(dateStr: string) {
   return new Date(dateStr).toLocaleString('en-US', {
     month: 'short',
@@ -306,10 +296,6 @@ function formatDateTime(dateStr: string) {
     minute: '2-digit',
     second: '2-digit',
   })
-}
-
-function formatThresholdKey(key: string) {
-  return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 }
 
 async function fetchDeviceData() {
@@ -333,8 +319,7 @@ async function fetchDeviceData() {
     deviceEvents.value = eventsData.results || []
     useSeoMeta({ title: `${deviceData.serial_number} - EsoCore Portal` })
   } catch (error: unknown) {
-    const err = error as { data?: { detail?: string }; message?: string }
-    errorMsg.value = err?.data?.detail || err?.message || 'Failed to load device data'
+    errorMsg.value = apiErrorMessage(error, 'Failed to load device data')
     console.error('Failed to fetch device:', error)
   }
 }

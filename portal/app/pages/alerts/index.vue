@@ -235,16 +235,6 @@ function eventStatusColor(status: string): BadgeColor {
   return map[status] || 'neutral'
 }
 
-function formatTimeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime()
-  const minutes = Math.floor(diff / 60000)
-  if (minutes < 1) return 'just now'
-  if (minutes < 60) return `${minutes}m ago`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
-  return `${Math.floor(hours / 24)}d ago`
-}
-
 async function fetchEvents() {
   loading.value = true
   errorMsg.value = ''
@@ -254,8 +244,7 @@ async function fetchEvents() {
     })
     events.value = data.results || []
   } catch (error: unknown) {
-    const err = error as { message?: string; data?: { detail?: string } }
-    errorMsg.value = err?.data?.detail || err?.message || 'Unknown error'
+    errorMsg.value = apiErrorMessage(error)
     console.error('Failed to fetch events:', error)
   } finally {
     loading.value = false
@@ -268,10 +257,9 @@ async function acknowledgeEvent(eventId: string) {
     const event = events.value.find(e => e.id === eventId)
     if (event) event.status = 'acknowledged'
   } catch (error: unknown) {
-    const err = error as { data?: { detail?: string }; message?: string }
     toast.add({
       title: 'Failed to acknowledge event',
-      description: err?.data?.detail || err?.message || 'Unknown error',
+      description: apiErrorMessage(error),
       color: 'error',
     })
   }
@@ -283,10 +271,9 @@ async function resolveEvent(eventId: string) {
     const event = events.value.find(e => e.id === eventId)
     if (event) event.status = 'resolved'
   } catch (error: unknown) {
-    const err = error as { data?: { detail?: string }; message?: string }
     toast.add({
       title: 'Failed to resolve event',
-      description: err?.data?.detail || err?.message || 'Unknown error',
+      description: apiErrorMessage(error),
       color: 'error',
     })
   }

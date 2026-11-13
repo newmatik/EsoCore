@@ -1,0 +1,119 @@
+import { describe, expect, it } from 'vitest'
+import { useApi } from '../app/composables/useApi'
+import { useAuthStore } from '../app/stores/auth'
+import { API_BASE_URL, nuxt } from './setup'
+
+/** Path and options of the only $fetch call made. */
+function fetchCall() {
+  expect(nuxt.$fetch).toHaveBeenCalledTimes(1)
+  const [path, options] = nuxt.$fetch.mock.calls[0]!
+  return { path, options }
+}
+
+describe('useApi', () => {
+  it('sends requests to the configured API base URL and returns the response', async () => {
+    nuxt.$fetch.mockResolvedValue({ count: 0, results: [] })
+
+    const result = await useApi().get('/devices/devices/', { page_size: 8 })
+
+    expect(result).toEqual({ count: 0, results: [] })
+    const { path, options } = fetchCall()
+    expect(path).toBe('/devices/devices/')
+    expect(options).toMatchObject({
+      baseURL: API_BASE_URL,
+      method: 'GET',
+      query: { page_size: 8 },
+    })
+  })
+
+  it('sends no Authorization header while signed out', async () => {
+    nuxt.$fetch.mockResolvedValue({})
+
+    await useApi().get('/dashboard/summary/')
+
+    expect(fetchCall().options.headers).toEqual({})
+  })
+
+  it('sends the token of the signed-in user', async () => {
+    nuxt.$fetch.mockResolvedValue({})
+    useAuthStore().token = 'abc123'
+
+    await useApi().get('/dashboard/summary/')
+
+    expect(fetchCall().options.headers).toEqual({ Authorization: 'Token abc123' })
+  })
+
+  it.each([
+    ['post', 'POST'],
+    ['put', 'PUT'],
+    ['patch', 'PATCH'],
+  ] as const)('%s sends the body as JSON', async (helper, method) => {
+    nuxt.$fetch.mockResolvedValue({})
+
+    await useApi()[helper]('/events/events/7/', { status: 'resolved' })
+
+    const { options } = fetchCall()
+    expect(options.method).toBe(method)
+    expect(options.body).toEqual({ status: 'resolved' })
+    expect(options.headers).toEqual({ 'Content-Type': 'application/json' })
+  })
+
+  it('del sends a DELETE request', async () => {
+    nuxt.$fetch.mockResolvedValue(undefined)
+
+    await useApi().del('/devices/devices/7/')
+
+    expect(fetchCall().options.method).toBe('DELETE')
+  })
+
+  it('keeps a Content-Type the caller set and adds its other headers', async () => {
+    nuxt.$fetch.mockResolvedValue({})
+
+    await useApi().request('/firmware/upload/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/octet-stream', 'X-Request-Id': '42' },
+    })
+
+    expect(fetchCall().options.headers).toEqual({
+      'Content-Type': 'application/octet-stream',
+      'X-Request-Id': '42',
+    })
+  })
+
+  it('signs the user out and opens the login page when the API answers 401', async () => {
+    const error = { statusCode: 401, data: { detail: 'Invalid token.' } }
+    nuxt.$fetch.mockRejectedValue(error)
+    const authStore = useAuthStore()
+    authStore.token = 'expired'
+    nuxt.cookie('auth_token').value = 'expired'
+
+    await expect(useApi().get('/devices/devices/')).rejects.toBe(error)
+
+    expect(authStore.token).toBeNull()
+    expect(nuxt.cookie('auth_token').value).toBeNull()
+    expect(nuxt.navigateTo).toHaveBeenCalledWith('/login')
+  })
+
+  it('also recognises a 401 reported as `status`', async () => {
+    nuxt.$fetch.mockRejectedValue({ status: 401 })
+    const authStore = useAuthStore()
+    authStore.token = 'expired'
+
+    await expect(useApi().get('/devices/devices/')).rejects.toEqual({ status: 401 })
+
+    expect(authStore.token).toBeNull()
+    expect(nuxt.navigateTo).toHaveBeenCalledWith('/login')
+  })
+
+  it.each([403, 404, 500])('passes a %d on and keeps the user signed in', async statusCode => {
+    const error = { statusCode, data: { detail: 'Nope.' } }
+    nuxt.$fetch.mockRejectedValue(error)
+    const authStore = useAuthStore()
+    authStore.token = 'abc123'
+
+    await expect(useApi().get('/devices/devices/')).rejects.toBe(error)
+
+    expect(authStore.token).toBe('abc123')
+    expect(nuxt.navigateTo).not.toHaveBeenCalled()
+  })
+})
