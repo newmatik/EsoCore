@@ -562,12 +562,16 @@ static void modbus_rx_reset_all(void) {
     modbus_rx_pending_length = 0;
 }
 
+static bool modbus_execute_frame(const modbus_frame_t *frame, bool respond, uint8_t *response_buffer,
+                                 uint16_t *response_length, uint16_t max_response_length);
+
 /**
- * @brief Check a complete raw frame and answer it
+ * @brief Check a complete raw frame, execute it and, if asked to, build the response
  *
+ * @param respond false to execute the request without building a response
  * @return true if a response is ready to be transmitted
  */
-static bool modbus_rx_answer(uint8_t *raw_frame, uint16_t frame_length, uint32_t now_us,
+static bool modbus_rx_answer(uint8_t *raw_frame, uint16_t frame_length, uint32_t now_us, bool respond,
                             uint8_t *response_buffer, uint16_t *response_length,
                             uint16_t max_response_length) {
     modbus_frame_t frame;
@@ -585,7 +589,8 @@ static bool modbus_rx_answer(uint8_t *raw_frame, uint16_t frame_length, uint32_t
 
     frame.timestamp = now_us;
 
-    return modbus_process_frame(&frame, response_buffer, response_length, max_response_length) &&
+    return modbus_execute_frame(&frame, respond, response_buffer, response_length,
+                                max_response_length) &&
            *response_length > 0;
 }
 
@@ -1108,6 +1113,14 @@ bool modbus_send_request(uint8_t slave_address, uint8_t function_code,
  */
 bool modbus_process_frame(const modbus_frame_t *frame, uint8_t *response_buffer,
                          uint16_t *response_length, uint16_t max_response_length) {
+    return modbus_execute_frame(frame, true, response_buffer, response_length, max_response_length);
+}
+
+/**
+ * @brief Execute a request and, unless it is a broadcast or respond is false, build the response
+ */
+static bool modbus_execute_frame(const modbus_frame_t *frame, bool respond, uint8_t *response_buffer,
+                                 uint16_t *response_length, uint16_t max_response_length) {
     if (!modbus_initialized || !frame || !response_buffer || !response_length ||
         modbus_config.mode != MODBUS_MODE_SLAVE) {
         return false;
@@ -1171,8 +1184,9 @@ bool modbus_process_frame(const modbus_frame_t *frame, uint8_t *response_buffer,
             break;
     }
 
-    /* A broadcast request is executed but never answered */
-    if (broadcast) {
+    /* A broadcast request is executed but never answered. Neither is a
+     * request whose response can no longer be sent (see modbus_rtu_poll()). */
+    if (broadcast || !respond) {
         return true;
     }
 
@@ -1298,17 +1312,15 @@ bool modbus_rtu_poll(uint32_t now_us, uint8_t *response_buffer,
         return false;
     }
 
-    /* A frame that was set aside when the next one began comes first. If it
-     * needs no response (broadcast, another slave, bad CRC), go on to the
-     * frame behind it in the same call. */
+    /* A frame that was set aside when the next one began comes first. It is
+     * executed, but not answered: the master has already started its next
+     * request, so the response would arrive too late and collide with it. */
     if (modbus_rx_pending_length > 0) {
         uint16_t pending_length = modbus_rx_pending_length;
 
         modbus_rx_pending_length = 0;
-        if (modbus_rx_answer(modbus_rx_pending_buffer, pending_length, now_us,
-                             response_buffer, response_length, max_response_length)) {
-            return true;
-        }
+        (void)modbus_rx_answer(modbus_rx_pending_buffer, pending_length, now_us, false,
+                               response_buffer, response_length, max_response_length);
         *response_length = 0;
     }
 
@@ -1333,7 +1345,7 @@ bool modbus_rtu_poll(uint32_t now_us, uint8_t *response_buffer,
         return false;
     }
 
-    return modbus_rx_answer(modbus_rx_buffer, frame_length, now_us,
+    return modbus_rx_answer(modbus_rx_buffer, frame_length, now_us, true,
                             response_buffer, response_length, max_response_length);
 }
 

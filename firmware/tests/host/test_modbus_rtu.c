@@ -867,19 +867,26 @@ static void test_receiver_back_to_back_frames(void) {
     REQUEST(0x03, 0x00, 0x01, 0x00, 0x01);
     EXPECT_RESPONSE(0x03, 0x02, 0x00, 0x03);
 
-    begin("receiver: two unpolled frames are answered in order");
+    begin("receiver: an unpolled request is executed but not answered once the next one began");
     now = 0;
     uint8_t first[8];
     write_register_frame(first, SLAVE_ADDRESS, 1, 3);
     feed(first, sizeof(first), &now);
     now += T3_5_US + CHAR_US;
-    feed(READ_REGISTER_0, sizeof(READ_REGISTER_0), &now);
-    CHECK(poll_at(now + FRAME_END_US));
-    EXPECT_RESPONSE(0x06, 0x00, 0x01, 0x00, 0x03);
+    modbus_rtu_receive_byte(READ_REGISTER_0[0], now); /* the master has started its next request */
+    CHECK(!poll_at(now + 1));                         /* no late response into that request */
+    CHECK(response_length == 0);
+    now += CHAR_US;
+    feed(&READ_REGISTER_0[1], sizeof(READ_REGISTER_0) - 1, &now);
     CHECK(poll_at(now + FRAME_END_US));
     EXPECT_RESPONSE(0x03, 0x02, 0x00, 0x00);
     CHECK(!poll_at(now + FRAME_END_US));
-    CHECK(statistics().overrun_errors == 0);
+    modbus_statistics_t stats = statistics();
+    CHECK(stats.overrun_errors == 0);
+    CHECK(stats.frames_received == 2);
+    CHECK(stats.frames_sent == 1);
+    REQUEST(0x03, 0x00, 0x01, 0x00, 0x01); /* the write was executed */
+    EXPECT_RESPONSE(0x03, 0x02, 0x00, 0x03);
 
     begin("receiver: a third unpolled frame costs the second one");
     now = 0;
@@ -893,9 +900,7 @@ static void test_receiver_back_to_back_frames(void) {
     feed(second, sizeof(second), &now);
     now += T3_5_US + CHAR_US;
     feed(third, sizeof(third), &now);
-    CHECK(poll_at(now + FRAME_END_US));
-    EXPECT_RESPONSE(0x06, 0x00, 0x01, 0x00, 0x11);
-    CHECK(poll_at(now + FRAME_END_US));
+    CHECK(poll_at(now + FRAME_END_US)); /* first: executed silently; third: answered */
     EXPECT_RESPONSE(0x06, 0x00, 0x03, 0x00, 0x33);
     CHECK(!poll_at(now + 2 * FRAME_END_US));
     CHECK(statistics().overrun_errors == 1);
