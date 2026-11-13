@@ -81,11 +81,21 @@ static modbus_config_t slave_config(void) {
     return config;
 }
 
+/**
+ * Lets the receiver see a silent bus, as it needs once after init or a change
+ * of the communication parameters before it accepts frames.
+ */
+static void sync_receiver(void) {
+    modbus_rtu_poll(0, response, &response_length, sizeof(response));
+    modbus_rtu_poll(1000000, response, &response_length, sizeof(response));
+}
+
 static void begin(const char *name) {
     current_test = name;
     modbus_rtu_deinit();
     modbus_config_t config = slave_config();
     CHECK(modbus_rtu_init(&config));
+    sync_receiver();
     memset(response, 0xEE, sizeof(response));
     response_length = 0xFFFF;
 }
@@ -851,6 +861,7 @@ static void test_receiver_back_to_back_frames(void) {
     modbus_config_t fast = slave_config();
     fast.baud_rate = 115200;
     CHECK(modbus_rtu_init(&fast));
+    sync_receiver();
     now = 0;
     for (uint16_t i = 0; i < sizeof(broadcast_write); i++) {
         modbus_rtu_receive_byte(broadcast_write[i], now);
@@ -946,6 +957,72 @@ static void test_receiver_poll_during_a_character(void) {
     EXPECT_RESPONSE(0x03, 0x02, 0x00, 0x00);
 }
 
+static void test_receiver_initial_synchronisation(void) {
+    /* Write Multiple Registers to slave 0x12 whose data happens to end in a
+     * complete, CRC-valid Write Single Register frame for slave 0x11. */
+    const uint8_t stream[] = {0x12, 0x10, 0x00, 0x00, 0x00, 0x04, 0x08, 0x7F, 0x82,
+                              0x11, 0x06, 0x00, 0x01, 0x00, 0x03, 0x9A, 0x9B};
+    modbus_config_t config = slave_config();
+    uint32_t now;
+
+    current_test = "receiver: the tail of a frame joined midway is not executed";
+    modbus_rtu_deinit();
+    CHECK(modbus_rtu_init(&config));
+    CHECK(modbus_calculate_crc(&stream[9], 6) == 0x9B9A); /* the tail is a valid frame */
+    now = 0;
+    feed(&stream[9], 8, &now); /* the slave came up after the ninth character */
+    CHECK(!poll_at(now + FRAME_END_US));
+    CHECK(!poll_at(now + 2 * FRAME_END_US));
+    CHECK(response_length == 0);
+    CHECK(statistics().frames_received == 0);
+
+    /* That silence synchronised the receiver; the write was not executed */
+    now += 3 * FRAME_END_US;
+    const uint8_t read_register_1[] = {0x11, 0x03, 0x00, 0x01, 0x00, 0x01};
+    uint8_t request[8];
+    memcpy(request, read_register_1, 6);
+    uint16_t crc = modbus_calculate_crc(request, 6);
+    request[6] = (uint8_t)(crc & 0xFF);
+    request[7] = (uint8_t)(crc >> 8);
+    feed(request, sizeof(request), &now);
+    CHECK(poll_at(now + FRAME_END_US));
+    EXPECT_RESPONSE(0x03, 0x02, 0x00, 0x00);
+
+    current_test = "receiver: synchronises on T3.5 between characters without a poll";
+    modbus_rtu_deinit();
+    CHECK(modbus_rtu_init(&config));
+    now = 0;
+    feed(&stream[9], 8, &now);
+    now += T3_5_US + CHAR_US; /* silence, then the first character of a real frame */
+    feed(READ_REGISTER_0, sizeof(READ_REGISTER_0), &now);
+    CHECK(poll_at(now + FRAME_END_US));
+    EXPECT_RESPONSE(0x03, 0x02, 0x00, 0x00);
+    CHECK(statistics().frames_received == 1);
+
+    current_test = "receiver: stays unsynchronised while the bus is busy";
+    modbus_rtu_deinit();
+    CHECK(modbus_rtu_init(&config));
+    now = 0;
+    CHECK(!poll_at(now));
+    for (int i = 0; i < 4; i++) { /* traffic with gaps shorter than T3.5 */
+        now += T3_5_US / 2;
+        feed(READ_REGISTER_0, sizeof(READ_REGISTER_0), &now);
+        CHECK(!poll_at(now + 1));
+    }
+    CHECK(!poll_at(now + FRAME_END_US));
+    CHECK(statistics().frames_received == 0);
+
+    current_test = "receiver: synchronises on a silent bus by polling alone";
+    modbus_rtu_deinit();
+    CHECK(modbus_rtu_init(&config));
+    CHECK(!poll_at(5000));
+    CHECK(!poll_at(5000 + FRAME_END_US));
+    now = 5000 + FRAME_END_US + 1;
+    feed(READ_REGISTER_0, sizeof(READ_REGISTER_0), &now);
+    CHECK(poll_at(now + FRAME_END_US));
+    EXPECT_RESPONSE(0x03, 0x02, 0x00, 0x00);
+}
+
 static void test_receiver_broadcast_and_wraparound(void) {
     begin("receiver: broadcast is executed and not answered");
     uint32_t now = 0;
@@ -973,6 +1050,7 @@ static void test_receiver_broadcast_and_wraparound(void) {
     modbus_config_t config = slave_config();
     config.baud_rate = 115200;
     CHECK(modbus_rtu_init(&config));
+    sync_receiver();
     now = 0;
     for (uint16_t i = 0; i < sizeof(READ_REGISTER_0); i++) {
         modbus_rtu_receive_byte(READ_REGISTER_0[i], now);
@@ -987,9 +1065,11 @@ static void test_receiver_broadcast_and_wraparound(void) {
     modbus_rtu_deinit();
     config.baud_rate = 115200;
     CHECK(modbus_rtu_init(&config));
+    sync_receiver();
     modbus_rtu_receive_byte(0x11, 0); /* a frame in the old format is dropped */
     CHECK(modbus_set_comm_params(9600, 8, 1, 'E'));
-    now = 100000;
+    sync_receiver(); /* the receiver synchronises again */
+    now = 2000000;
     feed(READ_REGISTER_0, sizeof(READ_REGISTER_0), &now); /* 1146 us apart: over the old T1.5 of 750 us */
     CHECK(!poll_at(now + 1750 + 95 + TOLERANCE_US));      /* the old timing no longer applies */
     CHECK(poll_at(now + FRAME_END_US));
@@ -1022,6 +1102,7 @@ int main(void) {
     test_receiver_bad_frames();
     test_receiver_back_to_back_frames();
     test_receiver_poll_during_a_character();
+    test_receiver_initial_synchronisation();
     test_receiver_broadcast_and_wraparound();
 
     modbus_rtu_deinit();

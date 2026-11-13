@@ -237,8 +237,13 @@ with the microsecond time at which it was completely received, and calls `modbus
 - A silence of at least T3.5 (3.5 character times) ends the frame; it is then checked (length, CRC, address) and answered. `modbus_rtu_poll()`
   closes the frame one character time after T3.5, when it is certain that no further character had begun. A frame that is complete when the next
   one begins is still executed, but no longer answered: its response would collide with the request that has already started.
+- After start-up or a change of the communication parameters the receiver accepts frames only once it has seen T3.5 of silence, so that the tail
+  of a frame it joined midway is never taken for a frame.
 - Up to 19200 Bd both times follow from the character format (9600 Bd 8E1: 1719 µs and 4011 µs); above 19200 Bd they are fixed at 750 µs and
   1750 µs. `modbus_rtu_get_frame_timing()` returns them.
+
+This layer sees a character only when it is complete. Before it transmits a response, the UART driver must check that the line is idle, because a
+master that gave up waiting may just have begun its next request.
 
 Master mode builds the requests for the same eight function codes, but `modbus_send_request()` is still a stub without a UART, so no master
 request completes yet.

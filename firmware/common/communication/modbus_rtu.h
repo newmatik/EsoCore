@@ -373,6 +373,11 @@ bool modbus_rtu_get_frame_timing(uint32_t baud_rate, uint8_t data_bits, uint8_t 
  * two characters makes the frame incomplete and it is discarded as a whole; a
  * silence of at least T3.5 ends the frame.
  *
+ * After modbus_rtu_init() and modbus_set_comm_params() the receiver first
+ * waits for T3.5 of silence, seen between two characters or by
+ * modbus_rtu_poll(), before it accepts a frame: it may have joined in the
+ * middle of one.
+ *
  * The timestamp is the time the character was completely received (the UART
  * receive-complete event), taken from a free-running microsecond counter; it
  * may wrap around. The receiver subtracts one character time from the
@@ -402,6 +407,11 @@ void modbus_rtu_receive_byte(uint8_t byte, uint32_t now_us);
  * so the response would be late and would collide with that request on the
  * bus. A second frame that completes while one is still set aside is lost
  * and counts as an overrun error.
+ *
+ * This layer sees a character only when it is complete. Before transmitting
+ * a returned response, the UART driver must check that the line is idle (no
+ * start bit seen since), because a master that gave up waiting may just have
+ * begun its next request.
  *
  * Measured times can be off by a microsecond or two (whole-microsecond
  * timestamps, rounded character time); the receiver decides the T1.5 and T3.5

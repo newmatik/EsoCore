@@ -37,6 +37,13 @@ static bool modbus_rx_in_frame = false;     /* A frame is being received or awai
 static bool modbus_rx_frame_bad = false;    /* The current frame must be discarded */
 static uint32_t modbus_rx_last_byte_us = 0; /* Time the last character was completely received */
 
+/* The receiver accepts frames only after it has seen T3.5 of silence once
+ * (the "initial state" of the RTU state diagram). Until then it may have
+ * joined in the middle of a frame, whose tail could look like a valid frame. */
+static bool modbus_rx_synced = false;
+static bool modbus_rx_sync_started = false; /* modbus_rx_sync_ref_us is valid */
+static uint32_t modbus_rx_sync_ref_us = 0;  /* Last bus activity seen, or the first poll */
+
 /* A complete frame that the receiver set aside because the next frame began
  * before modbus_rtu_poll() took it. A length of 0 means there is none. */
 static uint8_t modbus_rx_pending_buffer[MODBUS_MAX_FRAME_SIZE];
@@ -560,6 +567,8 @@ static void modbus_rx_reset(void) {
 static void modbus_rx_reset_all(void) {
     modbus_rx_reset();
     modbus_rx_pending_length = 0;
+    modbus_rx_synced = false;
+    modbus_rx_sync_started = false;
 }
 
 static bool modbus_execute_frame(const modbus_frame_t *frame, bool respond, uint8_t *response_buffer,
@@ -1257,6 +1266,21 @@ void modbus_rtu_receive_byte(uint8_t byte, uint32_t now_us) {
         return;
     }
 
+    if (!modbus_rx_synced) {
+        /* Not yet synchronised: this character may belong to a frame whose
+         * start was missed. It counts only as bus activity, unless T3.5 of
+         * silence lies before it; then it is the first character of a frame. */
+        uint32_t silence_us = now_us - modbus_rx_sync_ref_us;
+
+        silence_us = (silence_us > modbus_char_us) ? (silence_us - modbus_char_us) : 0;
+        if (!modbus_rx_sync_started || silence_us + MODBUS_TIMING_TOLERANCE_US < modbus_t3_5_us) {
+            modbus_rx_sync_ref_us = now_us;
+            modbus_rx_sync_started = true;
+            return;
+        }
+        modbus_rx_synced = true;
+    }
+
     if (modbus_rx_in_frame) {
         /* Both timestamps mark the end of a character, so their distance holds
          * this character's own duration; the rest is the silence before it.
@@ -1309,6 +1333,19 @@ bool modbus_rtu_poll(uint32_t now_us, uint8_t *response_buffer,
 
     if (!modbus_initialized || modbus_config.mode != MODBUS_MODE_SLAVE ||
         !response_buffer || !response_length) {
+        return false;
+    }
+
+    if (!modbus_rx_synced) {
+        /* Synchronised once the bus has been silent for T3.5 since the last
+         * activity, or since the first poll if nothing was received. */
+        if (!modbus_rx_sync_started) {
+            modbus_rx_sync_ref_us = now_us;
+            modbus_rx_sync_started = true;
+        } else if ((uint32_t)(now_us - modbus_rx_sync_ref_us) >=
+                   modbus_t3_5_us + modbus_char_us + MODBUS_TIMING_TOLERANCE_US) {
+            modbus_rx_synced = true;
+        }
         return false;
     }
 
