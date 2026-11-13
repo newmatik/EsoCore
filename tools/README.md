@@ -5,10 +5,12 @@ Tools CI workflow runs the same command).
 
 ## sync_bom_data.py
 
-Copies the BOM CSVs from `hardware/` to `website/public/bom/`, which the website renders. Run it from the repository root after editing any `bom.csv`:
+Copies the BOM CSVs from `hardware/` to `website/public/bom/`, which the website renders. Run it from the repository root after editing any `bom.csv`.
+Every run copies every BOM that exists under `hardware/` and overwrites its file in `website/public/bom/`, whether the source changed or not, so edit
+BOMs only under `hardware/`:
 
 ```bash
-python3 tools/sync_bom_data.py            # copy changed BOMs
+python3 tools/sync_bom_data.py            # copy all BOMs, overwriting the website copies
 python3 tools/sync_bom_data.py --dry-run  # show what would be copied
 python3 tools/sync_bom_data.py --verbose  # print every action
 ```
