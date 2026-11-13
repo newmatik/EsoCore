@@ -35,7 +35,8 @@ static bool modbus_data_map_owned = false;
 /* RTU receiver state (slave mode), see modbus_rtu_receive_byte(). */
 static bool modbus_rx_in_frame = false;     /* A frame is being received or awaits modbus_rtu_poll() */
 static bool modbus_rx_frame_bad = false;    /* The current frame must be discarded */
-static uint32_t modbus_rx_last_byte_us = 0; /* Time of the last received character */
+static uint32_t modbus_rx_last_byte_us = 0; /* Time the last character was completely received */
+static uint32_t modbus_char_us = 0;         /* Duration of one character on the line */
 static uint32_t modbus_t1_5_us = 0;         /* Maximum silence between two characters of a frame */
 static uint32_t modbus_t3_5_us = 0;         /* Minimum silence between two frames */
 
@@ -543,6 +544,33 @@ static void modbus_rx_reset(void) {
     modbus_rx_frame_bad = false;
 }
 
+/** @brief Bits per character: start bit, data bits, parity bit if any, stop bits */
+static uint32_t modbus_bits_per_char(uint8_t data_bits, uint8_t stop_bits, char parity) {
+    return 1u + data_bits + ((parity == 'N' || parity == 'n') ? 0u : 1u) + stop_bits;
+}
+
+/**
+ * @brief Set the receiver timing (character time, T1.5, T3.5) for a character format
+ *
+ * @return true if set, false if the timing cannot be derived (baud rate 0)
+ */
+static bool modbus_apply_frame_timing(uint32_t baud_rate, uint8_t data_bits, uint8_t stop_bits,
+                                      char parity) {
+    uint32_t t1_5_us = 0;
+    uint32_t t3_5_us = 0;
+
+    if (!modbus_rtu_get_frame_timing(baud_rate, data_bits, stop_bits, parity, &t1_5_us, &t3_5_us)) {
+        return false;
+    }
+
+    /* One character time in microseconds, rounded up */
+    modbus_char_us = (uint32_t)((modbus_bits_per_char(data_bits, stop_bits, parity) * 1000000ull +
+                                 baud_rate - 1) / baud_rate);
+    modbus_t1_5_us = t1_5_us;
+    modbus_t3_5_us = t3_5_us;
+    return true;
+}
+
 /* ============================================================================
  * Public API Implementation
  * ============================================================================ */
@@ -555,11 +583,9 @@ bool modbus_rtu_init(const modbus_config_t *config) {
         return false;
     }
 
-    uint32_t t1_5_us = 0;
-    uint32_t t3_5_us = 0;
-
-    if (!modbus_rtu_get_frame_timing(config->baud_rate, config->data_bits, config->stop_bits,
-                                     config->parity, &t1_5_us, &t3_5_us)) {
+    /* The receiver timing follows from the character format */
+    if (!modbus_apply_frame_timing(config->baud_rate, config->data_bits, config->stop_bits,
+                                   config->parity)) {
         return false;
     }
 
@@ -595,8 +621,6 @@ bool modbus_rtu_init(const modbus_config_t *config) {
         modbus_data_map.num_input_registers = modbus_config.max_registers;
     }
 
-    modbus_t1_5_us = t1_5_us;
-    modbus_t3_5_us = t3_5_us;
     modbus_rx_reset();
 
     modbus_initialized = true;
@@ -1158,8 +1182,7 @@ bool modbus_rtu_get_frame_timing(uint32_t baud_rate, uint8_t data_bits, uint8_t 
         return true;
     }
 
-    /* Bits per character: start bit, data bits, parity bit if any, stop bits */
-    uint32_t bits_per_char = 1u + data_bits + ((parity == 'N' || parity == 'n') ? 0u : 1u) + stop_bits;
+    uint32_t bits_per_char = modbus_bits_per_char(data_bits, stop_bits, parity);
 
     /* 1.5 and 3.5 character times in microseconds, rounded up */
     *t1_5_us = (uint32_t)((bits_per_char * 1500000ull + baud_rate - 1) / baud_rate);
@@ -1176,8 +1199,11 @@ void modbus_rtu_receive_byte(uint8_t byte, uint32_t now_us) {
     }
 
     if (modbus_rx_in_frame) {
-        /* Unsigned subtraction keeps the gap correct across timer wrap-around */
-        uint32_t gap_us = now_us - modbus_rx_last_byte_us;
+        /* Both timestamps mark the end of a character, so their distance holds
+         * this character's own duration; the rest is the silence before it.
+         * Unsigned subtraction keeps the distance correct across timer wrap-around. */
+        uint32_t distance_us = now_us - modbus_rx_last_byte_us;
+        uint32_t gap_us = (distance_us > modbus_char_us) ? (distance_us - modbus_char_us) : 0;
 
         if (gap_us >= modbus_t3_5_us) {
             /* The previous frame had ended but modbus_rtu_poll() never took
@@ -1347,6 +1373,13 @@ bool modbus_set_comm_params(uint32_t baud_rate, uint8_t data_bits,
     if (!modbus_initialized) {
         return false;
     }
+
+    /* The receiver timing depends on the character format; a frame received
+     * with the old format is discarded. */
+    if (!modbus_apply_frame_timing(baud_rate, data_bits, stop_bits, parity)) {
+        return false;
+    }
+    modbus_rx_reset();
 
     modbus_config.baud_rate = baud_rate;
     modbus_config.data_bits = data_bits;

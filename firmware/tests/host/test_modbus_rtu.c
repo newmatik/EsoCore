@@ -662,7 +662,10 @@ static void test_frame_timing_values(void) {
 /** Read holding register 0 from the test slave, with CRC. */
 static const uint8_t READ_REGISTER_0[] = {0x11, 0x03, 0x00, 0x00, 0x00, 0x01, 0x86, 0x9A};
 
-/** Feeds bytes back to back starting at *now_us; leaves *now_us at the last byte. */
+/**
+ * Feeds bytes back to back. Timestamps mark the end of each character, as a
+ * UART receive-complete interrupt reports them; *now_us is left at the last one.
+ */
 static void feed(const uint8_t *bytes, uint16_t count, uint32_t *now_us) {
     for (uint16_t i = 0; i < count; i++) {
         if (i > 0) {
@@ -702,15 +705,28 @@ static void test_receiver_inter_character_gap(void) {
     begin("receiver: a gap of exactly T1.5 inside a frame is accepted");
     uint32_t now = 0;
     feed(READ_REGISTER_0, 4, &now);
-    now += T1_5_US;
+    now += T1_5_US + CHAR_US; /* silence, then the next character itself */
     feed(&READ_REGISTER_0[4], 4, &now);
     CHECK(poll_at(now + T3_5_US));
     EXPECT_RESPONSE(0x03, 0x02, 0x00, 0x00);
 
+    begin("receiver: silence is measured, not the distance between characters");
+    /* 1000 us of silence at 9600 Bd is legal (T1.5 = 1719 us), although the
+     * characters then end 2146 us apart. */
+    now = 0;
+    for (uint16_t i = 0; i < sizeof(READ_REGISTER_0); i++) {
+        modbus_rtu_receive_byte(READ_REGISTER_0[i], now);
+        now += 1000 + CHAR_US;
+    }
+    now -= 1000 + CHAR_US;
+    CHECK(poll_at(now + T3_5_US));
+    EXPECT_RESPONSE(0x03, 0x02, 0x00, 0x00);
+    CHECK(statistics().framing_errors == 0);
+
     begin("receiver: a gap of more than T1.5 inside a frame discards the frame");
     now = 0;
     feed(READ_REGISTER_0, 4, &now);
-    now += T1_5_US + 1;
+    now += T1_5_US + 1 + CHAR_US;
     feed(&READ_REGISTER_0[4], 4, &now);
     CHECK(!poll_at(now + T3_5_US));
     CHECK(response_length == 0);
@@ -728,7 +744,7 @@ static void test_receiver_inter_character_gap(void) {
     begin("receiver: a gap just under T3.5 does not split one frame into two");
     now = 0;
     feed(READ_REGISTER_0, sizeof(READ_REGISTER_0), &now);
-    now += T3_5_US - 1;
+    now += T3_5_US - 1 + CHAR_US;
     feed(READ_REGISTER_0, sizeof(READ_REGISTER_0), &now);
     CHECK(!poll_at(now + T3_5_US));
     CHECK(statistics().framing_errors == 1);
@@ -788,7 +804,7 @@ static void test_receiver_back_to_back_frames(void) {
     first[7] = (uint8_t)(crc >> 8);
 
     feed(first, sizeof(first), &now);
-    now += T3_5_US; /* frame complete, but poll is late */
+    now += T3_5_US + CHAR_US; /* T3.5 of silence: frame complete, but poll is late */
     feed(READ_REGISTER_0, sizeof(READ_REGISTER_0), &now);
     CHECK(poll_at(now + T3_5_US));
     EXPECT_RESPONSE(0x03, 0x02, 0x00, 0x00); /* the answer belongs to the second frame */
@@ -835,6 +851,20 @@ static void test_receiver_broadcast_and_wraparound(void) {
     CHECK(!poll_at(now + 1749));
     CHECK(poll_at(now + 1750));
     EXPECT_RESPONSE(0x03, 0x02, 0x00, 0x00);
+
+    begin("receiver: timing follows a change of the communication parameters");
+    modbus_rtu_deinit();
+    config.baud_rate = 115200;
+    CHECK(modbus_rtu_init(&config));
+    modbus_rtu_receive_byte(0x11, 0); /* a frame in the old format is dropped */
+    CHECK(modbus_set_comm_params(9600, 8, 1, 'E'));
+    now = 100000;
+    feed(READ_REGISTER_0, sizeof(READ_REGISTER_0), &now); /* 1146 us apart: over the old T1.5 of 750 us */
+    CHECK(!poll_at(now + 1750));                          /* the old T3.5 no longer applies */
+    CHECK(poll_at(now + T3_5_US));
+    EXPECT_RESPONSE(0x03, 0x02, 0x00, 0x00);
+    CHECK(statistics().framing_errors == 0);
+    CHECK(!modbus_set_comm_params(0, 8, 1, 'E'));
 }
 
 /* ------------------------------------------------------------------------- */

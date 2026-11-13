@@ -230,8 +230,8 @@ Errors are answered with exception responses: 01 for any other function code, 03
 outside the data map, 04 when a callback fails. Broadcast requests (address 0) are executed and not answered. The application sets discrete inputs
 and input registers with `modbus_set_discrete_input()` and `modbus_set_input_register()`.
 
-RTU framing follows the timing of the serial line specification. The UART driver passes every received character with a microsecond timestamp to
-`modbus_rtu_receive_byte()` and calls `modbus_rtu_poll()` when the T3.5 timer expires (or periodically):
+RTU framing follows the timing of the serial line specification. The UART driver passes every received character to `modbus_rtu_receive_byte()`
+with the microsecond time at which it was completely received, and calls `modbus_rtu_poll()` when the T3.5 timer expires (or periodically):
 
 - A silence of more than T1.5 (1.5 character times) inside a frame discards the whole frame.
 - A silence of at least T3.5 (3.5 character times) ends the frame; it is then checked (length, CRC, address) and answered.

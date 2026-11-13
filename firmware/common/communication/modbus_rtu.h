@@ -373,12 +373,15 @@ bool modbus_rtu_get_frame_timing(uint32_t baud_rate, uint8_t data_bits, uint8_t 
  * two characters makes the frame incomplete and it is discarded as a whole; a
  * silence of at least T3.5 ends the frame.
  *
- * The timestamp is a free-running microsecond counter; it may wrap around.
+ * The timestamp is the time the character was completely received (the UART
+ * receive-complete event), taken from a free-running microsecond counter; it
+ * may wrap around. The receiver subtracts one character time from the
+ * distance between two timestamps to get the silence between the characters.
  * Call this function and modbus_rtu_poll() from the same context, or keep the
  * receive interrupt masked while modbus_rtu_poll() runs.
  *
  * @param byte Received character
- * @param now_us Time the character was received, in microseconds
+ * @param now_us Time the character was completely received, in microseconds
  */
 void modbus_rtu_receive_byte(uint8_t byte, uint32_t now_us);
 
@@ -486,11 +489,14 @@ bool modbus_enable_broadcast(bool enable);
 /**
  * @brief Set communication parameters
  *
+ * Also recalculates the RTU frame timing (T1.5, T3.5) for the new character
+ * format and discards a frame that is being received.
+ *
  * @param baud_rate Baud rate
  * @param data_bits Data bits (7 or 8)
  * @param stop_bits Stop bits (1 or 2)
  * @param parity Parity ('N', 'E', 'O')
- * @return true if parameters set successfully, false otherwise
+ * @return true if parameters set successfully, false if not initialized or the baud rate is 0
  */
 bool modbus_set_comm_params(uint32_t baud_rate, uint8_t data_bits,
                            uint8_t stop_bits, char parity);
