@@ -93,8 +93,9 @@ gates of the part you changed before pushing.
 - **Firmware** (`firmware-ci.yml`): `cd firmware && make test`. It builds the host unit tests in `firmware/tests/host/`
   with the local C compiler (address and undefined-behaviour sanitizers on) and runs them; no ARM toolchain needed. It
   does not build the target firmware, which does not build yet.
-- **Root markdown lint** (not in CI): `pnpm install --lockfile=false && pnpm run lint:md` from the repository root,
-  which has no lockfile.
+- **Markdown** (`docs-ci.yml`): `pnpm install --lockfile=false && pnpm run lint:md` from the repository root, which has
+  no lockfile. CI runs the same `markdownlint` command with the version pinned in the workflow. Rules are in
+  `.markdownlint.yaml`.
 
 `deploy-website.yml` deploys the website to the Cloudflare Worker `esocore-website` (static assets, Newmatik account
 `24c549e9c3005de7a3c295ead2c4bb87`) on every push to `main` that touches `website/`, and hourly when the last successful

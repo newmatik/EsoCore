@@ -359,7 +359,7 @@ Calculate your potential savings from downtime prevention:
 
 **Current Annual Downtime Cost:**
 
-```
+```text
 = (Production value × Downtime hours) + (Repair cost × Number of failures) + Labor costs
 ```
 

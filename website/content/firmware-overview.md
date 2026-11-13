@@ -44,7 +44,7 @@ communication with the Edge over the RS-485 multi-drop bus.
 
 The firmware repository is organized under the `firmware/` directory:
 
-```
+```text
 firmware/
 ├── Makefile                    # Top-level build system
 ├── common/                     # Shared library code (used by both edge and sensors)
@@ -241,7 +241,7 @@ make edge DEBUG=1
 
 Build artifacts are placed in the `build/` directory:
 
-```
+```text
 build/
 ├── edge/
 │   ├── esocore_edge.elf       # Linked ELF binary (for debugging)

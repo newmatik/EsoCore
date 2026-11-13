@@ -2,7 +2,7 @@
 
 ## Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │ Dual Ethernet Ports (2× RJ-45)                              │
 │ Physically isolated networks                                │
@@ -27,7 +27,7 @@
 
 ## Technical Implementation
 
-```
+```text
 STM32H747XI Microcontroller
 │
 ├─── Ethernet MAC 0 (Machine Network)
@@ -110,7 +110,7 @@ Critical Layout Rules for Ethernet:
 
 1. Differential Pair Routing (TXD, RXD)
 
-```
+   ```text
    ┌─────────────────────────────────────┐
    │ - Impedance: 50Ω ± 10% differential │
    │ - Trace width: ~8 mil (0.2 mm)      │
@@ -120,7 +120,7 @@ Critical Layout Rules for Ethernet:
    │ - Keep away: 3× trace width from    │
    │   other signals                     │
    └─────────────────────────────────────┘
-```
+   ```
 
 2. Clock Signal (REF_CLK - 50 MHz)
    - Route as controlled impedance (50Ω)

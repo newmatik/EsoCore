@@ -59,7 +59,7 @@ The main dashboard provides an at-a-glance overview of the entire device fleet:
 
 The portal code lives in the `portal/` directory:
 
-```
+```text
 portal/
 ├── app/
 │   ├── app.vue                # Root application component

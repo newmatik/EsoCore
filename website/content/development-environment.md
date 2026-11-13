@@ -11,7 +11,7 @@ rationale and minimum setup.
 - **Why**: Professional EDA suite with comprehensive schematic capture, PCB layout, 3D visualization, and manufacturing output generation.
   Industry-standard tool with extensive component libraries and advanced features.
 
-  ### High-Speed Design Capabilities
+  **High-Speed Design Capabilities**
 
   Altium Designer excels in high-speed routing and signal integrity with industry-leading features:
   - **Advanced Length Matching**: Intelligent algorithms ensure precise signal timing in high-speed interfaces, critical for reliable communication

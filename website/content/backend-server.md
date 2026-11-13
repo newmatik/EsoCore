@@ -26,7 +26,7 @@ events and alerts, and exposes REST APIs consumed by the Portal frontend.
 
 The server code lives in the `server/` directory of the repository:
 
-```
+```text
 server/
 ├── esocore_api/              # Django project configuration
 │   ├── settings.py            # Database, middleware, installed apps
