@@ -90,6 +90,9 @@ gates of the part you changed before pushing.
 - **Website** (`website-ci.yml`): `cd website && pnpm install --frozen-lockfile && pnpm lint && pnpm format:check &&
   pnpm typecheck && pnpm test && pnpm build`.
 - **Tools** (`tools-ci.yml`): `python3 -m unittest discover -s tools -v` from the repository root.
+- **Firmware** (`firmware-ci.yml`): `cd firmware && make test`. It builds the host unit tests in `firmware/tests/host/`
+  with the local C compiler (address and undefined-behaviour sanitizers on) and runs them; no ARM toolchain needed. It
+  does not build the target firmware, which does not build yet.
 - **Root markdown lint** (not in CI): `pnpm install --lockfile=false && pnpm run lint:md` from the repository root,
   which has no lockfile.
 

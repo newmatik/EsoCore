@@ -113,6 +113,7 @@ firmware/
 ├── stm32/
 │   ├── edge/              # Edge device firmware
 │   └── sensors/           # Sensor module firmware
+├── tests/host/            # Unit tests that run on the development machine (`make test`)
 ├── build/                 # Generated build artifacts
 ├── release/               # Release packages
 └── Makefile               # Build system
@@ -207,6 +208,56 @@ The Edge device communicates with the EsoCore server at `/api/iot/v1/`:
 - `HEARTBEAT` - Connection monitoring
 - `DATA_REQUEST/RESPONSE` - Sensor data exchange
 - `CONFIG_UPDATE` - Configuration updates
+
+### Modbus RTU
+
+`common/communication/modbus_rtu.c` implements the protocol layer of Modbus RTU; it has no UART driver yet.
+
+In slave mode it serves these function codes from its data map (coils and holding registers optionally through callbacks):
+
+| Code | Function                 | Limit per request |
+| ---- | ------------------------ | ----------------- |
+| 0x01 | Read Coils               | 2000 coils        |
+| 0x02 | Read Discrete Inputs     | 2000 inputs       |
+| 0x03 | Read Holding Registers   | 125 registers     |
+| 0x04 | Read Input Registers     | 125 registers     |
+| 0x05 | Write Single Coil        |                   |
+| 0x06 | Write Single Register    |                   |
+| 0x0F | Write Multiple Coils     | 1968 coils        |
+| 0x10 | Write Multiple Registers | 123 registers     |
+
+Errors are answered with exception responses: 01 for any other function code, 03 for a bad quantity, value or request length, 02 for an address
+outside the data map, 04 when a callback fails. Broadcast requests (address 0) are executed and not answered. The application sets discrete inputs
+and input registers with `modbus_set_discrete_input()` and `modbus_set_input_register()`.
+
+RTU framing follows the timing of the serial line specification. The UART driver passes every received character to `modbus_rtu_receive_byte()`
+with the microsecond time at which it was completely received, and calls `modbus_rtu_poll()` when the T3.5 timer expires (or periodically):
+
+- A silence of more than T1.5 (1.5 character times) inside a frame discards the whole frame.
+- A silence of at least T3.5 (3.5 character times) ends the frame; it is then checked (length, CRC, address) and answered. `modbus_rtu_poll()`
+  closes the frame one character time after T3.5, when it is certain that no further character had begun. A frame that is complete when the next
+  one begins is still executed, but no longer answered: its response would collide with the request that has already started.
+- After start-up or a change of the communication parameters the receiver accepts frames only once it has seen T3.5 of silence, so that the tail
+  of a frame it joined midway is never taken for a frame.
+- Up to 19200 Bd both times follow from the character format (9600 Bd 8E1: 1719 µs and 4011 µs); above 19200 Bd they are fixed at 750 µs and
+  1750 µs. `modbus_rtu_get_frame_timing()` returns them.
+
+This layer sees a character only when it is complete. Before it transmits a response, the UART driver must check that the line is idle, because a
+master that gave up waiting may just have begun its next request.
+
+Master mode builds the requests for the same eight function codes, but `modbus_send_request()` is still a stub without a UART, so no master
+request completes yet.
+
+## Host Unit Tests
+
+```bash
+make test
+```
+
+Builds the tests in `tests/host/` with the host C compiler (`HOST_CC`, default `cc`), with the address and undefined-behaviour sanitizers, and
+runs them. No ARM toolchain or target hardware is needed. They cover the Modbus RTU slave: every function code with the request and response
+examples of the Modbus specification, the exception responses, broadcast, and the T1.5/T3.5 receiver. The Firmware CI workflow runs the same
+command on every pull request.
 
 ## Hardware Abstraction Layer (HAL) Status
 

@@ -181,7 +181,7 @@ else
 endif
 
 # Build rules
-.PHONY: all clean edge sensors help light
+.PHONY: all clean edge sensors help light test
 
 all: edge sensors
 
@@ -201,6 +201,7 @@ help:
 	@echo "  temperature - Build temperature sensor module"
 	@echo "  proximity   - Build proximity sensor module"
 	@echo "  light       - Build light sensor module"
+	@echo "  test        - Build and run the host unit tests (no target hardware)"
 	@echo "  clean       - Clean all build artifacts"
 	@echo "  help        - Show this help message"
 	@echo ""
@@ -392,6 +393,22 @@ flash_current: $(BUILD_DIR)/sensors/current/$(PROJECT_NAME)_current.hex
 flash_air_quality: $(BUILD_DIR)/sensors/air_quality/$(PROJECT_NAME)_air_quality.hex
 	@echo "Flashing air quality sensor firmware..."
 	# Add your programming command here
+
+# Host unit tests: hardware-independent modules compiled with the host compiler
+# and run on the development machine. Needs a C11 compiler, not the ARM toolchain.
+HOST_CC ?= cc
+HOST_TEST_CFLAGS := $(STANDARD) -Wall -Wextra -Werror -Wno-unused-function -Wno-unused-parameter \
+	-g -fsanitize=address,undefined -fno-sanitize-recover=undefined
+HOST_TEST_DIR := $(BUILD_DIR)/tests
+
+test: $(HOST_TEST_DIR)/test_modbus_rtu
+	@echo "Running host unit tests..."
+	@$(HOST_TEST_DIR)/test_modbus_rtu
+
+$(HOST_TEST_DIR)/test_modbus_rtu: tests/host/test_modbus_rtu.c common/communication/modbus_rtu.c common/communication/modbus_rtu.h
+	@mkdir -p $(HOST_TEST_DIR)
+	$(HOST_CC) $(HOST_TEST_CFLAGS) -Icommon/communication -o $@ \
+		tests/host/test_modbus_rtu.c common/communication/modbus_rtu.c
 
 # Code analysis
 analyze:

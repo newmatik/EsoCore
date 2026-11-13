@@ -16,6 +16,7 @@
  * - Standard Modbus function codes (1, 2, 3, 4, 5, 6, 15, 16)
  * - Exception handling and error recovery
  * - CRC-16 error detection
+ * - RTU frame timing (T1.5 inter-character and T3.5 inter-frame silence)
  * - Configurable timeouts and retries
  * - Broadcast message support
  * - Diagnostic and statistics collection
@@ -163,6 +164,11 @@ typedef struct {
 /**
  * @brief Initialize Modbus RTU protocol
  *
+ * Allocates the data map: max_coils entries each for coils and discrete
+ * inputs, max_registers entries each for holding and input registers, all
+ * zero. The RTU frame timing is derived from the baud rate and character
+ * format, so the baud rate must not be 0.
+ *
  * @param config Pointer to Modbus configuration
  * @return true if initialization successful, false otherwise
  */
@@ -178,10 +184,37 @@ bool modbus_rtu_deinit(void);
 /**
  * @brief Initialize Modbus data map
  *
+ * Replaces the tables that modbus_rtu_init() allocated with the caller's
+ * arrays. The arrays stay owned by the caller and must outlive the module.
+ *
  * @param data_map Pointer to data map structure
  * @return true if initialization successful, false otherwise
  */
 bool modbus_init_data_map(modbus_data_map_t *data_map);
+
+/**
+ * @brief Set a discrete input in the data map (slave mode)
+ *
+ * Discrete inputs are read-only for the master (function 0x02); the
+ * application sets them here.
+ *
+ * @param address Discrete input address
+ * @param value Value to store
+ * @return true if stored, false if not initialized or the address is out of range
+ */
+bool modbus_set_discrete_input(uint16_t address, bool value);
+
+/**
+ * @brief Set an input register in the data map (slave mode)
+ *
+ * Input registers are read-only for the master (function 0x04); the
+ * application sets them here.
+ *
+ * @param address Input register address
+ * @param value Value to store
+ * @return true if stored, false if not initialized or the address is out of range
+ */
+bool modbus_set_input_register(uint16_t address, uint16_t value);
 
 /**
  * @brief Read coils from slave device
@@ -296,14 +329,102 @@ bool modbus_send_request(uint8_t slave_address, uint8_t function_code,
 /**
  * @brief Process incoming Modbus frame (slave mode)
  *
- * @param frame Pointer to received frame
+ * Serves function codes 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x0F and 0x10 from
+ * the data map (coils and holding registers through the registered callbacks,
+ * if any). Any other function code, a bad quantity or value, an address
+ * outside the data map or a failed access is answered with the matching
+ * exception response.
+ *
+ * A broadcast request (address 0) is executed if broadcast is enabled and is
+ * never answered: the function returns true with *response_length set to 0.
+ *
+ * @param frame Pointer to received frame (CRC already checked)
  * @param response_buffer Pointer to response buffer
- * @param response_length Pointer to store response length
- * @param max_response_length Maximum response buffer length
- * @return true if frame processed successfully, false otherwise
+ * @param response_length Pointer to store response length (0 if nothing is to be sent)
+ * @param max_response_length Maximum response buffer length (MODBUS_MAX_FRAME_SIZE fits every response)
+ * @return true if the frame was addressed to this slave and processed, false otherwise
  */
 bool modbus_process_frame(const modbus_frame_t *frame, uint8_t *response_buffer,
                          uint16_t *response_length, uint16_t max_response_length);
+
+/**
+ * @brief Calculate the RTU inter-character (T1.5) and inter-frame (T3.5) times
+ *
+ * Up to 19200 Bd the times are 1.5 and 3.5 character times of the configured
+ * character format. Above 19200 Bd the fixed values 750 us and 1750 us apply
+ * (Modbus over Serial Line Specification V1.02, section 2.5.1.1).
+ *
+ * @param baud_rate Baud rate
+ * @param data_bits Data bits (7 or 8)
+ * @param stop_bits Stop bits (1 or 2)
+ * @param parity Parity ('N', 'E', 'O')
+ * @param t1_5_us Pointer to store T1.5 in microseconds
+ * @param t3_5_us Pointer to store T3.5 in microseconds
+ * @return true if calculated, false for a baud rate of 0 or a NULL pointer
+ */
+bool modbus_rtu_get_frame_timing(uint32_t baud_rate, uint8_t data_bits, uint8_t stop_bits,
+                                char parity, uint32_t *t1_5_us, uint32_t *t3_5_us);
+
+/**
+ * @brief Feed one received character into the RTU receiver (slave mode)
+ *
+ * Call for every character the UART receives, with the time it arrived. The
+ * receiver applies the RTU framing rules: a silence of more than T1.5 between
+ * two characters makes the frame incomplete and it is discarded as a whole; a
+ * silence of at least T3.5 ends the frame.
+ *
+ * After modbus_rtu_init() and modbus_set_comm_params() the receiver first
+ * waits for T3.5 of silence, seen between two characters or by
+ * modbus_rtu_poll(), before it accepts a frame: it may have joined in the
+ * middle of one.
+ *
+ * The timestamp is the time the character was completely received (the UART
+ * receive-complete event), taken from a free-running microsecond counter; it
+ * may wrap around. The receiver subtracts one character time from the
+ * distance between two timestamps to get the silence between the characters.
+ * Call this function and modbus_rtu_poll() from the same context, or keep the
+ * receive interrupt masked while modbus_rtu_poll() runs.
+ *
+ * @param byte Received character
+ * @param now_us Time the character was completely received, in microseconds
+ */
+void modbus_rtu_receive_byte(uint8_t byte, uint32_t now_us);
+
+/**
+ * @brief Close the received frame after T3.5 of silence and answer it (slave mode)
+ *
+ * Call periodically, or from a timer started with each received character.
+ * The buffered frame is closed once nothing has been received for T3.5 plus
+ * one character time: a character that began inside T3.5 is only reported
+ * when it is complete, so this is the earliest moment at which T3.5 of
+ * silence is certain. The frame is then checked (length, T1.5 violation, CRC)
+ * and, if valid and addressed to this slave, processed with
+ * modbus_process_frame().
+ *
+ * If the next frame begins before the previous one was taken here, the
+ * receiver sets the previous one aside. This function then executes it first
+ * but does not answer it: the master has already started its next request,
+ * so the response would be late and would collide with that request on the
+ * bus. A second frame that completes while one is still set aside is lost
+ * and counts as an overrun error.
+ *
+ * This layer sees a character only when it is complete. Before transmitting
+ * a returned response, the UART driver must check that the line is idle (no
+ * start bit seen since), because a master that gave up waiting may just have
+ * begun its next request.
+ *
+ * Measured times can be off by a microsecond or two (whole-microsecond
+ * timestamps, rounded character time); the receiver decides the T1.5 and T3.5
+ * limits in favour of accepting the frame by that margin.
+ *
+ * @param now_us Current time in microseconds
+ * @param response_buffer Pointer to response buffer
+ * @param response_length Pointer to store response length
+ * @param max_response_length Maximum response buffer length
+ * @return true if a response is ready to be transmitted, false otherwise
+ */
+bool modbus_rtu_poll(uint32_t now_us, uint8_t *response_buffer,
+                    uint16_t *response_length, uint16_t max_response_length);
 
 /**
  * @brief Register coil read/write callback
@@ -391,11 +512,14 @@ bool modbus_enable_broadcast(bool enable);
 /**
  * @brief Set communication parameters
  *
+ * Also recalculates the RTU frame timing (T1.5, T3.5) for the new character
+ * format and discards a frame that is being received.
+ *
  * @param baud_rate Baud rate
  * @param data_bits Data bits (7 or 8)
  * @param stop_bits Stop bits (1 or 2)
  * @param parity Parity ('N', 'E', 'O')
- * @return true if parameters set successfully, false otherwise
+ * @return true if parameters set successfully, false if not initialized or the baud rate is 0
  */
 bool modbus_set_comm_params(uint32_t baud_rate, uint8_t data_bits,
                            uint8_t stop_bits, char parity);
