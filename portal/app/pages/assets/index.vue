@@ -50,7 +50,7 @@
       <!-- Assets Grid -->
       <template v-else>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <UCard v-for="asset in filteredAssets" :key="asset.id">
+          <UCard v-for="asset in filteredAssets" :key="asset.id" data-testid="asset-card">
             <div class="flex items-start justify-between mb-3">
               <div>
                 <h3 class="text-sm font-semibold text-(--ui-text-highlighted)">
