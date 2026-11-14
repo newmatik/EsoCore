@@ -32,6 +32,7 @@ static uint32_t protocol_errors = 0;
 /* Message buffer */
 static uint8_t receive_buffer[ESOCORE_PROTOCOL_FRAME_SIZE];
 static uint32_t receive_buffer_index = 0;
+static uint32_t last_receive_time_ms = 0;
 static bool receiving_message = false;
 
 /* Sequence number for outgoing messages */
@@ -381,11 +382,24 @@ bool esocore_protocol_receive_message(esocore_message_t *message, uint32_t timeo
                 receive_buffer, receive_buffer_index, message, &consumed);
 
             if (status == ESOCORE_FRAME_INCOMPLETE) {
-                break;
+                if (protocol_get_timestamp_ms() - last_receive_time_ms <=
+                    ESOCORE_PROTOCOL_FRAME_GAP_TIMEOUT_MS) {
+                    break; /* Wait for the rest of the frame */
+                }
+                /* Abandoned partial frame: drop its start byte and search on */
+                protocol_errors++;
+                consumed = 1;
             }
 
             memmove(receive_buffer, receive_buffer + consumed, receive_buffer_index - consumed);
             receive_buffer_index -= consumed;
+
+            if (status != ESOCORE_FRAME_OK && status != ESOCORE_FRAME_CRC_ERROR) {
+                if (status == ESOCORE_FRAME_INVALID) {
+                    protocol_errors++;
+                }
+                continue; /* Not a frame (or an abandoned one); message is not filled */
+            }
 
             bool for_us = message->header.destination_address == device_address ||
                           message->header.destination_address == ESOCORE_PROTOCOL_BROADCAST_ADDRESS;
@@ -399,16 +413,13 @@ bool esocore_protocol_receive_message(esocore_message_t *message, uint32_t timeo
                     }
                     return true;
                 }
-            } else if (status == ESOCORE_FRAME_CRC_ERROR) {
+            } else {
                 crc_errors++;
                 if (for_us) {
                     /* Send NACK for CRC error */
                     protocol_send_ack(message, false);
                 }
-            } else if (status == ESOCORE_FRAME_INVALID) {
-                protocol_errors++;
             }
-            /* ESOCORE_FRAME_NO_START: a byte between frames, skipped */
         }
 
         if (protocol_get_timestamp_ms() - start_time > timeout_ms) {
@@ -424,6 +435,7 @@ bool esocore_protocol_receive_message(esocore_message_t *message, uint32_t timeo
 
         if (received > 0) {
             receive_buffer_index += (uint32_t)received;
+            last_receive_time_ms = protocol_get_timestamp_ms();
         } else if (received < 0) {
             protocol_errors++;
             return false;

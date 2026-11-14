@@ -52,6 +52,10 @@
 #define ESOCORE_PROTOCOL_MASTER_ADDRESS       0x00
 
 #define ESOCORE_PROTOCOL_DEFAULT_TIMEOUT_MS   1000
+
+/* A partial frame that receives no byte for this long is abandoned: its start
+ * byte is dropped and the receiver searches the rest for the next frame. */
+#define ESOCORE_PROTOCOL_FRAME_GAP_TIMEOUT_MS 50
 #define ESOCORE_PROTOCOL_RETRY_COUNT          3
 
 /* ============================================================================
@@ -198,7 +202,7 @@ typedef enum {
     ESOCORE_FRAME_INCOMPLETE,           /**< More bytes needed */
     ESOCORE_FRAME_NO_START,             /**< First byte is not a start byte; skip it */
     ESOCORE_FRAME_INVALID,              /**< Start byte with an impossible length; skip it */
-    ESOCORE_FRAME_CRC_ERROR,            /**< Complete frame with a wrong CRC; skip it */
+    ESOCORE_FRAME_CRC_ERROR,            /**< Complete frame with a wrong CRC; skip its start byte */
 } esocore_frame_status_t;
 
 /**

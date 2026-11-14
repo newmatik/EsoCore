@@ -226,8 +226,10 @@ are little endian.
 | 8      | n    | Payload                                                     |
 | 8 + n  | 2    | CRC-16/MODBUS (as Modbus RTU) over bytes 0 to 7 + n         |
 
-A receiver drops bytes until it sees a start byte, skips a start byte whose length is above 256, and drops a frame with a
-wrong CRC (the sensor modules answer it with `NACK`). There is no end delimiter and no byte stuffing.
+A receiver drops bytes until it sees a start byte. It skips a start byte whose length is above 256 or whose frame has a
+wrong CRC (the sensor modules answer a wrong CRC with `NACK`) and searches on from the next byte, so a damaged length
+cannot swallow the following frame. A partial frame that gets no byte for 50 ms (`ESOCORE_PROTOCOL_FRAME_GAP_TIMEOUT_MS`)
+is abandoned the same way. There is no end delimiter and no byte stuffing.
 
 | Type   | Message             | Payload                                                                                        |
 | ------ | ------------------- | ---------------------------------------------------------------------------------------------- |

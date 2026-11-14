@@ -62,6 +62,7 @@ static uint32_t last_config_check_time = 0;
 static struct {
     bool master_connected;
     bool sensors_active;
+    bool acquisition_running;           /* START/STOP state; measurements go out only while running */
     uint8_t active_sensors;
     uint32_t total_measurements;
     uint8_t system_health;
@@ -151,6 +152,7 @@ static bool initialize_demo_sensors(void) {
 
     if (success) {
         system_status.sensors_active = true;
+        system_status.acquisition_running = true;
     }
 
     return success;
@@ -189,8 +191,8 @@ static void send_sensor_data(void) {
 
     if (current_time - last_data_transmit_time >= DATA_TRANSMIT_INTERVAL_MS) {
         // No measurements are sent in low power mode (supply in brownout or lost)
-        if (system_status.sensors_active && system_status.master_connected &&
-            !system_status.low_power_mode) {
+        if (system_status.sensors_active && system_status.acquisition_running &&
+            system_status.master_connected && !system_status.low_power_mode) {
             bool data_sent = false;
 
             switch (device_type) {
@@ -233,24 +235,30 @@ static bool handle_command(uint8_t command, const uint8_t *data, uint16_t length
     (void)data;
     (void)length;
 
+    bool ok = false;
+
     switch (command) {
         case ESOCORE_CMD_SENSOR_START:
             if (device_type == ESOCORE_DEVICE_TYPE_VIBRATION) {
-                return vibration_sensor_start_acquisition();
+                ok = vibration_sensor_start_acquisition();
+            } else if (device_type == ESOCORE_DEVICE_TYPE_CURRENT) {
+                ok = current_sensor_start_acquisition();
             }
-            if (device_type == ESOCORE_DEVICE_TYPE_CURRENT) {
-                return current_sensor_start_acquisition();
+            if (ok) {
+                system_status.acquisition_running = true;
             }
-            return false;
+            return ok;
 
         case ESOCORE_CMD_SENSOR_STOP:
             if (device_type == ESOCORE_DEVICE_TYPE_VIBRATION) {
-                return vibration_sensor_stop_acquisition();
+                ok = vibration_sensor_stop_acquisition();
+            } else if (device_type == ESOCORE_DEVICE_TYPE_CURRENT) {
+                ok = current_sensor_stop_acquisition();
             }
-            if (device_type == ESOCORE_DEVICE_TYPE_CURRENT) {
-                return current_sensor_stop_acquisition();
+            if (ok) {
+                system_status.acquisition_running = false;
             }
-            return false;
+            return ok;
 
         default:
             return false; /* Other commands are not implemented yet */

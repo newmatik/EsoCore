@@ -60,6 +60,7 @@ static volatile uint16_t sb_rx_tail = 0;
 /* Frame parser state: bytes of a frame not yet complete (reset with the ring) */
 static uint8_t  sb_frame_buf[ESOCORE_PROTOCOL_FRAME_SIZE];
 static uint32_t sb_frame_len = 0;
+static uint32_t sb_last_rx_ms = 0;      /* Time the last byte arrived */
 
 /* Timing */
 static uint32_t sb_last_discovery_ms  = 0;
@@ -311,67 +312,86 @@ static bool sbus_send_frame(uint8_t destination, esocore_message_type_t type,
  * - ESOCORE_MSG_DATA_RESPONSE / ESOCORE_MSG_DATA_BURST: invoke data callback
  *   (one call per frame, with sequence number and flags for reassembly)
  *
- * A frame that is still incomplete stays in the buffer for the next poll.
+ * A frame that is still incomplete stays in the buffer for the next poll. If
+ * no byte arrives for ESOCORE_PROTOCOL_FRAME_GAP_TIMEOUT_MS, the partial frame
+ * is abandoned: its start byte is dropped and the rest searched again.
  */
-static void sbus_process_rx(void) {
+static void sbus_parse_frames(bool stale) {
     static esocore_message_t message;
+
+    /* Take every complete frame out of the buffer */
+    while (sb_frame_len > 0) {
+        uint32_t consumed = 0;
+        esocore_frame_status_t status = esocore_protocol_decode_frame(
+            sb_frame_buf, sb_frame_len, &message, &consumed);
+
+        if (status == ESOCORE_FRAME_INCOMPLETE) {
+            if (!stale) {
+                break; /* Wait for the rest of the frame */
+            }
+            sb_status.bus_errors++;
+            consumed = 1;
+        }
+
+        memmove(sb_frame_buf, sb_frame_buf + consumed, sb_frame_len - consumed);
+        sb_frame_len -= consumed;
+
+        if (status == ESOCORE_FRAME_CRC_ERROR || status == ESOCORE_FRAME_INVALID) {
+            sb_status.bus_errors++;
+            continue;
+        }
+        if (status != ESOCORE_FRAME_OK) {
+            continue; /* ESOCORE_FRAME_NO_START: a byte between frames */
+        }
+
+        if (message.header.destination_address != SBUS_EDGE_ADDRESS &&
+            message.header.destination_address != ESOCORE_PROTOCOL_BROADCAST_ADDRESS) {
+            continue; /* Frame for another node */
+        }
+
+        uint8_t src_addr = message.header.source_address;
+
+        switch (message.header.message_type) {
+            case ESOCORE_MSG_DISCOVER_RESPONSE:
+                sbus_handle_discovery_response(src_addr, message.payload,
+                                               message.header.payload_length);
+                break;
+
+            case ESOCORE_MSG_HEARTBEAT:
+                sbus_handle_heartbeat(src_addr);
+                break;
+
+            case ESOCORE_MSG_DATA_RESPONSE:
+            case ESOCORE_MSG_DATA_BURST:
+                if (sb_data_cb) {
+                    sb_data_cb(src_addr, message.header.sequence_number,
+                               message.header.flags, message.payload,
+                               message.header.payload_length, sb_cb_ctx);
+                }
+                break;
+
+            default:
+                /* Unknown or unhandled message type */
+                break;
+        }
+    }
+}
+
+static void sbus_process_rx(void) {
     uint8_t byte;
+    bool received = false;
 
     while (sbus_rx_read(&byte)) {
         sb_frame_buf[sb_frame_len++] = byte;
+        received = true;
+        sbus_parse_frames(false);
+    }
 
-        /* Take every complete frame out of the buffer */
-        while (sb_frame_len > 0) {
-            uint32_t consumed = 0;
-            esocore_frame_status_t status = esocore_protocol_decode_frame(
-                sb_frame_buf, sb_frame_len, &message, &consumed);
-
-            if (status == ESOCORE_FRAME_INCOMPLETE) {
-                break;
-            }
-
-            memmove(sb_frame_buf, sb_frame_buf + consumed, sb_frame_len - consumed);
-            sb_frame_len -= consumed;
-
-            if (status == ESOCORE_FRAME_CRC_ERROR || status == ESOCORE_FRAME_INVALID) {
-                sb_status.bus_errors++;
-                continue;
-            }
-            if (status != ESOCORE_FRAME_OK) {
-                continue; /* ESOCORE_FRAME_NO_START: a byte between frames */
-            }
-
-            if (message.header.destination_address != SBUS_EDGE_ADDRESS &&
-                message.header.destination_address != ESOCORE_PROTOCOL_BROADCAST_ADDRESS) {
-                continue; /* Frame for another node */
-            }
-
-            uint8_t src_addr = message.header.source_address;
-
-            switch (message.header.message_type) {
-                case ESOCORE_MSG_DISCOVER_RESPONSE:
-                    sbus_handle_discovery_response(src_addr, message.payload,
-                                                   message.header.payload_length);
-                    break;
-
-                case ESOCORE_MSG_HEARTBEAT:
-                    sbus_handle_heartbeat(src_addr);
-                    break;
-
-                case ESOCORE_MSG_DATA_RESPONSE:
-                case ESOCORE_MSG_DATA_BURST:
-                    if (sb_data_cb) {
-                        sb_data_cb(src_addr, message.header.sequence_number,
-                                   message.header.flags, message.payload,
-                                   message.header.payload_length, sb_cb_ctx);
-                    }
-                    break;
-
-                default:
-                    /* Unknown or unhandled message type */
-                    break;
-            }
-        }
+    uint32_t now = sbus_get_time_ms();
+    if (received) {
+        sb_last_rx_ms = now;
+    } else if (sb_frame_len > 0 && now - sb_last_rx_ms > ESOCORE_PROTOCOL_FRAME_GAP_TIMEOUT_MS) {
+        sbus_parse_frames(true);
     }
 }
 

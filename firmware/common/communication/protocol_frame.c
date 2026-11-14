@@ -141,8 +141,15 @@ esocore_frame_status_t esocore_protocol_decode_frame(const uint8_t *buffer, uint
 
                 uint16_t crc = esocore_protocol_calculate_crc16(
                     buffer, (uint16_t)(ESOCORE_PROTOCOL_HEADER_SIZE + payload_length));
-                status = (crc == message->crc) ? ESOCORE_FRAME_OK : ESOCORE_FRAME_CRC_ERROR;
-                skip = frame_length;
+                if (crc == message->crc) {
+                    status = ESOCORE_FRAME_OK;
+                    skip = frame_length;
+                } else {
+                    /* The length may be the damaged byte: resynchronise on the next byte
+                     * rather than dropping a following frame along with this one */
+                    status = ESOCORE_FRAME_CRC_ERROR;
+                    skip = 1;
+                }
             }
         }
     }

@@ -139,11 +139,34 @@ static void test_partial_and_bad_frames(void) {
         CHECK(consumed == 0);
     }
 
-    /* A corrupted payload byte fails the CRC; the whole frame is skipped */
+    /* A corrupted payload byte fails the CRC; only the start byte is skipped */
     frame[9] ^= 0x40;
     CHECK(esocore_protocol_decode_frame(frame, length, &received, &consumed) == ESOCORE_FRAME_CRC_ERROR);
-    CHECK(consumed == length);
+    CHECK(consumed == 1);
     frame[9] ^= 0x40;
+
+    /* A damaged length must not swallow the next frame: after the CRC error the
+     * receiver searches on byte by byte and finds the following frame */
+    uint8_t damaged[128];
+    memcpy(damaged, frame, length);
+    damaged[6] = 12; /* heartbeat now claims 12 payload bytes, covering the next frame's header */
+    memcpy(&damaged[length], frame, length);
+    uint32_t total = 2U * length;
+    uint32_t pos = 0;
+    int crc_errors = 0;
+    esocore_frame_status_t result;
+    while ((result = esocore_protocol_decode_frame(&damaged[pos], total - pos, &received, &consumed)) !=
+               ESOCORE_FRAME_OK &&
+           result != ESOCORE_FRAME_INCOMPLETE) {
+        if (result == ESOCORE_FRAME_CRC_ERROR) {
+            crc_errors++;
+        }
+        pos += consumed;
+    }
+    CHECK(crc_errors == 1);
+    CHECK(result == ESOCORE_FRAME_OK);
+    CHECK(pos == length);
+    CHECK(received.header.payload_length == 4);
 
     /* Bytes before a frame are skipped one at a time */
     uint8_t noisy[70];
