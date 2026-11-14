@@ -553,7 +553,7 @@ bool esocore_protocol_send_heartbeat(void) {
 /**
  * @brief Send sensor data message
  */
-bool esocore_protocol_send_sensor_data(const esocore_sensor_data_t *sensor_data,
+bool esocore_protocol_send_sensor_data(const esocore_sensor_data_payload_t *sensor_data,
                                       uint16_t data_size) {
     if (!sensor_data || data_size > ESOCORE_PROTOCOL_MAX_PAYLOAD_SIZE) {
         return false;

@@ -9,6 +9,7 @@
 
 #include "hal_spi.h"
 #include "../bsp/system_clock.h"
+#include <stddef.h>
 
 /* SPI CR1 bits */
 #define SPI_CR1_SPE     (1UL << 0)

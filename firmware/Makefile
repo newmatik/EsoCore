@@ -37,7 +37,9 @@ COMMON_INCLUDES := \
 	-Icommon/safety \
 	-Icommon/management \
 	-Icommon/intelligence \
-	-Icommon/ui
+	-Icommon/ui \
+	-Icommon/sensors \
+	-Icommon/analog
 
 EDGE_INCLUDES := \
 	$(COMMON_INCLUDES) \
@@ -45,9 +47,7 @@ EDGE_INCLUDES := \
 	-Istm32/$(EDGE_TARGET)/hal \
 	-Istm32/$(EDGE_TARGET)/cmsis \
 	-Istm32/$(EDGE_TARGET)/bsp \
-	-Istm32/$(EDGE_TARGET)/drivers \
-	-Icommon/analog \
-	-Icommon/communication
+	-Istm32/$(EDGE_TARGET)/drivers
 
 SENSOR_INCLUDES := \
 	$(COMMON_INCLUDES) \
@@ -66,7 +66,7 @@ COMMON_SOURCES := \
 	common/communication/sensor_bus.c \
 	common/analog/analog_input.c \
 	common/analog/signal_chain.c \
-	common/storage/sensor_interface.c \
+	common/sensors/sensor_interface.c \
 	common/storage/storage_system.c \
 	common/safety/safety_io.c \
 	common/management/power_management.c \
@@ -93,8 +93,17 @@ EDGE_SOURCES := \
 	stm32/$(EDGE_TARGET)/drivers/drv_pga280.c \
 	stm32/$(EDGE_TARGET)/drivers/drv_tmux1101.c \
 	stm32/$(EDGE_TARGET)/drivers/drv_iepe.c \
-	stm32/$(EDGE_TARGET)/drivers/drv_ssr.c \
-	stm32/$(EDGE_TARGET)/startup/startup_stm32h747xx.s
+	stm32/$(EDGE_TARGET)/drivers/drv_ssr.c
+
+# Startup code (vector table, reset handler) of the STM32H747. It is not in the
+# repository yet, so the Edge firmware compiles (edge-objects) but does not link.
+EDGE_STARTUP := stm32/$(EDGE_TARGET)/startup/startup_stm32h747xx.s
+EDGE_LINKER_SCRIPT := stm32/$(EDGE_TARGET)/linker/STM32H747IITx_FLASH_CM7.ld
+
+# Debug and release objects are kept apart, so changing DEBUG never mixes the two.
+EDGE_OBJ_DIR := $(BUILD_DIR)/edge/obj/$(if $(filter 1,$(DEBUG)),debug,release)
+EDGE_OBJECTS := $(patsubst %.c,$(EDGE_OBJ_DIR)/%.o,$(COMMON_SOURCES) $(EDGE_SOURCES))
+EDGE_STARTUP_OBJECT := $(EDGE_OBJ_DIR)/$(EDGE_STARTUP:.s=.o)
 
 SENSOR_SOURCES := \
 	stm32/sensors/main.c \
@@ -161,9 +170,7 @@ CFLAGS := \
 	-fdata-sections \
 	-fno-common \
 	-fmessage-length=0 \
-	-fno-exceptions \
-	-fno-rtti \
-	-fno-threadsafe-statics
+	-fno-exceptions
 
 # Linker flags
 LDFLAGS := \
@@ -181,7 +188,7 @@ else
 endif
 
 # Build rules
-.PHONY: all clean edge sensors help light test
+.PHONY: all clean edge edge-objects sensors help light test
 
 all: edge sensors
 
@@ -190,7 +197,8 @@ help:
 	@echo ""
 	@echo "Available targets:"
 	@echo "  all       - Build all targets (edge and sensors)"
-	@echo "  edge      - Build Edge device firmware"
+	@echo "  edge      - Build Edge device firmware (needs the STM32H747 startup file)"
+	@echo "  edge-objects - Compile every Edge source file without linking"
 	@echo "  sensors   - Build all sensor modules"
 	@echo "  vibration   - Build vibration sensor module"
 	@echo "  acoustic    - Build acoustic sensor module"
@@ -212,17 +220,34 @@ help:
 # Edge device build
 edge: $(BUILD_DIR)/edge/$(PROJECT_NAME)_edge.elf
 
-$(BUILD_DIR)/edge/$(PROJECT_NAME)_edge.elf: $(COMMON_SOURCES) $(EDGE_SOURCES)
-	@echo "Building Edge device firmware..."
-	@mkdir -p $(BUILD_DIR)/edge
-	$(CC) $(CFLAGS) $(EDGE_MCU_FLAGS) $(EDGE_INCLUDES) \
-		$(COMMON_SOURCES) $(EDGE_SOURCES) \
-		$(LDFLAGS) -T stm32/$(EDGE_TARGET)/linker/STM32H747IITx_FLASH_CM7.ld \
+# Compile every Edge source file without linking. Works without the startup file.
+edge-objects: $(EDGE_OBJECTS)
+	@echo "Edge device sources compiled ($(words $(EDGE_OBJECTS)) files)"
+
+$(EDGE_OBJ_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(EDGE_MCU_FLAGS) $(EDGE_INCLUDES) -MMD -MP -c $< -o $@
+
+$(EDGE_OBJ_DIR)/%.o: %.s
+	@mkdir -p $(dir $@)
+	$(CC) $(EDGE_MCU_FLAGS) -c $< -o $@
+
+$(EDGE_STARTUP):
+	@echo "Missing $@: the STM32H747 startup file is not in the repository yet,"
+	@echo "so the Edge firmware cannot be linked. 'make edge-objects' compiles it."
+	@false
+
+$(BUILD_DIR)/edge/$(PROJECT_NAME)_edge.elf: $(EDGE_OBJECTS) $(EDGE_STARTUP_OBJECT) $(EDGE_LINKER_SCRIPT)
+	@echo "Linking Edge device firmware..."
+	$(CC) $(EDGE_MCU_FLAGS) $(EDGE_OBJECTS) $(EDGE_STARTUP_OBJECT) \
+		$(LDFLAGS) -T $(EDGE_LINKER_SCRIPT) \
 		-o $@ -lm
 	$(OBJCOPY) -O ihex $@ $(BUILD_DIR)/edge/$(PROJECT_NAME)_edge.hex
 	$(OBJCOPY) -O binary $@ $(BUILD_DIR)/edge/$(PROJECT_NAME)_edge.bin
 	$(SIZE) $@
 	@echo "Edge device firmware built successfully"
+
+-include $(EDGE_OBJECTS:.o=.d)
 
 # Sensor modules build
 sensors: vibration acoustic current air_quality oil_quality pressure temperature proximity light

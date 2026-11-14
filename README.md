@@ -90,18 +90,21 @@ See `website/README.md` for deployment instructions.
 ```bash
 cd firmware
 make all          # Build Edge + all sensors
+make edge-objects # Compile the Edge sources without linking
 make edge         # Build Edge only
 make vibration    # Build a single sensor target
 make help         # List all available targets
 ```
 
-Requires the ARM GCC toolchain. These targets do not build yet ([#128](https://github.com/newmatik/EsoCore/issues/128)); `make test` runs the
-host unit tests with the local C compiler. See `firmware/README.md` for architecture and protocol details.
+Requires the ARM GCC toolchain. `make edge-objects` compiles every Edge source file; the targets that link do not build yet
+([#128](https://github.com/newmatik/EsoCore/issues/128)). `make test` runs the host unit tests with the local C compiler. See
+`firmware/README.md` for architecture and protocol details.
 
 ### Checks
 
 The server, portal, website, tools and firmware each have a CI workflow in `.github/workflows/` that runs on pull requests to `main` (`hardware/` has
-none; the firmware workflow runs the host unit tests and does not build the target firmware). The commands for these parts are listed in
+none; the firmware workflow runs the host unit tests and compiles the Edge sources, it does not link the target firmware). The commands for
+these parts are listed in
 [AGENTS.md](AGENTS.md#lint-and-test-commands); run the ones for the part you changed before pushing.
 
 ## Hardware
