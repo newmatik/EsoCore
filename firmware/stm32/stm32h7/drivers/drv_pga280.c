@@ -20,6 +20,7 @@
 #include "drv_pga280.h"
 #include "../hal/hal_spi.h"
 #include "../hal/hal_gpio.h"
+#include <stddef.h>
 
 /* ============================================================================
  * Extern SPI Handle

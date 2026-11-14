@@ -11,6 +11,7 @@
  */
 
 #include "tinyml_engine.h"
+#include <math.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -388,7 +389,7 @@ bool tinyml_engine_init(const tinyml_engine_config_t *config) {
     memset(models, 0, sizeof(models));
 
     /* Initialize status */
-    engine_status.status = TINYML_STATUS_READY;
+    engine_status = TINYML_STATUS_READY;
 
     /* Initialize performance statistics */
     memset(&performance_stats, 0, sizeof(tinyml_performance_stats_t));
@@ -414,7 +415,7 @@ bool tinyml_engine_deinit(void) {
     }
 
     /* Reset status */
-    engine_status.status = TINYML_STATUS_UNINITIALIZED;
+    engine_status = TINYML_STATUS_UNINITIALIZED;
 
     return true;
 }
@@ -515,7 +516,7 @@ bool tinyml_perform_inference(const tinyml_inference_request_t *request,
     }
 
     /* Check if engine is ready */
-    if (engine_status.status != TINYML_STATUS_READY) {
+    if (engine_status != TINYML_STATUS_READY) {
         result->success = false;
         strcpy(result->error_message, "Engine not ready");
         return false;

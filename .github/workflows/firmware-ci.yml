@@ -1,8 +1,9 @@
 name: Firmware CI
 
 # Runs the host unit tests of the hardware-independent firmware modules
-# (firmware/tests/host). They are built with the runner's C compiler; the ARM
-# toolchain is not needed, and the target firmware is not built here.
+# (firmware/tests/host), built with the runner's C compiler, and compiles every
+# source file of the Edge firmware with the ARM toolchain. The firmware is not
+# linked here: the STM32H747 startup file is not in the repository yet.
 # The pull_request trigger is not path-filtered (see website-ci.yml for why).
 on:
   push:
@@ -33,3 +34,17 @@ jobs:
       - name: Run host unit tests
         working-directory: firmware
         run: make test
+
+      - name: Install the ARM toolchain
+        run: |
+          packages="gcc-arm-none-eabi libnewlib-arm-none-eabi"
+          # Self-hosted runners share apt; skip it when the packages are already there.
+          if ! dpkg -s $packages >/dev/null 2>&1; then
+            sudo apt-get -o DPkg::Lock::Timeout=600 update
+            sudo apt-get -o DPkg::Lock::Timeout=600 install -y --no-install-recommends $packages
+          fi
+          arm-none-eabi-gcc --version | head -1
+
+      - name: Compile the Edge firmware sources
+        working-directory: firmware
+        run: make edge-objects

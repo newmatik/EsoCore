@@ -99,8 +99,8 @@ static bool config_validate_parameter_value(uint16_t parameter_id, const esocore
 
     /* Check string length */
     if (param->data_type == ESOCORE_CONFIG_TYPE_STRING) {
-        uint16_t str_len = strnlen((const char *)value->value, value->value_size);
-        if (str_len >= value->value_size) {
+        /* The string must be terminated inside the value buffer */
+        if (memchr(value->value, '\0', value->value_size) == NULL) {
             return false;
         }
     }

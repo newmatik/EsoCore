@@ -73,6 +73,7 @@ EsoCore supports three complementary data acquisition methods:
 make all
 
 # Build specific components
+make edge-objects           # Edge device: compile every source file, no linking
 make edge                   # Edge device
 make vibration              # Vibration sensor
 make acoustic               # Acoustic sensor
@@ -95,19 +96,20 @@ make flash_air_quality
 make help
 ```
 
-> **Build status:** no firmware target builds yet. `make edge` stops at a source path that does not exist, several
-> modules in `common/` do not compile, and the STM32H7 startup file as well as the STM32G0 HAL, CMSIS, startup and
-> linker files (`stm32/stm32g0/`) are not in the repository. Issue
-> [#128](https://github.com/newmatik/EsoCore/issues/128) tracks this. What runs today is `make test`, the host unit
-> tests described below.
+> **Build status:** `make edge-objects` compiles every source file of the Edge firmware with the ARM toolchain, and
+> `make test` runs the host unit tests described below. No target links yet: `make edge` stops because the STM32H7
+> startup file is not in the repository, and the sensor targets need the STM32G0 HAL, CMSIS, startup and linker files
+> (`stm32/stm32g0/`), which are missing too. Issue [#128](https://github.com/newmatik/EsoCore/issues/128) tracks this.
 
 ## Project Structure
 
 ```text
 firmware/
 ├── common/                # Shared components
+│   ├── analog/            # Analog inputs and signal chain
 │   ├── communication/     # WiFi, HTTP, RS-485, Modbus
-│   ├── storage/           # Sensor interface, microSD
+│   ├── sensors/           # Sensor interface
+│   ├── storage/           # microSD
 │   ├── safety/            # EN ISO 13849 safety I/O (dual-channel inputs + relay outputs)
 │   ├── management/        # Power, configuration management
 │   ├── intelligence/      # Event system, TinyML

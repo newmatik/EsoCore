@@ -765,9 +765,10 @@ bool storage_create_record(const uint8_t *sensor_data, uint32_t data_length,
     record->sequence_number = 0; /* TODO: Generate sequence number */
 
     if (metadata) {
-        record->metadata = metadata;
+        strncpy(record->metadata, metadata, sizeof(record->metadata) - 1);
+        record->metadata[sizeof(record->metadata) - 1] = '\0';
     } else {
-        record->metadata = NULL;
+        record->metadata[0] = '\0';
     }
 
     return true;

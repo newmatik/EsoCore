@@ -205,7 +205,7 @@ bool sensor_bus_get_status(sensor_bus_status_t *status);
  * @brief Trigger a device discovery scan
  *
  * Sends a broadcast discovery request using the EsoCore protocol
- * (MSG_TYPE_DISCOVERY_REQUEST) and collects responses to build or
+ * (discovery request) and collects responses to build or
  * update the device table.
  *
  * @return true if discovery initiated successfully, false otherwise

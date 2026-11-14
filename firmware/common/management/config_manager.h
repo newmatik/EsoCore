@@ -1,194 +1,179 @@
 /**
  * @file config_manager.h
- * @brief Advanced Configuration Management for EsoCore Edge Device
+ * @brief Configuration Management System
  *
- * This file implements a comprehensive configuration management system for the EsoCore Edge device,
- * providing remote parameter updates, configuration profiles, validation, and rollback capabilities.
- * The system ensures safe and reliable configuration changes in industrial environments.
- *
- * Features:
- * - Remote configuration updates via API
- * - Configuration profiles and versioning
- * - Parameter validation and constraints
- * - Automatic rollback on failure
- * - Configuration backup and restore
- * - Change tracking and audit trails
- * - Safe parameter application with staging
- * - Configuration synchronization across fleet
- * - Template-based configuration management
+ * This header defines the advanced configuration management system for EsoCore devices,
+ * providing remote parameter updates, configuration profiles, and parameter validation.
  *
  * @author EsoCore Development Team
  * @copyright Copyright © 2025 Newmatik. All rights reserved.
  * @license Apache License, Version 2.0
  */
 
-#ifndef ESOCORE_CONFIG_MANAGER_H
-#define ESOCORE_CONFIG_MANAGER_H
+#ifndef CONFIG_MANAGER_H
+#define CONFIG_MANAGER_H
 
 #include <stdint.h>
 #include <stdbool.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* ============================================================================
- * Configuration Management Constants
+ * Configuration System Constants
  * ============================================================================ */
 
-#define CONFIG_MAX_PROFILES              16    /* Maximum configuration profiles */
-#define CONFIG_MAX_PARAMETERS            256   /* Maximum configuration parameters */
-#define CONFIG_MAX_PARAMETER_NAME        64    /* Maximum parameter name length */
-#define CONFIG_MAX_PARAMETER_VALUE       128   /* Maximum parameter value length */
-#define CONFIG_MAX_VALIDATION_RULES      64    /* Maximum validation rules */
-#define CONFIG_BACKUP_SLOTS              5     /* Number of configuration backup slots */
-#define CONFIG_CHANGE_LOG_SIZE           100   /* Configuration change log size */
+#define ESOCORE_MAX_CONFIG_PARAMETERS     128
+#define ESOCORE_MAX_CONFIG_PROFILES       8
+#define ESOCORE_MAX_PARAMETER_NAME_LENGTH 32
+#define ESOCORE_MAX_PARAMETER_VALUE_SIZE  64
+#define ESOCORE_MAX_CONFIG_VALIDATORS     16
+#define ESOCORE_CONFIG_BACKUP_SLOTS       4
 
 /* ============================================================================
  * Configuration Parameter Types
  * ============================================================================ */
 
+/**
+ * @brief Configuration parameter data types
+ */
 typedef enum {
-    CONFIG_TYPE_INT32      = 0,    /* 32-bit signed integer */
-    CONFIG_TYPE_UINT32     = 1,    /* 32-bit unsigned integer */
-    CONFIG_TYPE_FLOAT      = 2,    /* 32-bit floating point */
-    CONFIG_TYPE_DOUBLE     = 3,    /* 64-bit floating point */
-    CONFIG_TYPE_BOOL       = 4,    /* Boolean value */
-    CONFIG_TYPE_STRING     = 5,    /* String value */
-    CONFIG_TYPE_ENUM       = 6,    /* Enumeration value */
-    CONFIG_TYPE_ARRAY_INT  = 7,    /* Integer array */
-    CONFIG_TYPE_ARRAY_FLOAT = 8,   /* Float array */
-    CONFIG_TYPE_JSON       = 9,    /* JSON object */
-} config_parameter_type_t;
+    ESOCORE_CONFIG_TYPE_BOOL        = 0x01,  /**< Boolean value */
+    ESOCORE_CONFIG_TYPE_INT8        = 0x02,  /**< 8-bit signed integer */
+    ESOCORE_CONFIG_TYPE_INT16       = 0x03,  /**< 16-bit signed integer */
+    ESOCORE_CONFIG_TYPE_INT32       = 0x04,  /**< 32-bit signed integer */
+    ESOCORE_CONFIG_TYPE_UINT8       = 0x05,  /**< 8-bit unsigned integer */
+    ESOCORE_CONFIG_TYPE_UINT16      = 0x06,  /**< 16-bit unsigned integer */
+    ESOCORE_CONFIG_TYPE_UINT32      = 0x07,  /**< 32-bit unsigned integer */
+    ESOCORE_CONFIG_TYPE_FLOAT       = 0x08,  /**< 32-bit floating point */
+    ESOCORE_CONFIG_TYPE_DOUBLE      = 0x09,  /**< 64-bit floating point */
+    ESOCORE_CONFIG_TYPE_STRING      = 0x0A,  /**< Null-terminated string */
+    ESOCORE_CONFIG_TYPE_BINARY      = 0x0B,  /**< Binary data */
+    ESOCORE_CONFIG_TYPE_ENUM        = 0x0C   /**< Enumeration value */
+} esocore_config_type_t;
+
+/**
+ * @brief Configuration parameter access levels
+ */
+typedef enum {
+    ESOCORE_ACCESS_READ_ONLY        = 0x01,  /**< Read-only parameter */
+    ESOCORE_ACCESS_READ_WRITE       = 0x02,  /**< Read-write parameter */
+    ESOCORE_ACCESS_ADMIN_ONLY       = 0x03,  /**< Admin-only access */
+    ESOCORE_ACCESS_SYSTEM_ONLY      = 0x04   /**< System-only access */
+} esocore_config_access_t;
+
+/**
+ * @brief Configuration parameter categories
+ */
+typedef enum {
+    ESOCORE_CATEGORY_SYSTEM         = 0x01,  /**< System configuration */
+    ESOCORE_CATEGORY_NETWORK        = 0x02,  /**< Network configuration */
+    ESOCORE_CATEGORY_SENSOR         = 0x03,  /**< Sensor configuration */
+    ESOCORE_CATEGORY_STORAGE        = 0x04,  /**< Storage configuration */
+    ESOCORE_CATEGORY_POWER          = 0x05,  /**< Power management */
+    ESOCORE_CATEGORY_SAFETY         = 0x06,  /**< Safety system */
+    ESOCORE_CATEGORY_USER_INTERFACE = 0x07,  /**< User interface */
+    ESOCORE_CATEGORY_DIAGNOSTIC     = 0x08,  /**< Diagnostic settings */
+    ESOCORE_CATEGORY_MAX
+} esocore_config_category_t;
 
 /* ============================================================================
- * Configuration Profile Structures
+ * Data Structures
  * ============================================================================ */
 
+/**
+ * @brief Configuration parameter definition
+ */
 typedef struct {
-    char name[CONFIG_MAX_PARAMETER_NAME];       /* Parameter name */
-    config_parameter_type_t type;               /* Parameter type */
-    void *value;                               /* Parameter value */
-    void *default_value;                       /* Default value */
-    void *min_value;                           /* Minimum allowed value */
-    void *max_value;                           /* Maximum allowed value */
-    char description[128];                     /* Parameter description */
-    char unit[16];                             /* Parameter unit */
-    uint32_t flags;                            /* Parameter flags */
-    bool requires_restart;                     /* Requires device restart */
-    uint32_t validation_rules;                 /* Validation rule indices */
-} config_parameter_t;
+    uint16_t parameter_id;                  /**< Unique parameter identifier */
+    char name[ESOCORE_MAX_PARAMETER_NAME_LENGTH]; /**< Parameter name */
+    esocore_config_type_t data_type;       /**< Parameter data type */
+    esocore_config_access_t access_level;   /**< Access level */
+    esocore_config_category_t category;     /**< Parameter category */
+    uint16_t max_value_size;                /**< Maximum value size in bytes */
+    uint32_t default_value;                 /**< Default value (32-bit) */
+    uint32_t min_value;                     /**< Minimum allowed value */
+    uint32_t max_value;                     /**< Maximum allowed value */
+    bool requires_restart;                  /**< Requires system restart */
+    bool is_persistent;                     /**< Persists across reboots */
+    char description[128];                  /**< Parameter description */
+    char units[16];                         /**< Units of measurement */
+} esocore_config_parameter_t;
 
+/**
+ * @brief Configuration parameter value
+ */
 typedef struct {
-    char profile_name[32];                     /* Profile name */
-    char profile_version[16];                  /* Profile version */
-    char description[128];                     /* Profile description */
-    uint32_t created_timestamp;                /* Creation timestamp */
-    uint32_t modified_timestamp;               /* Last modification timestamp */
-    config_parameter_t *parameters;            /* Array of parameters */
-    uint32_t num_parameters;                   /* Number of parameters */
-    uint32_t profile_id;                       /* Unique profile ID */
-    bool is_active;                            /* Profile is currently active */
-    bool is_template;                          /* Profile is a template */
-    char target_hardware[32];                  /* Target hardware version */
-    char target_firmware[16];                  /* Target firmware version */
-} config_profile_t;
+    uint16_t parameter_id;                  /**< Parameter identifier */
+    esocore_config_type_t data_type;       /**< Parameter data type */
+    uint16_t value_size;                    /**< Size of value data */
+    uint8_t value[ESOCORE_MAX_PARAMETER_VALUE_SIZE]; /**< Parameter value */
+    uint32_t timestamp;                     /**< Value timestamp */
+    uint8_t source;                         /**< Source of value change */
+} esocore_config_value_t;
 
-/* ============================================================================
- * Configuration Validation Structures
- * ============================================================================ */
-
-typedef enum {
-    CONFIG_VALIDATION_RANGE     = 0,    /* Range validation */
-    CONFIG_VALIDATION_ENUM      = 1,    /* Enumeration validation */
-    CONFIG_VALIDATION_REGEX     = 2,    /* Regular expression validation */
-    CONFIG_VALIDATION_CUSTOM    = 3,    /* Custom validation function */
-    CONFIG_VALIDATION_DEPENDENCY = 4,  /* Parameter dependency validation */
-} config_validation_type_t;
-
+/**
+ * @brief Configuration profile
+ */
 typedef struct {
-    config_validation_type_t type;             /* Validation type */
-    char parameter_name[CONFIG_MAX_PARAMETER_NAME]; /* Parameter to validate */
-    void *validation_data;                     /* Validation data (range, enum values, etc.) */
-    char error_message[128];                   /* Error message for validation failure */
-    bool (*custom_validator)(const void *value, const void *validation_data); /* Custom validator function */
-} config_validation_rule_t;
+    uint8_t profile_id;                     /**< Profile identifier */
+    char profile_name[32];                  /**< Profile name */
+    char profile_description[128];          /**< Profile description */
+    uint16_t parameter_count;               /**< Number of parameters in profile */
+    esocore_config_value_t *parameters;     /**< Parameter values */
+    bool is_active;                         /**< Profile is currently active */
+    uint32_t created_timestamp;             /**< Profile creation timestamp */
+    uint32_t modified_timestamp;            /**< Profile modification timestamp */
+} esocore_config_profile_t;
 
-/* ============================================================================
- * Configuration Change Tracking
- * ============================================================================ */
-
-typedef enum {
-    CONFIG_CHANGE_TYPE_UPDATE   = 0,    /* Parameter update */
-    CONFIG_CHANGE_TYPE_PROFILE_SWITCH = 1, /* Profile switch */
-    CONFIG_CHANGE_TYPE_ROLLBACK = 2,    /* Rollback operation */
-    CONFIG_CHANGE_TYPE_RESET    = 3,    /* Reset to defaults */
-    CONFIG_CHANGE_TYPE_IMPORT   = 4,    /* Configuration import */
-} config_change_type_t;
-
+/**
+ * @brief Configuration validation rule
+ */
 typedef struct {
-    uint32_t change_id;                         /* Unique change ID */
-    config_change_type_t change_type;           /* Type of change */
-    char parameter_name[CONFIG_MAX_PARAMETER_NAME]; /* Affected parameter */
-    char old_value[CONFIG_MAX_PARAMETER_VALUE]; /* Old parameter value */
-    char new_value[CONFIG_MAX_PARAMETER_VALUE]; /* New parameter value */
-    uint32_t timestamp;                         /* Change timestamp */
-    char user_id[32];                           /* User who made the change */
-    char change_reason[128];                    /* Reason for change */
-    bool requires_restart;                      /* Change requires restart */
-    bool applied_successfully;                  /* Change applied successfully */
-    char error_message[128];                    /* Error message if failed */
-} config_change_log_entry_t;
+    uint16_t parameter_id;                  /**< Parameter to validate */
+    uint8_t validator_type;                 /**< Type of validation */
+    uint32_t rule_value;                    /**< Validation rule value */
+    char error_message[64];                 /**< Error message if validation fails */
+    bool (*custom_validator)(const esocore_config_value_t *value, void *context); /**< Custom validator function */
+    void *validator_context;                /**< Context for custom validator */
+} esocore_config_validator_t;
 
-/* ============================================================================
- * Configuration Management Status
- * ============================================================================ */
-
-typedef enum {
-    CONFIG_STATUS_IDLE          = 0,    /* Configuration system idle */
-    CONFIG_STATUS_LOADING       = 1,    /* Loading configuration */
-    CONFIG_STATUS_VALIDATING    = 2,    /* Validating configuration */
-    CONFIG_STATUS_APPLYING      = 3,    /* Applying configuration changes */
-    CONFIG_STATUS_ROLLBACK      = 4,    /* Performing rollback */
-    CONFIG_STATUS_ERROR         = 5,    /* Configuration error */
-    CONFIG_STATUS_PENDING_RESTART = 6,  /* Restart required */
-} config_manager_status_t;
-
+/**
+ * @brief Configuration system status
+ */
 typedef struct {
-    config_manager_status_t status;             /* Current status */
-    config_profile_t *active_profile;           /* Currently active profile */
-    uint32_t pending_changes;                   /* Number of pending changes */
-    uint32_t failed_changes;                    /* Number of failed changes */
-    bool restart_required;                      /* System restart required */
-    uint32_t last_backup_timestamp;             /* Last backup timestamp */
-    uint32_t config_version;                    /* Configuration version */
-    uint32_t change_log_entries;                /* Number of change log entries */
-    float validation_progress;                  /* Validation progress (0-100) */
-    char last_error[128];                       /* Last error message */
-} config_manager_status_t;
+    uint16_t total_parameters;              /**< Total number of parameters */
+    uint16_t active_parameters;             /**< Number of active parameters */
+    uint8_t active_profile;                 /**< Currently active profile */
+    uint32_t last_update_timestamp;         /**< Timestamp of last configuration update */
+    uint32_t pending_changes;               /**< Number of pending changes */
+    bool requires_restart;                  /**< System requires restart */
+    uint8_t validation_errors;              /**< Number of validation errors */
+    uint32_t backup_timestamp;              /**< Timestamp of last backup */
+    bool remote_sync_enabled;               /**< Remote synchronization enabled */
+} esocore_config_status_t;
 
-/* ============================================================================
- * Remote Configuration Structures
- * ============================================================================ */
-
-typedef enum {
-    CONFIG_UPDATE_METHOD_IMMEDIATE = 0,  /* Apply immediately */
-    CONFIG_UPDATE_METHOD_SCHEDULED = 1,  /* Apply at scheduled time */
-    CONFIG_UPDATE_METHOD_MAINTENANCE = 2, /* Apply during maintenance window */
-    CONFIG_UPDATE_METHOD_GRADUAL = 3,    /* Apply gradually (canary deployment) */
-} config_update_method_t;
-
+/**
+ * @brief Configuration update request
+ */
 typedef struct {
-    char target_device_id[32];                  /* Target device ID */
-    config_profile_t *new_profile;              /* New configuration profile */
-    config_update_method_t update_method;       /* Update method */
-    uint32_t scheduled_time;                    /* Scheduled update time */
-    uint32_t rollback_timeout_minutes;          /* Rollback timeout */
-    bool enable_validation;                     /* Enable validation before apply */
-    bool create_backup;                         /* Create backup before update */
-    char update_reason[128];                    /* Reason for update */
-    char requested_by[32];                      /* User who requested update */
-} config_remote_update_request_t;
+    uint16_t parameter_id;                  /**< Parameter to update */
+    esocore_config_value_t new_value;       /**< New parameter value */
+    uint8_t source;                         /**< Source of update request */
+    uint32_t request_timestamp;             /**< Request timestamp */
+    bool requires_validation;               /**< Requires validation */
+    bool requires_restart;                  /**< Requires system restart */
+} esocore_config_update_request_t;
+
+/**
+ * @brief Configuration backup structure
+ */
+typedef struct {
+    uint8_t backup_slot;                    /**< Backup slot identifier */
+    char backup_name[32];                   /**< Backup name */
+    uint32_t backup_timestamp;              /**< Backup timestamp */
+    uint16_t parameter_count;               /**< Number of parameters backed up */
+    uint32_t data_size;                     /**< Size of backup data */
+    bool is_compressed;                     /**< Backup is compressed */
+    bool is_encrypted;                      /**< Backup is encrypted */
+} esocore_config_backup_t;
 
 /* ============================================================================
  * Function Prototypes
@@ -197,362 +182,372 @@ typedef struct {
 /**
  * @brief Initialize configuration manager
  *
- * @param max_profiles Maximum number of configuration profiles
- * @param max_parameters Maximum number of parameters per profile
  * @return true if initialization successful, false otherwise
  */
-bool config_manager_init(uint32_t max_profiles, uint32_t max_parameters);
+bool esocore_config_init(void);
 
 /**
  * @brief Deinitialize configuration manager
  *
  * @return true if deinitialization successful, false otherwise
  */
-bool config_manager_deinit(void);
+bool esocore_config_deinit(void);
 
 /**
- * @brief Create new configuration profile
+ * @brief Register configuration parameter
  *
- * @param profile_name Name of the new profile
- * @param description Profile description
- * @param profile Pointer to profile structure to initialize
- * @return true if profile created successfully, false otherwise
+ * @param parameter Pointer to parameter definition
+ * @return true if parameter registered successfully, false otherwise
  */
-bool config_create_profile(const char *profile_name, const char *description,
-                          config_profile_t *profile);
+bool esocore_config_register_parameter(const esocore_config_parameter_t *parameter);
 
 /**
- * @brief Load configuration profile from storage
+ * @brief Unregister configuration parameter
  *
- * @param profile_name Name of the profile to load
- * @param profile Pointer to profile structure to fill
- * @return true if profile loaded successfully, false otherwise
+ * @param parameter_id Parameter identifier to unregister
+ * @return true if parameter unregistered successfully, false otherwise
  */
-bool config_load_profile(const char *profile_name, config_profile_t *profile);
+bool esocore_config_unregister_parameter(uint16_t parameter_id);
 
 /**
- * @brief Save configuration profile to storage
+ * @brief Get parameter definition
  *
- * @param profile Pointer to profile to save
- * @return true if profile saved successfully, false otherwise
+ * @param parameter_id Parameter identifier
+ * @param parameter Pointer to parameter structure to fill
+ * @return true if parameter definition retrieved successfully, false otherwise
  */
-bool config_save_profile(const config_profile_t *profile);
+bool esocore_config_get_parameter_definition(uint16_t parameter_id,
+                                           esocore_config_parameter_t *parameter);
 
 /**
- * @brief Delete configuration profile
+ * @brief Set parameter value
  *
- * @param profile_name Name of the profile to delete
- * @return true if profile deleted successfully, false otherwise
+ * @param parameter_id Parameter identifier
+ * @param value Pointer to new parameter value
+ * @param source Source of the value change
+ * @return true if parameter value set successfully, false otherwise
  */
-bool config_delete_profile(const char *profile_name);
-
-/**
- * @brief Activate configuration profile
- *
- * @param profile_name Name of the profile to activate
- * @return true if profile activated successfully, false otherwise
- */
-bool config_activate_profile(const char *profile_name);
-
-/**
- * @brief Get currently active profile
- *
- * @param profile Pointer to profile structure to fill
- * @return true if active profile retrieved successfully, false otherwise
- */
-bool config_get_active_profile(config_profile_t *profile);
-
-/**
- * @brief Add parameter to configuration profile
- *
- * @param profile Pointer to profile
- * @param parameter Pointer to parameter to add
- * @return true if parameter added successfully, false otherwise
- */
-bool config_add_parameter(config_profile_t *profile, const config_parameter_t *parameter);
-
-/**
- * @brief Update parameter value
- *
- * @param profile_name Name of the profile containing the parameter
- * @param parameter_name Name of the parameter to update
- * @param new_value Pointer to new parameter value
- * @param change_reason Reason for the change
- * @param user_id User making the change
- * @return true if parameter updated successfully, false otherwise
- */
-bool config_update_parameter(const char *profile_name, const char *parameter_name,
-                            const void *new_value, const char *change_reason,
-                            const char *user_id);
+bool esocore_config_set_value(uint16_t parameter_id, const esocore_config_value_t *value,
+                             uint8_t source);
 
 /**
  * @brief Get parameter value
  *
- * @param profile_name Name of the profile
- * @param parameter_name Name of the parameter
- * @param value_buffer Buffer to store parameter value
- * @param buffer_size Size of buffer
+ * @param parameter_id Parameter identifier
+ * @param value Pointer to value structure to fill
  * @return true if parameter value retrieved successfully, false otherwise
  */
-bool config_get_parameter_value(const char *profile_name, const char *parameter_name,
-                               void *value_buffer, uint32_t buffer_size);
+bool esocore_config_get_value(uint16_t parameter_id, esocore_config_value_t *value);
 
 /**
- * @brief Validate configuration profile
+ * @brief Get parameter value as integer
  *
- * @param profile Pointer to profile to validate
- * @param error_message Buffer to store validation error message
- * @param buffer_size Size of buffer
- * @return true if profile is valid, false otherwise
+ * @param parameter_id Parameter identifier
+ * @param int_value Pointer to store integer value
+ * @return true if integer value retrieved successfully, false otherwise
  */
-bool config_validate_profile(const config_profile_t *profile, char *error_message,
-                            uint32_t buffer_size);
+bool esocore_config_get_int_value(uint16_t parameter_id, int32_t *int_value);
 
 /**
- * @brief Add validation rule
+ * @brief Get parameter value as string
  *
- * @param rule Pointer to validation rule to add
- * @return true if validation rule added successfully, false otherwise
+ * @param parameter_id Parameter identifier
+ * @param str_value Pointer to string buffer
+ * @param buffer_size Size of string buffer
+ * @return true if string value retrieved successfully, false otherwise
  */
-bool config_add_validation_rule(const config_validation_rule_t *rule);
+bool esocore_config_get_string_value(uint16_t parameter_id, char *str_value,
+                                    uint16_t buffer_size);
 
 /**
- * @brief Apply configuration changes
+ * @brief Get parameter value as boolean
  *
- * @param profile_name Name of the profile to apply
- * @return true if configuration applied successfully, false otherwise
+ * @param parameter_id Parameter identifier
+ * @param bool_value Pointer to store boolean value
+ * @return true if boolean value retrieved successfully, false otherwise
  */
-bool config_apply_changes(const char *profile_name);
+bool esocore_config_get_bool_value(uint16_t parameter_id, bool *bool_value);
 
 /**
- * @brief Rollback configuration to previous version
+ * @brief Get parameter value as float
  *
- * @param rollback_reason Reason for rollback
- * @param user_id User performing rollback
- * @return true if rollback successful, false otherwise
+ * @param parameter_id Parameter identifier
+ * @param float_value Pointer to store float value
+ * @return true if float value retrieved successfully, false otherwise
  */
-bool config_rollback_changes(const char *rollback_reason, const char *user_id);
+bool esocore_config_get_float_value(uint16_t parameter_id, float *float_value);
+
+/**
+ * @brief Validate parameter value
+ *
+ * @param parameter_id Parameter identifier
+ * @param value Pointer to value to validate
+ * @return true if parameter value is valid, false otherwise
+ */
+bool esocore_config_validate_value(uint16_t parameter_id, const esocore_config_value_t *value);
+
+/**
+ * @brief Get configuration system status
+ *
+ * @param status Pointer to status structure to fill
+ * @return true if status retrieved successfully, false otherwise
+ */
+bool esocore_config_get_status(esocore_config_status_t *status);
+
+/**
+ * @brief Create configuration profile
+ *
+ * @param profile Pointer to profile definition
+ * @return true if profile created successfully, false otherwise
+ */
+bool esocore_config_create_profile(const esocore_config_profile_t *profile);
+
+/**
+ * @brief Delete configuration profile
+ *
+ * @param profile_id Profile identifier to delete
+ * @return true if profile deleted successfully, false otherwise
+ */
+bool esocore_config_delete_profile(uint8_t profile_id);
+
+/**
+ * @brief Load configuration profile
+ *
+ * @param profile_id Profile identifier to load
+ * @return true if profile loaded successfully, false otherwise
+ */
+bool esocore_config_load_profile(uint8_t profile_id);
+
+/**
+ * @brief Get configuration profile
+ *
+ * @param profile_id Profile identifier
+ * @param profile Pointer to profile structure to fill
+ * @return true if profile retrieved successfully, false otherwise
+ */
+bool esocore_config_get_profile(uint8_t profile_id, esocore_config_profile_t *profile);
+
+/**
+ * @brief List available configuration profiles
+ *
+ * @param profiles Array to store profile IDs
+ * @param max_profiles Maximum number of profiles to list
+ * @param num_profiles Pointer to store number of profiles found
+ * @return true if profiles listed successfully, false otherwise
+ */
+bool esocore_config_list_profiles(uint8_t *profiles, uint8_t max_profiles,
+                                 uint8_t *num_profiles);
+
+/**
+ * @brief Add validator for parameter
+ *
+ * @param validator Pointer to validator definition
+ * @return true if validator added successfully, false otherwise
+ */
+bool esocore_config_add_validator(const esocore_config_validator_t *validator);
+
+/**
+ * @brief Remove validator for parameter
+ *
+ * @param parameter_id Parameter identifier
+ * @return true if validator removed successfully, false otherwise
+ */
+bool esocore_config_remove_validator(uint16_t parameter_id);
+
+/**
+ * @brief Validate all configuration parameters
+ *
+ * @param error_count Pointer to store number of validation errors
+ * @return true if all parameters are valid, false otherwise
+ */
+bool esocore_config_validate_all(uint8_t *error_count);
+
+/**
+ * @brief Apply pending configuration changes
+ *
+ * @return true if changes applied successfully, false otherwise
+ */
+bool esocore_config_apply_changes(void);
+
+/**
+ * @brief Discard pending configuration changes
+ *
+ * @return true if changes discarded successfully, false otherwise
+ */
+bool esocore_config_discard_changes(void);
+
+/**
+ * @brief Save configuration to persistent storage
+ *
+ * @return true if configuration saved successfully, false otherwise
+ */
+bool esocore_config_save(void);
+
+/**
+ * @brief Load configuration from persistent storage
+ *
+ * @return true if configuration loaded successfully, false otherwise
+ */
+bool esocore_config_load(void);
+
+/**
+ * @brief Reset configuration to factory defaults
+ *
+ * @return true if configuration reset successfully, false otherwise
+ */
+bool esocore_config_reset_to_defaults(void);
 
 /**
  * @brief Create configuration backup
  *
  * @param backup_name Name for the backup
+ * @param slot Backup slot to use
  * @return true if backup created successfully, false otherwise
  */
-bool config_create_backup(const char *backup_name);
+bool esocore_config_create_backup(const char *backup_name, uint8_t slot);
 
 /**
  * @brief Restore configuration from backup
  *
- * @param backup_name Name of the backup to restore
+ * @param slot Backup slot to restore from
  * @return true if backup restored successfully, false otherwise
  */
-bool config_restore_backup(const char *backup_name);
+bool esocore_config_restore_backup(uint8_t slot);
 
 /**
- * @brief Get configuration change log
+ * @brief Export configuration to file
  *
- * @param log_entries Array to store log entries
- * @param max_entries Maximum number of entries to retrieve
- * @param num_entries Pointer to store number of entries retrieved
- * @return true if log retrieved successfully, false otherwise
+ * @param filename Export filename
+ * @param format Export format (0=JSON, 1=Binary)
+ * @return true if configuration exported successfully, false otherwise
  */
-bool config_get_change_log(config_change_log_entry_t *log_entries, uint32_t max_entries,
-                          uint32_t *num_entries);
+bool esocore_config_export(const char *filename, uint8_t format);
 
 /**
- * @brief Export configuration profile to JSON
+ * @brief Import configuration from file
  *
- * @param profile_name Name of the profile to export
- * @param json_buffer Buffer to store JSON data
- * @param buffer_size Size of buffer
- * @return true if export successful, false otherwise
+ * @param filename Import filename
+ * @param format Import format
+ * @return true if configuration imported successfully, false otherwise
  */
-bool config_export_profile_json(const char *profile_name, char *json_buffer,
-                               uint32_t buffer_size);
+bool esocore_config_import(const char *filename, uint8_t format);
 
 /**
- * @brief Import configuration profile from JSON
+ * @brief Enable remote configuration synchronization
  *
- * @param json_data JSON data containing profile
- * @param profile_name Name for the imported profile
- * @return true if import successful, false otherwise
+ * @param enable true to enable remote sync, false to disable
+ * @param server_url Remote server URL
+ * @param api_key API key for authentication
+ * @return true if remote sync configured successfully, false otherwise
  */
-bool config_import_profile_json(const char *json_data, const char *profile_name);
-
-/**
- * @brief Get configuration manager status
- *
- * @param status Pointer to status structure to fill
- * @return true if status retrieved successfully, false otherwise
- */
-bool config_get_manager_status(config_manager_status_t *status);
-
-/**
- * @brief Process remote configuration update request
- *
- * @param request Pointer to remote update request
- * @return true if update request processed successfully, false otherwise
- */
-bool config_process_remote_update(const config_remote_update_request_t *request);
-
-/**
- * @brief Get pending configuration updates
- *
- * @param updates Array to store pending updates
- * @param max_updates Maximum number of updates to retrieve
- * @param num_updates Pointer to store number of updates retrieved
- * @return true if pending updates retrieved successfully, false otherwise
- */
-bool config_get_pending_updates(config_remote_update_request_t *updates,
-                               uint32_t max_updates, uint32_t *num_updates);
-
-/**
- * @brief Approve configuration update
- *
- * @param update_id ID of the update to approve
- * @param approver_id ID of the approver
- * @return true if update approved successfully, false otherwise
- */
-bool config_approve_update(uint32_t update_id, const char *approver_id);
-
-/**
- * @brief Reject configuration update
- *
- * @param update_id ID of the update to reject
- * @param reject_reason Reason for rejection
- * @param rejector_id ID of the rejector
- * @return true if update rejected successfully, false otherwise
- */
-bool config_reject_update(uint32_t update_id, const char *reject_reason,
-                         const char *rejector_id);
-
-/**
- * @brief Get configuration templates
- *
- * @param templates Array to store template names
- * @param max_templates Maximum number of templates to retrieve
- * @param num_templates Pointer to store number of templates retrieved
- * @return true if templates retrieved successfully, false otherwise
- */
-bool config_get_templates(char *templates[][32], uint32_t max_templates,
-                         uint32_t *num_templates);
-
-/**
- * @brief Create configuration template
- *
- * @param template_name Name of the template
- * @param base_profile_name Name of the base profile
- * @param description Template description
- * @return true if template created successfully, false otherwise
- */
-bool config_create_template(const char *template_name, const char *base_profile_name,
-                           const char *description);
-
-/**
- * @brief Apply template to create new profile
- *
- * @param template_name Name of the template to apply
- * @param new_profile_name Name for the new profile
- * @param custom_parameters JSON string with custom parameter values
- * @return true if template applied successfully, false otherwise
- */
-bool config_apply_template(const char *template_name, const char *new_profile_name,
-                          const char *custom_parameters);
-
-/**
- * @brief Get configuration parameter constraints
- *
- * @param parameter_name Name of the parameter
- * @param constraints JSON buffer to store constraints
- * @param buffer_size Size of buffer
- * @return true if constraints retrieved successfully, false otherwise
- */
-bool config_get_parameter_constraints(const char *parameter_name, char *constraints,
-                                     uint32_t buffer_size);
-
-/**
- * @brief Set configuration parameter constraints
- *
- * @param parameter_name Name of the parameter
- * @param constraints JSON string with parameter constraints
- * @return true if constraints set successfully, false otherwise
- */
-bool config_set_parameter_constraints(const char *parameter_name, const char *constraints);
-
-/**
- * @brief Check if configuration change requires restart
- *
- * @param profile_name Name of the profile
- * @param parameter_name Name of the parameter being changed
- * @return true if restart is required, false otherwise
- */
-bool config_requires_restart(const char *profile_name, const char *parameter_name);
-
-/**
- * @brief Get configuration health status
- *
- * @param health_score Pointer to store health score (0-100)
- * @param issues Pointer to store number of configuration issues
- * @return true if health status retrieved successfully, false otherwise
- */
-bool config_get_health_status(float *health_score, uint32_t *issues);
-
-/**
- * @brief Perform configuration consistency check
- *
- * @param issues_buffer Buffer to store consistency issues
- * @param buffer_size Size of buffer
- * @return true if consistency check completed successfully, false otherwise
- */
-bool config_check_consistency(char *issues_buffer, uint32_t buffer_size);
-
-/**
- * @brief Reset configuration to factory defaults
- *
- * @param reset_reason Reason for reset
- * @param user_id User performing reset
- * @return true if reset successful, false otherwise
- */
-bool config_reset_to_defaults(const char *reset_reason, const char *user_id);
-
-/**
- * @brief Get configuration version information
- *
- * @param version_string Buffer to store version string
- * @param buffer_size Size of buffer
- * @return true if version information retrieved successfully, false otherwise
- */
-bool config_get_version_info(char *version_string, uint16_t buffer_size);
-
-/**
- * @brief Enable/disable configuration change notifications
- *
- * @param enable true to enable notifications, false to disable
- * @param notification_endpoint Endpoint for notifications
- * @return true if configuration successful, false otherwise
- */
-bool config_enable_change_notifications(bool enable, const char *notification_endpoint);
+bool esocore_config_enable_remote_sync(bool enable, const char *server_url,
+                                      const char *api_key);
 
 /**
  * @brief Synchronize configuration with remote server
  *
- * @return true if synchronization successful, false otherwise
+ * @return true if synchronization completed successfully, false otherwise
  */
-bool config_sync_with_remote(void);
+bool esocore_config_sync_remote(void);
 
 /**
- * @brief Get configuration update progress
+ * @brief Get configuration change history
  *
- * @param progress Pointer to store progress percentage (0-100)
- * @param status_message Buffer to store status message
- * @param buffer_size Size of buffer
- * @return true if progress retrieved successfully, false otherwise
+ * @param history Array to store change history
+ * @param max_entries Maximum number of entries to retrieve
+ * @param num_entries Pointer to store number of entries retrieved
+ * @return true if history retrieved successfully, false otherwise
  */
-bool config_get_update_progress(float *progress, char *status_message, uint16_t buffer_size);
+bool esocore_config_get_change_history(esocore_config_value_t *history,
+                                      uint32_t max_entries, uint32_t *num_entries);
 
-#ifdef __cplusplus
-}
-#endif
+/**
+ * @brief Register configuration change callback
+ *
+ * @param callback Callback function for configuration changes
+ * @param context User context pointer
+ * @return true if callback registered successfully, false otherwise
+ */
+bool esocore_config_register_callback(void (*callback)(uint16_t parameter_id,
+                                                      const esocore_config_value_t *old_value,
+                                                      const esocore_config_value_t *new_value,
+                                                      void *context),
+                                     void *context);
 
-#endif /* ESOCORE_CONFIG_MANAGER_H */
+/**
+ * @brief Unregister configuration change callback
+ *
+ * @return true if callback unregistered successfully, false otherwise
+ */
+bool esocore_config_unregister_callback(void);
+
+/**
+ * @brief Get parameter statistics
+ *
+ * @param parameter_id Parameter identifier
+ * @param change_count Pointer to store number of changes
+ * @param last_change Pointer to store last change timestamp
+ * @return true if statistics retrieved successfully, false otherwise
+ */
+bool esocore_config_get_parameter_stats(uint16_t parameter_id, uint32_t *change_count,
+                                       uint32_t *last_change);
+
+/**
+ * @brief Lock configuration parameter
+ *
+ * @param parameter_id Parameter identifier to lock
+ * @return true if parameter locked successfully, false otherwise
+ */
+bool esocore_config_lock_parameter(uint16_t parameter_id);
+
+/**
+ * @brief Unlock configuration parameter
+ *
+ * @param parameter_id Parameter identifier to unlock
+ * @return true if parameter unlocked successfully, false otherwise
+ */
+bool esocore_config_unlock_parameter(uint16_t parameter_id);
+
+/**
+ * @brief Check if parameter requires restart
+ *
+ * @param parameter_id Parameter identifier
+ * @param requires_restart Pointer to store restart requirement
+ * @return true if restart requirement checked successfully, false otherwise
+ */
+bool esocore_config_requires_restart(uint16_t parameter_id, bool *requires_restart);
+
+/**
+ * @brief Get configuration system memory usage
+ *
+ * @param used_memory Pointer to store used memory
+ * @param available_memory Pointer to store available memory
+ * @return true if memory usage retrieved successfully, false otherwise
+ */
+bool esocore_config_get_memory_usage(uint32_t *used_memory, uint32_t *available_memory);
+
+/**
+ * @brief Perform configuration system self-test
+ *
+ * @return true if self-test passed, false otherwise
+ */
+bool esocore_config_self_test(void);
+
+/**
+ * @brief Get configuration system version
+ *
+ * @param version_string Buffer to store version string
+ * @param buffer_size Size of version buffer
+ * @return true if version retrieved successfully, false otherwise
+ */
+bool esocore_config_get_version(char *version_string, uint16_t buffer_size);
+
+/**
+ * @brief Enable configuration change notifications
+ *
+ * @param enable true to enable notifications, false to disable
+ * @return true if notification setting changed successfully, false otherwise
+ */
+bool esocore_config_enable_notifications(bool enable);
+
+#endif /* CONFIG_MANAGER_H */

@@ -287,7 +287,6 @@ bool esocore_event_init(const esocore_event_config_t *config) {
 
     /* Initialize status */
     memset(&event_status, 0, sizeof(event_status));
-    event_status.status = 1; /* Ready */
 
     /* Reset counters */
     event_sequence_counter = 0;

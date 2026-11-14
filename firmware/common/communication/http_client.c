@@ -444,17 +444,42 @@ bool http_client_send_request(const http_request_t *request, http_response_t *re
 }
 
 /**
+ * @brief Fill a request with method, URL, body and content type
+ *
+ * The URL and the content type are copied into the request; both must fit
+ * their fields, otherwise the request is rejected rather than truncated.
+ */
+static bool http_prepare_request(http_request_t *request, http_method_t method, const char *url,
+                                const uint8_t *body, uint16_t body_length,
+                                const char *content_type) {
+    if (!request || !url || strlen(url) >= sizeof(request->url)) {
+        return false;
+    }
+    if (content_type && strlen(content_type) >= sizeof(request->content_type)) {
+        return false;
+    }
+
+    memset(request, 0, sizeof(*request));
+    request->method = method;
+    strcpy(request->url, url);
+    request->body = body;
+    request->body_length = body ? body_length : 0;
+    if (content_type) {
+        strcpy(request->content_type, content_type);
+    }
+
+    return true;
+}
+
+/**
  * @brief Send GET request
  */
 bool http_client_get(const char *url, http_response_t *response) {
-    http_request_t request = {
-        .method = HTTP_METHOD_GET,
-        .url = url,
-        .num_headers = 0,
-        .body = NULL,
-        .body_length = 0,
-        .content_type = ""
-    };
+    http_request_t request;
+
+    if (!http_prepare_request(&request, HTTP_METHOD_GET, url, NULL, 0, NULL)) {
+        return false;
+    }
 
     return http_client_send_request(&request, response);
 }
@@ -464,16 +489,10 @@ bool http_client_get(const char *url, http_response_t *response) {
  */
 bool http_client_post(const char *url, const uint8_t *body, uint16_t body_length,
                      const char *content_type, http_response_t *response) {
-    http_request_t request = {
-        .method = HTTP_METHOD_POST,
-        .url = url,
-        .num_headers = 0,
-        .body = body,
-        .body_length = body_length
-    };
+    http_request_t request;
 
-    if (content_type) {
-        strcpy(request.content_type, content_type);
+    if (!http_prepare_request(&request, HTTP_METHOD_POST, url, body, body_length, content_type)) {
+        return false;
     }
 
     return http_client_send_request(&request, response);
@@ -484,16 +503,10 @@ bool http_client_post(const char *url, const uint8_t *body, uint16_t body_length
  */
 bool http_client_put(const char *url, const uint8_t *body, uint16_t body_length,
                     const char *content_type, http_response_t *response) {
-    http_request_t request = {
-        .method = HTTP_METHOD_PUT,
-        .url = url,
-        .num_headers = 0,
-        .body = body,
-        .body_length = body_length
-    };
+    http_request_t request;
 
-    if (content_type) {
-        strcpy(request.content_type, content_type);
+    if (!http_prepare_request(&request, HTTP_METHOD_PUT, url, body, body_length, content_type)) {
+        return false;
     }
 
     return http_client_send_request(&request, response);
@@ -664,7 +677,7 @@ bool esocore_api_send_heartbeat(const char *status, http_response_t *response) {
         return false;
     }
 
-    return http_client_post(API_ENDPOINT_heartbeat,
+    return http_client_post(API_ENDPOINT_HEARTBEAT,
                            (const uint8_t *)json_payload, len,
                            "application/json", response);
 }

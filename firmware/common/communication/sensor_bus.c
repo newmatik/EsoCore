@@ -3,9 +3,9 @@
  * @brief RS-485 Sensor Bus Manager Implementation
  *
  * This file implements the sensor bus management layer using USART2 with the
- * SN65HVD72D half-duplex RS-485 transceiver. It builds on top of the EsoCore
- * protocol layer (protocol.h) to provide automatic device discovery,
- * hot-plug detection, health monitoring, and 12V bus power management.
+ * SN65HVD72D half-duplex RS-485 transceiver. It provides automatic device
+ * discovery, hot-plug detection, health monitoring, and 12V bus power
+ * management, and takes its CRC-16 from the protocol layer (protocol.h).
  *
  * Hardware:
  * - USART2 (PA3 TX, PA0 RX) at configurable baud rate (default 115200)
@@ -34,6 +34,27 @@
 #define SBUS_HEARTBEAT_INTERVAL_MS 1000   /* Expected heartbeat interval from sensors */
 #define SBUS_DISCOVERY_WAIT_MS     200    /* Time to wait for discovery responses */
 #define SBUS_TX_TIMEOUT_MS         50     /* UART transmit timeout */
+
+/*
+ * Frame layout used by this module:
+ *   start (1) | version (1) | source (1) | destination (1) | type (1) |
+ *   payload length (2, little endian) | header CRC (2) | payload |
+ *   payload CRC (2) | end (1)
+ *
+ * This is not the message layout of protocol.h (esocore_message_t), which the
+ * sensor modules use. The two have to be brought together before the Edge can
+ * talk to a sensor module; until then the constants of this layout live here.
+ */
+#define SBUS_FRAME_START           0xAA   /* Start delimiter */
+#define SBUS_FRAME_END             0x55   /* End delimiter */
+#define SBUS_MAX_PAYLOAD_SIZE      256    /* Largest payload in a frame */
+
+#define SBUS_MSG_DISCOVERY_REQUEST  0x01  /* Edge -> sensors: discover devices */
+#define SBUS_MSG_DISCOVERY_RESPONSE 0x02  /* Sensors -> Edge: device info */
+#define SBUS_MSG_HEARTBEAT          0x03  /* Keep-alive */
+#define SBUS_MSG_DATA_RESPONSE      0x21  /* Sensors -> Edge: requested data */
+#define SBUS_MSG_DATA_STREAM        0x22  /* Sensors -> Edge: streamed data */
+#define SBUS_MSG_COMMAND            0x30  /* Edge -> sensors: execute command */
 
 /* ============================================================================
  * Private Data Structures
@@ -258,13 +279,13 @@ static bool sbus_transmit(const uint8_t *data, uint16_t length) {
 /**
  * @brief Process incoming data from the RX buffer
  *
- * Scans for EsoCore protocol frames (start delimiter ESOCORE_FRAME_START),
+ * Scans for EsoCore protocol frames (start delimiter SBUS_FRAME_START),
  * parses complete frames, and dispatches them based on message type.
  *
  * Handled message types:
- * - MSG_TYPE_DISCOVERY_RESPONSE: update device table
- * - MSG_TYPE_HEARTBEAT: refresh device last_seen timestamp
- * - MSG_TYPE_DATA_STREAM / MSG_TYPE_DATA_RESPONSE: invoke data callback
+ * - SBUS_MSG_DISCOVERY_RESPONSE: update device table
+ * - SBUS_MSG_HEARTBEAT: refresh device last_seen timestamp
+ * - SBUS_MSG_DATA_STREAM / SBUS_MSG_DATA_RESPONSE: invoke data callback
  *
  * TODO: This currently uses a simplified byte-by-byte parser. For
  * production, integrate with the full esocore_protocol_receive_message()
@@ -276,7 +297,7 @@ static void sbus_process_rx(void) {
     /*
      * Simplified frame processing loop.
      *
-     * The EsoCore protocol frame starts with ESOCORE_FRAME_START (0xAA).
+     * The EsoCore protocol frame starts with SBUS_FRAME_START (0xAA).
      * We scan for it, then attempt to read a complete frame header to
      * determine the payload length, and finally validate + process.
      *
@@ -286,14 +307,14 @@ static void sbus_process_rx(void) {
      * within a single poll interval.
      */
 
-    static uint8_t  frame_buf[ESOCORE_MAX_PAYLOAD_SIZE + 32];
+    static uint8_t  frame_buf[SBUS_MAX_PAYLOAD_SIZE + 32];
     static uint16_t frame_idx = 0;
     static bool     in_frame = false;
     static uint16_t expected_len = 0;
 
     while (sbus_rx_read(&byte)) {
         if (!in_frame) {
-            if (byte == ESOCORE_FRAME_START) {
+            if (byte == SBUS_FRAME_START) {
                 frame_buf[0] = byte;
                 frame_idx = 1;
                 in_frame = true;
@@ -313,7 +334,7 @@ static void sbus_process_rx(void) {
         }
 
         /*
-         * Once we have the header (sizeof esocore_frame_header_t bytes),
+         * Once we have the header (start to header CRC),
          * we can determine the total expected frame length.
          * Header: start(1) + version(1) + src(1) + dst(1) + type(1) +
          *         payload_len(2) + header_crc(2) = 9 bytes
@@ -323,7 +344,7 @@ static void sbus_process_rx(void) {
             uint16_t payload_len = (uint16_t)frame_buf[5] |
                                    ((uint16_t)frame_buf[6] << 8);
 
-            if (payload_len > ESOCORE_MAX_PAYLOAD_SIZE) {
+            if (payload_len > SBUS_MAX_PAYLOAD_SIZE) {
                 /* Invalid payload length */
                 in_frame = false;
                 frame_idx = 0;
@@ -345,7 +366,7 @@ static void sbus_process_rx(void) {
             uint8_t *payload = &frame_buf[9];
 
             /* Verify end delimiter */
-            if (frame_buf[expected_len - 1] != ESOCORE_FRAME_END) {
+            if (frame_buf[expected_len - 1] != SBUS_FRAME_END) {
                 sb_status.bus_errors++;
                 in_frame = false;
                 frame_idx = 0;
@@ -353,21 +374,21 @@ static void sbus_process_rx(void) {
             }
 
             /* TODO: Validate header CRC and payload CRC using
-             * esocore_crc16() for production use */
+             * esocore_protocol_calculate_crc16() for production use */
 
             /* Dispatch based on message type */
             switch (msg_type) {
-                case MSG_TYPE_DISCOVERY_RESPONSE:
+                case SBUS_MSG_DISCOVERY_RESPONSE:
                     sbus_handle_discovery_response(src_addr, payload,
                                                    payload_len);
                     break;
 
-                case MSG_TYPE_HEARTBEAT:
+                case SBUS_MSG_HEARTBEAT:
                     sbus_handle_heartbeat(src_addr);
                     break;
 
-                case MSG_TYPE_DATA_RESPONSE:
-                case MSG_TYPE_DATA_STREAM:
+                case SBUS_MSG_DATA_RESPONSE:
+                case SBUS_MSG_DATA_STREAM:
                     if (sb_data_cb) {
                         sb_data_cb(src_addr, payload, payload_len,
                                    sb_cb_ctx);
@@ -709,28 +730,28 @@ bool sensor_bus_discover(void) {
     /*
      * Build and send a discovery request broadcast.
      *
-     * Uses the EsoCore protocol frame format defined in protocol.h:
-     * - Start delimiter: ESOCORE_FRAME_START (0xAA)
-     * - Message type: MSG_TYPE_DISCOVERY_REQUEST (0x01)
+     * Uses the frame layout described at the top of this file:
+     * - Start delimiter: SBUS_FRAME_START (0xAA)
+     * - Message type: SBUS_MSG_DISCOVERY_REQUEST (0x01)
      * - Destination: broadcast (0xFF)
      *
-     * TODO: Use esocore_send_message() once it has proper USART2 bindings.
+     * TODO: Use esocore_protocol_send_message() once it has USART2 bindings.
      * For now, we build the frame manually and transmit via sbus_transmit().
      */
 
     uint8_t discovery_frame[12];
     uint16_t idx = 0;
 
-    discovery_frame[idx++] = ESOCORE_FRAME_START;       /* Start delimiter */
+    discovery_frame[idx++] = SBUS_FRAME_START;       /* Start delimiter */
     discovery_frame[idx++] = ESOCORE_PROTOCOL_VERSION;   /* Protocol version */
     discovery_frame[idx++] = 0x00;                       /* Source: Edge (addr 0) */
     discovery_frame[idx++] = 0xFF;                       /* Destination: broadcast */
-    discovery_frame[idx++] = MSG_TYPE_DISCOVERY_REQUEST;  /* Message type */
+    discovery_frame[idx++] = SBUS_MSG_DISCOVERY_REQUEST;  /* Message type */
     discovery_frame[idx++] = 0x00;                       /* Payload length low */
     discovery_frame[idx++] = 0x00;                       /* Payload length high */
 
-    /* Header CRC (placeholder -- TODO: compute with esocore_crc16) */
-    uint16_t hdr_crc = esocore_crc16(&discovery_frame[0], idx);
+    /* Header CRC */
+    uint16_t hdr_crc = esocore_protocol_calculate_crc16(&discovery_frame[0], idx);
     discovery_frame[idx++] = (uint8_t)(hdr_crc & 0xFF);
     discovery_frame[idx++] = (uint8_t)((hdr_crc >> 8) & 0xFF);
 
@@ -738,7 +759,7 @@ bool sensor_bus_discover(void) {
     discovery_frame[idx++] = 0x00;
     discovery_frame[idx++] = 0x00;
 
-    discovery_frame[idx++] = ESOCORE_FRAME_END;          /* End delimiter */
+    discovery_frame[idx++] = SBUS_FRAME_END;          /* End delimiter */
 
     bool ok = sbus_transmit(discovery_frame, idx);
 
@@ -757,7 +778,7 @@ bool sensor_bus_send_command(uint8_t address, uint8_t cmd,
         return false;
     }
 
-    if (length > ESOCORE_MAX_PAYLOAD_SIZE - 1) {
+    if (length > SBUS_MAX_PAYLOAD_SIZE - 1) {
         return false; /* Command byte + data must fit in payload */
     }
 
@@ -766,24 +787,24 @@ bool sensor_bus_send_command(uint8_t address, uint8_t cmd,
      *
      * Payload: [CMD_BYTE] [DATA...]
      *
-     * TODO: Use esocore_send_message() with MSG_TYPE_COMMAND once
+     * TODO: Use esocore_protocol_send_message() once
      * the protocol layer supports USART2 hardware bindings.
      */
 
-    uint8_t frame[ESOCORE_MAX_PAYLOAD_SIZE + 32];
+    uint8_t frame[SBUS_MAX_PAYLOAD_SIZE + 32];
     uint16_t idx = 0;
     uint16_t payload_len = 1 + length; /* cmd byte + data */
 
-    frame[idx++] = ESOCORE_FRAME_START;
+    frame[idx++] = SBUS_FRAME_START;
     frame[idx++] = ESOCORE_PROTOCOL_VERSION;
     frame[idx++] = 0x00;               /* Source: Edge */
     frame[idx++] = address;             /* Destination */
-    frame[idx++] = MSG_TYPE_COMMAND;    /* Message type */
+    frame[idx++] = SBUS_MSG_COMMAND;    /* Message type */
     frame[idx++] = (uint8_t)(payload_len & 0xFF);
     frame[idx++] = (uint8_t)((payload_len >> 8) & 0xFF);
 
     /* Header CRC */
-    uint16_t hdr_crc = esocore_crc16(&frame[0], idx);
+    uint16_t hdr_crc = esocore_protocol_calculate_crc16(&frame[0], idx);
     frame[idx++] = (uint8_t)(hdr_crc & 0xFF);
     frame[idx++] = (uint8_t)((hdr_crc >> 8) & 0xFF);
 
@@ -795,11 +816,11 @@ bool sensor_bus_send_command(uint8_t address, uint8_t cmd,
     }
 
     /* Payload CRC */
-    uint16_t pay_crc = esocore_crc16(&frame[9], payload_len);
+    uint16_t pay_crc = esocore_protocol_calculate_crc16(&frame[9], payload_len);
     frame[idx++] = (uint8_t)(pay_crc & 0xFF);
     frame[idx++] = (uint8_t)((pay_crc >> 8) & 0xFF);
 
-    frame[idx++] = ESOCORE_FRAME_END;
+    frame[idx++] = SBUS_FRAME_END;
 
     return sbus_transmit(frame, idx);
 }
