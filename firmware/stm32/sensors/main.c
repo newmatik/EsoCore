@@ -62,6 +62,7 @@ static uint32_t last_config_check_time = 0;
 static struct {
     bool master_connected;
     bool sensors_active;
+    bool acquisition_running;           /* START/STOP state; measurements go out only while running */
     uint8_t active_sensors;
     uint32_t total_measurements;
     uint8_t system_health;
@@ -151,6 +152,7 @@ static bool initialize_demo_sensors(void) {
 
     if (success) {
         system_status.sensors_active = true;
+        system_status.acquisition_running = true;
     }
 
     return success;
@@ -189,22 +191,24 @@ static void send_sensor_data(void) {
 
     if (current_time - last_data_transmit_time >= DATA_TRANSMIT_INTERVAL_MS) {
         // No measurements are sent in low power mode (supply in brownout or lost)
-        if (system_status.sensors_active && system_status.master_connected &&
-            !system_status.low_power_mode) {
+        if (system_status.sensors_active && system_status.acquisition_running &&
+            system_status.master_connected && !system_status.low_power_mode) {
             bool data_sent = false;
 
             switch (device_type) {
                 case ESOCORE_DEVICE_TYPE_VIBRATION:
-                    if (vibration_sensor_read_data(&vibration_data, 500)) {
-                        esocore_protocol_send_sensor_data((esocore_sensor_data_payload_t *)&vibration_data, sizeof(vibration_data));
+                    if (vibration_sensor_read_data(&vibration_data, 500) &&
+                        esocore_protocol_send_sensor_data((const uint8_t *)&vibration_data,
+                                                          sizeof(vibration_data))) {
                         data_sent = true;
                         system_status.total_measurements++;
                     }
                     break;
 
                 case ESOCORE_DEVICE_TYPE_CURRENT:
-                    if (current_sensor_read_data(&current_data, 500)) {
-                        esocore_protocol_send_sensor_data((esocore_sensor_data_payload_t *)&current_data, sizeof(current_data));
+                    if (current_sensor_read_data(&current_data, 500) &&
+                        esocore_protocol_send_sensor_data((const uint8_t *)&current_data,
+                                                          sizeof(current_data))) {
                         data_sent = true;
                         system_status.total_measurements++;
                     }
@@ -221,6 +225,43 @@ static void send_sensor_data(void) {
         }
 
         last_data_transmit_time = current_time;
+    }
+}
+
+/**
+ * @brief Execute a command from the Edge (ESOCORE_MSG_COMMAND)
+ */
+static bool handle_command(uint8_t command, const uint8_t *data, uint16_t length) {
+    (void)data;
+    (void)length;
+
+    bool ok = false;
+
+    switch (command) {
+        case ESOCORE_CMD_SENSOR_START:
+            if (device_type == ESOCORE_DEVICE_TYPE_VIBRATION) {
+                ok = vibration_sensor_start_acquisition();
+            } else if (device_type == ESOCORE_DEVICE_TYPE_CURRENT) {
+                ok = current_sensor_start_acquisition();
+            }
+            if (ok) {
+                system_status.acquisition_running = true;
+            }
+            return ok;
+
+        case ESOCORE_CMD_SENSOR_STOP:
+            if (device_type == ESOCORE_DEVICE_TYPE_VIBRATION) {
+                ok = vibration_sensor_stop_acquisition();
+            } else if (device_type == ESOCORE_DEVICE_TYPE_CURRENT) {
+                ok = current_sensor_stop_acquisition();
+            }
+            if (ok) {
+                system_status.acquisition_running = false;
+            }
+            return ok;
+
+        default:
+            return false; /* Other commands are not implemented yet */
     }
 }
 
@@ -324,6 +365,7 @@ static bool initialize_system(void) {
     }
     printf("✓ Power management initialized\n");
 
+    esocore_protocol_register_command_handler(handle_command);
     if (!esocore_protocol_init(device_address, device_type)) {
         printf("ERROR: Protocol initialization failed\n");
         return false;

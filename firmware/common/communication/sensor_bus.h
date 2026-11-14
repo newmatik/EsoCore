@@ -124,17 +124,24 @@ typedef void (*sensor_bus_device_callback_t)(const sensor_bus_device_t *device,
 /**
  * @brief Incoming sensor data callback
  *
- * Invoked when a data frame is received from a sensor device. The
+ * Invoked once per data frame received from a sensor device. The
  * application should process the data within this callback or copy
  * it for deferred processing.
  *
- * @param address Source device address
- * @param data    Pointer to received data payload
- * @param length  Length of data payload
- * @param ctx     User-provided context pointer
+ * A reading longer than one payload arrives in several frames: each has
+ * ESOCORE_FLAG_FRAGMENTED in flags, the last one also
+ * ESOCORE_FLAG_LAST_FRAGMENT, and their sequence numbers follow each other
+ * (modulo 256). A gap in the sequence numbers means a fragment was lost.
+ *
+ * @param address  Source device address
+ * @param sequence Sequence number of the frame
+ * @param flags    Frame flags (ESOCORE_FLAG_*)
+ * @param data     Pointer to received data payload
+ * @param length   Length of data payload
+ * @param ctx      User-provided context pointer
  */
-typedef void (*sensor_bus_data_callback_t)(uint8_t address,
-                                          const uint8_t *data,
+typedef void (*sensor_bus_data_callback_t)(uint8_t address, uint8_t sequence,
+                                          uint8_t flags, const uint8_t *data,
                                           uint16_t length, void *ctx);
 
 /* ============================================================================
