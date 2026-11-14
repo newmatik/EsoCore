@@ -4,7 +4,12 @@
     <div class="bg-(--ui-bg-elevated) shadow">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div class="flex items-center gap-4">
-          <UButton leading-icon="i-heroicons-arrow-left" variant="ghost" to="/devices" />
+          <UButton
+            leading-icon="i-heroicons-arrow-left"
+            variant="ghost"
+            to="/devices"
+            aria-label="Back to devices"
+          />
           <div class="min-w-0">
             <h1 class="text-2xl font-bold text-(--ui-text-highlighted)">
               {{ device?.serial_number || 'Loading...' }}

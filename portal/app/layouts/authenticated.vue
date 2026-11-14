@@ -1,35 +1,35 @@
 <template>
   <div class="min-h-screen bg-(--ui-bg)">
     <header class="bg-(--ui-bg-elevated) border-b border-(--ui-border)">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-2"
+      >
         <!-- Brand -->
         <NuxtLink
           to="/dashboard"
-          class="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          class="flex min-w-0 items-center gap-2 hover:opacity-80 transition-opacity"
         >
-          <img src="/icon.svg" alt="Portal Icon" class="h-6 w-6" />
-          <span class="text-lg font-semibold text-(--ui-text-highlighted)">
+          <img src="/icon.svg" alt="Portal Icon" class="h-6 w-6 shrink-0" />
+          <span class="truncate text-base sm:text-lg font-semibold text-(--ui-text-highlighted)">
             {{ portalTitle }}
           </span>
         </NuxtLink>
 
-        <!-- Navigation -->
-        <nav class="flex items-center gap-1">
-          <NuxtLink
-            v-for="item in navItems"
-            :key="item.to"
-            :to="item.to"
-            class="px-3 py-1.5 text-sm rounded-md transition-colors"
-            :class="
-              isActive(item.to)
-                ? 'bg-(--ui-bg-accented) text-(--ui-text-highlighted) font-medium'
-                : 'text-(--ui-text-muted) hover:bg-(--ui-bg-accented) hover:text-(--ui-text)'
-            "
-          >
-            {{ item.label }}
-          </NuxtLink>
+        <div class="flex shrink-0 items-center gap-1">
+          <!-- Navigation (medium screens and up) -->
+          <nav aria-label="Main" class="hidden md:flex items-center gap-1">
+            <NuxtLink
+              v-for="item in navItems"
+              :key="item.to"
+              :to="item.to"
+              class="px-3 py-1.5 text-sm rounded-md transition-colors"
+              :class="navItemClass(item.to)"
+            >
+              {{ item.label }}
+            </NuxtLink>
+          </nav>
 
-          <div class="w-px h-5 bg-(--ui-border) mx-2" />
+          <div class="hidden md:block w-px h-5 bg-(--ui-border) mx-2" />
 
           <ClientOnly>
             <ThemeToggle />
@@ -38,6 +38,10 @@
           <!-- User Menu -->
           <div class="relative ml-1" ref="menuRef">
             <button
+              type="button"
+              aria-label="Account menu"
+              aria-haspopup="menu"
+              :aria-expanded="showMenu"
               @click="showMenu = !showMenu"
               class="flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-(--ui-text-muted) hover:bg-(--ui-bg-accented) transition-colors"
             >
@@ -74,6 +78,7 @@
                   </p>
                 </div>
                 <button
+                  type="button"
                   @click="handleLogout"
                   class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-(--ui-bg-accented) transition-colors"
                 >
@@ -82,8 +87,38 @@
               </div>
             </Transition>
           </div>
-        </nav>
+
+          <!-- Navigation toggle (small screens) -->
+          <UButton
+            class="md:hidden"
+            variant="ghost"
+            color="neutral"
+            :icon="showNav ? 'i-heroicons-x-mark' : 'i-heroicons-bars-3'"
+            :aria-label="showNav ? 'Close navigation' : 'Open navigation'"
+            :aria-expanded="showNav"
+            aria-controls="mobile-nav"
+            @click="showNav = !showNav"
+          />
+        </div>
       </div>
+
+      <!-- Navigation (small screens) -->
+      <nav
+        v-if="showNav"
+        id="mobile-nav"
+        aria-label="Main"
+        class="md:hidden border-t border-(--ui-border) px-4 sm:px-6 py-2 flex flex-col gap-1"
+      >
+        <NuxtLink
+          v-for="item in navItems"
+          :key="item.to"
+          :to="item.to"
+          class="px-3 py-2 text-sm rounded-md transition-colors"
+          :class="navItemClass(item.to)"
+        >
+          {{ item.label }}
+        </NuxtLink>
+      </nav>
     </header>
 
     <main>
@@ -103,6 +138,7 @@ const route = useRoute()
 useHead({ title: portalTitle })
 
 const showMenu = ref(false)
+const showNav = ref(false)
 const menuRef = ref<HTMLElement>()
 
 const navItems = [
@@ -115,6 +151,20 @@ const navItems = [
 function isActive(path: string) {
   return route.path === path || route.path.startsWith(path + '/')
 }
+
+function navItemClass(path: string) {
+  return isActive(path)
+    ? 'bg-(--ui-bg-accented) text-(--ui-text-highlighted) font-medium'
+    : 'text-(--ui-text-muted) hover:bg-(--ui-bg-accented) hover:text-(--ui-text)'
+}
+
+// Close the small-screen navigation after a link has been followed.
+watch(
+  () => route.path,
+  () => {
+    showNav.value = false
+  }
+)
 
 async function handleLogout() {
   showMenu.value = false
