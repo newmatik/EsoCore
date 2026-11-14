@@ -128,8 +128,9 @@ jobs:
         with:
           node-version-file: website/.nvmrc
       - uses: pnpm/action-setup@v6
+        # No version here: the action reads the exact pnpm version from packageManager.
         with:
-          version: 10
+          package_json_file: website/package.json
       - run: pnpm install --frozen-lockfile
       - run: pnpm generate
       - name: Deploy to Cloudflare Workers
