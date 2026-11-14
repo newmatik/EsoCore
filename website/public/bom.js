@@ -114,12 +114,16 @@
       // Layout wrapper for table + summary
       const wrap = document.createElement('div')
       wrap.className = 'bom-wrap'
+      // The table scrolls inside its own box on narrow screens (.table-scroll in theme.css).
+      const tableScroll = document.createElement('div')
+      tableScroll.className = 'table-scroll'
+      tableScroll.appendChild(table)
       const summary = document.createElement('div')
       summary.className = 'bom-summary'
 
       mount.replaceChildren()
       mount.appendChild(controls)
-      wrap.appendChild(table)
+      wrap.appendChild(tableScroll)
       wrap.appendChild(summary)
       mount.appendChild(wrap)
 
