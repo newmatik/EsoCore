@@ -84,6 +84,7 @@
 <script setup>
 import { marked } from 'marked'
 import { docsConfig, isGroupExpanded } from '~/utils/docs-config'
+import { wrapTables } from '~/utils/wrap-tables'
 
 const route = useRoute()
 const slug = computed(() => {
@@ -150,7 +151,7 @@ const renderedContent = computed(() => {
     headerIds: true,
   })
 
-  return marked.parse(content.value)
+  return wrapTables(marked.parse(content.value))
 })
 
 // Set page title
