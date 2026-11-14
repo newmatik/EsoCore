@@ -234,14 +234,15 @@ wrong CRC (the sensor modules answer it with `NACK`). There is no end delimiter 
 | `0x01` | `DISCOVER`          | none; Edge to broadcast                                                                        |
 | `0x02` | `DISCOVER_RESPONSE` | device type, firmware major and minor, hardware version, serial (2), capabilities, status, uptime in s (4) |
 | `0x03` | `HEARTBEAT`         | device type, status, 2 reserved bytes                                                          |
-| `0x11` | `DATA_RESPONSE`     | sensor data; longer data in several frames flagged `FRAGMENTED`, the last also `LAST_FRAGMENT` |
+| `0x11` | `DATA_RESPONSE`     | sensor data; longer data in consecutive frames flagged `FRAGMENTED`, the last also `LAST_FRAGMENT` |
 | `0x13` | `DATA_ACK`          | sequence number of the acknowledged frame, `0x01`                                              |
 | `0x31` | `NACK`              | sequence number of the rejected frame, `0x00`                                                  |
 | `0x27` | `COMMAND`           | `esocore_command_t` byte, then its data; Edge to one module                                    |
 
 The other message types of `esocore_message_type_t` (configuration, control, firmware update) use the same frame. The
-sensor data payload is still the module's data struct as it is in memory, cut into fragments; a defined serialised
-form per module is open.
+Edge's data callback gets each frame with its sequence number and flags; putting fragments back together is up to the
+application. The sensor data payload is still the module's data struct as it is in memory, cut into fragments; a
+defined serialised form per module is open.
 
 ### Modbus RTU
 

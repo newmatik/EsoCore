@@ -305,7 +305,7 @@ static bool sbus_send_frame(uint8_t destination, esocore_message_type_t type,
  * - ESOCORE_MSG_DISCOVER_RESPONSE: update device table
  * - ESOCORE_MSG_HEARTBEAT: refresh device last_seen timestamp
  * - ESOCORE_MSG_DATA_RESPONSE / ESOCORE_MSG_DATA_BURST: invoke data callback
- *   (one call per frame; fragments carry ESOCORE_FLAG_FRAGMENTED)
+ *   (one call per frame, with sequence number and flags for reassembly)
  *
  * A frame that is still incomplete stays in the buffer for the next poll.
  */
@@ -359,7 +359,8 @@ static void sbus_process_rx(void) {
                 case ESOCORE_MSG_DATA_RESPONSE:
                 case ESOCORE_MSG_DATA_BURST:
                     if (sb_data_cb) {
-                        sb_data_cb(src_addr, message.payload,
+                        sb_data_cb(src_addr, message.header.sequence_number,
+                                   message.header.flags, message.payload,
                                    message.header.payload_length, sb_cb_ctx);
                     }
                     break;
