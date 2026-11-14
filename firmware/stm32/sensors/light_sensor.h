@@ -35,6 +35,7 @@ extern "C" {
  * ============================================================================ */
 
 typedef struct {
+    esocore_sensor_config_t base_config;   /* Base sensor configuration */
     uint16_t visible_sample_rate_hz;       /* Visible light sample rate (1-100 Hz) */
     uint16_t uv_sample_rate_hz;            /* UV radiation sample rate (1-50 Hz) */
     uint16_t ir_temp_sample_rate_hz;       /* IR temperature sample rate (1-10 Hz) */
@@ -52,10 +53,84 @@ typedef struct {
 } light_sensor_config_t;
 
 /* ============================================================================
+ * Per-Sensor Measurement Data
+ * ============================================================================ */
+
+/* Visible light measurement (TSL2591) */
+typedef struct {
+    float lux;                             /* Illuminance (lux) */
+    float infrared_raw;                    /* Infrared component (IR channel) */
+    float visible_raw;                     /* Visible component (full minus IR) */
+    float full_spectrum_raw;               /* Full spectrum component */
+} light_visible_data_t;
+
+/* UV radiation measurement (VEML6075) */
+typedef struct {
+    float uva_watts_per_m2;                /* UVA irradiance (W/m²) */
+    float uvb_watts_per_m2;                /* UVB irradiance (W/m²) */
+    float uv_index;                        /* UV Index (0-11+) */
+} light_uv_data_t;
+
+/* Color measurement (TCS34725) */
+typedef struct {
+    uint16_t red_counts;                   /* Red channel raw count */
+    uint16_t green_counts;                 /* Green channel raw count */
+    uint16_t blue_counts;                  /* Blue channel raw count */
+    uint16_t clear_counts;                 /* Clear channel raw count */
+    float color_temperature_kelvin;        /* Correlated color temperature (K) */
+    float lux_from_color;                  /* Lux calculated from clear channel */
+} light_color_data_t;
+
+/* Spectral measurement (AS7341) */
+typedef struct {
+    float channel_data[10];                /* 10 spectral channel intensities */
+    uint8_t flicker_frequency_hz;          /* Detected flicker frequency (0 = none) */
+} light_spectral_data_t;
+
+/* IR temperature measurement (MLX90614) */
+typedef struct {
+    float object_temperature_celsius;      /* Object temperature (°C) */
+    float ambient_temperature_celsius;     /* Ambient temperature (°C) */
+} light_ir_data_t;
+
+/* Workplace lighting compliance assessment (OSHA/EU) */
+typedef struct {
+    bool illuminance_compliant;            /* Illuminance meets requirements */
+    char illuminance_status[48];           /* Illuminance assessment text */
+    bool uv_safety_compliant;              /* UV exposure within safe limits */
+    char uv_safety_status[48];             /* UV safety assessment text */
+    bool color_temperature_compliant;      /* Color temperature in acceptable range */
+    char color_temperature_status[48];     /* Color temperature assessment text */
+    bool overall_compliant;                /* All compliance checks passed */
+    uint32_t assessment_timestamp;         /* Assessment timestamp */
+} light_workplace_compliance_t;
+
+/* Environmental light pollution analysis */
+typedef struct {
+    char pollution_level[48];              /* Light pollution level text */
+    float sky_brightness_index;            /* Sky brightness index (0-4) */
+    char ecological_impact[64];            /* Ecological impact assessment text */
+    uint32_t assessment_timestamp;         /* Assessment timestamp */
+} light_environmental_analysis_t;
+
+/* ============================================================================
  * Light Sensor Data
  * ============================================================================ */
 
 typedef struct {
+    /* Per-sensor measurements */
+    light_visible_data_t visible_data;     /* Visible light measurement */
+    light_uv_data_t uv_data;               /* UV radiation measurement */
+    light_color_data_t color_data;         /* Color measurement */
+    light_spectral_data_t spectral_data;   /* Spectral measurement */
+    light_ir_data_t ir_data;               /* IR temperature measurement */
+
+    /* Derived assessments */
+    light_workplace_compliance_t workplace_compliance;     /* Workplace compliance */
+    light_environmental_analysis_t environmental_analysis; /* Light pollution analysis */
+    uint8_t light_quality_score;           /* Overall light quality score (0-100) */
+    char condition_description[64];        /* Condition description */
+
     /* Visible Light Sensor (TSL2591) */
     float illuminance_lux;                 /* Illuminance in lux */
     uint16_t channel0_raw;                 /* Full spectrum raw count */
@@ -91,6 +166,17 @@ typedef struct {
     uint8_t sensor_status;                 /* Sensor status flags */
     uint32_t timestamp;                    /* Measurement timestamp */
 } light_sensor_data_t;
+
+/* ============================================================================
+ * Light Sensor Status
+ * ============================================================================ */
+
+typedef struct {
+    esocore_sensor_status_t base_status;   /* Base sensor status */
+    uint32_t measurements_taken;           /* Measurements since start */
+    uint32_t last_measurement_time;        /* Timestamp of last measurement */
+    bool calibration_valid;                /* Calibration data is valid */
+} light_sensor_status_t;
 
 /* ============================================================================
  * Light Analysis Results
@@ -194,12 +280,21 @@ bool light_sensor_start_measurement(void);
 bool light_sensor_stop_measurement(void);
 
 /**
+ * @brief Configure light sensor
+ *
+ * @param config Pointer to new sensor configuration
+ * @return true if configuration applied, false otherwise
+ */
+bool light_sensor_configure(const light_sensor_config_t *config);
+
+/**
  * @brief Read light sensor data
  *
  * @param data Pointer to data structure to fill
+ * @param timeout_ms Read timeout (ms)
  * @return true if data read successfully, false otherwise
  */
-bool light_sensor_read_data(light_sensor_data_t *data);
+bool light_sensor_read_data(light_sensor_data_t *data, uint32_t timeout_ms);
 
 /**
  * @brief Perform light quality analysis
@@ -291,9 +386,57 @@ bool light_sensor_self_test(void);
 /**
  * @brief Get sensor status
  *
- * @return Status flags bitmask
+ * @param status Pointer to status structure to fill
+ * @return true if status retrieved successfully, false otherwise
  */
-uint8_t light_sensor_get_status(void);
+bool light_sensor_get_status(light_sensor_status_t *status);
+
+/**
+ * @brief Calibrate all light sensors
+ *
+ * @return true if calibration successful, false otherwise
+ */
+bool light_sensor_calibrate(void);
+
+/**
+ * @brief Calculate overall light condition score
+ *
+ * @param visible_data Visible light measurement
+ * @param uv_data UV radiation measurement
+ * @param color_data Color measurement
+ * @param spectral_data Spectral measurement
+ * @return Light quality score (0-100)
+ */
+uint8_t light_sensor_calculate_condition(const light_visible_data_t *visible_data,
+                                       const light_uv_data_t *uv_data,
+                                       const light_color_data_t *color_data,
+                                       const light_spectral_data_t *spectral_data);
+
+/**
+ * @brief Get light sensor capabilities
+ *
+ * @return Pointer to static capabilities structure
+ */
+const esocore_sensor_capabilities_t *light_sensor_get_capabilities(void);
+
+/**
+ * @brief Get light sensor configuration
+ *
+ * @param config Pointer to configuration structure to fill
+ * @return true if configuration retrieved, false otherwise
+ */
+bool light_sensor_get_configuration(light_sensor_config_t *config);
+
+/**
+ * @brief Export light sensor data
+ *
+ * @param data Pointer to data to export
+ * @param filename Target file name
+ * @param format Export format identifier
+ * @return true if export successful, false otherwise
+ */
+bool light_sensor_export_data(const light_sensor_data_t *data,
+                            const char *filename, uint8_t format);
 
 /**
  * @brief Set illuminance alarm thresholds

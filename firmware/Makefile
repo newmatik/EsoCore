@@ -192,15 +192,19 @@ EDGE_OBJ_DIR := $(BUILD_DIR)/edge/obj/$(if $(filter 1,$(DEBUG)),debug,release)-$
 EDGE_OBJECTS := $(patsubst %.c,$(EDGE_OBJ_DIR)/%.o,$(COMMON_SOURCES) $(EDGE_SOURCES))
 EDGE_STARTUP_OBJECT := $(EDGE_OBJ_DIR)/$(EDGE_STARTUP:.s=.o)
 
-# Sensor module objects. The sensor sources listed here compile with the
-# sensor MCU flags; the remaining modules join the list as their headers are
-# completed (#141). Linking needs the STM32G0 support files (#128).
+# Sensor module objects: main.c and every sensor module, compiled with the
+# sensor MCU flags. Linking needs the STM32G0 support files (#128).
 SENSOR_OBJECT_SOURCES := \
 	stm32/sensors/main.c \
-	stm32/sensors/vibration_sensor.c \
-	stm32/sensors/acoustic_sensor.c \
-	stm32/sensors/current_sensor.c \
-	stm32/sensors/air_quality_sensor.c
+	$(VIBRATION_SOURCES) \
+	$(ACOUSTIC_SOURCES) \
+	$(CURRENT_SOURCES) \
+	$(AIR_QUALITY_SOURCES) \
+	$(OIL_QUALITY_SOURCES) \
+	$(PRESSURE_SOURCES) \
+	$(TEMPERATURE_SOURCES) \
+	$(PROXIMITY_SOURCES) \
+	$(LIGHT_SOURCES)
 SENSOR_COMPILE := $(CC) $(CFLAGS) $(SENSOR_MCU_FLAGS) $(SENSOR_INCLUDES)
 SENSOR_COMPILE_ID := $(firstword $(shell printf '%s\n' '$(subst ','\'',$(SENSOR_COMPILE))' | cksum))
 SENSOR_OBJ_DIR := $(BUILD_DIR)/sensors/obj/$(if $(filter 1,$(DEBUG)),debug,release)-$(SENSOR_COMPILE_ID)
@@ -218,7 +222,7 @@ help:
 	@echo "  all       - Build all targets (edge and sensors)"
 	@echo "  edge      - Build Edge device firmware (needs the STM32H747 startup file)"
 	@echo "  edge-objects - Compile every Edge source file without linking"
-	@echo "  sensor-objects - Compile the sensor module sources that build so far, without linking"
+	@echo "  sensor-objects - Compile every sensor module source file without linking"
 	@echo "  sensors   - Build all sensor modules"
 	@echo "  vibration   - Build vibration sensor module"
 	@echo "  acoustic    - Build acoustic sensor module"

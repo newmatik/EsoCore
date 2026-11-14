@@ -362,7 +362,7 @@ static void calculate_temperature_statistics(const float *temperatures, uint8_t 
 /**
  * @brief Analyze thermal gradients and hotspots
  */
-static void analyze_thermal_gradients(const temperature_spot_data_t *spot_data,
+static void analyze_thermal_gradients(const temperature_spot_sensor_data_t *spot_data,
                                     temperature_gradient_analysis_t *gradient_analysis) {
     /* Calculate thermal gradients between different measurement points */
     float temperatures[4]; /* NTC sensors */
@@ -413,7 +413,7 @@ static void analyze_thermal_gradients(const temperature_spot_data_t *spot_data,
 /**
  * @brief Assess thermal stress and fatigue
  */
-static void assess_thermal_stress(const temperature_spot_data_t *spot_data,
+static void assess_thermal_stress(const temperature_spot_sensor_data_t *spot_data,
                                 temperature_stress_analysis_t *stress_analysis) {
     /* Analyze thermal cycling and stress */
 
@@ -422,8 +422,9 @@ static void assess_thermal_stress(const temperature_spot_data_t *spot_data,
     static bool first_measurement = true;
 
     if (first_measurement) {
-        memcpy(previous_temps, spot_data->ntc_temperatures,
-               sizeof(previous_temps));
+        for (uint8_t i = 0; i < 4; i++) {
+            previous_temps[i] = spot_data->ntc_temperatures[i].temperature_celsius;
+        }
         first_measurement = false;
     }
 
@@ -471,7 +472,7 @@ static void assess_thermal_stress(const temperature_spot_data_t *spot_data,
 /**
  * @brief Monitor operating temperature limits
  */
-static void monitor_temperature_limits(const temperature_spot_data_t *spot_data,
+static void monitor_temperature_limits(const temperature_spot_sensor_data_t *spot_data,
                                      temperature_limit_monitoring_t *limit_monitoring) {
     /* Check all temperature measurements against limits */
     float max_temp = -273.15f;

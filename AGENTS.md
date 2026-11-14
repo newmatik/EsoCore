@@ -96,9 +96,9 @@ gates of the part you changed before pushing.
 - **Firmware** (`firmware-ci.yml`): `cd firmware && make test && make edge-objects && make sensor-objects`. `make test`
   builds the host unit tests in `firmware/tests/host/` with the local C compiler (address and undefined-behaviour
   sanitizers on) and runs them; no ARM toolchain needed. `make edge-objects` compiles every Edge source file with
-  `arm-none-eabi-gcc`, `make sensor-objects` the sensor module sources listed in `SENSOR_OBJECT_SOURCES` (the rest
-  follow with #141). The target firmware is not linked: `make edge` needs the STM32H747 startup file, which is not in
-  the repository.
+  `arm-none-eabi-gcc`, `make sensor-objects` every sensor module source file. The target firmware is not linked:
+  `make edge` needs the STM32H747 startup file, which is not in the repository, and the sensor targets the STM32G0
+  support files (#128).
 - **Markdown** (`docs-ci.yml`): `pnpm install --lockfile=false && pnpm run lint:md` from the repository root, which has
   no lockfile. CI runs the same `markdownlint` command with the version pinned in the workflow. Rules are in
   `.markdownlint.yaml`.
