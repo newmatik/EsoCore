@@ -40,7 +40,6 @@
             <button
               type="button"
               aria-label="Account menu"
-              aria-haspopup="menu"
               :aria-expanded="showMenu"
               @click="showMenu = !showMenu"
               class="flex items-center gap-2 px-2 py-1.5 rounded-md text-sm text-(--ui-text-muted) hover:bg-(--ui-bg-accented) transition-colors"
