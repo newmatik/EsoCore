@@ -115,10 +115,12 @@ WSGI_APPLICATION = "esocore_api.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# ESOCORE_SQLITE_PATH moves the SQLite file, e.g. for the portal's browser smoke
+# test (portal/e2e/), which runs against a fresh database of its own.
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": os.environ.get("ESOCORE_SQLITE_PATH") or BASE_DIR / "db.sqlite3",
     }
 }
 

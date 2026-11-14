@@ -139,9 +139,11 @@ portal/
 │   └── utils/
 │       └── format.ts                 # Shared display helpers (time ago, labels, API error text)
 ├── public/                           # Static assets (icons, robots.txt)
+├── e2e/                              # Playwright browser smoke test and its API fixtures
 ├── tests/                            # Vitest unit tests; setup.ts stubs the Nuxt auto-imports
 ├── eslint.config.js                  # ESLint configuration
 ├── nuxt.config.ts                    # Nuxt configuration
+├── playwright.config.ts              # Browser smoke test configuration
 ├── package.json                      # Dependencies and scripts
 ├── pnpm-lock.yaml                    # Lockfile
 ├── pnpm-workspace.yaml               # pnpm settings (overrides, allowed build scripts)
@@ -205,6 +207,28 @@ Vitest runs the unit tests in `tests/` in plain Node, without starting Nuxt. The
 store, the auth route guard, the branding composable and the display helpers in `app/utils/format.ts`.
 `tests/setup.ts` replaces the Nuxt auto-imports that this code uses (`$fetch`, `useRuntimeConfig`, `useCookie`,
 `navigateTo`). A test for code that uses another auto-import needs a stub there first.
+
+### Browser smoke test
+
+```bash
+pnpm build
+pnpm exec playwright install chromium   # once
+E2E_PYTHON=../server/.venv/bin/python pnpm test:e2e
+```
+
+Playwright (`playwright.config.ts`, `e2e/`) starts the Django API on a fresh SQLite database (`migrate`, `seed_data`
+and `e2e/fixtures.py`, which adds a user of its own with more alerts than one API page) and the built portal, then
+checks in Chromium: sign-in, the four dashboard counters against the API, that `/devices`, `/alerts` and `/assets`
+show as many rows as the API counts, a device detail page, no uncaught page error or failed API request, and no
+sideways scrolling at 390 px width.
+
+- `E2E_PYTHON` is the Python command of the server environment, relative to the repository root or on `PATH`
+  (default `poetry run python`, run in `server/`).
+- `E2E_API_PORT` and `E2E_PORTAL_PORT` default to 18000 and 13080, so the dev servers can keep running.
+- `ESOCORE_SQLITE_PATH` sets the database file (default: `esocore-portal-e2e.sqlite3` in the system temp
+  directory). It is deleted at the start of every run; never point it at a database you want to keep.
+
+Portal CI runs the suite after the build.
 
 ## Deployment
 

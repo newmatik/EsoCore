@@ -40,7 +40,12 @@
             </div>
             <div class="ml-4">
               <p class="text-sm font-medium text-(--ui-text-muted)">{{ stat.label }}</p>
-              <p class="text-2xl font-semibold text-(--ui-text-highlighted)">{{ stat.value }}</p>
+              <p
+                class="text-2xl font-semibold text-(--ui-text-highlighted)"
+                data-testid="stat-value"
+              >
+                {{ stat.value }}
+              </p>
             </div>
           </div>
         </UCard>

@@ -96,6 +96,7 @@
               <tr
                 v-for="event in filteredEvents"
                 :key="event.id"
+                data-testid="alert-row"
                 class="hover:bg-(--ui-bg-accented) transition-colors"
               >
                 <td class="px-6 py-4">

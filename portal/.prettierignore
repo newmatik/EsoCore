@@ -31,3 +31,7 @@ pnpm-lock.yaml
 # Auto-generated files
 .nuxt/
 .nitro/
+
+# Playwright smoke test output
+test-results/
+playwright-report/
