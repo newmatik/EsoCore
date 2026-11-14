@@ -22,8 +22,10 @@ const env = {
   SECRET_KEY: process.env.SECRET_KEY || 'portal-smoke-test-only',
   ALLOWED_HOSTS: 'localhost,127.0.0.1',
   CORS_ALLOWED_ORIGINS: process.env.E2E_PORTAL_ORIGIN,
-  ESOCORE_SQLITE_PATH:
-    process.env.ESOCORE_SQLITE_PATH || join(tmpdir(), 'esocore-portal-e2e.sqlite3'),
+  // Absolute, so the file deleted here is the one Django opens from server/.
+  ESOCORE_SQLITE_PATH: resolve(
+    process.env.ESOCORE_SQLITE_PATH || join(tmpdir(), 'esocore-portal-e2e.sqlite3')
+  ),
 }
 rmSync(env.ESOCORE_SQLITE_PATH, { force: true })
 

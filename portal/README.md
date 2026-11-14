@@ -213,7 +213,7 @@ store, the auth route guard, the branding composable and the display helpers in 
 ```bash
 pnpm build
 pnpm exec playwright install chromium   # once
-E2E_PYTHON=../server/.venv/bin/python pnpm test:e2e
+E2E_PYTHON=server/.venv/bin/python pnpm test:e2e
 ```
 
 Playwright (`playwright.config.ts`, `e2e/`) starts the Django API on a fresh SQLite database (`migrate`, `seed_data`
@@ -226,7 +226,7 @@ sideways scrolling at 390 px width.
   (default `poetry run python`, run in `server/`).
 - `E2E_API_PORT` and `E2E_PORTAL_PORT` default to 18000 and 13080, so the dev servers can keep running.
 - `ESOCORE_SQLITE_PATH` sets the database file (default: `esocore-portal-e2e.sqlite3` in the system temp
-  directory). It is deleted at the start of every run; never point it at a database you want to keep.
+  directory; a relative path is taken from `portal/`). It is deleted at the start of every run; never point it at a database you want to keep.
 
 Portal CI runs the suite after the build.
 
