@@ -57,6 +57,10 @@ static volatile uint8_t  sb_rx_buf[SBUS_RX_BUFFER_SIZE];
 static volatile uint16_t sb_rx_head = 0;
 static volatile uint16_t sb_rx_tail = 0;
 
+/* Frame parser state: bytes of a frame not yet complete (reset with the ring) */
+static uint8_t  sb_frame_buf[ESOCORE_PROTOCOL_FRAME_SIZE];
+static uint32_t sb_frame_len = 0;
+
 /* Timing */
 static uint32_t sb_last_discovery_ms  = 0;
 static uint32_t sb_current_time_ms    = 0;  /* Updated externally or via SysTick */
@@ -310,26 +314,24 @@ static bool sbus_send_frame(uint8_t destination, esocore_message_type_t type,
  * A frame that is still incomplete stays in the buffer for the next poll.
  */
 static void sbus_process_rx(void) {
-    static uint8_t           frame_buf[ESOCORE_PROTOCOL_FRAME_SIZE];
-    static uint32_t          frame_len = 0;
     static esocore_message_t message;
     uint8_t byte;
 
     while (sbus_rx_read(&byte)) {
-        frame_buf[frame_len++] = byte;
+        sb_frame_buf[sb_frame_len++] = byte;
 
         /* Take every complete frame out of the buffer */
-        while (frame_len > 0) {
+        while (sb_frame_len > 0) {
             uint32_t consumed = 0;
             esocore_frame_status_t status = esocore_protocol_decode_frame(
-                frame_buf, frame_len, &message, &consumed);
+                sb_frame_buf, sb_frame_len, &message, &consumed);
 
             if (status == ESOCORE_FRAME_INCOMPLETE) {
                 break;
             }
 
-            memmove(frame_buf, frame_buf + consumed, frame_len - consumed);
-            frame_len -= consumed;
+            memmove(sb_frame_buf, sb_frame_buf + consumed, sb_frame_len - consumed);
+            sb_frame_len -= consumed;
 
             if (status == ESOCORE_FRAME_CRC_ERROR || status == ESOCORE_FRAME_INVALID) {
                 sb_status.bus_errors++;
@@ -523,6 +525,7 @@ bool sensor_bus_init(const sensor_bus_config_t *config) {
     memset((void *)&sb_status, 0, sizeof(sensor_bus_status_t));
     sb_rx_head = 0;
     sb_rx_tail = 0;
+    sb_frame_len = 0;
     sb_last_discovery_ms = 0;
     sb_current_time_ms = 0;
 
@@ -589,6 +592,7 @@ bool sensor_bus_start(void) {
     /* Flush RX buffer */
     sb_rx_head = 0;
     sb_rx_tail = 0;
+    sb_frame_len = 0;
 
     /* Enable UART RX interrupt */
     hal_uart_enable_rx_interrupt(&sb_uart);

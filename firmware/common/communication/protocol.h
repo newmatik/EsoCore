@@ -288,6 +288,23 @@ typedef struct {
 bool esocore_protocol_init(uint8_t device_address, esocore_device_type_t device_type);
 
 /**
+ * @brief Handler for ESOCORE_MSG_COMMAND
+ *
+ * @param command esocore_command_t value (first payload byte)
+ * @param data Command data (the rest of the payload)
+ * @param length Length of the command data
+ * @return true if the command was executed
+ */
+typedef bool (*esocore_command_handler_t)(uint8_t command, const uint8_t *data, uint16_t length);
+
+/**
+ * @brief Register the handler esocore_protocol_handle_message() calls for commands
+ *
+ * @param handler Handler, or NULL to refuse commands
+ */
+void esocore_protocol_register_command_handler(esocore_command_handler_t handler);
+
+/**
  * @brief Shut the protocol down
  *
  * Flushes the receive state. esocore_protocol_init() can start it again.

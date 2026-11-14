@@ -227,6 +227,37 @@ static void send_sensor_data(void) {
 }
 
 /**
+ * @brief Execute a command from the Edge (ESOCORE_MSG_COMMAND)
+ */
+static bool handle_command(uint8_t command, const uint8_t *data, uint16_t length) {
+    (void)data;
+    (void)length;
+
+    switch (command) {
+        case ESOCORE_CMD_SENSOR_START:
+            if (device_type == ESOCORE_DEVICE_TYPE_VIBRATION) {
+                return vibration_sensor_start_acquisition();
+            }
+            if (device_type == ESOCORE_DEVICE_TYPE_CURRENT) {
+                return current_sensor_start_acquisition();
+            }
+            return false;
+
+        case ESOCORE_CMD_SENSOR_STOP:
+            if (device_type == ESOCORE_DEVICE_TYPE_VIBRATION) {
+                return vibration_sensor_stop_acquisition();
+            }
+            if (device_type == ESOCORE_DEVICE_TYPE_CURRENT) {
+                return current_sensor_stop_acquisition();
+            }
+            return false;
+
+        default:
+            return false; /* Other commands are not implemented yet */
+    }
+}
+
+/**
  * @brief Process incoming protocol messages
  */
 static void process_protocol_messages(void) {
@@ -326,6 +357,7 @@ static bool initialize_system(void) {
     }
     printf("✓ Power management initialized\n");
 
+    esocore_protocol_register_command_handler(handle_command);
     if (!esocore_protocol_init(device_address, device_type)) {
         printf("ERROR: Protocol initialization failed\n");
         return false;

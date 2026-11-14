@@ -37,6 +37,9 @@ static bool receiving_message = false;
 /* Sequence number for outgoing messages */
 static uint8_t sequence_number = 0;
 
+/* Application handler for ESOCORE_MSG_COMMAND */
+static esocore_command_handler_t command_handler = NULL;
+
 /* ============================================================================
  * Hardware Abstraction Layer (HAL)
  * ============================================================================ */
@@ -136,7 +139,7 @@ static uint32_t protocol_get_timestamp_ms(void) {
  * @return true if message->crc is the CRC of its header and payload as sent
  */
 bool esocore_protocol_validate_crc(const esocore_message_t *message) {
-    if (!message) {
+    if (!message || message->header.payload_length > ESOCORE_PROTOCOL_MAX_PAYLOAD_SIZE) {
         return false;
     }
 
@@ -313,6 +316,13 @@ void esocore_protocol_deinit(void) {
 }
 
 /**
+ * @brief Register the handler for ESOCORE_MSG_COMMAND
+ */
+void esocore_protocol_register_command_handler(esocore_command_handler_t handler) {
+    command_handler = handler;
+}
+
+/**
  * @brief Send a protocol message
  */
 bool esocore_protocol_send_message(uint8_t destination_address,
@@ -438,6 +448,14 @@ bool esocore_protocol_handle_message(const esocore_message_t *message) {
         case ESOCORE_MSG_DATA_ACK:
         case ESOCORE_MSG_NACK:
             return protocol_handle_system_message(message);
+
+        case ESOCORE_MSG_COMMAND:
+            /* Payload: command byte, then its data */
+            if (!command_handler || message->header.payload_length == 0) {
+                return false;
+            }
+            return command_handler(message->payload[0], &message->payload[1],
+                                   (uint16_t)(message->header.payload_length - 1));
 
         /* TODO: Handle other message types */
         default:
