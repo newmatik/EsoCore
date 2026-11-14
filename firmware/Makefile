@@ -100,11 +100,6 @@ EDGE_SOURCES := \
 EDGE_STARTUP := stm32/$(EDGE_TARGET)/startup/startup_stm32h747xx.s
 EDGE_LINKER_SCRIPT := stm32/$(EDGE_TARGET)/linker/STM32H747IITx_FLASH_CM7.ld
 
-# Debug and release objects are kept apart, so changing DEBUG never mixes the two.
-EDGE_OBJ_DIR := $(BUILD_DIR)/edge/obj/$(if $(filter 1,$(DEBUG)),debug,release)
-EDGE_OBJECTS := $(patsubst %.c,$(EDGE_OBJ_DIR)/%.o,$(COMMON_SOURCES) $(EDGE_SOURCES))
-EDGE_STARTUP_OBJECT := $(EDGE_OBJ_DIR)/$(EDGE_STARTUP:.s=.o)
-
 SENSOR_SOURCES := \
 	stm32/sensors/main.c \
 	stm32/$(SENSOR_TARGET)/hal/hal_init.c \
@@ -187,6 +182,16 @@ else
 	CFLAGS += -DNDEBUG
 endif
 
+# Edge objects. Each compiler command line gets its own object directory, named
+# after DEBUG and a checksum of the command, so changing the compiler or any
+# option (DEBUG=1, OPTIMIZATION=-Os, ...) never mixes objects built with
+# different commands. This does not depend on file timestamps.
+EDGE_COMPILE := $(CC) $(CFLAGS) $(EDGE_MCU_FLAGS) $(EDGE_INCLUDES)
+EDGE_COMPILE_ID := $(firstword $(shell printf '%s\n' '$(subst ','\'',$(EDGE_COMPILE))' | cksum))
+EDGE_OBJ_DIR := $(BUILD_DIR)/edge/obj/$(if $(filter 1,$(DEBUG)),debug,release)-$(EDGE_COMPILE_ID)
+EDGE_OBJECTS := $(patsubst %.c,$(EDGE_OBJ_DIR)/%.o,$(COMMON_SOURCES) $(EDGE_SOURCES))
+EDGE_STARTUP_OBJECT := $(EDGE_OBJ_DIR)/$(EDGE_STARTUP:.s=.o)
+
 # Build rules
 .PHONY: all clean edge edge-objects sensors help light test
 
@@ -226,7 +231,7 @@ edge-objects: $(EDGE_OBJECTS)
 
 $(EDGE_OBJ_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(EDGE_MCU_FLAGS) $(EDGE_INCLUDES) -MMD -MP -c $< -o $@
+	$(EDGE_COMPILE) -MMD -MP -c $< -o $@
 
 $(EDGE_OBJ_DIR)/%.o: %.s
 	@mkdir -p $(dir $@)
