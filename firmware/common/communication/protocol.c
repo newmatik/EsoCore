@@ -379,6 +379,20 @@ bool esocore_protocol_init(uint8_t device_address_param, esocore_device_type_t d
 }
 
 /**
+ * @brief Shut the protocol down; esocore_protocol_init() starts it again
+ */
+void esocore_protocol_deinit(void) {
+    if (!protocol_initialized) {
+        return;
+    }
+
+    protocol_hw_flush_buffers();
+    receive_buffer_index = 0;
+    receiving_message = false;
+    protocol_initialized = false;
+}
+
+/**
  * @brief Send a protocol message
  */
 bool esocore_protocol_send_message(uint8_t destination_address,

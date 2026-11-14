@@ -653,15 +653,15 @@ bool air_quality_sensor_read_data(air_quality_sensor_data_t *data, uint32_t time
 
     /* Generate condition description */
     if (data->air_quality_score >= 90) {
-        strcpy(data->condition_description, "Excellent air quality - Optimal conditions");
+        strcpy(data->quality_description, "Excellent air quality - Optimal conditions");
     } else if (data->air_quality_score >= 70) {
-        strcpy(data->condition_description, "Good air quality - Generally acceptable");
+        strcpy(data->quality_description, "Good air quality - Generally acceptable");
     } else if (data->air_quality_score >= 50) {
-        strcpy(data->condition_description, "Moderate air quality - Some concerns present");
+        strcpy(data->quality_description, "Moderate air quality - Some concerns present");
     } else if (data->air_quality_score >= 30) {
-        strcpy(data->condition_description, "Poor air quality - Ventilation recommended");
+        strcpy(data->quality_description, "Poor air quality - Ventilation recommended");
     } else {
-        strcpy(data->condition_description, "Very poor air quality - Immediate action required");
+        strcpy(data->quality_description, "Very poor air quality - Immediate action required");
     }
 
     /* Update status */

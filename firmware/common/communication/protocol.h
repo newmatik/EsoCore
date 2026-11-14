@@ -255,6 +255,13 @@ typedef struct {
 bool esocore_protocol_init(uint8_t device_address, esocore_device_type_t device_type);
 
 /**
+ * @brief Shut the protocol down
+ *
+ * Flushes the receive state. esocore_protocol_init() can start it again.
+ */
+void esocore_protocol_deinit(void);
+
+/**
  * @brief Send a protocol message
  *
  * @param destination_address Destination device address

@@ -16,6 +16,10 @@
 #include <stdlib.h>
 #include <math.h>
 
+/* Single-precision pi. PI_F is not ISO C (undefined under -std=c11) and is a
+ * double, which the Cortex-M0+ would compute in software. */
+#define PI_F 3.14159265358979f
+
 /* ============================================================================
  * Private Data Structures
  * ============================================================================ */
@@ -149,14 +153,14 @@ static void fft_init_windows(void) {
         float ratio = (float)i / (float)(VIBRATION_SENSOR_FFT_SIZE - 1);
 
         /* Hanning window */
-        hanning_window[i] = 0.5f * (1.0f - cosf(2.0f * M_PI * ratio));
+        hanning_window[i] = 0.5f * (1.0f - cosf(2.0f * PI_F * ratio));
 
         /* Hamming window */
-        hamming_window[i] = 0.54f - 0.46f * cosf(2.0f * M_PI * ratio);
+        hamming_window[i] = 0.54f - 0.46f * cosf(2.0f * PI_F * ratio);
 
         /* Blackman window */
-        blackman_window[i] = 0.42f - 0.5f * cosf(2.0f * M_PI * ratio) +
-                           0.08f * cosf(4.0f * M_PI * ratio);
+        blackman_window[i] = 0.42f - 0.5f * cosf(2.0f * PI_F * ratio) +
+                           0.08f * cosf(4.0f * PI_F * ratio);
     }
 }
 
@@ -262,7 +266,7 @@ static void bearing_calculate_fault_frequencies(float shaft_speed_rpm,
     float shaft_speed_hz = shaft_speed_rpm / 60.0f;
     float pitch_diameter = pitch_diameter_mm / 1000.0f; /* Convert to meters */
     float ball_diameter = ball_diameter_mm / 1000.0f;
-    float contact_angle_rad = contact_angle_deg * M_PI / 180.0f;
+    float contact_angle_rad = contact_angle_deg * PI_F / 180.0f;
 
     /* Ball Pass Frequency Outer race */
     *bpfo = (float)balls * shaft_speed_hz * 0.5f *

@@ -205,7 +205,8 @@ bool acoustic_sensor_perform_fft(const int16_t *audio_data, uint32_t data_length
  * @brief Calculate sound pressure level
  */
 bool acoustic_sensor_calculate_spl(const int16_t *audio_data, uint32_t data_length,
-                                  uint32_t sampling_rate, acoustic_processed_data_t *processed_data);
+                                  float sensitivity_mv_pa, uint32_t sampling_rate,
+                                  acoustic_processed_data_t *processed_data);
 
 /**
  * @brief Apply A-weighting filter

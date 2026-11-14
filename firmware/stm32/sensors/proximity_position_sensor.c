@@ -17,6 +17,9 @@
 #include <stdlib.h>
 #include <math.h>
 
+/* Single-precision pi: M_PI is not ISO C and the Cortex-M0+ has no FPU */
+#define PI_F 3.14159265358979f
+
 /* ============================================================================
  * Private Data Structures and Constants
  * ============================================================================ */
@@ -302,7 +305,7 @@ static bool laser_distance_read(float *distance_mm, uint16_t *signal_rate_mcps,
 /**
  * @brief Analyze position accuracy and precision
  */
-static void analyze_position_accuracy(const proximity_position_data_t *position_data,
+static void analyze_position_accuracy(const proximity_position_sensor_data_t *position_data,
                                     position_accuracy_analysis_t *accuracy_analysis) {
     /* Calculate position accuracy metrics */
 
@@ -361,7 +364,7 @@ static void analyze_position_accuracy(const proximity_position_data_t *position_
 /**
  * @brief Analyze motion patterns and anomalies
  */
-static void analyze_motion_patterns(const proximity_position_data_t *position_data,
+static void analyze_motion_patterns(const proximity_position_sensor_data_t *position_data,
                                   motion_analysis_t *motion_analysis) {
     /* Analyze motion characteristics */
 
@@ -432,7 +435,7 @@ static void analyze_motion_patterns(const proximity_position_data_t *position_da
 /**
  * @brief Analyze proximity detection performance
  */
-static void analyze_proximity_performance(const proximity_position_data_t *proximity_data,
+static void analyze_proximity_performance(const proximity_position_sensor_data_t *proximity_data,
                                         proximity_detection_analysis_t *detection_analysis) {
     /* Analyze proximity sensor performance */
 
@@ -491,7 +494,7 @@ static void analyze_proximity_performance(const proximity_position_data_t *proxi
 /**
  * @brief Monitor system health and diagnostics
  */
-static void monitor_system_health(const proximity_position_data_t *sensor_data,
+static void monitor_system_health(const proximity_position_sensor_data_t *sensor_data,
                                 system_health_monitoring_t *health_monitoring) {
     /* Monitor overall system health */
 
@@ -601,7 +604,7 @@ bool proximity_position_sensor_init(const proximity_position_sensor_config_t *co
     calibration_data.capacitive_scale_mm = 1.0f;
     calibration_data.capacitive_threshold_pf = 15.0f; /* 15pF threshold */
 
-    calibration_data.encoder_distance_per_pulse_mm = (ENCODER_WHEEL_DIAMETER_MM * M_PI) /
+    calibration_data.encoder_distance_per_pulse_mm = (ENCODER_WHEEL_DIAMETER_MM * PI_F) /
                                                     ENCODER_PULSES_PER_REVOLUTION;
     calibration_data.encoder_position_offset = 0;
     calibration_data.encoder_velocity_scale = 1.0f;

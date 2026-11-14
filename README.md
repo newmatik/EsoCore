@@ -89,16 +89,18 @@ See `website/README.md` for deployment instructions.
 
 ```bash
 cd firmware
-make all          # Build Edge + all sensors
-make edge-objects # Compile the Edge sources without linking
-make edge         # Build Edge only
-make vibration    # Build a single sensor target
-make help         # List all available targets
+make all            # Build Edge + all sensors
+make edge-objects   # Compile the Edge sources without linking
+make sensor-objects # Compile the sensor module sources without linking
+make edge           # Build Edge only
+make vibration      # Build a single sensor target
+make help           # List all available targets
 ```
 
-Requires the ARM GCC toolchain. `make edge-objects` compiles every Edge source file; the targets that link do not build yet
-([#128](https://github.com/newmatik/EsoCore/issues/128)). `make test` runs the host unit tests with the local C compiler. See
-`firmware/README.md` for architecture and protocol details.
+Requires the ARM GCC toolchain. `make edge-objects` and `make sensor-objects` compile every Edge and sensor module
+source file; the targets that link do not build yet ([#128](https://github.com/newmatik/EsoCore/issues/128)).
+`make test` runs the host unit tests with the local C compiler. See `firmware/README.md` for architecture and
+protocol details.
 
 ### Checks
 

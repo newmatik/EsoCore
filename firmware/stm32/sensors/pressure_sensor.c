@@ -144,8 +144,8 @@ static bool pressure_sensor_read_raw(uint16_t *adc_value, float *temperature_c) 
 /**
  * @brief Configure pressure sensor parameters
  */
-static bool pressure_sensor_configure(float range_min_bar, float range_max_bar,
-                                    float sensitivity_mv_bar) {
+static bool pressure_sensor_hw_configure(float range_min_bar, float range_max_bar,
+                                       float sensitivity_mv_bar) {
     /* TODO: Implement pressure sensor configuration */
     /* This would typically involve:
      * - Setting measurement range
@@ -463,7 +463,7 @@ bool pressure_sensor_init(const pressure_sensor_config_t *config) {
         default: range_max = PRESSURE_RANGE_10BAR_MAX; break;
     }
 
-    if (!pressure_sensor_configure(PRESSURE_RANGE_NEGATIVE_MIN, range_max, 10.0f)) {
+    if (!pressure_sensor_hw_configure(PRESSURE_RANGE_NEGATIVE_MIN, range_max, 10.0f)) {
         return false;
     }
 

@@ -206,6 +206,7 @@ bool current_sensor_analyze_harmonics(const int16_t *current_samples, uint32_t s
  * @brief Analyze power quality
  */
 bool current_sensor_analyze_power(const current_processed_data_t *current_data,
+                                const current_harmonic_data_t *harmonic_data,
                                 current_power_data_t *power_data);
 
 /**
@@ -232,8 +233,8 @@ bool current_sensor_convert_to_current(const int16_t *adc_samples, float *curren
 /**
  * @brief Calculate RMS current
  */
-bool current_sensor_calculate_rms(const float *current_a, uint32_t sample_count,
-                                float *rms_current_a);
+bool current_sensor_calculate_rms(const int16_t *adc_samples, uint32_t length,
+                                float sensitivity_mv_a, current_processed_data_t *processed_data);
 
 /**
  * @brief Calculate total harmonic distortion

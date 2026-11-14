@@ -48,3 +48,7 @@ jobs:
       - name: Compile the Edge firmware sources
         working-directory: firmware
         run: make edge-objects
+
+      - name: Compile the sensor module sources
+        working-directory: firmware
+        run: make sensor-objects

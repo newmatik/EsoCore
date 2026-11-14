@@ -17,6 +17,10 @@
 #include <stdlib.h>
 #include <math.h>
 
+/* Single-precision pi. PI_F is not ISO C (undefined under -std=c11) and is a
+ * double, which the Cortex-M0+ would compute in software. */
+#define PI_F 3.14159265358979f
+
 /* ============================================================================
  * Private Data Structures and Constants
  * ============================================================================ */
@@ -49,6 +53,7 @@ static struct {
     float rated_current_a;
     float rated_power_hp;
     float rated_speed_rpm;
+    float frequency_hz;                      /* Supply frequency */
     bool is_three_phase;
 } motor_specs;
 
@@ -83,7 +88,8 @@ static bool acs723_init(void) {
     motor_specs.poles = 4;
     motor_specs.rated_current_a = 10.0f;
     motor_specs.rated_power_hp = 5.0f;
-    motor_specs.rated_speed_rpm = 1800.0f;
+    motor_specs.rated_speed_rpm = 1450.0f;   /* 4 poles at 50 Hz: below the 1500 rpm synchronous speed */
+    motor_specs.frequency_hz = 50.0f;
     motor_specs.is_three_phase = true;
 
     return true;
@@ -103,7 +109,7 @@ static bool acs723_read_samples(int16_t *buffer, uint32_t num_samples) {
 
     /* Placeholder: Generate test current data */
     static float phase = 0.0f;
-    const float phase_increment = 2.0f * M_PI * 50.0f / 5000.0f; /* 50Hz at 5kHz sampling */
+    const float phase_increment = 2.0f * PI_F * 50.0f / 5000.0f; /* 50Hz at 5kHz sampling */
 
     for (uint32_t i = 0; i < num_samples; i++) {
         /* Simulate AC current with harmonics */
@@ -120,8 +126,8 @@ static bool acs723_read_samples(int16_t *buffer, uint32_t num_samples) {
         buffer[i] = (int16_t)(current * 4096.0f / 60.0f); /* ±30A range */
 
         phase += phase_increment;
-        if (phase > 2.0f * M_PI) {
-            phase -= 2.0f * M_PI;
+        if (phase > 2.0f * PI_F) {
+            phase -= 2.0f * PI_F;
         }
     }
 
@@ -166,14 +172,14 @@ static void initialize_fft_windows(void) {
         float ratio = (float)i / (float)(CURRENT_SENSOR_FFT_SIZE - 1);
 
         /* Hanning window */
-        hanning_window[i] = 0.5f * (1.0f - cosf(2.0f * M_PI * ratio));
+        hanning_window[i] = 0.5f * (1.0f - cosf(2.0f * PI_F * ratio));
 
         /* Hamming window */
-        hamming_window[i] = 0.54f - 0.46f * cosf(2.0f * M_PI * ratio);
+        hamming_window[i] = 0.54f - 0.46f * cosf(2.0f * PI_F * ratio);
 
         /* Blackman window */
-        blackman_window[i] = 0.42f - 0.5f * cosf(2.0f * M_PI * ratio) +
-                           0.08f * cosf(4.0f * M_PI * ratio);
+        blackman_window[i] = 0.42f - 0.5f * cosf(2.0f * PI_F * ratio) +
+                           0.08f * cosf(4.0f * PI_F * ratio);
     }
 }
 
