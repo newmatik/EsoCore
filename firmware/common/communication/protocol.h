@@ -16,6 +16,26 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+/*
+ * Frame layout on the RS-485 sensor bus (Edge and sensor modules alike).
+ * All multi-byte fields are little endian.
+ *
+ *   offset  size  field
+ *   0       1     start byte (ESOCORE_PROTOCOL_START_BYTE, 0xAA)
+ *   1       1     source address
+ *   2       1     destination address (0x00 Edge, 0xFF broadcast)
+ *   3       1     message type (esocore_message_type_t)
+ *   4       1     sequence number
+ *   5       1     flags (ESOCORE_FLAG_*)
+ *   6       2     payload length n (0 to ESOCORE_PROTOCOL_MAX_PAYLOAD_SIZE)
+ *   8       n     payload
+ *   8 + n   2     CRC-16/MODBUS over bytes 0 to 7 + n
+ *
+ * esocore_protocol_encode_frame() and esocore_protocol_decode_frame() are the
+ * only code that reads or writes this layout; the in-memory structs below are
+ * not wire images. firmware/README.md documents the layout and the payloads.
+ */
+
 /* ============================================================================
  * Protocol Configuration
  * ============================================================================ */
@@ -27,8 +47,6 @@
 #define ESOCORE_PROTOCOL_FRAME_SIZE           (ESOCORE_PROTOCOL_HEADER_SIZE + ESOCORE_PROTOCOL_MAX_PAYLOAD_SIZE + ESOCORE_PROTOCOL_CRC_SIZE)
 
 #define ESOCORE_PROTOCOL_START_BYTE           0xAA
-#define ESOCORE_PROTOCOL_ESCAPE_BYTE          0xBB
-#define ESOCORE_PROTOCOL_END_BYTE             0xCC
 
 #define ESOCORE_PROTOCOL_BROADCAST_ADDRESS    0xFF
 #define ESOCORE_PROTOCOL_MASTER_ADDRESS       0x00
@@ -87,6 +105,7 @@ typedef enum {
     ESOCORE_MSG_CALIBRATE_STATUS   = 0x24,  /**< Calibration status */
     ESOCORE_MSG_SELF_TEST          = 0x25,  /**< Run self-test */
     ESOCORE_MSG_SELF_TEST_RESULT   = 0x26,  /**< Self-test result */
+    ESOCORE_MSG_COMMAND            = 0x27,  /**< Command: esocore_command_t byte, then its data */
 
     /* Error messages */
     ESOCORE_MSG_ERROR              = 0x30,  /**< Error message */
@@ -135,8 +154,8 @@ typedef enum {
  * @brief Device information structure
  */
 typedef struct {
-    uint8_t address;                    /**< Device address (1-254) */
-    esocore_device_type_t device_type;  /**< Type of device */
+    uint8_t address;                    /**< Device address (1-254); the frame's source, not in the payload */
+    uint8_t device_type;                /**< Type of device (esocore_device_type_t) */
     uint8_t firmware_version_major;     /**< Major firmware version */
     uint8_t firmware_version_minor;     /**< Minor firmware version */
     uint8_t hardware_version;           /**< Hardware version */
@@ -147,26 +166,40 @@ typedef struct {
 } esocore_device_info_t;
 
 /**
- * @brief Protocol message header
+ * @brief Protocol message header (in memory; see the frame layout at the top)
  */
 typedef struct {
     uint8_t start_byte;                 /**< Start of frame marker */
     uint8_t source_address;             /**< Source device address */
     uint8_t destination_address;        /**< Destination device address */
-    esocore_message_type_t message_type;/**< Type of message */
+    uint8_t message_type;               /**< Type of message (esocore_message_type_t) */
     uint8_t sequence_number;            /**< Sequence number for ordering */
     uint8_t flags;                      /**< Message flags */
     uint16_t payload_length;            /**< Length of payload data */
-} __attribute__((packed)) esocore_message_header_t;
+} esocore_message_header_t;
 
 /**
- * @brief Complete protocol message
+ * @brief Complete protocol message (in memory; see the frame layout at the top)
  */
 typedef struct {
     esocore_message_header_t header;    /**< Message header */
     uint8_t payload[ESOCORE_PROTOCOL_MAX_PAYLOAD_SIZE]; /**< Message payload */
-    uint16_t crc;                       /**< CRC-16 checksum */
-} __attribute__((packed)) esocore_message_t;
+    uint16_t crc;                       /**< CRC-16 of the frame */
+} esocore_message_t;
+
+/** Size of a device info payload (ESOCORE_MSG_DISCOVER_RESPONSE) on the wire */
+#define ESOCORE_DEVICE_INFO_WIRE_SIZE         12
+
+/**
+ * @brief Result of esocore_protocol_decode_frame()
+ */
+typedef enum {
+    ESOCORE_FRAME_OK = 0,               /**< Complete frame with a valid CRC */
+    ESOCORE_FRAME_INCOMPLETE,           /**< More bytes needed */
+    ESOCORE_FRAME_NO_START,             /**< First byte is not a start byte; skip it */
+    ESOCORE_FRAME_INVALID,              /**< Start byte with an impossible length; skip it */
+    ESOCORE_FRAME_CRC_ERROR,            /**< Complete frame with a wrong CRC; skip it */
+} esocore_frame_status_t;
 
 /**
  * @brief Sensor data payload structure
@@ -309,14 +342,17 @@ bool esocore_protocol_send_discovery(void);
 bool esocore_protocol_send_heartbeat(void);
 
 /**
- * @brief Send sensor data message
+ * @brief Send sensor data to the Edge
  *
- * @param sensor_data Pointer to sensor data structure
- * @param data_size Size of sensor data
- * @return true if data sent successfully, false otherwise
+ * Data longer than ESOCORE_PROTOCOL_MAX_PAYLOAD_SIZE is split over several
+ * ESOCORE_MSG_DATA_RESPONSE frames flagged ESOCORE_FLAG_FRAGMENTED; the last
+ * one also carries ESOCORE_FLAG_LAST_FRAGMENT.
+ *
+ * @param data Data to send
+ * @param length Length of the data in bytes
+ * @return true only if every frame was sent
  */
-bool esocore_protocol_send_sensor_data(const esocore_sensor_data_payload_t *sensor_data,
-                                      uint16_t data_size);
+bool esocore_protocol_send_sensor_data(const uint8_t *data, uint32_t length);
 
 /**
  * @brief Request configuration from master device
@@ -342,6 +378,59 @@ bool esocore_protocol_send_error(uint8_t error_code, const char *error_message);
  * @return CRC-16 checksum
  */
 uint16_t esocore_protocol_calculate_crc16(const uint8_t *data, uint16_t length);
+
+/**
+ * @brief CRC-16 of a message as it is sent: header bytes 0 to 7 and payload
+ */
+uint16_t esocore_protocol_frame_crc(const esocore_message_t *message);
+
+/**
+ * @brief Serialise a message into a frame (layout at the top of this file)
+ *
+ * Writes the CRC computed from header and payload; message->crc is not used.
+ *
+ * @param message Message to encode (payload_length at most ESOCORE_PROTOCOL_MAX_PAYLOAD_SIZE)
+ * @param buffer Output buffer
+ * @param buffer_size Size of the output buffer
+ * @return Frame length in bytes, or 0 if the message does not fit or is invalid
+ */
+uint16_t esocore_protocol_encode_frame(const esocore_message_t *message,
+                                       uint8_t *buffer, uint16_t buffer_size);
+
+/**
+ * @brief Parse the frame at the start of a receive buffer
+ *
+ * @param buffer Received bytes; a frame must start at buffer[0]
+ * @param length Number of bytes in the buffer
+ * @param message Filled for ESOCORE_FRAME_OK and ESOCORE_FRAME_CRC_ERROR
+ * @param consumed Bytes to drop from the buffer before the next call (0 if incomplete)
+ * @return Decoding result
+ */
+esocore_frame_status_t esocore_protocol_decode_frame(const uint8_t *buffer, uint32_t length,
+                                                     esocore_message_t *message,
+                                                     uint32_t *consumed);
+
+/**
+ * @brief Serialise device information for a discovery response
+ *
+ * Layout: device type, firmware major, firmware minor, hardware version,
+ * serial number (2, little endian), capabilities, status flags, uptime in
+ * seconds (4, little endian). The address is the frame's source address.
+ *
+ * @param buffer At least ESOCORE_DEVICE_INFO_WIRE_SIZE bytes
+ * @return ESOCORE_DEVICE_INFO_WIRE_SIZE
+ */
+uint16_t esocore_protocol_encode_device_info(const esocore_device_info_t *device_info,
+                                             uint8_t *buffer);
+
+/**
+ * @brief Parse a discovery response payload (see esocore_protocol_encode_device_info)
+ *
+ * @param address Source address of the frame, stored in device_info->address
+ * @return false if the payload is shorter than ESOCORE_DEVICE_INFO_WIRE_SIZE
+ */
+bool esocore_protocol_decode_device_info(const uint8_t *payload, uint16_t length,
+                                         uint8_t address, esocore_device_info_t *device_info);
 
 /**
  * @brief Validate message CRC

@@ -127,48 +127,20 @@ static uint32_t protocol_get_timestamp_ms(void) {
  * Protocol Core Functions
  * ============================================================================ */
 
-/**
- * @brief Calculate CRC-16 for data integrity
- *
- * @param data Pointer to data buffer
- * @param length Length of data
- * @return CRC-16 checksum
- */
-uint16_t esocore_protocol_calculate_crc16(const uint8_t *data, uint16_t length) {
-    uint16_t crc = 0xFFFF;
-
-    for (uint16_t i = 0; i < length; i++) {
-        crc ^= data[i];
-
-        for (uint8_t j = 0; j < 8; j++) {
-            if (crc & 1) {
-                crc = (crc >> 1) ^ 0xA001;
-            } else {
-                crc >>= 1;
-            }
-        }
-    }
-
-    return crc;
-}
+/* esocore_protocol_calculate_crc16() and the frame codec are in protocol_frame.c. */
 
 /**
  * @brief Validate message CRC
  *
  * @param message Pointer to message to validate
- * @return true if CRC is valid, false otherwise
+ * @return true if message->crc is the CRC of its header and payload as sent
  */
 bool esocore_protocol_validate_crc(const esocore_message_t *message) {
     if (!message) {
         return false;
     }
 
-    uint16_t calculated_crc = esocore_protocol_calculate_crc16(
-        (const uint8_t *)message,
-        sizeof(esocore_message_header_t) + message->header.payload_length
-    );
-
-    return (calculated_crc == message->crc);
+    return esocore_protocol_frame_crc(message) == message->crc;
 }
 
 /**
@@ -185,7 +157,8 @@ bool esocore_protocol_validate_crc(const esocore_message_t *message) {
 static bool protocol_build_message(uint8_t destination_address, esocore_message_type_t message_type,
                                   const uint8_t *payload, uint16_t payload_length,
                                   uint8_t flags, esocore_message_t *message) {
-    if (!message || payload_length > ESOCORE_PROTOCOL_MAX_PAYLOAD_SIZE) {
+    if (!message || payload_length > ESOCORE_PROTOCOL_MAX_PAYLOAD_SIZE ||
+        (payload_length > 0 && !payload)) {
         return false;
     }
 
@@ -193,72 +166,17 @@ static bool protocol_build_message(uint8_t destination_address, esocore_message_
     message->header.start_byte = ESOCORE_PROTOCOL_START_BYTE;
     message->header.source_address = device_address;
     message->header.destination_address = destination_address;
-    message->header.message_type = message_type;
+    message->header.message_type = (uint8_t)message_type;
     message->header.sequence_number = sequence_number++;
     message->header.flags = flags;
     message->header.payload_length = payload_length;
 
     /* Copy payload */
-    if (payload && payload_length > 0) {
+    if (payload_length > 0) {
         memcpy(message->payload, payload, payload_length);
     }
 
-    /* Calculate and set CRC */
-    uint16_t crc_data_length = sizeof(esocore_message_header_t) + payload_length;
-    message->crc = esocore_protocol_calculate_crc16((const uint8_t *)message, crc_data_length);
-
-    return true;
-}
-
-/**
- * @brief Parse received data into message structure
- *
- * @param data Pointer to received data
- * @param data_length Length of received data
- * @param message Pointer to message structure to fill
- * @return true if message parsed successfully, false otherwise
- */
-static bool protocol_parse_message(const uint8_t *data, uint32_t data_length,
-                                  esocore_message_t *message) {
-    if (!data || !message || data_length < sizeof(esocore_message_header_t)) {
-        return false;
-    }
-
-    /* Copy header */
-    memcpy(&message->header, data, sizeof(esocore_message_header_t));
-
-    /* Validate start byte */
-    if (message->header.start_byte != ESOCORE_PROTOCOL_START_BYTE) {
-        protocol_errors++;
-        return false;
-    }
-
-    /* Check payload length */
-    if (message->header.payload_length > ESOCORE_PROTOCOL_MAX_PAYLOAD_SIZE) {
-        protocol_errors++;
-        return false;
-    }
-
-    /* Check if we have enough data for complete message */
-    uint32_t expected_length = sizeof(esocore_message_header_t) +
-                              message->header.payload_length +
-                              ESOCORE_PROTOCOL_CRC_SIZE;
-
-    if (data_length < expected_length) {
-        return false; /* Incomplete message */
-    }
-
-    /* Copy payload */
-    if (message->header.payload_length > 0) {
-        memcpy(message->payload, data + sizeof(esocore_message_header_t),
-               message->header.payload_length);
-    }
-
-    /* Copy CRC */
-    memcpy(&message->crc,
-           data + sizeof(esocore_message_header_t) + message->header.payload_length,
-           ESOCORE_PROTOCOL_CRC_SIZE);
-
+    message->crc = esocore_protocol_frame_crc(message);
     return true;
 }
 
@@ -294,11 +212,13 @@ static bool protocol_handle_system_message(const esocore_message_t *message) {
             /* Send discovery response */
             {
                 esocore_device_info_t device_info;
+                uint8_t device_info_payload[ESOCORE_DEVICE_INFO_WIRE_SIZE];
                 if (esocore_protocol_get_device_info(&device_info)) {
                     return esocore_protocol_send_message(
                         message->header.source_address,
                         ESOCORE_MSG_DISCOVER_RESPONSE,
-                        (const uint8_t *)&device_info, sizeof(device_info),
+                        device_info_payload,
+                        esocore_protocol_encode_device_info(&device_info, device_info_payload),
                         ESOCORE_FLAG_ACK_REQUIRED
                     );
                 }
@@ -412,9 +332,10 @@ bool esocore_protocol_send_message(uint8_t destination_address,
         return false;
     }
 
-    /* Send message */
-    uint32_t message_size = sizeof(esocore_message_header_t) + payload_length + ESOCORE_PROTOCOL_CRC_SIZE;
-    if (!protocol_hw_send((const uint8_t *)&message, message_size)) {
+    /* Serialise and send the frame */
+    uint8_t frame[ESOCORE_PROTOCOL_FRAME_SIZE];
+    uint16_t frame_length = esocore_protocol_encode_frame(&message, frame, sizeof(frame));
+    if (frame_length == 0 || !protocol_hw_send(frame, frame_length)) {
         protocol_errors++;
         return false;
     }
@@ -431,6 +352,9 @@ bool esocore_protocol_send_message(uint8_t destination_address,
 
 /**
  * @brief Receive a protocol message
+ *
+ * Bytes of a frame that is still incomplete when the timeout ends stay in the
+ * receive buffer for the next call.
  */
 bool esocore_protocol_receive_message(esocore_message_t *message, uint32_t timeout_ms) {
     if (!protocol_initialized || !message) {
@@ -438,75 +362,63 @@ bool esocore_protocol_receive_message(esocore_message_t *message, uint32_t timeo
     }
 
     uint32_t start_time = protocol_get_timestamp_ms();
-    uint32_t bytes_received = 0;
 
-    /* Receive data with timeout */
-    while (bytes_received < sizeof(esocore_message_t)) {
+    for (;;) {
+        /* Take every complete frame out of the buffer */
+        while (receive_buffer_index > 0) {
+            uint32_t consumed = 0;
+            esocore_frame_status_t status = esocore_protocol_decode_frame(
+                receive_buffer, receive_buffer_index, message, &consumed);
+
+            if (status == ESOCORE_FRAME_INCOMPLETE) {
+                break;
+            }
+
+            memmove(receive_buffer, receive_buffer + consumed, receive_buffer_index - consumed);
+            receive_buffer_index -= consumed;
+
+            bool for_us = message->header.destination_address == device_address ||
+                          message->header.destination_address == ESOCORE_PROTOCOL_BROADCAST_ADDRESS;
+
+            if (status == ESOCORE_FRAME_OK) {
+                messages_received++;
+                if (for_us) {
+                    /* Send acknowledgement if required */
+                    if (message->header.flags & ESOCORE_FLAG_ACK_REQUIRED) {
+                        protocol_send_ack(message, true);
+                    }
+                    return true;
+                }
+            } else if (status == ESOCORE_FRAME_CRC_ERROR) {
+                crc_errors++;
+                if (for_us) {
+                    /* Send NACK for CRC error */
+                    protocol_send_ack(message, false);
+                }
+            } else if (status == ESOCORE_FRAME_INVALID) {
+                protocol_errors++;
+            }
+            /* ESOCORE_FRAME_NO_START: a byte between frames, skipped */
+        }
+
         if (protocol_get_timestamp_ms() - start_time > timeout_ms) {
             timeout_errors++;
             return false;
         }
 
         int32_t received = protocol_hw_receive(
-            receive_buffer + bytes_received,
-            sizeof(receive_buffer) - bytes_received,
+            receive_buffer + receive_buffer_index,
+            sizeof(receive_buffer) - receive_buffer_index,
             10 /* Small timeout for polling */
         );
 
         if (received > 0) {
-            bytes_received += received;
+            receive_buffer_index += (uint32_t)received;
         } else if (received < 0) {
             protocol_errors++;
             return false;
         }
-
-        /* Check if we have a complete message */
-        if (bytes_received >= sizeof(esocore_message_header_t)) {
-            esocore_message_header_t temp_header;
-            memcpy(&temp_header, receive_buffer, sizeof(esocore_message_header_t));
-
-            if (temp_header.start_byte == ESOCORE_PROTOCOL_START_BYTE) {
-                uint32_t expected_size = sizeof(esocore_message_header_t) +
-                                        temp_header.payload_length +
-                                        ESOCORE_PROTOCOL_CRC_SIZE;
-
-                if (bytes_received >= expected_size) {
-                    /* Parse the complete message */
-                    if (protocol_parse_message(receive_buffer, bytes_received, message)) {
-                        /* Validate CRC */
-                        if (esocore_protocol_validate_crc(message)) {
-                            messages_received++;
-
-                            /* Check if message is for us */
-                            if (message->header.destination_address == device_address ||
-                                message->header.destination_address == ESOCORE_PROTOCOL_BROADCAST_ADDRESS) {
-
-                                /* Send acknowledgement if required */
-                                if (message->header.flags & ESOCORE_FLAG_ACK_REQUIRED) {
-                                    protocol_send_ack(message, true);
-                                }
-
-                                return true;
-                            }
-                        } else {
-                            crc_errors++;
-                            /* Send NACK for CRC error */
-                            protocol_send_ack(message, false);
-                        }
-                    } else {
-                        protocol_errors++;
-                    }
-
-                    /* Reset receive buffer */
-                    bytes_received = 0;
-                }
-            } else {
-                /* Not a valid start byte, continue receiving */
-            }
-        }
     }
-
-    return false;
 }
 
 /**
@@ -566,19 +478,41 @@ bool esocore_protocol_send_heartbeat(void) {
 
 /**
  * @brief Send sensor data message
+ *
+ * Data longer than one payload goes out in consecutive frames, each flagged
+ * ESOCORE_FLAG_FRAGMENTED, the last one also ESOCORE_FLAG_LAST_FRAGMENT. The
+ * receiver puts them together in sequence number order.
  */
-bool esocore_protocol_send_sensor_data(const esocore_sensor_data_payload_t *sensor_data,
-                                      uint16_t data_size) {
-    if (!sensor_data || data_size > ESOCORE_PROTOCOL_MAX_PAYLOAD_SIZE) {
+bool esocore_protocol_send_sensor_data(const uint8_t *data, uint32_t length) {
+    if (!data || length == 0) {
         return false;
     }
 
-    return esocore_protocol_send_message(
-        ESOCORE_PROTOCOL_MASTER_ADDRESS,
-        ESOCORE_MSG_DATA_RESPONSE,
-        (const uint8_t *)sensor_data, data_size,
-        ESOCORE_FLAG_ACK_REQUIRED
-    );
+    bool fragmented = length > ESOCORE_PROTOCOL_MAX_PAYLOAD_SIZE;
+    uint32_t offset = 0;
+
+    while (offset < length) {
+        uint32_t remaining = length - offset;
+        uint16_t chunk = (uint16_t)(remaining > ESOCORE_PROTOCOL_MAX_PAYLOAD_SIZE
+                                        ? ESOCORE_PROTOCOL_MAX_PAYLOAD_SIZE
+                                        : remaining);
+        uint8_t flags = ESOCORE_FLAG_ACK_REQUIRED;
+        if (fragmented) {
+            flags |= ESOCORE_FLAG_FRAGMENTED;
+            if (offset + chunk == length) {
+                flags |= ESOCORE_FLAG_LAST_FRAGMENT;
+            }
+        }
+
+        if (!esocore_protocol_send_message(ESOCORE_PROTOCOL_MASTER_ADDRESS,
+                                           ESOCORE_MSG_DATA_RESPONSE,
+                                           data + offset, chunk, flags)) {
+            return false;
+        }
+        offset += chunk;
+    }
+
+    return true;
 }
 
 /**
@@ -629,7 +563,7 @@ bool esocore_protocol_get_device_info(esocore_device_info_t *device_info) {
     memset(device_info, 0, sizeof(esocore_device_info_t));
 
     device_info->address = device_address;
-    device_info->device_type = device_type;
+    device_info->device_type = (uint8_t)device_type;
     device_info->firmware_version_major = 1;
     device_info->firmware_version_minor = 0;
     device_info->hardware_version = 1;

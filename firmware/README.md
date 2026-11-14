@@ -210,10 +210,38 @@ The Edge device communicates with the EsoCore server at `/api/iot/v1/`:
 
 ### RS-485 Sensor Bus Protocol
 
-- `DISCOVER` - Device discovery
-- `HEARTBEAT` - Connection monitoring
-- `DATA_REQUEST/RESPONSE` - Sensor data exchange
-- `CONFIG_UPDATE` - Configuration updates
+The Edge (`common/communication/sensor_bus.c`) and the sensor modules (`common/communication/protocol.c`) use one frame
+layout, defined in `protocol.h` and built and parsed only by `common/communication/protocol_frame.c`. Multi-byte fields
+are little endian.
+
+| Offset | Size | Field                                                       |
+| ------ | ---- | ----------------------------------------------------------- |
+| 0      | 1    | Start byte `0xAA`                                           |
+| 1      | 1    | Source address (`0x00` is the Edge)                         |
+| 2      | 1    | Destination address (`0xFF` broadcast)                      |
+| 3      | 1    | Message type (`esocore_message_type_t`)                     |
+| 4      | 1    | Sequence number                                             |
+| 5      | 1    | Flags (`ESOCORE_FLAG_*`)                                    |
+| 6      | 2    | Payload length n, 0 to 256                                  |
+| 8      | n    | Payload                                                     |
+| 8 + n  | 2    | CRC-16/MODBUS (as Modbus RTU) over bytes 0 to 7 + n         |
+
+A receiver drops bytes until it sees a start byte, skips a start byte whose length is above 256, and drops a frame with a
+wrong CRC (the sensor modules answer it with `NACK`). There is no end delimiter and no byte stuffing.
+
+| Type   | Message             | Payload                                                                                        |
+| ------ | ------------------- | ---------------------------------------------------------------------------------------------- |
+| `0x01` | `DISCOVER`          | none; Edge to broadcast                                                                        |
+| `0x02` | `DISCOVER_RESPONSE` | device type, firmware major and minor, hardware version, serial (2), capabilities, status, uptime in s (4) |
+| `0x03` | `HEARTBEAT`         | device type, status, 2 reserved bytes                                                          |
+| `0x11` | `DATA_RESPONSE`     | sensor data; longer data in several frames flagged `FRAGMENTED`, the last also `LAST_FRAGMENT` |
+| `0x13` | `DATA_ACK`          | sequence number of the acknowledged frame, `0x01`                                              |
+| `0x31` | `NACK`              | sequence number of the rejected frame, `0x00`                                                  |
+| `0x27` | `COMMAND`           | `esocore_command_t` byte, then its data; Edge to one module                                    |
+
+The other message types of `esocore_message_type_t` (configuration, control, firmware update) use the same frame. The
+sensor data payload is still the module's data struct as it is in memory, cut into fragments; a defined serialised
+form per module is open.
 
 ### Modbus RTU
 
@@ -262,8 +290,9 @@ make test
 
 Builds the tests in `tests/host/` with the host C compiler (`HOST_CC`, default `cc`), with the address and undefined-behaviour sanitizers, and
 runs them. No ARM toolchain or target hardware is needed. They cover the Modbus RTU slave: every function code with the request and response
-examples of the Modbus specification, the exception responses, broadcast, and the T1.5/T3.5 receiver. The Firmware CI workflow runs the same
-command on every pull request.
+examples of the Modbus specification, the exception responses, broadcast, and the T1.5/T3.5 receiver; and the sensor bus frame codec
+(`test_protocol.c`): the byte layout, frames encoded by one side and decoded by the other, partial, corrupt and back-to-back frames, and the
+discovery payload. The Firmware CI workflow runs the same command on every pull request.
 
 ## Hardware Abstraction Layer (HAL) Status
 
