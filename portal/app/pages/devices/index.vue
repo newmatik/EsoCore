@@ -91,6 +91,7 @@
               <tr
                 v-for="device in filteredDevices"
                 :key="device.id"
+                data-testid="device-row"
                 class="hover:bg-(--ui-bg-accented) transition-colors"
               >
                 <td class="px-6 py-4">

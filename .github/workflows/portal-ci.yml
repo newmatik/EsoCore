@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "portal/**"
+      - "server/**"
       - ".github/workflows/portal-ci.yml"
   pull_request:
     branches: [main]
@@ -21,7 +22,7 @@ jobs:
   build-and-lint:
     name: Portal
     runs-on: ${{ github.event.pull_request.head.repo.fork && 'ubuntu-latest' || vars.LINUX_RUNNER || 'ubuntu-latest' }}
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v7
         with:
@@ -60,3 +61,69 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      # Browser smoke test (e2e/smoke.spec.ts): the built portal against the
+      # Django API with the seed data, on a fresh SQLite database.
+      - name: Setup Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      # pipx is not installed on the Beast runners. Same Poetry as server CI.
+      - name: Install server dependencies
+        working-directory: server
+        run: |
+          python -m pip install poetry==2.5.1
+          poetry install --no-interaction --only main
+
+      # `pnpm install --frozen-lockfile` installs the @playwright/test version
+      # of pnpm-lock.yaml; Playwright's browser build is tied to it.
+      - name: Resolve Playwright version
+        id: playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      - name: Install Playwright browser
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps chromium
+
+      # The cache holds only the browser; the system libraries still need installing.
+      - name: Install Playwright system dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps chromium
+
+      # Several runners share one machine on Beast: free ports and a database
+      # in this runner's own temp directory keep parallel jobs apart.
+      - name: Pick smoke test ports and database
+        run: |
+          python3 - >> "$GITHUB_ENV" <<'EOF'
+          import socket
+          ports = []
+          for _ in range(2):
+              s = socket.socket()
+              s.bind(("127.0.0.1", 0))
+              ports.append((s, s.getsockname()[1]))
+          print(f"E2E_API_PORT={ports[0][1]}")
+          print(f"E2E_PORTAL_PORT={ports[1][1]}")
+          EOF
+          echo "ESOCORE_SQLITE_PATH=$RUNNER_TEMP/esocore-portal-e2e.sqlite3" >> "$GITHUB_ENV"
+
+      - name: Browser smoke test
+        run: pnpm test:e2e
+
+      - name: Upload smoke test report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: portal-smoke-report
+          path: |
+            portal/playwright-report/
+            portal/test-results/
+          retention-days: 7
+          if-no-files-found: ignore

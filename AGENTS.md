@@ -88,8 +88,10 @@ gates of the part you changed before pushing.
   poetry run isort --check-only .`, then `poetry run python manage.py test`. CI repeats the tests against PostgreSQL 17
   with `DJANGO_SETTINGS_MODULE=esocore_api.test_settings_postgres`.
 - **Portal** (`portal-ci.yml`): `cd portal && pnpm install --frozen-lockfile && pnpm lint && pnpm format:check &&
-  pnpm typecheck && pnpm test && pnpm build`. `pnpm test` runs the Vitest unit tests in `portal/tests/` (plain Node, no
-  Nuxt boot: `tests/setup.ts` stubs the Nuxt auto-imports the code under test uses).
+  pnpm typecheck && pnpm test && pnpm build`, then `pnpm test:e2e`. `pnpm test` runs the Vitest unit tests in
+  `portal/tests/` (plain Node, no Nuxt boot: `tests/setup.ts` stubs the Nuxt auto-imports the code under test uses).
+  `pnpm test:e2e` is the Playwright browser smoke test in `portal/e2e/` against the API with the seed data; it needs
+  the server's Python environment (`E2E_PYTHON`, see the portal README).
 - **Website** (`website-ci.yml`): `cd website && pnpm install --frozen-lockfile && pnpm lint && pnpm format:check &&
   pnpm typecheck && pnpm test && pnpm build`.
 - **Tools** (`tools-ci.yml`): `python3 -m unittest discover -s tools -v` from the repository root.
