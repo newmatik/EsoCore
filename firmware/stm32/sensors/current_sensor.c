@@ -88,7 +88,7 @@ static bool acs723_init(void) {
     motor_specs.poles = 4;
     motor_specs.rated_current_a = 10.0f;
     motor_specs.rated_power_hp = 5.0f;
-    motor_specs.rated_speed_rpm = 1800.0f;
+    motor_specs.rated_speed_rpm = 1450.0f;   /* 4 poles at 50 Hz: below the 1500 rpm synchronous speed */
     motor_specs.frequency_hz = 50.0f;
     motor_specs.is_three_phase = true;
 

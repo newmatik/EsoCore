@@ -188,7 +188,9 @@ static void send_sensor_data(void) {
     uint32_t current_time = system_uptime_ms;
 
     if (current_time - last_data_transmit_time >= DATA_TRANSMIT_INTERVAL_MS) {
-        if (system_status.sensors_active && system_status.master_connected) {
+        // No measurements are sent in low power mode (supply in brownout or lost)
+        if (system_status.sensors_active && system_status.master_connected &&
+            !system_status.low_power_mode) {
             bool data_sent = false;
 
             switch (device_type) {
@@ -366,6 +368,7 @@ static void system_runtime_loop(void) {
 
         // System maintenance
         process_protocol_messages();
+        esocore_power_poll();
         manage_power();
         update_system_health();
 
