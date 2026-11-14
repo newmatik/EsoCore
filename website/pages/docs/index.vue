@@ -80,6 +80,7 @@
 <script setup>
 import { marked } from 'marked'
 import { docsConfig, isGroupExpanded } from '~/utils/docs-config'
+import { wrapTables } from '~/utils/wrap-tables'
 
 // Set page meta
 useHead({
@@ -114,7 +115,7 @@ const renderedReadmeContent = computed(() => {
     headerIds: true,
   })
 
-  return marked.parse(readmeContent.value)
+  return wrapTables(marked.parse(readmeContent.value))
 })
 
 // Helper function to flatten docs for search indexing
