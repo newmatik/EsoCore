@@ -192,8 +192,22 @@ EDGE_OBJ_DIR := $(BUILD_DIR)/edge/obj/$(if $(filter 1,$(DEBUG)),debug,release)-$
 EDGE_OBJECTS := $(patsubst %.c,$(EDGE_OBJ_DIR)/%.o,$(COMMON_SOURCES) $(EDGE_SOURCES))
 EDGE_STARTUP_OBJECT := $(EDGE_OBJ_DIR)/$(EDGE_STARTUP:.s=.o)
 
+# Sensor module objects. The sensor sources listed here compile with the
+# sensor MCU flags; the remaining modules join the list as their headers are
+# completed (#141). Linking needs the STM32G0 support files (#128).
+SENSOR_OBJECT_SOURCES := \
+	stm32/sensors/main.c \
+	stm32/sensors/vibration_sensor.c \
+	stm32/sensors/acoustic_sensor.c \
+	stm32/sensors/current_sensor.c \
+	stm32/sensors/air_quality_sensor.c
+SENSOR_COMPILE := $(CC) $(CFLAGS) $(SENSOR_MCU_FLAGS) $(SENSOR_INCLUDES)
+SENSOR_COMPILE_ID := $(firstword $(shell printf '%s\n' '$(subst ','\'',$(SENSOR_COMPILE))' | cksum))
+SENSOR_OBJ_DIR := $(BUILD_DIR)/sensors/obj/$(if $(filter 1,$(DEBUG)),debug,release)-$(SENSOR_COMPILE_ID)
+SENSOR_OBJECTS := $(patsubst %.c,$(SENSOR_OBJ_DIR)/%.o,$(SENSOR_OBJECT_SOURCES))
+
 # Build rules
-.PHONY: all clean edge edge-objects sensors help light test
+.PHONY: all clean edge edge-objects sensor-objects sensors help light test
 
 all: edge sensors
 
@@ -204,6 +218,7 @@ help:
 	@echo "  all       - Build all targets (edge and sensors)"
 	@echo "  edge      - Build Edge device firmware (needs the STM32H747 startup file)"
 	@echo "  edge-objects - Compile every Edge source file without linking"
+	@echo "  sensor-objects - Compile the sensor module sources that build so far, without linking"
 	@echo "  sensors   - Build all sensor modules"
 	@echo "  vibration   - Build vibration sensor module"
 	@echo "  acoustic    - Build acoustic sensor module"
@@ -253,6 +268,16 @@ $(BUILD_DIR)/edge/$(PROJECT_NAME)_edge.elf: $(EDGE_OBJECTS) $(EDGE_STARTUP_OBJEC
 	@echo "Edge device firmware built successfully"
 
 -include $(EDGE_OBJECTS:.o=.d)
+
+# Compile the sensor module sources of SENSOR_OBJECT_SOURCES without linking.
+sensor-objects: $(SENSOR_OBJECTS)
+	@echo "Sensor module sources compiled ($(words $(SENSOR_OBJECTS)) files)"
+
+$(SENSOR_OBJ_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(SENSOR_COMPILE) -MMD -MP -c $< -o $@
+
+-include $(SENSOR_OBJECTS:.o=.d)
 
 # Sensor modules build
 sensors: vibration acoustic current air_quality oil_quality pressure temperature proximity light

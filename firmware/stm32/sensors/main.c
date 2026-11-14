@@ -40,9 +40,6 @@
 #define DATA_TRANSMIT_INTERVAL_MS   2000    /* 2 seconds */
 #define CONFIG_CHECK_INTERVAL_MS    60000   /* 1 minute */
 
-/* Power Configuration */
-#define LOW_POWER_THRESHOLD_MA      50      /* Enter low power below this current */
-
 /* ============================================================================
  * Global Variables
  * ============================================================================ */
@@ -243,16 +240,16 @@ static void manage_power(void) {
     esocore_power_status_t power_status;
 
     if (esocore_power_get_status(&power_status)) {
-        // Enter low power mode if current is too low
-        if (power_status.total_current_ma < LOW_POWER_THRESHOLD_MA && !system_status.low_power_mode) {
-            esocore_power_enter_low_power();
+        // Enter low power mode while the supply is in brownout or lost
+        bool supply_low = power_status.state == ESOCORE_POWER_STATE_BROWNOUT ||
+                          power_status.state == ESOCORE_POWER_STATE_CRITICAL;
+        if (supply_low && !system_status.low_power_mode) {
             system_status.low_power_mode = true;
             esocore_event_log(ESOCORE_EVENT_POWER_LOW_VOLTAGE, ESOCORE_EVENT_SEVERITY_INFO,
                              (uint8_t *)"Entered low power mode", 0);
         }
-        // Exit low power mode if current is sufficient
-        else if (power_status.total_current_ma >= LOW_POWER_THRESHOLD_MA * 1.2f && system_status.low_power_mode) {
-            esocore_power_exit_low_power();
+        // Exit low power mode once the supply is back to normal
+        else if (power_status.state == ESOCORE_POWER_STATE_NORMAL && system_status.low_power_mode) {
             system_status.low_power_mode = false;
             esocore_event_log(ESOCORE_EVENT_POWER_SOURCE_CHANGE, ESOCORE_EVENT_SEVERITY_INFO,
                              (uint8_t *)"Exited low power mode", 0);
@@ -319,7 +316,7 @@ static bool initialize_system(void) {
     }
     printf("✓ Event system initialized\n");
 
-    if (!esocore_power_init()) {
+    if (!esocore_power_init(NULL)) {
         printf("ERROR: Power management initialization failed\n");
         return false;
     }

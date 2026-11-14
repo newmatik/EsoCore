@@ -18,6 +18,10 @@
 #include <stdlib.h>
 #include <math.h>
 
+/* Single-precision pi. PI_F is not ISO C (undefined under -std=c11) and is a
+ * double, which the Cortex-M0+ would compute in software. */
+#define PI_F 3.14159265358979f
+
 /* ============================================================================
  * Private Data Structures and Constants
  * ============================================================================ */
@@ -101,8 +105,8 @@ static bool ics43434_read_samples(int16_t *buffer, uint32_t num_samples) {
     for (uint32_t i = 0; i < num_samples; i++) {
         /* Simulate microphone signal with some noise and signals */
         float time = (float)(buffer_index + i) / 48000.0f;
-        float signal = 1000.0f * sinf(2.0f * M_PI * 1000.0f * time); /* 1kHz tone */
-        signal += 500.0f * sinf(2.0f * M_PI * 100.0f * time);        /* 100Hz tone */
+        float signal = 1000.0f * sinf(2.0f * PI_F * 1000.0f * time); /* 1kHz tone */
+        signal += 500.0f * sinf(2.0f * PI_F * 100.0f * time);        /* 100Hz tone */
         signal += (float)(rand() % 100) - 50.0f;                    /* Noise */
         buffer[i] = (int16_t)signal;
     }
@@ -163,7 +167,7 @@ static bool ma40s4r_read_samples(int16_t *buffer, uint32_t num_samples) {
     for (uint32_t i = 0; i < num_samples; i++) {
         /* Simulate ultrasound signal at 40kHz */
         float time = (float)(buffer_index + i) / 48000.0f;
-        float signal = 800.0f * sinf(2.0f * M_PI * 40000.0f * time); /* 40kHz tone */
+        float signal = 800.0f * sinf(2.0f * PI_F * 40000.0f * time); /* 40kHz tone */
         signal += (float)(rand() % 50) - 25.0f;                     /* Low noise */
         buffer[i] = (int16_t)signal;
     }
@@ -199,14 +203,14 @@ static void initialize_fft_windows(void) {
         float ratio = (float)i / (float)(ACOUSTIC_SENSOR_FFT_SIZE - 1);
 
         /* Hanning window */
-        hanning_window[i] = 0.5f * (1.0f - cosf(2.0f * M_PI * ratio));
+        hanning_window[i] = 0.5f * (1.0f - cosf(2.0f * PI_F * ratio));
 
         /* Hamming window */
-        hamming_window[i] = 0.54f - 0.46f * cosf(2.0f * M_PI * ratio);
+        hamming_window[i] = 0.54f - 0.46f * cosf(2.0f * PI_F * ratio);
 
         /* Blackman window */
-        blackman_window[i] = 0.42f - 0.5f * cosf(2.0f * M_PI * ratio) +
-                           0.08f * cosf(4.0f * M_PI * ratio);
+        blackman_window[i] = 0.42f - 0.5f * cosf(2.0f * PI_F * ratio) +
+                           0.08f * cosf(4.0f * PI_F * ratio);
     }
 }
 
@@ -508,7 +512,7 @@ bool acoustic_sensor_deinit(void) {
 
     /* Stop acquisition if active */
     if (sensor_status.base_status.current_mode == ESOCORE_MODE_ACTIVE) {
-        acoustic_sensor_stop_measurement();
+        acoustic_sensor_stop_acquisition();
     }
 
     /* TODO: Deinitialize hardware */
@@ -533,7 +537,7 @@ bool acoustic_sensor_configure(const acoustic_sensor_config_t *config) {
 /**
  * @brief Start acoustic measurement
  */
-bool acoustic_sensor_start_measurement(void) {
+bool acoustic_sensor_start_acquisition(void) {
     if (!sensor_initialized) {
         return false;
     }
@@ -553,7 +557,7 @@ bool acoustic_sensor_start_measurement(void) {
 /**
  * @brief Stop acoustic measurement
  */
-bool acoustic_sensor_stop_measurement(void) {
+bool acoustic_sensor_stop_acquisition(void) {
     if (!sensor_initialized) {
         return false;
     }
@@ -612,16 +616,16 @@ bool acoustic_sensor_read_data(acoustic_sensor_data_t *data, uint32_t timeout_ms
     data->ultrasound_data = ultrasound;
 
     /* Calculate overall condition score */
-    data->air_quality_score = acoustic_sensor_calculate_condition(&processed, &bands);
+    data->acoustic_condition = acoustic_sensor_calculate_condition(&processed, &bands);
 
     /* Generate condition description */
-    if (data->air_quality_score >= 90) {
+    if (data->acoustic_condition >= 90) {
         strcpy(data->condition_description, "Excellent acoustic environment");
-    } else if (data->air_quality_score >= 70) {
+    } else if (data->acoustic_condition >= 70) {
         strcpy(data->condition_description, "Good acoustic conditions");
-    } else if (data->air_quality_score >= 50) {
+    } else if (data->acoustic_condition >= 50) {
         strcpy(data->condition_description, "Moderate acoustic environment");
-    } else if (data->air_quality_score >= 30) {
+    } else if (data->acoustic_condition >= 30) {
         strcpy(data->condition_description, "Poor acoustic conditions - monitor closely");
     } else {
         strcpy(data->condition_description, "Critical acoustic environment - immediate attention required");

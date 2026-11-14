@@ -74,6 +74,7 @@ make all
 
 # Build specific components
 make edge-objects           # Edge device: compile every source file, no linking
+make sensor-objects         # Sensor modules: compile the sources that build so far, no linking
 make edge                   # Edge device
 make vibration              # Vibration sensor
 make acoustic               # Acoustic sensor
@@ -96,8 +97,10 @@ make flash_air_quality
 make help
 ```
 
-> **Build status:** `make edge-objects` compiles every source file of the Edge firmware with the ARM toolchain, and
-> `make test` runs the host unit tests described below. No target links yet: `make edge` stops because the STM32H7
+> **Build status:** `make edge-objects` compiles every source file of the Edge firmware with the ARM toolchain,
+> `make sensor-objects` compiles `main.c` and the vibration, acoustic, current and air quality modules of
+> `stm32/sensors/` (the other five modules do not compile yet, issue [#141](https://github.com/newmatik/EsoCore/issues/141)),
+> and `make test` runs the host unit tests described below. No target links yet: `make edge` stops because the STM32H7
 > startup file is not in the repository, and the sensor targets need the STM32G0 HAL, CMSIS, startup and linker files
 > (`stm32/stm32g0/`), which are missing too. Issue [#128](https://github.com/newmatik/EsoCore/issues/128) tracks this.
 

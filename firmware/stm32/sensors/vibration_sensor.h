@@ -103,7 +103,7 @@ typedef struct {
     float fault_severity;                   /**< Fault severity (0-1) */
     uint16_t fault_frequency_hz;            /**< Fault frequency */
     float bpfo_amplitude;                   /**< Ball Pass Frequency Outer amplitude */
-    float bpf_i_amplitude;                  /**< Ball Pass Frequency Inner amplitude */
+    float bpfi_amplitude;                   /**< Ball Pass Frequency Inner amplitude */
     float ftf_amplitude;                    /**< Fundamental Train Frequency amplitude */
     float bsf_amplitude;                    /**< Ball Spin Frequency amplitude */
     uint8_t fault_type;                     /**< Fault type (0=Outer race, 1=Inner race, 2=Balls, 3=Cage) */

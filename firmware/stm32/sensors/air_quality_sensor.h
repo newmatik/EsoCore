@@ -61,6 +61,7 @@ typedef struct {
 typedef struct {
     uint8_t gas_type;                       /**< Type of gas (0=CO2, 1=VOC, 2=CO, 3=NO2, etc.) */
     float concentration_ppm;                /**< Concentration in ppm */
+    float concentration_ppb;                /**< Concentration in ppb (VOC sensors report ppb) */
     float concentration_ug_m3;              /**< Concentration in µg/m³ */
     uint16_t raw_adc_value;                 /**< Raw ADC value */
     float temperature_compensated;          /**< Temperature compensated value */
