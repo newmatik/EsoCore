@@ -75,8 +75,9 @@ static void check_module(const module_t *m) {
     CHECK(bytes_a[1] == ESOCORE_SENSOR_PAYLOAD_VERSION);
     CHECK(bytes_a[length] == 0xEE); /* nothing written past the payload */
 
-    /* Decode into a different struct and encode again: the same bytes */
-    memset(m->b, 0, m->struct_size);
+    /* Decode into a different, uninitialised-looking struct (bool bytes that
+     * are not 0 or 1 must not be read) and encode again: the same bytes */
+    memset(m->b, 0xA5, m->struct_size);
     CHECK(m->decode(bytes_a, length, m->b));
     memset(bytes_b, 0, sizeof(bytes_b));
     CHECK(m->encode(m->b, bytes_b, BUFFER_SIZE) == length);
@@ -199,6 +200,17 @@ static bool vibration_decode(const uint8_t *buffer, uint32_t length, void *data)
     return vibration_sensor_decode_data(buffer, length, data);
 }
 
+/* Encoding only reads the reading: a const one in read-only memory works */
+static const vibration_sensor_data_t vibration_const;
+static const current_sensor_data_t current_const;
+
+static void test_const_readings(void) {
+    current_test = "const_readings";
+    CHECK(vibration_sensor_encode_data(&vibration_const, bytes_a, BUFFER_SIZE) == VIBRATION_SENSOR_DATA_WIRE_SIZE);
+    CHECK(bytes_a[0] == ESOCORE_DEVICE_TYPE_VIBRATION && bytes_a[2] == 0 && bytes_a[VIBRATION_SENSOR_DATA_WIRE_SIZE - 1] == 0);
+    CHECK(current_sensor_encode_data(&current_const, bytes_a, BUFFER_SIZE) == CURRENT_SENSOR_DATA_WIRE_SIZE);
+}
+
 static void test_vibration(void) {
     const module_t m = {"vibration", ESOCORE_DEVICE_TYPE_VIBRATION, VIBRATION_SENSOR_DATA_WIRE_SIZE,
                         &vibration_a, &vibration_b, sizeof(vibration_a),
@@ -276,6 +288,7 @@ static void test_current(void) {
 int main(void) {
     test_primitives();
     test_base_data_layout();
+    test_const_readings();
     test_vibration();
     test_current();
 

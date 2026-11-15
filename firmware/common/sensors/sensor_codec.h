@@ -89,16 +89,24 @@ void esocore_codec_u16_array(esocore_codec_t *codec, uint16_t *values, uint32_t 
 void esocore_codec_i16_array(esocore_codec_t *codec, int16_t *values, uint32_t count);
 void esocore_codec_f32_array(esocore_codec_t *codec, float *values, uint32_t count);
 
-/** An enum field stored as one byte; FILL picks a value from 0 to max_value */
-#define ESOCORE_CODEC_ENUM8(codec, field, enum_type, max_value)                      \
-    do {                                                                             \
-        uint8_t esocore_codec_enum_byte_ = (uint8_t)(field);                         \
-        esocore_codec_enum8_value((codec), &esocore_codec_enum_byte_, (max_value));  \
-        (field) = (enum_type)esocore_codec_enum_byte_;                               \
+/**
+ * An enum field stored as one byte; FILL picks a value from 0 to max_value.
+ * The field is read only when encoding and written only when decoding or
+ * filling.
+ */
+#define ESOCORE_CODEC_ENUM8(codec, field, enum_type, max_value)                                    \
+    do {                                                                                           \
+        uint8_t esocore_codec_enum_byte_ = 0;                                                      \
+        if ((codec)->mode == ESOCORE_CODEC_ENCODE) {                                               \
+            esocore_codec_enum_byte_ = (uint8_t)(field);                                           \
+        }                                                                                          \
+        if (esocore_codec_enum8_value((codec), &esocore_codec_enum_byte_, (max_value))) {          \
+            (field) = (enum_type)esocore_codec_enum_byte_;                                         \
+        }                                                                                          \
     } while (0)
 
-/** Helper of ESOCORE_CODEC_ENUM8 */
-void esocore_codec_enum8_value(esocore_codec_t *codec, uint8_t *value, uint8_t max_value);
+/** Helper of ESOCORE_CODEC_ENUM8; true when the field must be set from *value */
+bool esocore_codec_enum8_value(esocore_codec_t *codec, uint8_t *value, uint8_t max_value);
 
 /** Payload header: device type and layout version; DECODE checks both */
 void esocore_codec_header(esocore_codec_t *codec, uint8_t device_type);

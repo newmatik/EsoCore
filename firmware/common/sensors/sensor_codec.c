@@ -45,94 +45,140 @@ static uint32_t codec_random(esocore_codec_t *codec) {
 
 /* Reserve n bytes; false (and ok = false) when they do not fit */
 static bool codec_take(esocore_codec_t *codec, uint32_t n) {
-    if (!codec->ok || codec->capacity - codec->position < n || codec->position > codec->capacity) {
+    if (!codec->ok || codec->position > codec->capacity || codec->capacity - codec->position < n) {
         codec->ok = false;
         return false;
     }
     return true;
 }
 
-/* Unsigned little-endian integer of 1, 2 or 4 bytes */
-static void codec_uint(esocore_codec_t *codec, uint32_t *value, uint32_t size) {
-    switch (codec->mode) {
-        case ESOCORE_CODEC_ENCODE:
-            if (codec_take(codec, size)) {
-                for (uint32_t i = 0; i < size; i++) {
-                    codec->out[codec->position++] = (uint8_t)(*value >> (8U * i));
-                }
-            }
-            break;
-        case ESOCORE_CODEC_DECODE:
-            if (codec_take(codec, size)) {
-                uint32_t result = 0;
-                for (uint32_t i = 0; i < size; i++) {
-                    result |= (uint32_t)codec->in[codec->position++] << (8U * i);
-                }
-                *value = result;
-            }
-            break;
-        case ESOCORE_CODEC_FILL:
-        default:
-            *value = codec_random(codec);
-            if (size < 4) {
-                *value &= (1UL << (8U * size)) - 1U;
-            }
-            break;
-    }
-}
+/*
+ * The primitives below only read the field when encoding and only write it
+ * when decoding or filling: an encoded reading may be const, and a decode
+ * target may be uninitialised (a bool with any other byte than 0 or 1 must
+ * never be read).
+ */
 
-void esocore_codec_u8(esocore_codec_t *codec, uint8_t *value) {
-    uint32_t v = *value;
-    codec_uint(codec, &v, 1);
-    *value = (uint8_t)v;
-}
-
-void esocore_codec_i8(esocore_codec_t *codec, int8_t *value) {
-    uint8_t bits;
-    memcpy(&bits, value, 1);
-    esocore_codec_u8(codec, &bits);
-    memcpy(value, &bits, 1);
-}
-
-void esocore_codec_bool(esocore_codec_t *codec, bool *value) {
-    uint32_t v = *value ? 1U : 0U;
-    if (codec->mode == ESOCORE_CODEC_FILL) {
-        *value = (codec_random(codec) & 1U) != 0U;
-        return;
-    }
-    bool ok_before = codec->ok;
-    codec_uint(codec, &v, 1);
-    if (codec->mode == ESOCORE_CODEC_DECODE && ok_before && codec->ok) {
-        if (v > 1U) {
-            codec->ok = false; /* Not a bool: the bytes do not match this layout */
-        } else {
-            *value = v != 0U;
+/* ENCODE: append value as a little-endian integer of size bytes */
+static void codec_put(esocore_codec_t *codec, uint32_t value, uint32_t size) {
+    if (codec_take(codec, size)) {
+        for (uint32_t i = 0; i < size; i++) {
+            codec->out[codec->position++] = (uint8_t)(value >> (8U * i));
         }
     }
 }
 
+/* DECODE: read a little-endian integer of size bytes; false on overrun */
+static bool codec_get(esocore_codec_t *codec, uint32_t *value, uint32_t size) {
+    if (!codec_take(codec, size)) {
+        return false;
+    }
+    uint32_t result = 0;
+    for (uint32_t i = 0; i < size; i++) {
+        result |= (uint32_t)codec->in[codec->position++] << (8U * i);
+    }
+    *value = result;
+    return true;
+}
+
+/* FILL: a random integer of size bytes */
+static uint32_t codec_fill(esocore_codec_t *codec, uint32_t size) {
+    uint32_t value = codec_random(codec);
+    return size < 4 ? value & ((1UL << (8U * size)) - 1U) : value;
+}
+
+/* Raw bits of 1, 2 or 4 bytes: *bits is read for ENCODE; returns true when
+ * the caller must store *bits back into the field (DECODE, FILL) */
+static bool codec_bits(esocore_codec_t *codec, uint32_t *bits, uint32_t size) {
+    switch (codec->mode) {
+        case ESOCORE_CODEC_ENCODE:
+            codec_put(codec, *bits, size);
+            return false;
+        case ESOCORE_CODEC_DECODE:
+            return codec_get(codec, bits, size);
+        case ESOCORE_CODEC_FILL:
+        default:
+            *bits = codec_fill(codec, size);
+            return true;
+    }
+}
+
+void esocore_codec_u8(esocore_codec_t *codec, uint8_t *value) {
+    uint32_t bits = codec->mode == ESOCORE_CODEC_ENCODE ? *value : 0U;
+    if (codec_bits(codec, &bits, 1)) {
+        *value = (uint8_t)bits;
+    }
+}
+
+void esocore_codec_i8(esocore_codec_t *codec, int8_t *value) {
+    uint8_t raw = 0;
+    if (codec->mode == ESOCORE_CODEC_ENCODE) {
+        memcpy(&raw, value, 1);
+    }
+    uint32_t bits = raw;
+    if (codec_bits(codec, &bits, 1)) {
+        raw = (uint8_t)bits;
+        memcpy(value, &raw, 1);
+    }
+}
+
+void esocore_codec_bool(esocore_codec_t *codec, bool *value) {
+    switch (codec->mode) {
+        case ESOCORE_CODEC_ENCODE:
+            codec_put(codec, *value ? 1U : 0U, 1);
+            break;
+        case ESOCORE_CODEC_DECODE: {
+            uint32_t bits = 0;
+            if (codec_get(codec, &bits, 1)) {
+                if (bits > 1U) {
+                    codec->ok = false; /* Not a bool: the bytes do not match this layout */
+                } else {
+                    *value = bits != 0U;
+                }
+            }
+            break;
+        }
+        case ESOCORE_CODEC_FILL:
+        default:
+            *value = (codec_random(codec) & 1U) != 0U;
+            break;
+    }
+}
+
 void esocore_codec_u16(esocore_codec_t *codec, uint16_t *value) {
-    uint32_t v = *value;
-    codec_uint(codec, &v, 2);
-    *value = (uint16_t)v;
+    uint32_t bits = codec->mode == ESOCORE_CODEC_ENCODE ? *value : 0U;
+    if (codec_bits(codec, &bits, 2)) {
+        *value = (uint16_t)bits;
+    }
 }
 
 void esocore_codec_i16(esocore_codec_t *codec, int16_t *value) {
-    uint16_t bits;
-    memcpy(&bits, value, 2);
-    esocore_codec_u16(codec, &bits);
-    memcpy(value, &bits, 2);
+    uint16_t raw = 0;
+    if (codec->mode == ESOCORE_CODEC_ENCODE) {
+        memcpy(&raw, value, 2);
+    }
+    uint32_t bits = raw;
+    if (codec_bits(codec, &bits, 2)) {
+        raw = (uint16_t)bits;
+        memcpy(value, &raw, 2);
+    }
 }
 
 void esocore_codec_u32(esocore_codec_t *codec, uint32_t *value) {
-    codec_uint(codec, value, 4);
+    uint32_t bits = codec->mode == ESOCORE_CODEC_ENCODE ? *value : 0U;
+    if (codec_bits(codec, &bits, 4)) {
+        *value = bits;
+    }
 }
 
 void esocore_codec_i32(esocore_codec_t *codec, int32_t *value) {
-    uint32_t bits;
-    memcpy(&bits, value, 4);
-    codec_uint(codec, &bits, 4);
-    memcpy(value, &bits, 4);
+    uint32_t bits = 0;
+    if (codec->mode == ESOCORE_CODEC_ENCODE) {
+        memcpy(&bits, value, 4);
+    }
+    if (codec_bits(codec, &bits, 4)) {
+        memcpy(value, &bits, 4);
+    }
 }
 
 void esocore_codec_f32(esocore_codec_t *codec, float *value) {
@@ -141,10 +187,13 @@ void esocore_codec_f32(esocore_codec_t *codec, float *value) {
         *value = (float)((int32_t)(codec_random(codec) % 200001U) - 100000) / 100.0f;
         return;
     }
-    uint32_t bits;
-    memcpy(&bits, value, 4);
-    codec_uint(codec, &bits, 4);
-    memcpy(value, &bits, 4);
+    uint32_t bits = 0;
+    if (codec->mode == ESOCORE_CODEC_ENCODE) {
+        memcpy(&bits, value, 4);
+    }
+    if (codec_bits(codec, &bits, 4)) {
+        memcpy(value, &bits, 4);
+    }
 }
 
 void esocore_codec_chars(esocore_codec_t *codec, char *value, uint32_t n) {
@@ -213,12 +262,17 @@ void esocore_codec_f32_array(esocore_codec_t *codec, float *values, uint32_t cou
     }
 }
 
-void esocore_codec_enum8_value(esocore_codec_t *codec, uint8_t *value, uint8_t max_value) {
+bool esocore_codec_enum8_value(esocore_codec_t *codec, uint8_t *value, uint8_t max_value) {
     if (codec->mode == ESOCORE_CODEC_FILL) {
         *value = (uint8_t)(codec_random(codec) % ((uint32_t)max_value + 1U));
-        return;
+        return true;
     }
-    esocore_codec_u8(codec, value);
+    uint32_t bits = *value;
+    if (codec_bits(codec, &bits, 1)) {
+        *value = (uint8_t)bits;
+        return true;
+    }
+    return false;
 }
 
 void esocore_codec_header(esocore_codec_t *codec, uint8_t device_type) {
