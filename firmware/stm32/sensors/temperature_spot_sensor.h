@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "../../common/sensors/sensor_interface.h"
+#include "../../common/sensors/sensor_codec.h"
 
 /**
  * @brief Temperature spot sensor configuration
@@ -151,5 +152,29 @@ bool temperature_spot_sensor_get_configuration(temperature_spot_sensor_config_t 
 /** @brief Export temperature data */
 bool temperature_spot_sensor_export_data(const temperature_spot_sensor_data_t *data,
                                        const char *filename, uint8_t format);
+
+/* ============================================================================
+ * Bus Payload (layout rules: common/sensors/sensor_codec.h)
+ * ============================================================================ */
+
+/** Encoded size of a reading, header included */
+#define TEMPERATURE_SPOT_SENSOR_DATA_WIRE_SIZE 439U
+
+/** Walks every field of a reading in declaration order (encode, decode or fill) */
+void temperature_spot_sensor_codec(esocore_codec_t *codec, temperature_spot_sensor_data_t *data);
+
+/**
+ * @brief Serialise a reading for esocore_protocol_send_sensor_data()
+ *
+ * @return Bytes written (TEMPERATURE_SPOT_SENSOR_DATA_WIRE_SIZE), or 0 if capacity is too small
+ */
+uint32_t temperature_spot_sensor_encode_data(const temperature_spot_sensor_data_t *data, uint8_t *buffer, uint32_t capacity);
+
+/**
+ * @brief Parse a reading serialised by temperature_spot_sensor_encode_data()
+ *
+ * @return false if the length, device type, layout version or a bool byte is wrong
+ */
+bool temperature_spot_sensor_decode_data(const uint8_t *buffer, uint32_t length, temperature_spot_sensor_data_t *data);
 
 #endif /* TEMPERATURE_SPOT_SENSOR_H */

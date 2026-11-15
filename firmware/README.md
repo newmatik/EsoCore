@@ -349,6 +349,69 @@ Light (`light_sensor_data_t`, 519 bytes; no `base_data`):
 | 486    | 28   | AS7341: 10 channels (`uint16_t`), dominant wavelength, peak intensity     |
 | 514    | 5    | `sensor_status`, `timestamp`                                              |
 
+Oil quality (`oil_quality_sensor_data_t`, 791 bytes; no `base_data`):
+
+| Offset | Size | Section                                                                   |
+| ------ | ---- | ------------------------------------------------------------------------- |
+| 2      | 24   | turbidity, viscosity, water content, dielectric constant, temperature (`float`), timestamp |
+| 26     | 8    | `turbidity_data`                                                          |
+| 34     | 8    | `viscosity_data`                                                          |
+| 42     | 12   | `water_data`                                                              |
+| 54     | 8    | `dielectric_data`                                                         |
+| 62     | 6    | `temperature_data`                                                        |
+| 68     | 268  | `degradation_analysis`: four pairs of assessment text (64) and level byte, `float`, timestamp |
+| 336    | 390  | `maintenance_recommendations`: three action texts (128), change interval (`uint16_t`), timestamp |
+| 726    | 1    | `oil_quality_score`                                                       |
+| 727    | 64   | `condition_description`                                                   |
+
+Pressure (`pressure_sensor_data_t`, 565 bytes; no `base_data`):
+
+| Offset | Size | Section                                                                   |
+| ------ | ---- | ------------------------------------------------------------------------- |
+| 2      | 26   | pressure (Pa, bar), temperature, timestamp, raw ADC (`uint16_t`), rate, stability |
+| 28     | 93   | `hydraulic_analysis`                                                      |
+| 121    | 112  | `pneumatic_analysis`                                                      |
+| 233    | 106  | `anomaly_detection`: five flags, description (96), severity, timestamp    |
+| 339    | 61   | `leak_detection`                                                          |
+| 400    | 84   | `filter_monitoring`                                                       |
+| 484    | 1    | `pressure_condition_score`                                                |
+| 485    | 80   | `condition_description`                                                   |
+
+Proximity/position (`proximity_position_sensor_data_t`, 598 bytes; no `base_data`):
+
+| Offset | Size | Section                                                                   |
+| ------ | ---- | ------------------------------------------------------------------------- |
+| 2      | 17   | distance, x, y, z (`float`), target count                                 |
+| 19     | 4    | `inductive_data`                                                          |
+| 23     | 10   | `capacitive_data`                                                         |
+| 33     | 18   | `encoder_data`: position counts (`int32_t`), 3 `float`, direction (`int8_t`), valid |
+| 51     | 7    | `magnetic_data`                                                           |
+| 58     | 10   | `laser_data`                                                              |
+| 68     | 183  | `accuracy_analysis`                                                       |
+| 251    | 98   | `motion_analysis`                                                         |
+| 349    | 125  | `detection_analysis`                                                      |
+| 474    | 55   | `health_monitoring`                                                       |
+| 529    | 1    | `position_condition_score`                                                |
+| 530    | 64   | `condition_description`                                                   |
+| 594    | 4    | `timestamp`                                                               |
+
+Temperature spot (`temperature_spot_sensor_data_t`, 439 bytes; no `base_data`):
+
+| Offset | Size | Section                                                                   |
+| ------ | ---- | ------------------------------------------------------------------------- |
+| 2      | 8    | temperature, cold junction temperature (`float`)                          |
+| 10     | 36   | `ntc_temperatures`: 4 readings of 9 bytes (temperature, resistance, valid) |
+| 46     | 18   | `rtd_temperatures`: 2 readings of 9 bytes                                 |
+| 64     | 26   | `thermocouple_temperatures`: 2 readings of 13 bytes                       |
+| 90     | 9    | `ir_temperature`                                                          |
+| 99     | 56   | `statistics`                                                              |
+| 155    | 54   | `gradient_analysis`                                                       |
+| 209    | 72   | `stress_analysis`                                                         |
+| 281    | 89   | `limit_monitoring`                                                        |
+| 370    | 1    | `temperature_condition_score`                                             |
+| 371    | 64   | `condition_description`                                                   |
+| 435    | 4    | `timestamp`                                                               |
+
 `tests/host/test_sensor_codec.c` checks these offsets and sizes.
 
 ### Modbus RTU

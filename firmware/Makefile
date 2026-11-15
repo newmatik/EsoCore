@@ -131,16 +131,20 @@ AIR_QUALITY_SOURCES := \
 	stm32/sensors/air_quality_codec.c
 
 OIL_QUALITY_SOURCES := \
-	stm32/sensors/oil_quality_sensor.c
+	stm32/sensors/oil_quality_sensor.c \
+	stm32/sensors/oil_quality_codec.c
 
 PRESSURE_SOURCES := \
-	stm32/sensors/pressure_sensor.c
+	stm32/sensors/pressure_sensor.c \
+	stm32/sensors/pressure_codec.c
 
 TEMPERATURE_SOURCES := \
-	stm32/sensors/temperature_spot_sensor.c
+	stm32/sensors/temperature_spot_sensor.c \
+	stm32/sensors/temperature_spot_codec.c
 
 PROXIMITY_SOURCES := \
-	stm32/sensors/proximity_position_sensor.c
+	stm32/sensors/proximity_position_sensor.c \
+	stm32/sensors/proximity_position_codec.c
 
 LIGHT_SOURCES := \
 	stm32/sensors/light_sensor.c \

@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "../../common/sensors/sensor_interface.h"
+#include "../../common/sensors/sensor_codec.h"
 
 /* ============================================================================
  * Pressure Data Types
@@ -170,5 +171,29 @@ bool pressure_sensor_get_configuration(pressure_sensor_config_t *config);
 /** @brief Export pressure sensor data */
 bool pressure_sensor_export_data(const pressure_sensor_data_t *data,
                                const char *filename, uint8_t format);
+
+/* ============================================================================
+ * Bus Payload (layout rules: common/sensors/sensor_codec.h)
+ * ============================================================================ */
+
+/** Encoded size of a reading, header included */
+#define PRESSURE_SENSOR_DATA_WIRE_SIZE 565U
+
+/** Walks every field of a reading in declaration order (encode, decode or fill) */
+void pressure_sensor_codec(esocore_codec_t *codec, pressure_sensor_data_t *data);
+
+/**
+ * @brief Serialise a reading for esocore_protocol_send_sensor_data()
+ *
+ * @return Bytes written (PRESSURE_SENSOR_DATA_WIRE_SIZE), or 0 if capacity is too small
+ */
+uint32_t pressure_sensor_encode_data(const pressure_sensor_data_t *data, uint8_t *buffer, uint32_t capacity);
+
+/**
+ * @brief Parse a reading serialised by pressure_sensor_encode_data()
+ *
+ * @return false if the length, device type, layout version or a bool byte is wrong
+ */
+bool pressure_sensor_decode_data(const uint8_t *buffer, uint32_t length, pressure_sensor_data_t *data);
 
 #endif /* PRESSURE_SENSOR_H */

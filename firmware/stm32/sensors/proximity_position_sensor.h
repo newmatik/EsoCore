@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "../../common/sensors/sensor_interface.h"
+#include "../../common/sensors/sensor_codec.h"
 
 /* ============================================================================
  * Proximity Position Data Types
@@ -217,5 +218,29 @@ bool proximity_position_sensor_get_configuration(proximity_position_sensor_confi
 /** @brief Export sensor data to a file */
 bool proximity_position_sensor_export_data(const proximity_position_sensor_data_t *data,
                                          const char *filename, uint8_t format);
+
+/* ============================================================================
+ * Bus Payload (layout rules: common/sensors/sensor_codec.h)
+ * ============================================================================ */
+
+/** Encoded size of a reading, header included */
+#define PROXIMITY_POSITION_SENSOR_DATA_WIRE_SIZE 598U
+
+/** Walks every field of a reading in declaration order (encode, decode or fill) */
+void proximity_position_sensor_codec(esocore_codec_t *codec, proximity_position_sensor_data_t *data);
+
+/**
+ * @brief Serialise a reading for esocore_protocol_send_sensor_data()
+ *
+ * @return Bytes written (PROXIMITY_POSITION_SENSOR_DATA_WIRE_SIZE), or 0 if capacity is too small
+ */
+uint32_t proximity_position_sensor_encode_data(const proximity_position_sensor_data_t *data, uint8_t *buffer, uint32_t capacity);
+
+/**
+ * @brief Parse a reading serialised by proximity_position_sensor_encode_data()
+ *
+ * @return false if the length, device type, layout version or a bool byte is wrong
+ */
+bool proximity_position_sensor_decode_data(const uint8_t *buffer, uint32_t length, proximity_position_sensor_data_t *data);
 
 #endif /* PROXIMITY_POSITION_SENSOR_H */
