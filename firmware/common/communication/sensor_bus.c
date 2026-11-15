@@ -386,12 +386,18 @@ static void sbus_process_rx(void) {
         sbus_parse_frames(false);
     }
 
-    /* A partial frame is abandoned only when no byte is waiting and the last
-     * one arrived (RX ISR time, not poll time) more than the gap timeout ago,
-     * so a late poll does not drop a frame whose rest is already queued. */
-    if (sb_frame_len > 0 && sbus_rx_available() == 0 &&
-        sbus_get_time_ms() - sb_rx_byte_ms > ESOCORE_PROTOCOL_FRAME_GAP_TIMEOUT_MS) {
-        sbus_parse_frames(true);
+    /* A partial frame is abandoned only when the last byte arrived (RX ISR
+     * time, not poll time) more than the gap timeout ago and no byte is
+     * waiting, so a late poll does not drop a frame whose rest is already
+     * queued. Order matters against the ISR: the byte time is read before the
+     * clock (so the difference cannot underflow), and the queue is checked
+     * last (a byte that arrived meanwhile is seen there). */
+    if (sb_frame_len > 0) {
+        uint32_t last_byte_ms = sb_rx_byte_ms;
+        uint32_t now = sbus_get_time_ms();
+        if (now - last_byte_ms > ESOCORE_PROTOCOL_FRAME_GAP_TIMEOUT_MS && sbus_rx_available() == 0) {
+            sbus_parse_frames(true);
+        }
     }
 }
 
