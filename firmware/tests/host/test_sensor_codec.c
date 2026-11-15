@@ -13,6 +13,10 @@
 #include "../../stm32/sensors/air_quality_sensor.h"
 #include "../../stm32/sensors/current_sensor.h"
 #include "../../stm32/sensors/light_sensor.h"
+#include "../../stm32/sensors/oil_quality_sensor.h"
+#include "../../stm32/sensors/pressure_sensor.h"
+#include "../../stm32/sensors/proximity_position_sensor.h"
+#include "../../stm32/sensors/temperature_spot_sensor.h"
 #include "../../stm32/sensors/vibration_sensor.h"
 
 #include <stdio.h>
@@ -404,6 +408,155 @@ static void test_light(void) {
     CHECK(read_u32(bytes_a + 515) == 0x0A0B0C0DU);
 }
 
+/* ---------------------------------------------------------------------------
+ * Oil quality, pressure, proximity/position, temperature spot
+ * ------------------------------------------------------------------------- */
+
+MODULE_GLUE(oil_quality, oil_quality_sensor_data_t)
+MODULE_GLUE(pressure, pressure_sensor_data_t)
+MODULE_GLUE(proximity_position, proximity_position_sensor_data_t)
+MODULE_GLUE(temperature_spot, temperature_spot_sensor_data_t)
+
+static void test_oil_quality(void) {
+    const module_t m = {"oil_quality", ESOCORE_DEVICE_TYPE_OIL_QUALITY, OIL_QUALITY_SENSOR_DATA_WIRE_SIZE,
+                        &oil_quality_a, &oil_quality_b, sizeof(oil_quality_a),
+                        oil_quality_fill, oil_quality_encode, oil_quality_decode};
+    check_module(&m);
+
+    current_test = "oil_quality_layout";
+    memset(&oil_quality_a, 0, sizeof(oil_quality_a));
+    oil_quality_a.turbidity_ntu = 1.5f; /* no base_data */
+    oil_quality_a.timestamp = 0x01020304U;
+    oil_quality_a.turbidity_data.turbidity_ntu = 2.5f;
+    oil_quality_a.viscosity_data.viscosity_cst = 46.5f;
+    oil_quality_a.water_data.water_content_ppm = 120.5f;
+    oil_quality_a.dielectric_data.dielectric_constant = 2.25f;
+    oil_quality_a.temperature_data.temperature_celsius = 55.5f;
+    strcpy(oil_quality_a.degradation_analysis.turbidity_assessment, "clear");
+    oil_quality_a.degradation_analysis.contamination_level = 2;
+    strcpy(oil_quality_a.maintenance_recommendations.immediate_actions, "none");
+    oil_quality_a.maintenance_recommendations.change_interval_days = 0x0102;
+    oil_quality_a.oil_quality_score = 81;
+    CHECK(oil_quality_sensor_encode_data(&oil_quality_a, bytes_a, BUFFER_SIZE) == 791);
+    CHECK(read_f32(bytes_a + 2) == 1.5f);
+    CHECK(read_u32(bytes_a + 22) == 0x01020304U);
+    CHECK(read_f32(bytes_a + 26) == 2.5f);
+    CHECK(read_f32(bytes_a + 34) == 46.5f);
+    CHECK(read_f32(bytes_a + 42) == 120.5f);
+    CHECK(read_f32(bytes_a + 54) == 2.25f);
+    CHECK(read_f32(bytes_a + 62) == 55.5f);
+    CHECK(memcmp(bytes_a + 68, "clear", 6) == 0);
+    CHECK(bytes_a[132] == 2);
+    CHECK(memcmp(bytes_a + 336, "none", 5) == 0);
+    CHECK(bytes_a[720] == 0x02 && bytes_a[721] == 0x01);
+    CHECK(bytes_a[726] == 81);
+}
+
+static void test_pressure(void) {
+    const module_t m = {"pressure", ESOCORE_DEVICE_TYPE_PRESSURE, PRESSURE_SENSOR_DATA_WIRE_SIZE,
+                        &pressure_a, &pressure_b, sizeof(pressure_a),
+                        pressure_fill, pressure_encode, pressure_decode};
+    check_module(&m);
+
+    current_test = "pressure_layout";
+    memset(&pressure_a, 0, sizeof(pressure_a));
+    pressure_a.pressure_pa = 101325.0f; /* no base_data */
+    pressure_a.raw_adc_value = 0x0FFF;
+    strcpy(pressure_a.hydraulic_analysis.pump_performance, "good");
+    strcpy(pressure_a.pneumatic_analysis.compressor_performance, "fair");
+    pressure_a.anomaly_detection.pressure_surge_detected = true;
+    strcpy(pressure_a.leak_detection.leak_status, "tight");
+    pressure_a.filter_monitoring.differential_pressure_bar = 0.5f;
+    pressure_a.pressure_condition_score = 66;
+    strcpy(pressure_a.condition_description, "stable");
+    CHECK(pressure_sensor_encode_data(&pressure_a, bytes_a, BUFFER_SIZE) == 565);
+    CHECK(read_f32(bytes_a + 2) == 101325.0f);
+    CHECK(bytes_a[18] == 0xFF && bytes_a[19] == 0x0F);
+    CHECK(memcmp(bytes_a + 28, "good", 5) == 0);
+    CHECK(memcmp(bytes_a + 121, "fair", 5) == 0);
+    CHECK(bytes_a[233] == 1);
+    CHECK(memcmp(bytes_a + 339, "tight", 6) == 0);
+    CHECK(read_f32(bytes_a + 400) == 0.5f);
+    CHECK(bytes_a[484] == 66);
+    CHECK(memcmp(bytes_a + 485, "stable", 7) == 0);
+}
+
+static void test_proximity_position(void) {
+    const module_t m = {"proximity_position", ESOCORE_DEVICE_TYPE_PROXIMITY, PROXIMITY_POSITION_SENSOR_DATA_WIRE_SIZE,
+                        &proximity_position_a, &proximity_position_b, sizeof(proximity_position_a),
+                        proximity_position_fill, proximity_position_encode, proximity_position_decode};
+    check_module(&m);
+
+    current_test = "proximity_position_layout";
+    proximity_position_sensor_data_t *p = &proximity_position_a;
+    memset(p, 0, sizeof(*p));
+    p->distance_mm = 12.5f; /* no base_data */
+    p->target_count = 3;
+    p->inductive_data.sensor_states[1] = true;
+    p->capacitive_data.distance_mm = 4.5f;
+    p->encoder_data.position_counts = -5;
+    p->encoder_data.direction = -1;
+    p->magnetic_data.sensor_states[0] = true;
+    p->laser_data.distance_mm = 250.5f;
+    p->accuracy_analysis.encoder_resolution_mm = 0.25f;
+    strcpy(p->motion_analysis.speed_profile, "slow");
+    strcpy(p->detection_analysis.detection_reliability, "high");
+    p->health_monitoring.sensor_health_percentage = 100;
+    p->position_condition_score = 93;
+    p->timestamp = 0x11223344U;
+    CHECK(proximity_position_sensor_encode_data(p, bytes_a, BUFFER_SIZE) == 598);
+    CHECK(read_f32(bytes_a + 2) == 12.5f);
+    CHECK(bytes_a[18] == 3);
+    CHECK(bytes_a[19] == 0 && bytes_a[20] == 1);
+    CHECK(read_f32(bytes_a + 23) == 4.5f);
+    CHECK(read_u32(bytes_a + 33) == 0xFFFFFFFBU);
+    CHECK(bytes_a[49] == 0xFF);
+    CHECK(bytes_a[51] == 1);
+    CHECK(read_f32(bytes_a + 58) == 250.5f);
+    CHECK(read_f32(bytes_a + 68) == 0.25f);
+    CHECK(memcmp(bytes_a + 251, "slow", 5) == 0);
+    CHECK(memcmp(bytes_a + 349, "high", 5) == 0);
+    CHECK(bytes_a[474] == 100);
+    CHECK(bytes_a[529] == 93);
+    CHECK(read_u32(bytes_a + 594) == 0x11223344U);
+}
+
+static void test_temperature_spot(void) {
+    const module_t m = {"temperature_spot", ESOCORE_DEVICE_TYPE_TEMPERATURE, TEMPERATURE_SPOT_SENSOR_DATA_WIRE_SIZE,
+                        &temperature_spot_a, &temperature_spot_b, sizeof(temperature_spot_a),
+                        temperature_spot_fill, temperature_spot_encode, temperature_spot_decode};
+    check_module(&m);
+
+    current_test = "temperature_spot_layout";
+    temperature_spot_sensor_data_t *t = &temperature_spot_a;
+    memset(t, 0, sizeof(*t));
+    t->temperature_celsius = 21.5f; /* no base_data */
+    t->ntc_temperatures[0].temperature_celsius = 22.5f;
+    t->ntc_temperatures[3].valid = true;
+    t->rtd_temperatures[0].temperature_celsius = 23.5f;
+    t->thermocouple_temperatures[1].valid = true;
+    t->ir_temperature.object_temperature_celsius = 24.5f;
+    t->statistics.average_temperature_c = 25.5f;
+    t->gradient_analysis.max_thermal_gradient_c = 1.5f;
+    t->stress_analysis.thermal_stress_level = 0.5f;
+    t->limit_monitoring.max_temperature_c = 80.5f;
+    t->temperature_condition_score = 70;
+    t->timestamp = 0x55667788U;
+    CHECK(temperature_spot_sensor_encode_data(t, bytes_a, BUFFER_SIZE) == 439);
+    CHECK(read_f32(bytes_a + 2) == 21.5f);
+    CHECK(read_f32(bytes_a + 10) == 22.5f);
+    CHECK(bytes_a[10 + 3 * 9 + 8] == 1);
+    CHECK(read_f32(bytes_a + 46) == 23.5f);
+    CHECK(bytes_a[64 + 13 + 12] == 1);
+    CHECK(read_f32(bytes_a + 90) == 24.5f);
+    CHECK(read_f32(bytes_a + 99) == 25.5f);
+    CHECK(read_f32(bytes_a + 155) == 1.5f);
+    CHECK(read_f32(bytes_a + 209) == 0.5f);
+    CHECK(read_f32(bytes_a + 281) == 80.5f);
+    CHECK(bytes_a[370] == 70);
+    CHECK(read_u32(bytes_a + 435) == 0x55667788U);
+}
+
 int main(void) {
     test_primitives();
     test_base_data_layout();
@@ -413,6 +566,10 @@ int main(void) {
     test_acoustic();
     test_air_quality();
     test_light();
+    test_oil_quality();
+    test_pressure();
+    test_proximity_position();
+    test_temperature_spot();
 
     printf("sensor codec tests: %d checks, %d failed\n", checks_run, checks_failed);
     return checks_failed == 0 ? 0 : 1;

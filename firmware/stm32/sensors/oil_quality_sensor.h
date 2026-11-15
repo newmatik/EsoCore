@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "../../common/sensors/sensor_interface.h"
+#include "../../common/sensors/sensor_codec.h"
 
 /* ============================================================================
  * Oil Quality Sensor Configuration
@@ -183,5 +184,29 @@ bool oil_quality_sensor_get_configuration(oil_quality_sensor_config_t *config);
 /** @brief Export oil quality data to a file */
 bool oil_quality_export_data(const oil_quality_sensor_data_t *data,
                              const char *filename, uint8_t format);
+
+/* ============================================================================
+ * Bus Payload (layout rules: common/sensors/sensor_codec.h)
+ * ============================================================================ */
+
+/** Encoded size of a reading, header included */
+#define OIL_QUALITY_SENSOR_DATA_WIRE_SIZE 791U
+
+/** Walks every field of a reading in declaration order (encode, decode or fill) */
+void oil_quality_sensor_codec(esocore_codec_t *codec, oil_quality_sensor_data_t *data);
+
+/**
+ * @brief Serialise a reading for esocore_protocol_send_sensor_data()
+ *
+ * @return Bytes written (OIL_QUALITY_SENSOR_DATA_WIRE_SIZE), or 0 if capacity is too small
+ */
+uint32_t oil_quality_sensor_encode_data(const oil_quality_sensor_data_t *data, uint8_t *buffer, uint32_t capacity);
+
+/**
+ * @brief Parse a reading serialised by oil_quality_sensor_encode_data()
+ *
+ * @return false if the length, device type, layout version or a bool byte is wrong
+ */
+bool oil_quality_sensor_decode_data(const uint8_t *buffer, uint32_t length, oil_quality_sensor_data_t *data);
 
 #endif /* OIL_QUALITY_SENSOR_H */
