@@ -461,10 +461,13 @@ HOST_TEST_CFLAGS := $(STANDARD) -Wall -Wextra -Werror -Wno-unused-function -Wno-
 	-g -fsanitize=address,undefined -fno-sanitize-recover=undefined
 HOST_TEST_DIR := $(BUILD_DIR)/tests
 
-test: $(HOST_TEST_DIR)/test_modbus_rtu $(HOST_TEST_DIR)/test_protocol
+test: $(HOST_TEST_DIR)/test_modbus_rtu $(HOST_TEST_DIR)/test_protocol \
+	$(HOST_TEST_DIR)/test_protocol_timing $(HOST_TEST_DIR)/test_sensor_bus
 	@echo "Running host unit tests..."
 	@$(HOST_TEST_DIR)/test_modbus_rtu
 	@$(HOST_TEST_DIR)/test_protocol
+	@$(HOST_TEST_DIR)/test_protocol_timing
+	@$(HOST_TEST_DIR)/test_sensor_bus
 
 $(HOST_TEST_DIR)/test_modbus_rtu: tests/host/test_modbus_rtu.c common/communication/modbus_rtu.c common/communication/modbus_rtu.h
 	@mkdir -p $(HOST_TEST_DIR)
@@ -475,6 +478,19 @@ $(HOST_TEST_DIR)/test_protocol: tests/host/test_protocol.c common/communication/
 	@mkdir -p $(HOST_TEST_DIR)
 	$(HOST_CC) $(HOST_TEST_CFLAGS) -Icommon/communication -o $@ \
 		tests/host/test_protocol.c common/communication/protocol_frame.c
+
+$(HOST_TEST_DIR)/test_protocol_timing: tests/host/test_protocol_timing.c common/communication/protocol.c \
+		common/communication/protocol_frame.c common/communication/protocol.h
+	@mkdir -p $(HOST_TEST_DIR)
+	$(HOST_CC) $(HOST_TEST_CFLAGS) -Icommon/communication -o $@ \
+		tests/host/test_protocol_timing.c common/communication/protocol.c common/communication/protocol_frame.c
+
+# sensor_bus.c with the STM32H7 HAL headers; the test file supplies the UART and GPIO functions.
+$(HOST_TEST_DIR)/test_sensor_bus: tests/host/test_sensor_bus.c common/communication/sensor_bus.c \
+		common/communication/sensor_bus.h common/communication/protocol_frame.c common/communication/protocol.h
+	@mkdir -p $(HOST_TEST_DIR)
+	$(HOST_CC) $(HOST_TEST_CFLAGS) -Icommon/communication -o $@ \
+		tests/host/test_sensor_bus.c common/communication/sensor_bus.c common/communication/protocol_frame.c
 
 # Code analysis
 analyze:

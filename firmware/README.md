@@ -231,6 +231,16 @@ wrong CRC (the sensor modules answer a wrong CRC with `NACK`) and searches on fr
 cannot swallow the following frame. A partial frame that gets no byte for 50 ms (`ESOCORE_PROTOCOL_FRAME_GAP_TIMEOUT_MS`)
 is abandoned the same way. There is no end delimiter and no byte stuffing.
 
+Both ends measure time with a millisecond clock the application passes in: `sensor_bus_config_t.get_time_ms` (required)
+and `esocore_protocol_set_time_source()`. The Edge passes `system_clock_get_tick` (SysTick) to both. The Edge sends a
+discovery request on the first `sensor_bus_poll()` after `sensor_bus_start()` and then every `discovery_interval_ms`,
+and reports a module offline when no heartbeat, data or discovery response came from it for three heartbeat intervals
+(`ESOCORE_PROTOCOL_HEARTBEAT_INTERVAL_MS`, 15 s, which the modules also send at: 45 s). A partial frame is abandoned
+when no byte is waiting and the last one arrived (time stamped in the receive interrupt) more than 50 ms ago, so a late
+poll does not drop a frame whose rest is already buffered. The sensor modules have no
+tick in the repository yet (the STM32G0 support files are missing), so they set no clock and
+`esocore_protocol_receive_message()` reads once and returns instead of waiting for its timeout.
+
 | Type   | Message             | Payload                                                                                        |
 | ------ | ------------------- | ---------------------------------------------------------------------------------------------- |
 | `0x01` | `DISCOVER`          | none; Edge to broadcast                                                                        |
@@ -295,7 +305,10 @@ Builds the tests in `tests/host/` with the host C compiler (`HOST_CC`, default `
 runs them. No ARM toolchain or target hardware is needed. They cover the Modbus RTU slave: every function code with the request and response
 examples of the Modbus specification, the exception responses, broadcast, and the T1.5/T3.5 receiver; and the sensor bus frame codec
 (`test_protocol.c`): the byte layout, frames encoded by one side and decoded by the other, partial, corrupt and back-to-back frames, and the
-discovery payload. The Firmware CI workflow runs the same command on every pull request.
+discovery payload. `test_protocol_timing.c` checks that `esocore_protocol_receive_message()` returns after its timeout, also across the
+32-bit clock wrap, and without a clock after one read. `test_sensor_bus.c` runs the Edge's `sensor_bus.c` against a fake UART, GPIO and clock:
+`last_seen_ms`, the heartbeat timeout (also across the clock wrap), the discovery schedule and the partial-frame gap timeout. The Firmware CI
+workflow runs the same command on every pull request.
 
 ## Hardware Abstraction Layer (HAL) Status
 

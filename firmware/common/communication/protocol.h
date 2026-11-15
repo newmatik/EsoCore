@@ -56,6 +56,9 @@
 /* A partial frame that receives no byte for this long is abandoned: its start
  * byte is dropped and the receiver searches the rest for the next frame. */
 #define ESOCORE_PROTOCOL_FRAME_GAP_TIMEOUT_MS 50
+/* A sensor module sends a heartbeat at least this often; the Edge reports a
+ * module offline after SBUS_HEARTBEAT_TIMEOUT_MULT intervals without a frame. */
+#define ESOCORE_PROTOCOL_HEARTBEAT_INTERVAL_MS 15000
 #define ESOCORE_PROTOCOL_RETRY_COUNT          3
 
 /* ============================================================================
@@ -309,6 +312,23 @@ typedef bool (*esocore_command_handler_t)(uint8_t command, const uint8_t *data, 
 void esocore_protocol_register_command_handler(esocore_command_handler_t handler);
 
 /**
+ * @brief Millisecond clock: a free-running counter that wraps at 2^32
+ */
+typedef uint32_t (*esocore_time_fn_t)(void);
+
+/**
+ * @brief Set the clock for receive timeouts and the frame gap timeout
+ *
+ * The Edge passes system_clock_get_tick. Without a clock (NULL, the default)
+ * time cannot be measured: esocore_protocol_receive_message() then reads the
+ * receiver once and returns, whatever its timeout, and a
+ * partial frame is kept until it completes or turns out invalid.
+ *
+ * @param get_time_ms Clock, or NULL for none
+ */
+void esocore_protocol_set_time_source(esocore_time_fn_t get_time_ms);
+
+/**
  * @brief Shut the protocol down
  *
  * Flushes the receive state. esocore_protocol_init() can start it again.
@@ -333,6 +353,10 @@ bool esocore_protocol_send_message(uint8_t destination_address,
 
 /**
  * @brief Receive a protocol message
+ *
+ * Waits up to timeout_ms, measured with the clock of
+ * esocore_protocol_set_time_source(); without a clock it reads the receiver
+ * once and returns.
  *
  * @param message Pointer to message structure to fill
  * @param timeout_ms Timeout in milliseconds
