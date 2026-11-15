@@ -6,6 +6,8 @@ import { dirname, join, relative, resolve, sep } from 'node:path'
 import { test } from 'node:test'
 import { fileURLToPath } from 'node:url'
 
+import { marked } from 'marked'
+
 import { docsConfig } from '../utils/docs-config.js'
 
 const siteDir = resolve(dirname(fileURLToPath(import.meta.url)), '..')
@@ -42,27 +44,22 @@ function exists(path) {
   return existsSync(join(publicDir, decodeURIComponent(clean.slice(1))))
 }
 
-// Markdown link targets outside fenced code blocks and inline code.
+// Link targets of a Markdown document as the site renders it (marked): inline and reference links, not code.
 function markdownLinks(markdown) {
   const targets = []
-  // The open fence (e.g. '````'): a block ends only at a fence of the same character, at least as long, with no info string.
-  let fence = null
-  for (const line of markdown.split('\n')) {
-    const marker = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line)
-    if (marker) {
-      if (fence === null) {
-        fence = marker[1]
-        continue
-      }
-      if (marker[1][0] === fence[0] && marker[1].length >= fence.length && !marker[2].trim()) {
-        fence = null
-        continue
-      }
-    }
-    if (fence !== null) continue
-    const text = line.replace(/`[^`]*`/g, '')
-    for (const match of text.matchAll(/\]\(\s*<?([^)\s>]+)>?(?:\s+"[^"]*")?\s*\)/g))
-      targets.push(match[1])
+  marked.walkTokens(marked.lexer(markdown), token => {
+    if (token.type === 'link') targets.push(token.href)
+  })
+  return targets
+}
+
+// Literal /docs targets in a Vue file: to="/docs/..", href="/docs/..", :to="'/docs/..'" and :href="'/docs/..'".
+function vueDocLinks(source) {
+  const targets = []
+  for (const match of source.matchAll(
+    /(?:^|[\s<])(?::(?:to|href)="'(\/docs[^'#?]*)'|(?:to|href)="(\/docs[^"#?]*))/g
+  )) {
+    targets.push(match[1] ?? match[2])
   }
   return targets
 }
@@ -93,8 +90,8 @@ test('every /docs link in the Vue pages and components points to an existing pag
   for (const file of [...vueFiles, join(siteDir, 'app.vue'), join(siteDir, 'error.vue')]) {
     if (!existsSync(file)) continue
     const source = readFileSync(file, 'utf-8')
-    for (const match of source.matchAll(/\b(?:to|href)="(\/docs[^"#?]*)/g)) {
-      if (!exists(match[1])) broken.push(`${relative(siteDir, file)}: ${match[1]}`)
+    for (const target of vueDocLinks(source)) {
+      if (!exists(target)) broken.push(`${relative(siteDir, file)}: ${target}`)
     }
   }
   assert.deepEqual(broken, [], `broken /docs links:\n${broken.join('\n')}`)
@@ -120,4 +117,13 @@ test('the link check itself detects a missing page', () => {
   assert.equal(exists('/docs/'), true)
   assert.deepEqual(markdownLinks('```\n[a](/x)\n```\n`[b](/y)` [c](/z "t")'), ['/z'])
   assert.deepEqual(markdownLinks('````md\n```\n[a](/x)\n```\n````\n[b](/y)'), ['/y'])
+  assert.deepEqual(markdownLinks('See [the guide][g].\n\n[g]: /docs/missing-page'), [
+    '/docs/missing-page',
+  ])
+  assert.deepEqual(
+    vueDocLinks(
+      `<NuxtLink to="/docs/a" /><a :href="'/docs/b'">b</a><x :to="slug ? \`/docs/\${slug}\` : '/docs'" />`
+    ),
+    ['/docs/a', '/docs/b']
+  )
 })
