@@ -119,14 +119,16 @@ VIBRATION_SOURCES := \
 	stm32/sensors/vibration_codec.c
 
 ACOUSTIC_SOURCES := \
-	stm32/sensors/acoustic_sensor.c
+	stm32/sensors/acoustic_sensor.c \
+	stm32/sensors/acoustic_codec.c
 
 CURRENT_SOURCES := \
 	stm32/sensors/current_sensor.c \
 	stm32/sensors/current_codec.c
 
 AIR_QUALITY_SOURCES := \
-	stm32/sensors/air_quality_sensor.c
+	stm32/sensors/air_quality_sensor.c \
+	stm32/sensors/air_quality_codec.c
 
 OIL_QUALITY_SOURCES := \
 	stm32/sensors/oil_quality_sensor.c
@@ -141,7 +143,8 @@ PROXIMITY_SOURCES := \
 	stm32/sensors/proximity_position_sensor.c
 
 LIGHT_SOURCES := \
-	stm32/sensors/light_sensor.c
+	stm32/sensors/light_sensor.c \
+	stm32/sensors/light_codec.c
 
 # MCU-specific flags
 EDGE_MCU_FLAGS := \

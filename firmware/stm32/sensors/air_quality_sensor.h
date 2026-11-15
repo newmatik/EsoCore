@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "../../common/sensors/sensor_interface.h"
+#include "../../common/sensors/sensor_codec.h"
 
 /* ============================================================================
  * Air Quality Sensor Configuration
@@ -272,5 +273,29 @@ bool air_quality_get_diagnostics(uint8_t *diagnostic_data, uint16_t buffer_size)
  */
 bool air_quality_export_data(const air_quality_sensor_data_t *data,
                            const char *filename, uint8_t format);
+
+/* ============================================================================
+ * Bus Payload (layout rules: common/sensors/sensor_codec.h)
+ * ============================================================================ */
+
+/** Encoded size of a reading, header included */
+#define AIR_QUALITY_SENSOR_DATA_WIRE_SIZE 985U
+
+/** Walks every field of a reading in declaration order (encode, decode or fill) */
+void air_quality_sensor_codec(esocore_codec_t *codec, air_quality_sensor_data_t *data);
+
+/**
+ * @brief Serialise a reading for esocore_protocol_send_sensor_data()
+ *
+ * @return Bytes written (AIR_QUALITY_SENSOR_DATA_WIRE_SIZE), or 0 if capacity is too small
+ */
+uint32_t air_quality_sensor_encode_data(const air_quality_sensor_data_t *data, uint8_t *buffer, uint32_t capacity);
+
+/**
+ * @brief Parse a reading serialised by air_quality_sensor_encode_data()
+ *
+ * @return false if the length, device type, layout version or a bool byte is wrong
+ */
+bool air_quality_sensor_decode_data(const uint8_t *buffer, uint32_t length, air_quality_sensor_data_t *data);
 
 #endif /* AIR_QUALITY_SENSOR_H */

@@ -9,7 +9,10 @@
  */
 
 #include "sensor_codec.h"
+#include "../../stm32/sensors/acoustic_sensor.h"
+#include "../../stm32/sensors/air_quality_sensor.h"
 #include "../../stm32/sensors/current_sensor.h"
+#include "../../stm32/sensors/light_sensor.h"
 #include "../../stm32/sensors/vibration_sensor.h"
 
 #include <stdio.h>
@@ -285,12 +288,131 @@ static void test_current(void) {
     CHECK(bytes_a[2624] == 42);
 }
 
+/* ---------------------------------------------------------------------------
+ * Acoustic, air quality, light
+ * ------------------------------------------------------------------------- */
+
+#define MODULE_GLUE(prefix, type)                                                             \
+    static type prefix##_a;                                                                   \
+    static type prefix##_b;                                                                   \
+    static void prefix##_fill(esocore_codec_t *codec, void *data) {                          \
+        prefix##_sensor_codec(codec, data);                                                   \
+    }                                                                                         \
+    static uint32_t prefix##_encode(const void *data, uint8_t *buffer, uint32_t capacity) {   \
+        return prefix##_sensor_encode_data(data, buffer, capacity);                           \
+    }                                                                                         \
+    static bool prefix##_decode(const uint8_t *buffer, uint32_t length, void *data) {         \
+        return prefix##_sensor_decode_data(buffer, length, data);                             \
+    }
+
+MODULE_GLUE(acoustic, acoustic_sensor_data_t)
+MODULE_GLUE(air_quality, air_quality_sensor_data_t)
+MODULE_GLUE(light, light_sensor_data_t)
+
+static void test_acoustic(void) {
+    const module_t m = {"acoustic", ESOCORE_DEVICE_TYPE_ACOUSTIC, ACOUSTIC_SENSOR_DATA_WIRE_SIZE,
+                        &acoustic_a, &acoustic_b, sizeof(acoustic_a),
+                        acoustic_fill, acoustic_encode, acoustic_decode};
+    check_module(&m);
+
+    current_test = "acoustic_layout";
+    memset(&acoustic_a, 0, sizeof(acoustic_a));
+    acoustic_a.raw_data.audio_samples[0] = -2;
+    acoustic_a.processed_data.rms_level_db = 61.5f;
+    acoustic_a.fft_data.frequency_bins[0] = 7.25f;
+    acoustic_a.frequency_bands.band_31_5_hz = 30.5f;
+    acoustic_a.ultrasound_data.ultrasound_detected = true;
+    acoustic_a.acoustic_condition = 64;
+    strcpy(acoustic_a.condition_description, "quiet");
+    CHECK(acoustic_sensor_encode_data(&acoustic_a, bytes_a, BUFFER_SIZE) == 6602);
+    CHECK(bytes_a[278] == 0xFE && bytes_a[279] == 0xFF);
+    CHECK(read_f32(bytes_a + 4383) == 61.5f);
+    CHECK(read_f32(bytes_a + 4415) == 7.25f);
+    CHECK(read_f32(bytes_a + 6489) == 30.5f);
+    CHECK(bytes_a[6525] == 1);
+    CHECK(bytes_a[6537] == 64);
+    CHECK(memcmp(bytes_a + 6538, "quiet", 6) == 0);
+}
+
+static void test_air_quality(void) {
+    const module_t m = {"air_quality", ESOCORE_DEVICE_TYPE_AIR_QUALITY, AIR_QUALITY_SENSOR_DATA_WIRE_SIZE,
+                        &air_quality_a, &air_quality_b, sizeof(air_quality_a),
+                        air_quality_fill, air_quality_encode, air_quality_decode};
+    check_module(&m);
+
+    current_test = "air_quality_layout";
+    memset(&air_quality_a, 0, sizeof(air_quality_a));
+    air_quality_a.gas_sensors[0].gas_type = 3;
+    air_quality_a.gas_sensors[1].gas_type = 4; /* each gas entry is 24 bytes */
+    air_quality_a.gas_sensors[AIR_QUALITY_MAX_GASES - 1].timestamp = 0xCAFEF00DU;
+    air_quality_a.pm_data.pm1_0 = 12.5f;
+    air_quality_a.env_data.temperature_celsius = 21.5f;
+    air_quality_a.iaq_data.iaq_index = 0x0203;
+    air_quality_a.health_data.overall_risk_level = 9;
+    strcpy(air_quality_a.health_data.recommendations, "ventilate");
+    air_quality_a.air_quality_score = 77;
+    CHECK(air_quality_sensor_encode_data(&air_quality_a, bytes_a, BUFFER_SIZE) == 985);
+    CHECK(bytes_a[278] == 3);
+    CHECK(bytes_a[302] == 4);
+    CHECK(read_u32(bytes_a + 466) == 0xCAFEF00DU);
+    CHECK(read_f32(bytes_a + 470) == 12.5f);
+    CHECK(read_f32(bytes_a + 485) == 21.5f);
+    CHECK(bytes_a[505] == 0x03 && bytes_a[506] == 0x02);
+    CHECK(bytes_a[528] == 9);
+    CHECK(memcmp(bytes_a + 660, "ventilate", 10) == 0);
+    CHECK(bytes_a[920] == 77);
+}
+
+static void test_light(void) {
+    const module_t m = {"light", ESOCORE_DEVICE_TYPE_LIGHT, LIGHT_SENSOR_DATA_WIRE_SIZE,
+                        &light_a, &light_b, sizeof(light_a),
+                        light_fill, light_encode, light_decode};
+    check_module(&m);
+
+    current_test = "light_layout";
+    memset(&light_a, 0, sizeof(light_a));
+    light_a.visible_data.lux = 500.0f; /* light_sensor_data_t has no base_data */
+    light_a.uv_data.uva_watts_per_m2 = 1.5f;
+    light_a.color_data.red_counts = 0x0A0B;
+    light_a.spectral_data.channel_data[0] = 2.5f;
+    light_a.ir_data.object_temperature_celsius = 36.5f;
+    light_a.workplace_compliance.illuminance_compliant = true;
+    strcpy(light_a.environmental_analysis.pollution_level, "low");
+    light_a.light_quality_score = 90;
+    light_a.illuminance_lux = 480.0f;
+    light_a.uva_intensity_uwm2 = 3.5f;
+    light_a.object_temperature_c = 30.5f;
+    light_a.red_raw = 0x0C0D;
+    light_a.spectral_channels[0] = 0x0E0F;
+    light_a.sensor_status = 0x1F;
+    light_a.timestamp = 0x0A0B0C0DU;
+    CHECK(light_sensor_encode_data(&light_a, bytes_a, BUFFER_SIZE) == 519);
+    CHECK(read_f32(bytes_a + 2) == 500.0f);
+    CHECK(read_f32(bytes_a + 18) == 1.5f);
+    CHECK(bytes_a[30] == 0x0B && bytes_a[31] == 0x0A);
+    CHECK(read_f32(bytes_a + 46) == 2.5f);
+    CHECK(read_f32(bytes_a + 87) == 36.5f);
+    CHECK(bytes_a[95] == 1);
+    CHECK(memcmp(bytes_a + 247, "low", 4) == 0);
+    CHECK(bytes_a[367] == 90);
+    CHECK(read_f32(bytes_a + 432) == 480.0f);
+    CHECK(read_f32(bytes_a + 445) == 3.5f);
+    CHECK(read_f32(bytes_a + 458) == 30.5f);
+    CHECK(bytes_a[470] == 0x0D && bytes_a[471] == 0x0C);
+    CHECK(bytes_a[486] == 0x0F && bytes_a[487] == 0x0E);
+    CHECK(bytes_a[514] == 0x1F);
+    CHECK(read_u32(bytes_a + 515) == 0x0A0B0C0DU);
+}
+
 int main(void) {
     test_primitives();
     test_base_data_layout();
     test_const_readings();
     test_vibration();
     test_current();
+    test_acoustic();
+    test_air_quality();
+    test_light();
 
     printf("sensor codec tests: %d checks, %d failed\n", checks_run, checks_failed);
     return checks_failed == 0 ? 0 : 1;

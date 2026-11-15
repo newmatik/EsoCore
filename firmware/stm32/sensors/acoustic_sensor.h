@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "../../common/sensors/sensor_interface.h"
+#include "../../common/sensors/sensor_codec.h"
 
 /* ============================================================================
  * Acoustic Sensor Configuration
@@ -294,5 +295,29 @@ bool acoustic_sensor_check_saturation(uint8_t *saturation_flags);
  */
 bool acoustic_sensor_export_data(const acoustic_sensor_data_t *data,
                                const char *filename, uint8_t format);
+
+/* ============================================================================
+ * Bus Payload (layout rules: common/sensors/sensor_codec.h)
+ * ============================================================================ */
+
+/** Encoded size of a reading, header included */
+#define ACOUSTIC_SENSOR_DATA_WIRE_SIZE 6602U
+
+/** Walks every field of a reading in declaration order (encode, decode or fill) */
+void acoustic_sensor_codec(esocore_codec_t *codec, acoustic_sensor_data_t *data);
+
+/**
+ * @brief Serialise a reading for esocore_protocol_send_sensor_data()
+ *
+ * @return Bytes written (ACOUSTIC_SENSOR_DATA_WIRE_SIZE), or 0 if capacity is too small
+ */
+uint32_t acoustic_sensor_encode_data(const acoustic_sensor_data_t *data, uint8_t *buffer, uint32_t capacity);
+
+/**
+ * @brief Parse a reading serialised by acoustic_sensor_encode_data()
+ *
+ * @return false if the length, device type, layout version or a bool byte is wrong
+ */
+bool acoustic_sensor_decode_data(const uint8_t *buffer, uint32_t length, acoustic_sensor_data_t *data);
 
 #endif /* ACOUSTIC_SENSOR_H */
