@@ -303,6 +303,52 @@ Current (`current_sensor_data_t`, 2689 bytes):
 | 2624   | 1    | `current_condition`                                                       |
 | 2625   | 64   | `condition_description`                                                   |
 
+Acoustic (`acoustic_sensor_data_t`, 6602 bytes):
+
+| Offset | Size | Section                                                                   |
+| ------ | ---- | ------------------------------------------------------------------------- |
+| 2      | 276  | `base_data`                                                               |
+| 278    | 4105 | `raw_data`: 2048 samples (`int16_t`), sample count, timestamp, temperature (`int8_t`) |
+| 4383   | 32   | `processed_data`: 6 `float`, measurement duration, timestamp              |
+| 4415   | 2074 | `fft_data`: 512 frequency bins, dominant frequency (`uint16_t`), 6 `float` |
+| 6489   | 36   | `frequency_bands`: 9 octave bands (`float`), 31.5 Hz to 8 kHz             |
+| 6525   | 12   | `ultrasound_data`                                                         |
+| 6537   | 1    | `acoustic_condition`                                                      |
+| 6538   | 64   | `condition_description`                                                   |
+
+Air quality (`air_quality_sensor_data_t`, 985 bytes):
+
+| Offset | Size | Section                                                                   |
+| ------ | ---- | ------------------------------------------------------------------------- |
+| 2      | 276  | `base_data`                                                               |
+| 278    | 192  | `gas_sensors`: 8 entries of 24 bytes                                      |
+| 470    | 15   | `pm_data`                                                                 |
+| 485    | 20   | `env_data`: 5 `float`                                                     |
+| 505    | 23   | `iaq_data`                                                                |
+| 528    | 392  | `health_data`: 4 risk bytes, risk description (128), recommendations (256), timestamp |
+| 920    | 1    | `air_quality_score`                                                       |
+| 921    | 64   | `quality_description`                                                     |
+
+Light (`light_sensor_data_t`, 519 bytes; no `base_data`):
+
+| Offset | Size | Section                                                                   |
+| ------ | ---- | ------------------------------------------------------------------------- |
+| 2      | 16   | `visible_data`                                                            |
+| 18     | 12   | `uv_data`                                                                 |
+| 30     | 16   | `color_data`                                                              |
+| 46     | 41   | `spectral_data`: 10 channels (`float`), flicker frequency                 |
+| 87     | 8    | `ir_data`                                                                 |
+| 95     | 152  | `workplace_compliance`: three pairs of flag and status text (48), overall flag, timestamp |
+| 247    | 120  | `environmental_analysis`                                                  |
+| 367    | 1    | `light_quality_score`                                                     |
+| 368    | 64   | `condition_description`                                                   |
+| 432    | 13   | TSL2591: illuminance, channel 0 and 1, infrared ratio, gain               |
+| 445    | 13   | VEML6075: UVA, UVB, UV index, gain                                        |
+| 458    | 12   | MLX90614: object and ambient temperature, emissivity                      |
+| 470    | 16   | TCS34725: red, green, blue, clear (`uint16_t`), color temperature, lux    |
+| 486    | 28   | AS7341: 10 channels (`uint16_t`), dominant wavelength, peak intensity     |
+| 514    | 5    | `sensor_status`, `timestamp`                                              |
+
 `tests/host/test_sensor_codec.c` checks these offsets and sizes.
 
 ### Modbus RTU

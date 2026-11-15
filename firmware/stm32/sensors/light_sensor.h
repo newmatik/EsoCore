@@ -25,6 +25,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "../../common/sensors/sensor_interface.h"
+#include "../../common/sensors/sensor_codec.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -556,6 +557,30 @@ bool light_sensor_get_calibration_status(bool *visible_calibrated, bool *uv_cali
  * @return true if recalibration started successfully, false otherwise
  */
 bool light_sensor_force_recalibration(const char *sensor_type);
+
+/* ============================================================================
+ * Bus Payload (layout rules: common/sensors/sensor_codec.h)
+ * ============================================================================ */
+
+/** Encoded size of a reading, header included */
+#define LIGHT_SENSOR_DATA_WIRE_SIZE 519U
+
+/** Walks every field of a reading in declaration order (encode, decode or fill) */
+void light_sensor_codec(esocore_codec_t *codec, light_sensor_data_t *data);
+
+/**
+ * @brief Serialise a reading for esocore_protocol_send_sensor_data()
+ *
+ * @return Bytes written (LIGHT_SENSOR_DATA_WIRE_SIZE), or 0 if capacity is too small
+ */
+uint32_t light_sensor_encode_data(const light_sensor_data_t *data, uint8_t *buffer, uint32_t capacity);
+
+/**
+ * @brief Parse a reading serialised by light_sensor_encode_data()
+ *
+ * @return false if the length, device type, layout version or a bool byte is wrong
+ */
+bool light_sensor_decode_data(const uint8_t *buffer, uint32_t length, light_sensor_data_t *data);
 
 #ifdef __cplusplus
 }
