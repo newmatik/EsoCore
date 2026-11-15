@@ -531,7 +531,7 @@ Track results and scale based on proven value:
 ### Related Guides
 
 - [Predictive Maintenance Implementation](/docs/solutions/predictive-maintenance)
-- [Factory Monitoring Strategies](/docs/solutions/factory-monitoring)
+- [Portal: device dashboard, asset monitoring and alerts for every machine](/docs/portal)
 
 ### Technical Resources
 
