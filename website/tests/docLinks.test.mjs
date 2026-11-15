@@ -32,7 +32,7 @@ function pagePath(file) {
 // True when an internal path is served by the site: a docs page, a Vue page or a file in public/.
 function exists(path) {
   const clean = path.replace(/\/+$/, '') || '/'
-  if (clean === '/docs') return true
+  if (clean === '/docs') return existsSync(join(contentDir, 'README.md'))
   if (clean.startsWith('/docs/')) {
     const slug = decodeURIComponent(clean.slice('/docs/'.length))
     return slug !== 'README' && existsSync(join(contentDir, `${slug}.md`))
@@ -45,13 +45,21 @@ function exists(path) {
 // Markdown link targets outside fenced code blocks and inline code.
 function markdownLinks(markdown) {
   const targets = []
-  let fenced = false
+  // The open fence (e.g. '````'): a block ends only at a fence of the same character, at least as long, with no info string.
+  let fence = null
   for (const line of markdown.split('\n')) {
-    if (/^\s*(```|~~~)/.test(line)) {
-      fenced = !fenced
-      continue
+    const marker = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line)
+    if (marker) {
+      if (fence === null) {
+        fence = marker[1]
+        continue
+      }
+      if (marker[1][0] === fence[0] && marker[1].length >= fence.length && !marker[2].trim()) {
+        fence = null
+        continue
+      }
     }
-    if (fenced) continue
+    if (fence !== null) continue
     const text = line.replace(/`[^`]*`/g, '')
     for (const match of text.matchAll(/\]\(\s*<?([^)\s>]+)>?(?:\s+"[^"]*")?\s*\)/g))
       targets.push(match[1])
@@ -111,4 +119,5 @@ test('the link check itself detects a missing page', () => {
   assert.equal(exists('/docs/solutions/predictive-maintenance'), true)
   assert.equal(exists('/docs/'), true)
   assert.deepEqual(markdownLinks('```\n[a](/x)\n```\n`[b](/y)` [c](/z "t")'), ['/z'])
+  assert.deepEqual(markdownLinks('````md\n```\n[a](/x)\n```\n````\n[b](/y)'), ['/y'])
 })
