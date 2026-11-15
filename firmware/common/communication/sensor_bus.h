@@ -205,8 +205,9 @@ bool sensor_bus_stop(void);
  * Must be called periodically (e.g. from main loop). Handles incoming
  * messages, processes heartbeats, detects device timeouts, and triggers
  * discovery scans: on the first poll after sensor_bus_start(), then every
- * discovery_interval_ms. A device that has sent nothing for
- * SBUS_HEARTBEAT_TIMEOUT_MULT heartbeat intervals is reported offline.
+ * discovery_interval_ms. A device that has sent no heartbeat, data or
+ * discovery response for SBUS_HEARTBEAT_TIMEOUT_MULT heartbeat intervals
+ * (ESOCORE_PROTOCOL_HEARTBEAT_INTERVAL_MS) is reported offline.
  *
  * @return true if any activity was processed, false otherwise
  */

@@ -195,8 +195,8 @@ static sensor_bus_device_t device_status(uint8_t address) {
     return none;
 }
 
-/* Heartbeat timeout: SBUS_HEARTBEAT_TIMEOUT_MULT * 1000 ms */
-#define TIMEOUT_MS 3000U
+/* Heartbeat timeout: three heartbeat intervals of the sensor modules (45 s) */
+#define TIMEOUT_MS ((uint32_t)SBUS_HEARTBEAT_TIMEOUT_MULT * ESOCORE_PROTOCOL_HEARTBEAT_INTERVAL_MS)
 
 /* ---------------------------------------------------------------------------
  * Tests
@@ -227,6 +227,15 @@ static void test_last_seen_uses_clock(void) {
     receive_heartbeat(5);
     sensor_bus_poll();
     CHECK(device_status(5).last_seen_ms == 101500);
+
+    /* A data frame counts as a sign of life too */
+    fake_now_ms = 102000;
+    uint8_t frame[ESOCORE_PROTOCOL_FRAME_SIZE];
+    const uint8_t payload[] = {1};
+    receive_bytes(frame, sensor_frame(5, ESOCORE_MSG_DATA_RESPONSE, payload, sizeof(payload), frame));
+    sensor_bus_poll();
+    CHECK(data_frames == 1);
+    CHECK(device_status(5).last_seen_ms == 102000);
     CHECK(sensor_bus_deinit());
 }
 
@@ -266,8 +275,9 @@ static void test_heartbeats_keep_device_online(void) {
     start_bus(0);
     receive_discovery_response(9);
     sensor_bus_poll();
+    /* Heartbeats at the sensor modules' own interval */
     for (int i = 0; i < 20; i++) {
-        fake_now_ms += 1000;
+        fake_now_ms += ESOCORE_PROTOCOL_HEARTBEAT_INTERVAL_MS;
         receive_heartbeat(9);
         sensor_bus_poll();
     }
@@ -283,7 +293,7 @@ static void test_timeout_across_clock_wrap(void) {
     sensor_bus_poll();
     CHECK(connects == 1);
 
-    fake_now_ms = 0xFFFFFF00U + 2000U; /* wrapped past zero, 2 s later */
+    fake_now_ms = 0xFFFFFF00U + TIMEOUT_MS / 2U; /* wrapped past zero */
     sensor_bus_poll();
     CHECK(disconnects == 0);
 
@@ -371,6 +381,30 @@ static void test_partial_frame_within_gap(void) {
     CHECK(sensor_bus_deinit());
 }
 
+static void test_late_poll_keeps_queued_rest(void) {
+    current_test = "late_poll_keeps_queued_rest";
+    start_bus(0);
+    sensor_bus_poll();
+
+    uint8_t frame[ESOCORE_PROTOCOL_FRAME_SIZE];
+    const uint8_t payload[] = {5, 6, 7, 8};
+    uint16_t length = sensor_frame(6, ESOCORE_MSG_DATA_RESPONSE, payload, sizeof(payload), frame);
+
+    /* The rest arrives 1 ms after the start, but the next poll comes late */
+    receive_bytes(frame, 4);
+    sensor_bus_poll();
+    fake_now_ms = 1;
+    receive_bytes(frame + 4, (uint32_t)length - 4);
+    fake_now_ms = 1 + ESOCORE_PROTOCOL_FRAME_GAP_TIMEOUT_MS + 10;
+    sensor_bus_poll();
+    CHECK(data_frames == 1);
+
+    sensor_bus_status_t status;
+    CHECK(sensor_bus_get_status(&status));
+    CHECK(status.bus_errors == 0);
+    CHECK(sensor_bus_deinit());
+}
+
 int main(void) {
     test_init_needs_clock();
     test_last_seen_uses_clock();
@@ -380,6 +414,7 @@ int main(void) {
     test_discovery_timing();
     test_partial_frame_gap_timeout();
     test_partial_frame_within_gap();
+    test_late_poll_keeps_queued_rest();
 
     printf("sensor bus tests: %d checks, %d failed\n", checks_run, checks_failed);
     return checks_failed == 0 ? 0 : 1;

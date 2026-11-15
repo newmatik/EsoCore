@@ -234,7 +234,10 @@ is abandoned the same way. There is no end delimiter and no byte stuffing.
 Both ends measure time with a millisecond clock the application passes in: `sensor_bus_config_t.get_time_ms` (required)
 and `esocore_protocol_set_time_source()`. The Edge passes `system_clock_get_tick` (SysTick) to both. The Edge sends a
 discovery request on the first `sensor_bus_poll()` after `sensor_bus_start()` and then every `discovery_interval_ms`,
-and reports a module offline when nothing came from it for three heartbeat intervals (3 s). The sensor modules have no
+and reports a module offline when no heartbeat, data or discovery response came from it for three heartbeat intervals
+(`ESOCORE_PROTOCOL_HEARTBEAT_INTERVAL_MS`, 15 s, which the modules also send at: 45 s). A partial frame is abandoned
+when no byte is waiting and the last one arrived (time stamped in the receive interrupt) more than 50 ms ago, so a late
+poll does not drop a frame whose rest is already buffered. The sensor modules have no
 tick in the repository yet (the STM32G0 support files are missing), so they set no clock and
 `esocore_protocol_receive_message()` reads once and returns instead of waiting for its timeout.
 

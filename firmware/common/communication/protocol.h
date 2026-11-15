@@ -56,6 +56,9 @@
 /* A partial frame that receives no byte for this long is abandoned: its start
  * byte is dropped and the receiver searches the rest for the next frame. */
 #define ESOCORE_PROTOCOL_FRAME_GAP_TIMEOUT_MS 50
+/* A sensor module sends a heartbeat at least this often; the Edge reports a
+ * module offline after SBUS_HEARTBEAT_TIMEOUT_MULT intervals without a frame. */
+#define ESOCORE_PROTOCOL_HEARTBEAT_INTERVAL_MS 15000
 #define ESOCORE_PROTOCOL_RETRY_COUNT          3
 
 /* ============================================================================

@@ -36,7 +36,7 @@
 #define SENSOR_DEVICE_TYPE          ESOCORE_DEVICE_TYPE_VIBRATION /* Default type */
 
 /* Communication Configuration */
-#define HEARTBEAT_INTERVAL_MS       15000   /* 15 seconds */
+#define HEARTBEAT_INTERVAL_MS       ESOCORE_PROTOCOL_HEARTBEAT_INTERVAL_MS /* 15 seconds; the Edge expects it */
 #define DATA_TRANSMIT_INTERVAL_MS   2000    /* 2 seconds */
 #define CONFIG_CHECK_INTERVAL_MS    60000   /* 1 minute */
 
