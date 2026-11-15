@@ -422,7 +422,8 @@ Track results and expand monitoring based on proven ROI:
 ### Related Resources
 
 - [Equipment Downtime Prevention Strategies](/docs/solutions/equipment-downtime-prevention)
-- [Factory-Wide Monitoring Guide](/docs/solutions/factory-monitoring)
+- [Portal: device dashboard, asset monitoring and alerts for every machine](/docs/portal)
+- [Integration Guide: CMMS, SCADA, MES and ERP](/docs/getting-started/integration-guide)
 
 ---
 
