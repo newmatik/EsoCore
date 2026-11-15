@@ -68,6 +68,7 @@ COMMON_SOURCES := \
 	common/analog/analog_input.c \
 	common/analog/signal_chain.c \
 	common/sensors/sensor_interface.c \
+	common/sensors/sensor_codec.c \
 	common/storage/storage_system.c \
 	common/safety/safety_io.c \
 	common/management/power_management.c \
@@ -114,13 +115,15 @@ SENSOR_SOURCES := \
 
 # Sensor-specific sources
 VIBRATION_SOURCES := \
-	stm32/sensors/vibration_sensor.c
+	stm32/sensors/vibration_sensor.c \
+	stm32/sensors/vibration_codec.c
 
 ACOUSTIC_SOURCES := \
 	stm32/sensors/acoustic_sensor.c
 
 CURRENT_SOURCES := \
-	stm32/sensors/current_sensor.c
+	stm32/sensors/current_sensor.c \
+	stm32/sensors/current_codec.c
 
 AIR_QUALITY_SOURCES := \
 	stm32/sensors/air_quality_sensor.c
@@ -462,12 +465,13 @@ HOST_TEST_CFLAGS := $(STANDARD) -Wall -Wextra -Werror -Wno-unused-function -Wno-
 HOST_TEST_DIR := $(BUILD_DIR)/tests
 
 test: $(HOST_TEST_DIR)/test_modbus_rtu $(HOST_TEST_DIR)/test_protocol \
-	$(HOST_TEST_DIR)/test_protocol_timing $(HOST_TEST_DIR)/test_sensor_bus
+	$(HOST_TEST_DIR)/test_protocol_timing $(HOST_TEST_DIR)/test_sensor_bus $(HOST_TEST_DIR)/test_sensor_codec
 	@echo "Running host unit tests..."
 	@$(HOST_TEST_DIR)/test_modbus_rtu
 	@$(HOST_TEST_DIR)/test_protocol
 	@$(HOST_TEST_DIR)/test_protocol_timing
 	@$(HOST_TEST_DIR)/test_sensor_bus
+	@$(HOST_TEST_DIR)/test_sensor_codec
 
 $(HOST_TEST_DIR)/test_modbus_rtu: tests/host/test_modbus_rtu.c common/communication/modbus_rtu.c common/communication/modbus_rtu.h
 	@mkdir -p $(HOST_TEST_DIR)
@@ -491,6 +495,17 @@ $(HOST_TEST_DIR)/test_sensor_bus: tests/host/test_sensor_bus.c common/communicat
 	@mkdir -p $(HOST_TEST_DIR)
 	$(HOST_CC) $(HOST_TEST_CFLAGS) -Icommon/communication -o $@ \
 		tests/host/test_sensor_bus.c common/communication/sensor_bus.c common/communication/protocol_frame.c
+
+# Sensor reading payloads: the common codec and every module's codec file.
+SENSOR_CODEC_SOURCES := common/sensors/sensor_codec.c $(filter %_codec.c,$(VIBRATION_SOURCES) $(ACOUSTIC_SOURCES) \
+	$(CURRENT_SOURCES) $(AIR_QUALITY_SOURCES) $(OIL_QUALITY_SOURCES) $(PRESSURE_SOURCES) $(TEMPERATURE_SOURCES) \
+	$(PROXIMITY_SOURCES) $(LIGHT_SOURCES))
+
+$(HOST_TEST_DIR)/test_sensor_codec: tests/host/test_sensor_codec.c $(SENSOR_CODEC_SOURCES) common/sensors/sensor_codec.h \
+		$(wildcard stm32/sensors/*_sensor.h) common/sensors/sensor_interface.h
+	@mkdir -p $(HOST_TEST_DIR)
+	$(HOST_CC) $(HOST_TEST_CFLAGS) -Icommon/communication -Icommon/sensors -o $@ \
+		tests/host/test_sensor_codec.c $(SENSOR_CODEC_SOURCES)
 
 # Code analysis
 analyze:

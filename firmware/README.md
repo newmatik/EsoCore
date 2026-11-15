@@ -253,8 +253,57 @@ tick in the repository yet (the STM32G0 support files are missing), so they set 
 
 The other message types of `esocore_message_type_t` (configuration, control, firmware update) use the same frame. The
 Edge's data callback gets each frame with its sequence number and flags; putting fragments back together is up to the
-application. The sensor data payload is still the module's data struct as it is in memory, cut into fragments; a
-defined serialised form per module is open.
+application. The sensor data payload is the module's reading in the fixed layout of the next section, cut into fragments
+when it is longer than 256 bytes.
+
+### Sensor Data Payload
+
+A module never sends its data struct as it is in memory (padding, byte order and the size of `bool` and enums depend on
+the compiler). `common/sensors/sensor_codec.c` and one codec file per module (`stm32/sensors/<module>_codec.c`) write
+and read this layout; `<module>_sensor_encode_data()` and `<module>_sensor_decode_data()` are the entry points.
+
+| Offset | Size | Field                                                                    |
+| ------ | ---- | ------------------------------------------------------------------------ |
+| 0      | 1    | Device type (`esocore_device_type_t`), checked by the decoder            |
+| 1      | 1    | Layout version, `ESOCORE_SENSOR_PAYLOAD_VERSION` (1), checked            |
+| 2      |      | The fields of the module's data struct, in the order its header declares |
+
+Fields follow each other without padding. Integers are little endian (two's complement when signed): `uint8_t`,
+`int8_t`, `bool` (0 or 1; any other byte is refused) and enums take 1 byte, 16-bit integers 2 and 32-bit integers 4.
+`float` is IEEE 754 binary32, little endian. `char[n]` takes n bytes: the text, then zeros; the decoder always
+terminates it. Arrays are their elements in index order, nested structs their fields. The decoder accepts only the exact
+length. Any change of a layout raises the layout version.
+
+`base_data` (`esocore_sensor_data_t`, 276 bytes) is: timestamp (4), sensor type (1), sensor id (1), data points (2),
+data type (1), units (8), quality flags (1), data size (2), data (256).
+
+Vibration (`vibration_sensor_data_t`, 1501 bytes):
+
+| Offset | Size | Section                                                                   |
+| ------ | ---- | ------------------------------------------------------------------------- |
+| 2      | 276  | `base_data`                                                               |
+| 278    | 18   | `raw_data`: x, y, z raw (`int32_t` each), timestamp, temperature (`int16_t`) |
+| 296    | 52   | `processed_data`: 12 `float` (acceleration, velocity, displacement per axis, RMS, peak, crest factor), timestamp |
+| 348    | 1046 | `fft_data`: 256 frequency bins, dominant frequency (`uint16_t`), 5 `float` |
+| 1394   | 24   | `bearing_analysis`                                                        |
+| 1418   | 18   | `gear_analysis`                                                           |
+| 1436   | 1    | `overall_condition`                                                       |
+| 1437   | 64   | `condition_description`                                                   |
+
+Current (`current_sensor_data_t`, 2689 bytes):
+
+| Offset | Size | Section                                                                   |
+| ------ | ---- | ------------------------------------------------------------------------- |
+| 2      | 276  | `base_data`                                                               |
+| 278    | 2057 | `raw_data`: 1024 samples (`int16_t`), sample count, timestamp, temperature (`int8_t`) |
+| 2335   | 32   | `processed_data`: 7 `float`, timestamp                                    |
+| 2367   | 205  | `harmonic_data`: magnitudes, phases, percentages (16 `float` each), significant harmonics, 3 `float` |
+| 2572   | 32   | `power_data`: 8 `float`                                                   |
+| 2604   | 20   | `motor_data`                                                              |
+| 2624   | 1    | `current_condition`                                                       |
+| 2625   | 64   | `condition_description`                                                   |
+
+`tests/host/test_sensor_codec.c` checks these offsets and sizes.
 
 ### Modbus RTU
 
@@ -307,8 +356,10 @@ examples of the Modbus specification, the exception responses, broadcast, and th
 (`test_protocol.c`): the byte layout, frames encoded by one side and decoded by the other, partial, corrupt and back-to-back frames, and the
 discovery payload. `test_protocol_timing.c` checks that `esocore_protocol_receive_message()` returns after its timeout, also across the
 32-bit clock wrap, and without a clock after one read. `test_sensor_bus.c` runs the Edge's `sensor_bus.c` against a fake UART, GPIO and clock:
-`last_seen_ms`, the heartbeat timeout (also across the clock wrap), the discovery schedule and the partial-frame gap timeout. The Firmware CI
-workflow runs the same command on every pull request.
+`last_seen_ms`, the heartbeat timeout (also across the clock wrap), the discovery schedule and the partial-frame gap timeout.
+`test_sensor_codec.c` checks the sensor reading payloads: the field encodings, every module's round trip (encode, decode, encode again gives
+the same bytes), the documented sizes and section offsets, and refused payloads (wrong length, device type, layout version or bool byte). The
+Firmware CI workflow runs the same command on every pull request.
 
 ## Hardware Abstraction Layer (HAL) Status
 
