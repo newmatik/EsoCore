@@ -16,6 +16,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "../../common/sensors/sensor_interface.h"
+#include "../../common/sensors/sensor_codec.h"
 
 /* ============================================================================
  * Current Sensor Configuration
@@ -292,5 +293,29 @@ bool current_sensor_check_saturation(uint8_t *saturation_flags);
  */
 bool current_sensor_export_data(const current_sensor_data_t *data,
                               const char *filename, uint8_t format);
+
+/* ============================================================================
+ * Bus Payload (layout rules: common/sensors/sensor_codec.h)
+ * ============================================================================ */
+
+/** Encoded size of a reading, header included */
+#define CURRENT_SENSOR_DATA_WIRE_SIZE 2689U
+
+/** Walks every field of a reading in declaration order (encode, decode or fill) */
+void current_sensor_codec(esocore_codec_t *codec, current_sensor_data_t *data);
+
+/**
+ * @brief Serialise a reading for esocore_protocol_send_sensor_data()
+ *
+ * @return Bytes written (CURRENT_SENSOR_DATA_WIRE_SIZE), or 0 if capacity is too small
+ */
+uint32_t current_sensor_encode_data(const current_sensor_data_t *data, uint8_t *buffer, uint32_t capacity);
+
+/**
+ * @brief Parse a reading serialised by current_sensor_encode_data()
+ *
+ * @return false if the length, device type, layout version or a bool byte is wrong
+ */
+bool current_sensor_decode_data(const uint8_t *buffer, uint32_t length, current_sensor_data_t *data);
 
 #endif /* CURRENT_SENSOR_H */

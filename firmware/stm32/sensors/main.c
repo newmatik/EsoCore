@@ -75,6 +75,12 @@ static acoustic_sensor_data_t acoustic_data;
 static current_sensor_data_t current_data;
 static air_quality_sensor_data_t air_quality_data;
 
+/* Serialised reading of the module (sent in DATA_RESPONSE frames) */
+#define SENSOR_PAYLOAD_BUFFER_SIZE \
+    (VIBRATION_SENSOR_DATA_WIRE_SIZE > CURRENT_SENSOR_DATA_WIRE_SIZE ? VIBRATION_SENSOR_DATA_WIRE_SIZE \
+                                                                     : CURRENT_SENSOR_DATA_WIRE_SIZE)
+static uint8_t payload_buffer[SENSOR_PAYLOAD_BUFFER_SIZE];
+
 /* ============================================================================
  * System Initialization Functions
  * ============================================================================ */
@@ -194,28 +200,31 @@ static void send_sensor_data(void) {
         if (system_status.sensors_active && system_status.acquisition_running &&
             system_status.master_connected && !system_status.low_power_mode) {
             bool data_sent = false;
+            uint32_t payload_length = 0;
 
+            /* Serialise the reading (common/sensors/sensor_codec.h), never the struct as in memory */
             switch (device_type) {
                 case ESOCORE_DEVICE_TYPE_VIBRATION:
-                    if (vibration_sensor_read_data(&vibration_data, 500) &&
-                        esocore_protocol_send_sensor_data((const uint8_t *)&vibration_data,
-                                                          sizeof(vibration_data))) {
-                        data_sent = true;
-                        system_status.total_measurements++;
+                    if (vibration_sensor_read_data(&vibration_data, 500)) {
+                        payload_length = vibration_sensor_encode_data(&vibration_data, payload_buffer,
+                                                                      sizeof(payload_buffer));
                     }
                     break;
 
                 case ESOCORE_DEVICE_TYPE_CURRENT:
-                    if (current_sensor_read_data(&current_data, 500) &&
-                        esocore_protocol_send_sensor_data((const uint8_t *)&current_data,
-                                                          sizeof(current_data))) {
-                        data_sent = true;
-                        system_status.total_measurements++;
+                    if (current_sensor_read_data(&current_data, 500)) {
+                        payload_length = current_sensor_encode_data(&current_data, payload_buffer,
+                                                                    sizeof(payload_buffer));
                     }
                     break;
 
                 default:
                     break;
+            }
+
+            if (payload_length > 0 && esocore_protocol_send_sensor_data(payload_buffer, payload_length)) {
+                data_sent = true;
+                system_status.total_measurements++;
             }
 
             if (data_sent) {
