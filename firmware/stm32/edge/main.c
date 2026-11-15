@@ -314,6 +314,7 @@ static bool init_subsystems(void)
         .enable_12v_power    = true,
         .discovery_interval_ms = 5000,
         .max_sensors         = 32,
+        .get_time_ms         = system_clock_get_tick,
     };
     sensor_bus_init(&sbus_cfg);
 #endif
@@ -388,6 +389,7 @@ static bool init_subsystems(void)
 #endif
 
     /* --- Protocol (RS-485 sensor communication) --- */
+    esocore_protocol_set_time_source(system_clock_get_tick);
     esocore_protocol_init(DEVICE_ADDRESS, DEVICE_TYPE);
 
     return true;

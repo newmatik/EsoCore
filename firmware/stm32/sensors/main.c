@@ -365,6 +365,10 @@ static bool initialize_system(void) {
     }
     printf("✓ Power management initialized\n");
 
+    /* No millisecond tick yet (the STM32G0 SysTick support is not in the
+     * repository; system_uptime_ms is simulated in the loop), so no clock is
+     * set: esocore_protocol_receive_message() reads once and returns. Pass the
+     * tick with esocore_protocol_set_time_source() once it exists. */
     esocore_protocol_register_command_handler(handle_command);
     if (!esocore_protocol_init(device_address, device_type)) {
         printf("ERROR: Protocol initialization failed\n");

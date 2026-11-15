@@ -41,6 +41,9 @@ static uint8_t sequence_number = 0;
 /* Application handler for ESOCORE_MSG_COMMAND */
 static esocore_command_handler_t command_handler = NULL;
 
+/* Millisecond clock (esocore_protocol_set_time_source); NULL: none */
+static esocore_time_fn_t protocol_time_source = NULL;
+
 /* ============================================================================
  * Hardware Abstraction Layer (HAL)
  * ============================================================================ */
@@ -120,11 +123,13 @@ static bool protocol_hw_flush_buffers(void) {
 /**
  * @brief Get current timestamp in milliseconds
  *
+ * Reads the clock set with esocore_protocol_set_time_source(). Callers check
+ * protocol_time_source first: without a clock this returns 0.
+ *
  * @return Current timestamp
  */
 static uint32_t protocol_get_timestamp_ms(void) {
-    /* TODO: Get current system timestamp */
-    return 0;
+    return protocol_time_source ? protocol_time_source() : 0;
 }
 
 /* ============================================================================
@@ -317,6 +322,13 @@ void esocore_protocol_deinit(void) {
 }
 
 /**
+ * @brief Set the millisecond clock
+ */
+void esocore_protocol_set_time_source(esocore_time_fn_t get_time_ms) {
+    protocol_time_source = get_time_ms;
+}
+
+/**
  * @brief Register the handler for ESOCORE_MSG_COMMAND
  */
 void esocore_protocol_register_command_handler(esocore_command_handler_t handler) {
@@ -373,6 +385,7 @@ bool esocore_protocol_receive_message(esocore_message_t *message, uint32_t timeo
     }
 
     uint32_t start_time = protocol_get_timestamp_ms();
+    bool polled = false;
 
     for (;;) {
         /* Take every complete frame out of the buffer */
@@ -382,7 +395,8 @@ bool esocore_protocol_receive_message(esocore_message_t *message, uint32_t timeo
                 receive_buffer, receive_buffer_index, message, &consumed);
 
             if (status == ESOCORE_FRAME_INCOMPLETE) {
-                if (protocol_get_timestamp_ms() - last_receive_time_ms <=
+                if (!protocol_time_source ||
+                    protocol_get_timestamp_ms() - last_receive_time_ms <=
                     ESOCORE_PROTOCOL_FRAME_GAP_TIMEOUT_MS) {
                     break; /* Wait for the rest of the frame */
                 }
@@ -422,7 +436,11 @@ bool esocore_protocol_receive_message(esocore_message_t *message, uint32_t timeo
             }
         }
 
-        if (protocol_get_timestamp_ms() - start_time > timeout_ms) {
+        /* Without a clock the timeout cannot be measured: read once, then give up */
+        bool expired = protocol_time_source
+                           ? protocol_get_timestamp_ms() - start_time > timeout_ms
+                           : polled;
+        if (expired) {
             timeout_errors++;
             return false;
         }
@@ -432,6 +450,7 @@ bool esocore_protocol_receive_message(esocore_message_t *message, uint32_t timeo
             sizeof(receive_buffer) - receive_buffer_index,
             10 /* Small timeout for polling */
         );
+        polled = true;
 
         if (received > 0) {
             receive_buffer_index += (uint32_t)received;

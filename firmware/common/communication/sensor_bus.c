@@ -64,7 +64,7 @@ static uint32_t sb_last_rx_ms = 0;      /* Time the last byte arrived */
 
 /* Timing */
 static uint32_t sb_last_discovery_ms  = 0;
-static uint32_t sb_current_time_ms    = 0;  /* Updated externally or via SysTick */
+static bool     sb_discovery_due      = false; /* Discover on the next poll */
 
 /* Sequence number of the next frame the Edge sends */
 static uint8_t sb_tx_sequence = 0;
@@ -81,15 +81,14 @@ static void                        *sb_cb_ctx     = NULL;
 /**
  * @brief Get current system time in milliseconds
  *
- * TODO: Replace with actual SysTick or HAL timer query.
- * For now returns a module-internal counter that must be updated
- * externally or hooked to the system tick.
+ * Reads the clock passed in sensor_bus_config_t.get_time_ms
+ * (system_clock_get_tick on the Edge). sensor_bus_init() rejects a
+ * configuration without one.
  *
- * @return Current time in milliseconds
+ * @return Current time in milliseconds (wraps at 2^32)
  */
 static uint32_t sbus_get_time_ms(void) {
-    /* TODO: Implement using HAL timer or SysTick */
-    return sb_current_time_ms;
+    return sb_config.get_time_ms();
 }
 
 /* ============================================================================
@@ -378,20 +377,19 @@ static void sbus_parse_frames(bool stale) {
 }
 
 static void sbus_process_rx(void) {
-    uint8_t byte;
-    bool received = false;
+    uint32_t now = sbus_get_time_ms();
 
-    while (sbus_rx_read(&byte)) {
-        sb_frame_buf[sb_frame_len++] = byte;
-        received = true;
-        sbus_parse_frames(false);
+    /* A partial frame whose next byte did not come within the gap timeout is
+     * abandoned before newer bytes are appended to it. */
+    if (sb_frame_len > 0 && now - sb_last_rx_ms > ESOCORE_PROTOCOL_FRAME_GAP_TIMEOUT_MS) {
+        sbus_parse_frames(true);
     }
 
-    uint32_t now = sbus_get_time_ms();
-    if (received) {
+    uint8_t byte;
+    while (sbus_rx_read(&byte)) {
+        sb_frame_buf[sb_frame_len++] = byte;
         sb_last_rx_ms = now;
-    } else if (sb_frame_len > 0 && now - sb_last_rx_ms > ESOCORE_PROTOCOL_FRAME_GAP_TIMEOUT_MS) {
-        sbus_parse_frames(true);
+        sbus_parse_frames(false);
     }
 }
 
@@ -490,7 +488,7 @@ static void sbus_handle_heartbeat(uint8_t address) {
  * @brief Initialize the sensor bus manager
  */
 bool sensor_bus_init(const sensor_bus_config_t *config) {
-    if (!config || sb_initialized) {
+    if (!config || !config->get_time_ms || sb_initialized) {
         return false;
     }
 
@@ -547,7 +545,8 @@ bool sensor_bus_init(const sensor_bus_config_t *config) {
     sb_rx_tail = 0;
     sb_frame_len = 0;
     sb_last_discovery_ms = 0;
-    sb_current_time_ms = 0;
+    sb_discovery_due = false;
+    sb_last_rx_ms = 0;
 
     sb_status.state = SBUS_STATE_IDLE;
     sb_initialized = true;
@@ -627,8 +626,8 @@ bool sensor_bus_start(void) {
 
     sb_status.state = SBUS_STATE_RUNNING;
 
-    /* Trigger initial discovery */
-    sb_last_discovery_ms = 0; /* Force immediate discovery on first poll */
+    /* Discover on the first poll */
+    sb_discovery_due = true;
 
     return true;
 }
@@ -662,22 +661,26 @@ bool sensor_bus_poll(void) {
     bool activity = false;
     uint32_t now = sbus_get_time_ms();
 
-    /* Process incoming data from RX buffer */
+    /* Process incoming data from RX buffer; a partial frame is also checked
+     * when nothing arrived, so the gap timeout can abandon it. */
     if (sbus_rx_available() > 0) {
-        sbus_process_rx();
         activity = true;
+    }
+    if (activity || sb_frame_len > 0) {
+        sbus_process_rx();
     }
 
     /* Check for device heartbeat timeouts */
     sbus_check_timeouts();
 
-    /* Periodic discovery for hot-plug detection */
-    if (sb_config.discovery_interval_ms > 0) {
-        if ((now - sb_last_discovery_ms) >= sb_config.discovery_interval_ms) {
-            sensor_bus_discover();
-            sb_last_discovery_ms = now;
-            activity = true;
-        }
+    /* Discovery on the first poll after start, then periodic for hot-plug detection */
+    if (sb_discovery_due ||
+        (sb_config.discovery_interval_ms > 0 &&
+         (now - sb_last_discovery_ms) >= sb_config.discovery_interval_ms)) {
+        sensor_bus_discover();
+        sb_last_discovery_ms = now;
+        sb_discovery_due = false;
+        activity = true;
     }
 
     return activity;

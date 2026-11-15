@@ -62,6 +62,14 @@ typedef enum {
  * ============================================================================ */
 
 /**
+ * @brief Millisecond clock
+ *
+ * Returns a free-running millisecond counter that wraps at 2^32 (the Edge
+ * passes system_clock_get_tick). The bus only uses differences of two values.
+ */
+typedef uint32_t (*sensor_bus_time_fn_t)(void);
+
+/**
  * @brief Sensor bus configuration structure
  */
 typedef struct {
@@ -70,6 +78,7 @@ typedef struct {
     bool     enable_12v_power;      /* Enable 12V sensor bus power on start */
     uint32_t discovery_interval_ms; /* Periodic discovery interval (ms) */
     uint8_t  max_sensors;           /* Maximum number of sensors to track */
+    sensor_bus_time_fn_t get_time_ms; /* Millisecond clock (required) */
 } sensor_bus_config_t;
 
 /* ============================================================================
@@ -155,8 +164,9 @@ typedef void (*sensor_bus_data_callback_t)(uint8_t address, uint8_t sequence,
  * 12V PSU enable) according to the supplied configuration. Does not start
  * the bus; call sensor_bus_start() after initialization.
  *
- * @param config Pointer to sensor bus configuration
- * @return true if initialization successful, false otherwise
+ * @param config Pointer to sensor bus configuration (get_time_ms must be set)
+ * @return true if initialization successful, false otherwise (also when
+ *         config->get_time_ms is NULL)
  */
 bool sensor_bus_init(const sensor_bus_config_t *config);
 
@@ -194,7 +204,9 @@ bool sensor_bus_stop(void);
  *
  * Must be called periodically (e.g. from main loop). Handles incoming
  * messages, processes heartbeats, detects device timeouts, and triggers
- * periodic discovery scans.
+ * discovery scans: on the first poll after sensor_bus_start(), then every
+ * discovery_interval_ms. A device that has sent nothing for
+ * SBUS_HEARTBEAT_TIMEOUT_MULT heartbeat intervals is reported offline.
  *
  * @return true if any activity was processed, false otherwise
  */
