@@ -16,6 +16,9 @@ overrides:
   esbuild: '^0.28.1'
   '@fastify/busboy': '^3.2.1'
   '@nuxt/devtools': '^3.3.1'
+  # GHSA-mjrq-cffv-q4qc: @nuxt/ui 4.12 asks for @nuxt/schema ^4.6.1 and the lockfile kept
+  # 4.6.2 beside nuxt's 4.6.4. Remove once @nuxt/ui's own range starts at 4.6.4.
+  '@nuxt/schema': '^4.6.4'
   '@tiptap/core': '^3.30.5'
   baseline-browser-mapping: '^2.11.0'
   'brace-expansion@^2': '^2.1.7'
