@@ -30,7 +30,10 @@ function watchProblems(page: Page) {
   const problems: string[] = []
   page.on('pageerror', error => problems.push(`page error: ${error.message}`))
   page.on('requestfailed', request => {
-    if (request.url().startsWith(apiBase)) {
+    // The browser aborts requests still in flight when the test navigates on
+    // (net::ERR_ABORTED). That is the test moving faster than the page, not a
+    // failing API: a real failure shows as another error text or an HTTP status.
+    if (request.url().startsWith(apiBase) && request.failure()?.errorText !== 'net::ERR_ABORTED') {
       problems.push(`failed request: ${request.url()} ${request.failure()?.errorText}`)
     }
   })
