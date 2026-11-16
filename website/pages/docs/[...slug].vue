@@ -18,8 +18,7 @@
               class="result"
               @click="clearSearch"
             >
-              <strong>{{ result.title }}</strong
-              ><br />
+              <strong>{{ result.title }}</strong><br />
               <small v-html="result.snippet" />
             </NuxtLink>
           </div>
