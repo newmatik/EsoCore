@@ -24,16 +24,12 @@ from drf_spectacular.views import (
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
-from rest_framework import routers
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from esocore_api.auth_views import login_view, logout_view, me_view
 from esocore_api.branding import ADMIN_TITLE
 from esocore_api.dashboard_views import dashboard_summary
-
-# API Router for management endpoints
-router = routers.DefaultRouter()
 
 # Include app URLs
 urlpatterns = [
@@ -55,7 +51,6 @@ urlpatterns = [
     # Dashboard
     path("api/dashboard/summary/", dashboard_summary, name="dashboard-summary"),
     # Management API endpoints (Session auth)
-    path("api/", include(router.urls)),
     path("api/devices/", include("devices.urls")),
     path("api/assets/", include("assets.urls")),
     path("api/telemetry/", include("telemetry.urls")),
