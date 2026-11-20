@@ -34,6 +34,16 @@ class CorsAllowedOriginsSettingTests(SimpleTestCase):
         self.assertEqual(settings.CORS_ALLOWED_ORIGINS, expected)
 
 
+class ApiRootTests(TestCase):
+    """``GET /api/`` answers with the hand-written endpoint listing."""
+
+    def test_api_root_lists_the_endpoints(self):
+        response = APIClient().get("/api/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["docs"], "/api/docs/")
+        self.assertEqual(response.json()["devices"], "/api/devices/")
+
+
 class StableOrderingTests(TestCase):
     """Pages are cut with LIMIT/OFFSET, so every list needs a total order."""
 
