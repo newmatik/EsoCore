@@ -17,7 +17,7 @@ The website is built with [Nuxt.js](https://nuxt.com) and deployed as static ass
 
 ### Prerequisites
 
-- Node.js 24 (24.11 or newer; CI and `.nvmrc` use 24.22.3)
+- Node.js 24 (24.22.3, pinned in `.nvmrc`, `engines` and CI)
 - pnpm 8 or later
 
 ### Setup

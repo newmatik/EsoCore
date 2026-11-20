@@ -18,7 +18,7 @@ tools, and alerting interfaces.
 | **Real-time**        | socket.io-client (planned) | 4.8       |
 | **Auth**             | Token auth (Pinia store)   | --        |
 | **Utilities**        | VueUse                     | 12.0      |
-| **Node.js**          | 22+                        | --        |
+| **Node.js**          | 24.22.3                    | --        |
 | **Package Manager**  | pnpm                       | 10+       |
 
 ---
@@ -102,7 +102,7 @@ portal/
 
 ### Prerequisites
 
-- Node.js 24 (24.11 or newer; CI and `.nvmrc` use 24.22.3)
+- Node.js 24 (24.22.3, pinned in `.nvmrc`, `engines` and CI)
 - pnpm 10 or later
 - The Backend Server running at `http://localhost:8000` (see [Backend Server](/docs/backend-server))
 
