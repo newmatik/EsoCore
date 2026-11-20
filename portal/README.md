@@ -25,7 +25,7 @@ Modern Vue.js frontend application for the EsoCore IoT monitoring system, built 
 
 ### Prerequisites
 
-- Node.js 24 (24.11 or newer; CI and `.nvmrc` use 24.22.3)
+- Node.js 24 (24.22.3, pinned in `.nvmrc`, `engines` and CI)
 - pnpm 9+
 
 ### Installation
