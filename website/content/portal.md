@@ -18,7 +18,7 @@ tools, and alerting interfaces.
 | **Real-time**        | socket.io-client (planned) | 4.8       |
 | **Auth**             | Token auth (Pinia store)   | --        |
 | **Utilities**        | VueUse                     | 12.0      |
-| **Node.js**          | 22+                        | --        |
+| **Node.js**          | 24.22.3                    | --        |
 | **Package Manager**  | pnpm                       | 10+       |
 
 ---
