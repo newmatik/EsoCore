@@ -119,11 +119,13 @@ jobs:
 
       - name: Upload smoke test report
         if: failure()
+        # A blocked artifact storage (newmatik/agent-skills#158) must not fail the job.
+        continue-on-error: true
         uses: actions/upload-artifact@v7
         with:
           name: portal-smoke-report
           path: |
             portal/playwright-report/
             portal/test-results/
-          retention-days: 7
+          retention-days: 5
           if-no-files-found: ignore
