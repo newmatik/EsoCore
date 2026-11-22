@@ -194,27 +194,6 @@ static void oled_set_pixel_buffer(uint8_t x, uint8_t y, oled_color_t color) {
 }
 
 /**
- * @brief Get pixel from buffer
- *
- * @param x X coordinate
- * @param y Y coordinate
- * @return Pixel value (0 or 1)
- */
-static uint8_t oled_get_pixel_buffer(uint8_t x, uint8_t y) {
-    if (x >= OLED_WIDTH || y >= OLED_HEIGHT) {
-        return 0;
-    }
-
-    uint16_t index = x + (y / 8) * OLED_WIDTH;
-
-    if (index >= sizeof(oled_buffer)) {
-        return 0;
-    }
-
-    return (oled_buffer[index] >> (y % 8)) & 0x01;
-}
-
-/**
  * @brief Draw horizontal line in buffer
  *
  * @param x0 Starting X coordinate
