@@ -23,26 +23,26 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@nuxt/ui": "^4.12.0",
+    "@nuxt/ui": "^4.13.0",
     "@pinia/nuxt": "^1.0.3",
     "chart.js": "^4.6.1",
     "nuxt": "~4.6.4",
     "pinia": "^4.1.0",
     "tailwindcss": "^4.3.5",
     "vue": "^3.5.45",
-    "vue-chartjs": "^5.3.4",
-    "vue-router": "^5.5.0"
+    "vue-chartjs": "^5.3.6",
+    "vue-router": "^5.5.1"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.154",
+    "@iconify-json/lucide": "^1.2.157",
     "@nuxt/eslint-config": "^1.17.0",
-    "@playwright/test": "1.65.0",
+    "@playwright/test": "1.65.1",
     "@types/node": "^26.6.6",
-    "eslint": "^10.14.0",
+    "eslint": "^10.15.0",
     "eslint-plugin-vue": "^10.12.1",
     "prettier": "^3.10.1",
     "typescript": "^6.0.3",
-    "vitest": "^5.1.0",
+    "vitest": "^5.1.1",
     "vue-tsc": "^3.3.14"
   }
 }
