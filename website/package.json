@@ -22,19 +22,19 @@
     "test": "node --experimental-strip-types --test tests/*.test.mjs"
   },
   "dependencies": {
-    "marked": "^18.2.0",
+    "marked": "^18.2.1",
     "nuxt": "~4.6.4",
     "vue": "^3.5.45",
-    "vue-router": "^4.6.4"
+    "vue-router": "^4.6.5"
   },
   "devDependencies": {
     "@nuxt/eslint-config": "^1.17.0",
     "@types/node": "^26.6.6",
-    "eslint": "^10.14.0",
+    "eslint": "^10.15.0",
     "eslint-plugin-vue": "^10.12.1",
     "prettier": "^3.10.1",
     "typescript": "^6.0.3",
     "vue-tsc": "^3.3.14",
-    "wrangler": "^4.161.0"
+    "wrangler": "^4.165.0"
   }
 }
