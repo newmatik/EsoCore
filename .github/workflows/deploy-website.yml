@@ -42,7 +42,7 @@ jobs:
   behind:
     name: Production behind main?
     if: github.event_name == 'schedule' || inputs.catch_up == true
-    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ vars.LINUX_RUNNER || 'beast' }}
     timeout-minutes: 5
     permissions:
       actions: read
@@ -112,7 +112,7 @@ jobs:
     needs: behind
     # Push and manual runs skip `behind`; the schedule deploys only what it found missing.
     if: ${{ !cancelled() && (needs.behind.result == 'skipped' || needs.behind.outputs.deploy == 'true') }}
-    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ vars.LINUX_RUNNER || 'beast' }}
     timeout-minutes: 20
     environment:
       name: production
