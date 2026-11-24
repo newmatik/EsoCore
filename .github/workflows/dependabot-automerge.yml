@@ -34,7 +34,7 @@ concurrency:
 
 jobs:
   automerge:
-    runs-on: ${{ vars.LINUX_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ vars.LINUX_RUNNER || 'beast' }}
     timeout-minutes: 5
     # Only PRs that Dependabot opened, from a branch in this repo, and only
     # when Dependabot itself pushed (opened, rebased, recreated). A person
