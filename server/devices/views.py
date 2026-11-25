@@ -74,7 +74,7 @@ class FirmwareBundleViewSet(viewsets.ModelViewSet):
         firmware = self.get_object()
         devices = Device.objects.none()
         if request.user.is_authenticated:
-            devices = Device.objects.filter(
+            devices = Device.objects.select_related("site", "configuration").filter(
                 model__in=firmware.supported_models,
                 firmware_version__lt=firmware.version,
                 site__in=request.user.sites.all(),

@@ -318,6 +318,33 @@ class FirmwareBundleViewSetTests(TestCase):
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["serial_number"], "SN-001")
 
+    def test_devices_action_query_count_does_not_grow_with_devices(self):
+        self.client.force_authenticate(self.user)
+        expected = {}
+        for index in range(25):
+            device = Device.objects.create(
+                serial_number=f"PERF-{index}",
+                model="Edge v1",
+                firmware_version="1.0.0",
+                api_key=f"perf-key-{index}",
+                api_secret="unused",
+                site=self.site,
+            )
+            if index % 2 == 0:
+                DeviceConfiguration.objects.create(
+                    device=device, sampling_rates={"vibration": index + 1}
+                )
+            expected[str(device.pk)] = DeviceSerializer(device).data
+            if index in (0, 24):
+                with self.assertNumQueries(2):
+                    response = self.client.get(
+                        f"/api/devices/firmware/{self.fw.pk}/devices/"
+                    )
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
+                self.assertEqual(
+                    {str(row["id"]): row for row in response.data}, expected
+                )
+
     def test_devices_action_anonymous_is_empty(self):
         Device.objects.create(
             serial_number="SN-001",
