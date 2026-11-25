@@ -15,7 +15,7 @@ on:
       - "website/**"
       - ".github/workflows/deploy-website.yml"
   schedule:
-    - cron: '53 * * * *'
+    - cron: '53 4 * * *'
   workflow_dispatch:
     inputs:
       catch_up:
