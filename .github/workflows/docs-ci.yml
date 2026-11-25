@@ -25,7 +25,7 @@ concurrency:
 jobs:
   markdown:
     name: Markdown lint
-    runs-on: ${{ vars.LINUX_RUNNER || 'beast' }}
+    runs-on: ${{ vars.LIGHT_RUNNER || 'beast-light' }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
