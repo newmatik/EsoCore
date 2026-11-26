@@ -1,5 +1,4 @@
 import hashlib
-import hmac
 import uuid
 
 from django.contrib.auth.models import User
@@ -54,11 +53,6 @@ class Device(models.Model):
     def set_api_secret(self, raw_secret: str) -> None:
         """Hash and store the API secret."""
         self.api_secret = hashlib.sha256(raw_secret.encode()).hexdigest()
-
-    def check_api_secret(self, raw_secret: str) -> bool:
-        """Verify a raw secret against the stored hash (constant-time)."""
-        candidate = hashlib.sha256(raw_secret.encode()).hexdigest()
-        return hmac.compare_digest(candidate, self.api_secret)
 
 
 class DeviceConfiguration(models.Model):

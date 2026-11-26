@@ -25,7 +25,6 @@ static modbus_data_map_t modbus_data_map;
 static modbus_statistics_t modbus_statistics;
 static bool modbus_initialized = false;
 static uint8_t modbus_rx_buffer[MODBUS_MAX_FRAME_SIZE];
-static uint8_t modbus_tx_buffer[MODBUS_MAX_FRAME_SIZE];
 static uint16_t modbus_rx_index = 0;
 
 /* True while the data map arrays were allocated by modbus_rtu_init(). Arrays
@@ -122,52 +121,6 @@ bool modbus_validate_crc(const modbus_frame_t *frame) {
 /* ============================================================================
  * Frame Building and Parsing
  * ============================================================================ */
-
-/**
- * @brief Build Modbus RTU frame
- *
- * @param address Slave address
- * @param function_code Function code
- * @param data Pointer to data payload
- * @param data_length Data length
- * @param frame Pointer to frame structure to fill
- * @return true if frame built successfully, false otherwise
- */
-static bool modbus_build_frame(uint8_t address, uint8_t function_code,
-                              const uint8_t *data, uint16_t data_length,
-                              modbus_frame_t *frame) {
-    if (!frame || data_length > MODBUS_MAX_FRAME_SIZE - 4) {
-        return false;
-    }
-
-    frame->address = address;
-    frame->function_code = function_code;
-    frame->data_length = data_length;
-    frame->timestamp = 0; /* TODO: Add timestamp */
-
-    if (data && data_length > 0) {
-        frame->data = modbus_tx_buffer;
-        memcpy(frame->data, data, data_length);
-    } else {
-        frame->data = NULL;
-    }
-
-    /* Calculate CRC */
-    uint8_t crc_data[MODBUS_MAX_FRAME_SIZE];
-    uint16_t crc_data_length = 0;
-
-    crc_data[crc_data_length++] = address;
-    crc_data[crc_data_length++] = function_code;
-
-    if (data && data_length > 0) {
-        memcpy(&crc_data[crc_data_length], data, data_length);
-        crc_data_length += data_length;
-    }
-
-    frame->crc = modbus_calculate_crc(crc_data, crc_data_length);
-
-    return true;
-}
 
 /**
  * @brief Parse Modbus RTU frame from raw data

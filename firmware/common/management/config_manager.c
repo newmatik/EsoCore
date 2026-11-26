@@ -137,18 +137,6 @@ static int16_t find_free_parameter_slot(void) {
 }
 
 /**
- * @brief Find parameter by name
- */
-static int16_t find_parameter_by_name(const char *name) {
-    for (uint16_t i = 0; i < ESOCORE_MAX_CONFIG_PARAMETERS; i++) {
-        if (parameter_registered[i] && strcmp(parameter_registry[i].name, name) == 0) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-/**
  * @brief Register a configuration parameter
  */
 static bool register_parameter_internal(const esocore_config_parameter_t *parameter) {
